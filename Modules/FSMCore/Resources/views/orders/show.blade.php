@@ -4,10 +4,21 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>Order: {{ $order->name }}</h2>
     <div class="d-flex gap-2">
+        @if(class_exists(\Modules\FSMSkill\Http\Controllers\OrderSkillController::class))
+            <a href="{{ route('fsmskill.order-skills.index', $order->id) }}" class="btn btn-outline-info">Skill Requirements</a>
+        @endif
         <a href="{{ route('fsmcore.orders.edit', $order->id) }}" class="btn btn-primary">Edit</a>
         <a href="{{ route('fsmcore.orders.index') }}" class="btn btn-outline-secondary">Back</a>
     </div>
 </div>
+
+@if(session('skill_warning'))
+    @php $sw = (string) session('skill_warning'); $isError = str_starts_with($sw, 'Skill mismatch'); @endphp
+    <div class="alert {{ $isError ? 'alert-danger' : 'alert-warning' }} alert-dismissible fade show" role="alert">
+        ⚠ {{ $sw }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
 
 <div class="row g-3">
     <div class="col-md-8">
@@ -79,6 +90,57 @@
                     <span class="badge me-1" style="background:{{ $tag->color ?? '#6c757d' }};">{{ $tag->name }}</span>
                 @endforeach
             </div>
+        </div>
+        @endif
+
+        @if(class_exists(\Modules\FSMSkill\Models\FSMOrderSkillRequirement::class) && \Illuminate\Support\Facades\Schema::hasTable('fsm_order_skill_requirements'))
+        @php
+            $skillReqs = \Modules\FSMSkill\Models\FSMOrderSkillRequirement::with(['skill.skillType', 'skillLevel'])
+                ->where('fsm_order_id', $order->id)->get();
+        @endphp
+        <div class="card mb-3">
+            <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+                <span>Skill Requirements</span>
+                <a href="{{ route('fsmskill.order-skills.index', $order->id) }}" class="btn btn-sm btn-outline-info">Manage</a>
+            </div>
+            @if($skillReqs->isEmpty())
+                <div class="card-body text-muted">No skill requirements set.</div>
+            @else
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                    <thead class="table-light"><tr><th>Skill</th><th>Type</th><th>Min. Level</th>
+                    @if($order->person_id)<th>Match</th>@endif
+                    </tr></thead>
+                    <tbody>
+                    @foreach($skillReqs as $req)
+                        @php
+                            $matchClass = '';
+                            $matchIcon  = '';
+                            if ($order->person_id && class_exists(\Modules\FSMSkill\Services\SkillMatchService::class)) {
+                                $empSkill = \Modules\FSMSkill\Models\FSMEmployeeSkill::where('user_id', $order->person_id)
+                                    ->where('skill_id', $req->skill_id)->first();
+                                if (!$empSkill) {
+                                    $matchClass = 'table-danger'; $matchIcon = '✘';
+                                } elseif ($empSkill->isExpired()) {
+                                    $matchClass = 'table-danger'; $matchIcon = '✘ expired';
+                                } elseif ($empSkill->isExpiringSoon()) {
+                                    $matchClass = 'table-warning'; $matchIcon = '⚠ soon';
+                                } else {
+                                    $matchClass = 'table-success'; $matchIcon = '✔';
+                                }
+                            }
+                        @endphp
+                        <tr class="{{ $matchClass }}">
+                            <td>{{ $req->skill?->name ?? '—' }}</td>
+                            <td>{{ $req->skill?->skillType?->name ?? '—' }}</td>
+                            <td>{{ $req->skillLevel?->name ?? 'Any' }}</td>
+                            @if($order->person_id)<td>{{ $matchIcon }}</td>@endif
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
+            @endif
         </div>
         @endif
     </div>
