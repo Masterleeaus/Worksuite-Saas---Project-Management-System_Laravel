@@ -32,6 +32,10 @@ class FSMOrder extends Model
         'billing_amount',
         'hourly_rate',
         'is_invoiced',
+        // FSMWorkflow fields (added by FSMWorkflow module migration)
+        'size_id',
+        'estimated_sqm',
+        'room_count',
     ];
 
     protected $casts = [
@@ -49,6 +53,9 @@ class FSMOrder extends Model
         'scheduled_date_end' => 'datetime',
         'date_start' => 'datetime',
         'date_end' => 'datetime',
+        'size_id' => 'integer',
+        'estimated_sqm' => 'integer',
+        'room_count' => 'integer',
     ];
 
     public function location()
@@ -120,6 +127,16 @@ class FSMOrder extends Model
     public function photos()
     {
         return $this->hasMany(FSMOrderPhoto::class, 'fsm_order_id');
+    }
+
+    public function size()
+    {
+        if (!class_exists(\Modules\FSMWorkflow\Models\FSMSize::class)) {
+            return null;
+        }
+        return $this->belongsTo(\Modules\FSMWorkflow\Models\FSMSize::class, 'size_id');
+    }
+
     public function invoices()
     {
         if (!class_exists(\Modules\FSMSales\Models\FSMSalesInvoice::class)) {

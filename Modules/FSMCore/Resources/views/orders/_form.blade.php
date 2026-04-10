@@ -171,3 +171,33 @@
     </div>
 </div>
 @endif
+
+
+{{-- FSMWorkflow: Job size fields (shown only when module is active) --}}
+@if(class_exists(\Modules\FSMWorkflow\Models\FSMSize::class) && \Illuminate\Support\Facades\Schema::hasTable('fsm_sizes') && isset($sizes) && $sizes->count())
+<hr>
+<h6 class="text-muted fw-semibold mb-3">📐 Job Size</h6>
+<div class="row g-3">
+    <div class="col-md-4">
+        <label class="form-label">Job Size Tier</label>
+        <select name="size_id" class="form-select">
+            <option value="">— None —</option>
+            @foreach($sizes as $size)
+                <option value="{{ $size->id }}" {{ (int)old('size_id', $order?->size_id ?? 0) === $size->id ? 'selected' : '' }}>
+                    [{{ $size->code }}] {{ $size->name }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">Estimated Area (m²)</label>
+        <input type="number" min="0" name="estimated_sqm" class="form-control"
+               value="{{ old('estimated_sqm', $order?->estimated_sqm) }}" placeholder="Optional">
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">Room Count</label>
+        <input type="number" min="0" name="room_count" class="form-control"
+               value="{{ old('room_count', $order?->room_count) }}" placeholder="Used for payroll commission">
+    </div>
+</div>
+@endif
