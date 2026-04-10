@@ -11,18 +11,39 @@ window.axios = require('axios');
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 /**
- * Echo exposes an expressive API for subscribing to channels and listening
- * for events that are broadcast by Laravel. Echo and event broadcasting
- * allows your team to easily build robust real-time web applications.
+ * Echo + Laravel Reverb
+ *
+ * Laravel Reverb is our self-hosted WebSocket server. It speaks the Pusher
+ * protocol, so pusher-js is still used as the transport layer — no extra
+ * client package required.
+ *
+ * Environment variables (set in .env or webpack.mix.js):
+ *   VITE_REVERB_APP_KEY   / MIX_REVERB_APP_KEY
+ *   VITE_REVERB_HOST      / MIX_REVERB_HOST
+ *   VITE_REVERB_PORT      / MIX_REVERB_PORT
+ *   VITE_REVERB_SCHEME    / MIX_REVERB_SCHEME
+ *
+ * Start the server: php artisan reverb:start
  */
 
 import Echo from 'laravel-echo';
+import Pusher from 'pusher-js';
 
-window.Pusher = require('pusher-js');
+window.Pusher = Pusher;
+
+// Support both Vite (VITE_) and Laravel Mix (MIX_) env prefixes.
+const reverbKey    = process.env.VITE_REVERB_APP_KEY    ?? process.env.MIX_REVERB_APP_KEY    ?? 'worksuite-reverb-key';
+const reverbHost   = process.env.VITE_REVERB_HOST       ?? process.env.MIX_REVERB_HOST       ?? 'localhost';
+const reverbPort   = process.env.VITE_REVERB_PORT       ?? process.env.MIX_REVERB_PORT       ?? 8080;
+const reverbScheme = process.env.VITE_REVERB_SCHEME     ?? process.env.MIX_REVERB_SCHEME     ?? 'http';
 
 window.Echo = new Echo({
-    broadcaster: 'pusher',
-    key: process.env.MIX_PUSHER_APP_KEY,
-    cluster: process.env.MIX_PUSHER_APP_CLUSTER,
-    forceTLS: true
+    broadcaster:    'reverb',
+    key:            reverbKey,
+    wsHost:         reverbHost,
+    wsPort:         reverbScheme === 'https' ? 443 : reverbPort,
+    wssPort:        443,
+    forceTLS:       reverbScheme === 'https',
+    enabledTransports: ['ws', 'wss'],
+    disableStats:   true,
 });

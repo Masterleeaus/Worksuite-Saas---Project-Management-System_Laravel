@@ -1,4 +1,5 @@
 const mix = require('laravel-mix');
+require('dotenv').config(); // load .env so MIX_REVERB_* are available to webpack
 
 /*
  |--------------------------------------------------------------------------
