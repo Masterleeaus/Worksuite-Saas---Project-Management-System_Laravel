@@ -12,6 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('ai_tools_usage_history')) {
+            return;
+        }
         Schema::create('ai_tools_usage_history', function (Blueprint $table) {
             $table->id();
             $table->integer('company_id')->unsigned()->nullable();

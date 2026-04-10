@@ -10,6 +10,9 @@ return new class extends Migration
 {
     public function up()
     {
+        if (Schema::hasTable('payroll_global_settings')) {
+            return;
+        }
         Schema::create('payroll_global_settings', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('purchase_code')->nullable();
@@ -31,6 +34,9 @@ return new class extends Migration
         Schema::table('payroll_settings', function (Blueprint $table) {
             $table->dropColumn(['purchase_code']);
         });
+        if (! Schema::hasTable('payroll_settings')) {
+            return;
+        }
     }
 
     /**

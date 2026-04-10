@@ -13,6 +13,9 @@ class CreateServiceRequestsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('service_requests')) {
+            return;
+        }
         Schema::create('service_requests', function (Blueprint $table) {
             $table->uuid('id')->index()->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();

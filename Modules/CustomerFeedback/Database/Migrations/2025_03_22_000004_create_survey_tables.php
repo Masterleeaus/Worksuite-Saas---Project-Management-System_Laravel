@@ -8,6 +8,9 @@ return new class extends Migration {
     public function up(): void
     {
         // NPS Surveys
+        if (Schema::hasTable('nps_surveys')) {
+            return;
+        }
         Schema::create('nps_surveys', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();

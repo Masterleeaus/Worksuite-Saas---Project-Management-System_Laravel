@@ -13,6 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('employee_monthly_salaries')) {
+            return;
+        }
         Schema::table('employee_monthly_salaries', function (Blueprint $table) {
             $table->string('fixed_allowance')->after('basic_salary');
         });

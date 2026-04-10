@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('ai_agents')) {
+            return;
+        }
         Schema::create('ai_agents', function (Blueprint $t) {
             $t->bigIncrements('id');
             $t->unsignedBigInteger('tenant_id')->nullable();

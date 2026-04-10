@@ -18,6 +18,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('affiliate_settings')) {
+            return;
+        }
         Schema::create('affiliate_settings', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();

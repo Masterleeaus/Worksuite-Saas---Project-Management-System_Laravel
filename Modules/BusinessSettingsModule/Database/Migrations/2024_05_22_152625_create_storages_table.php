@@ -13,6 +13,9 @@ class CreateStoragesTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('storages')) {
+            return;
+        }
         Schema::create('storages', function (Blueprint $table) {
             $table->uuid('id')->primary()->index();
             $table->unsignedBigInteger('company_id')->nullable()->index();

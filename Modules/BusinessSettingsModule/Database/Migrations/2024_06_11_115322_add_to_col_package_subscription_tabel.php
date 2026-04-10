@@ -13,6 +13,9 @@ class AddToColPackageSubscriptionTabel extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('package_subscribers')) {
+            return;
+        }
         Schema::table('package_subscribers', function (Blueprint $table) {
             $table->foreignUuid('payment_id')->nullable();
         });

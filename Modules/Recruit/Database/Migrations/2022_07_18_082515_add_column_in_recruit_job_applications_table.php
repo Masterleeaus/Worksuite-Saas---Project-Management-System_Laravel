@@ -13,6 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('recruit_job_applications')) {
+            return;
+        }
         Schema::table('recruit_job_applications', function (Blueprint $table) {
             $table->enum('total_experience', ['fresher', '1-2', '3-4', '5-6', '7-8', '9-10', '11-12', '13-14', 'over-15'])->default(null)->nullable()->after('gender');
             $table->string('current_location')->nullable()->after('total_experience');

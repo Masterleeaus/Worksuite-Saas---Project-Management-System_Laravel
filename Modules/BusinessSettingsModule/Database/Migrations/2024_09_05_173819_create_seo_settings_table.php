@@ -13,6 +13,9 @@ class CreateSeoSettingsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('seo_settings')) {
+            return;
+        }
         Schema::create('seo_settings', function (Blueprint $table) {
             $table->uuid('id')->primary()->index();
             $table->unsignedBigInteger('company_id')->nullable()->index();

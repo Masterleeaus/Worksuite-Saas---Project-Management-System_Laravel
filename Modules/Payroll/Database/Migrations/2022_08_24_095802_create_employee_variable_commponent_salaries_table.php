@@ -13,6 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('employee_variable_salaries')) {
+            return;
+        }
         Schema::create('employee_variable_salaries', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('monthly_salary_id');

@@ -5,6 +5,9 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
   public function up(): void {
+    if (Schema::hasTable('pm_property_hazards')) {
+        return;
+    }
     Schema::create('pm_property_hazards', function (Blueprint $table) {
       $table->id();
       $table->unsignedBigInteger('company_id')->index();

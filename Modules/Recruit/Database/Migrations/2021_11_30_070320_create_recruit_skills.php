@@ -21,6 +21,9 @@ return new class extends Migration
     {
         \App\Models\Module::validateVersion(RecruitSetting::MODULE_NAME);
 
+        if (Schema::hasTable('recruit_skills')) {
+            return;
+        }
         Schema::create('recruit_skills', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();

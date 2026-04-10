@@ -63,10 +63,16 @@
                                         <th>{{$account->name}}</th>
                                         @foreach($months as $k => $m)
                                             @php
+    try {
+
                                                 $account_budget = $budget->where('accounting_account_id', $account->id)->first();
                                                 $value = !is_null($account_budget) && !is_null($account_budget->$m) 
                                                 ? $account_budget->$m : null;
-                                            @endphp
+                                            
+    } catch (\Exception $e) {
+        // Table may not exist yet
+    }
+@endphp
                                             <td>
                                                 @if(!is_null($value))
                                                     {{@num_format($value)}}  
@@ -155,10 +161,16 @@
                                 @endphp
                                 @foreach($accounts->where('account_primary_type', $account_type)->sortBy('name')->all() as $account)
                                     @php
+    try {
+
                                         $total = 0;
                                         $account_ids[]=$account->id;
                                         $account_budget = $budget->where('accounting_account_id', $account->id)->first();
-                                    @endphp
+                                    
+    } catch (\Exception $e) {
+        // Table may not exist yet
+    }
+@endphp
                                         <tr class="collapse-tr">
                                             <th>{{$account->name}}</th>
                                             <td>
@@ -272,9 +284,15 @@
                                 @endphp
                                 @foreach($accounts->where('account_primary_type', $account_type)->sortBy('name')->all() as $account)
                                     @php
+    try {
+
                                         $account_ids[]=$account->id;
                                         $account_budget = $budget->where('accounting_account_id', $account->id)->first();
-                                    @endphp
+                                    
+    } catch (\Exception $e) {
+        // Table may not exist yet
+    }
+@endphp
                                     <tr class="collapse-tr">
                                         <th>{{$account->name}}</th>
                                         <td>

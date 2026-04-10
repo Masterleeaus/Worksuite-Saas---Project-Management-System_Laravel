@@ -35,9 +35,15 @@
             @endphp
             @foreach($accounts->where('account_primary_type', $account_type)->sortBy('name')->all() as $account)
                 @php
+    try {
+
                     $account_ids[]=$account->id;
                     $account_budget = $budget->where('accounting_account_id', $account->id)->first();
-                @endphp
+                
+    } catch (\Exception $e) {
+        // Table may not exist yet
+    }
+@endphp
                 <tr>
                     <th align="left">{{$account->name}}</th>
                     <td align="left">

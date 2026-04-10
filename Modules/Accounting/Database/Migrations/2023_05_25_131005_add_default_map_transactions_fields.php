@@ -13,6 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('business_locations')) {
+            return;
+        }
         Schema::table('business_locations', function (Blueprint $table) {
             $table->text('accounting_default_map')->nullable()->after('custom_field4')
                 ->comment("Default transactions mapping of accounting module");

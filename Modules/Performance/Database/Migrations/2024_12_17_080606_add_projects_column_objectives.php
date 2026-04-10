@@ -12,6 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('objectives')) {
+            return;
+        }
         Schema::table('objectives', function (Blueprint $table) {
             $table->unsignedInteger('project_id')->after('id')->nullable();
             $table->foreign('project_id')->references('id')->on('projects')

@@ -13,6 +13,9 @@ class CreateAccountingAccountsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('accounting_accounts')) {
+            return;
+        }
         Schema::create('accounting_accounts', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');

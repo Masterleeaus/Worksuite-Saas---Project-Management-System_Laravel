@@ -13,6 +13,9 @@ class CreatePostAdditionalInformationTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('post_additional_information')) {
+            return;
+        }
         Schema::create('post_additional_information', function (Blueprint $table) {
             $table->id();
             $table->foreignUuid('post_id');

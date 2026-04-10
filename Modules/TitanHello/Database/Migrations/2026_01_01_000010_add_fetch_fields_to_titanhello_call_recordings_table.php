@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (! Schema::hasTable('titanhello_call_recordings')) {
+            return;
+        }
         Schema::table('titanhello_call_recordings', function (Blueprint $table) {
             $table->string('kind', 30)->default('call')->index();
             $table->timestamp('fetched_at')->nullable();

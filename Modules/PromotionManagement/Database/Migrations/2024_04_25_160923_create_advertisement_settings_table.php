@@ -13,6 +13,9 @@ class CreateAdvertisementSettingsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('advertisement_settings')) {
+            return;
+        }
         Schema::create('advertisement_settings', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();

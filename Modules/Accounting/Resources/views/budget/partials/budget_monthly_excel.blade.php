@@ -29,10 +29,16 @@
                     <th>{{$account->name}}</th>
                     @foreach($months as $k => $m)
                         @php
+    try {
+
                             $account_budget = $budget->where('accounting_account_id', $account->id)->first();
                             $value = !is_null($account_budget) && !is_null($account_budget->$m) 
                             ? $account_budget->$m : null;
-                        @endphp
+                        
+    } catch (\Exception $e) {
+        // Table may not exist yet
+    }
+@endphp
                         <td>
                             @if(!is_null($value))
                                 {{@num_format($value)}}  

@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('acc_bank_transaction_matches')) {
+            return;
+        }
         Schema::create('acc_bank_transaction_matches', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable();

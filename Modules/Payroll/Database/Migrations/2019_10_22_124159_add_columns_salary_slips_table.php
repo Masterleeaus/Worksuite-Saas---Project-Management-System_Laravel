@@ -13,6 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('salary_payment_methods')) {
+            return;
+        }
         Schema::create('salary_payment_methods', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('payment_method');
@@ -23,6 +26,9 @@ return new class extends Migration
         Schema::table('salary_slips', function (Blueprint $table) {
             $table->text('salary_json')->nullable();
             $table->text('extra_json')->nullable();
+        if (! Schema::hasTable('salary_slips')) {
+            return;
+        }
             $table->string('expense_claims')->default('0');
             $table->integer('pay_days');
 

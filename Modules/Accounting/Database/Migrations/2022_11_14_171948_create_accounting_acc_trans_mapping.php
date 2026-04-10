@@ -13,6 +13,9 @@ class CreateAccountingAccTransMapping extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('accounting_acc_trans_mappings')) {
+            return;
+        }
         Schema::create('accounting_acc_trans_mappings', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('business_id');

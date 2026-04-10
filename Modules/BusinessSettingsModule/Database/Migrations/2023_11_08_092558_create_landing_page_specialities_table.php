@@ -13,6 +13,9 @@ class CreateLandingPageSpecialitiesTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('landing_page_specialities')) {
+            return;
+        }
         Schema::create('landing_page_specialities', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();

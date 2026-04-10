@@ -13,6 +13,9 @@ class AccAdd extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('accounts')) {
+            return;
+        }
         Schema::create('accounts', function (Blueprint $table) {
             $table->uuid('id')->primary()->index();
             $table->unsignedBigInteger('company_id')->nullable()->index();

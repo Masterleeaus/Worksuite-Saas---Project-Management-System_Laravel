@@ -14,6 +14,9 @@ class CreateAccountingAccountTypesTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('accounting_account_types')) {
+            return;
+        }
         Schema::create('accounting_account_types', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');

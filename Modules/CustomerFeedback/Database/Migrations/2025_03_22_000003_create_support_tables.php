@@ -8,6 +8,9 @@ return new class extends Migration {
     public function up(): void
     {
         // Feedback Channels
+        if (Schema::hasTable('feedback_channels')) {
+            return;
+        }
         Schema::create('feedback_channels', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();

@@ -4,6 +4,7 @@ namespace Modules\Subdomain\Providers;
 
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 use Modules\Subdomain\Console\ActivateModuleCommand;
@@ -41,6 +42,9 @@ class SubdomainServiceProvider extends ServiceProvider
         // Banned_sub_domain
         Validator::extend('banned_sub_domain', function ($attribute, $value, $parameters, $validator) {
 
+            if (! Schema::hasTable('sub_domain_module_settings')) {
+                return true;
+            }
             $setting = SubdomainSetting::first();
 
             $value = explode('.' . getDomain(), $value)[0];

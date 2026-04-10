@@ -13,6 +13,9 @@ class CreateReviewRepliesTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('review_replies')) {
+            return;
+        }
         Schema::create('review_replies', function (Blueprint $table) {
             $table->uuid('id')->primary()->index();
             $table->unsignedBigInteger('company_id')->nullable()->index();

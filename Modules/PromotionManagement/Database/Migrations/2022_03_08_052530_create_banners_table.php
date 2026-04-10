@@ -13,6 +13,9 @@ class CreateBannersTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('banners')) {
+            return;
+        }
         Schema::create('banners', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();

@@ -13,6 +13,9 @@ class CreateNotificationSetupsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('notification_setups')) {
+            return;
+        }
         Schema::create('notification_setups', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();

@@ -13,6 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('salary_components')) {
+            return;
+        }
         Schema::create('salary_components', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('component_name');

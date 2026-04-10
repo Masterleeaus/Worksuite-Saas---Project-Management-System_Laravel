@@ -12,6 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('recruit_job_histories')) {
+            return;
+        }
         Schema::table('recruit_job_histories', function (Blueprint $table) {
             $table->integer('recruit_job_application_status_id')->unsigned()->nullable();
             $table->foreign('recruit_job_application_status_id')->references('id')->on('recruit_application_status')

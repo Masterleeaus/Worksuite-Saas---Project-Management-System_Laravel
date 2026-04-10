@@ -24,10 +24,9 @@ return new class extends Migration
             $table->decimal('balance', 30, 2)->default(0);
             $table->decimal('amount_requested', 30, 2)->default(0);
 
-            // Use enum default if available, otherwise fallback to 'pending'
             $table->string('status')
                 ->nullable()
-                ->default(PaymentStatus::PENDING->value ?? 'pending');
+                ->default(PaymentStatus::Pending->value);
 
             $table->string('payment_method');
             $table->string('other_payment_method')->nullable();

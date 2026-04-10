@@ -49,10 +49,16 @@
                                             <th>{{$account->name}}</th>
                                             @foreach($months as $k => $m)
                                                 @php
+    try {
+
                                                     $account_budget = $budget->where('accounting_account_id', $account->id)->first();
                                                     $value = !is_null($account_budget) && !is_null($account_budget->$m) 
                                                     ? $account_budget->$m : null;
-                                                @endphp
+                                                
+    } catch (\Exception $e) {
+        // Table may not exist yet
+    }
+@endphp
                                                 <td>
                                                     <input type="text" class="form-control input_number" 
                                                     name="budget[{{$account->id}}][{{$m}}]" @if(!is_null($value))
@@ -86,8 +92,14 @@
                                     </tr>
                                     @foreach($accounts as $account)
                                             @php
+    try {
+
                                                 $account_budget = $budget->where('accounting_account_id', $account->id)->first();
-                                            @endphp
+                                            
+    } catch (\Exception $e) {
+        // Table may not exist yet
+    }
+@endphp
                                         <tr>
                                             <th>{{$account->name}}</th>
                                             <td>
@@ -135,8 +147,14 @@
                                     </tr>
                                     @foreach($accounts as $account)
                                         @php
+    try {
+
                                             $account_budget = $budget->where('accounting_account_id', $account->id)->first();
-                                        @endphp
+                                        
+    } catch (\Exception $e) {
+        // Table may not exist yet
+    }
+@endphp
                                         <tr>
                                             <th>{{$account->name}}</th>
                                             <td>

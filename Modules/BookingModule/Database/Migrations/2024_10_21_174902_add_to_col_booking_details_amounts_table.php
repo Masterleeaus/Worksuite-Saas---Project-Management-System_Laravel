@@ -16,6 +16,9 @@ return new class extends Migration
     {
         \App\Models\Module::validateVersion(BookingModuleSetting::MODULE_NAME);
 
+        if (! Schema::hasTable('booking_details_amounts')) {
+            return;
+        }
         Schema::table('booking_details_amounts', function (Blueprint $table) {
             $table->foreignUuid('booking_repeat_id')->nullable();
             $table->foreignUuid('booking_repeat_details_id')->nullable();

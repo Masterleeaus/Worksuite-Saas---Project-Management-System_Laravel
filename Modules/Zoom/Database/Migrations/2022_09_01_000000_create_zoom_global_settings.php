@@ -12,6 +12,9 @@ return new class extends Migration
 {
     public function up()
     {
+        if (Schema::hasTable('zoom_global_settings')) {
+            return;
+        }
         Schema::create('zoom_global_settings', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -36,6 +39,9 @@ return new class extends Migration
         Schema::table('zoom_setting', function (Blueprint $table) {
             $table->dropColumn(['purchase_code', 'supported_until']);
         });
+        if (! Schema::hasTable('zoom_setting')) {
+            return;
+        }
 
         Module::where('module_name', 'Zoom')->update([
             'module_name' => ZoomSetting::MODULE_NAME,

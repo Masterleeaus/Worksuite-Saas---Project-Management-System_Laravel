@@ -13,6 +13,9 @@ class CreateAdvertisementAttachmentsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('advertisement_attachments')) {
+            return;
+        }
         Schema::create('advertisement_attachments', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();

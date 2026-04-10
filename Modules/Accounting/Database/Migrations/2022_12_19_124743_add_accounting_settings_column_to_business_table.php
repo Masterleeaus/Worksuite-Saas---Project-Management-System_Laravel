@@ -13,6 +13,9 @@ class AddAccountingSettingsColumnToBusinessTable extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('business')) {
+            return;
+        }
         Schema::table('business', function (Blueprint $table) {
             $table->text('accounting_settings')->nullable()->after('created_by');
         });

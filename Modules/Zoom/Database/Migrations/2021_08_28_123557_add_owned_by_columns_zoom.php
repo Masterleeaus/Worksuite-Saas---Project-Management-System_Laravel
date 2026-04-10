@@ -29,6 +29,9 @@ return new class extends Migration
 
         $module->permissions()->createMany($regularPermissions);
 
+        if (! Schema::hasTable('zoom_meetings')) {
+            return;
+        }
         Schema::table('zoom_meetings', function (Blueprint $table) {
             $table->integer('added_by')->unsigned()->nullable();
             $table->foreign('added_by')->references('id')->on('users')->onDelete('SET NULL')->onUpdate('cascade');

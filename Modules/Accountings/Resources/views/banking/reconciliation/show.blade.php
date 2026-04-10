@@ -42,8 +42,14 @@
                         <tbody>
                         @forelse($selected as $t)
                             @php
+    try {
+
                                 $line = \Modules\Accountings\Entities\BankReconciliationLine::where('reconciliation_id',$rec->id)->where('bank_transaction_id',$t->id)->first();
-                            @endphp
+                            
+    } catch (\Exception $e) {
+        // Table may not exist yet
+    }
+@endphp
                             <tr>
                                 <td>{{ $t->txn_date->format('Y-m-d') }}</td>
                                 <td>{{ $t->description }}</td>

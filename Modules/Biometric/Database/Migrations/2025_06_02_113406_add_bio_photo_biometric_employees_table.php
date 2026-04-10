@@ -12,6 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('biometric_employees')) {
+            return;
+        }
         Schema::table('biometric_employees', function (Blueprint $table) {
             $table->boolean('has_photo')->default(false)->after('user_id');
             $table->text('photo')->nullable()->after('has_photo');

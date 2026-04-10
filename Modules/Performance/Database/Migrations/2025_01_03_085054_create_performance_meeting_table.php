@@ -14,6 +14,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('performance_meetings')) {
+            return;
+        }
         Schema::create('performance_meetings', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('company_id')->nullable();

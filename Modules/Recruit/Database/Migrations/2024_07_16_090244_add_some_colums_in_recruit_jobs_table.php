@@ -11,6 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('recruit_jobs')) {
+            return;
+        }
         Schema::table('recruit_jobs', function (Blueprint $table) {
             $table->boolean('is_currentctc_require')->default(false);
             $table->boolean('is_expectedctc_require')->default(false);

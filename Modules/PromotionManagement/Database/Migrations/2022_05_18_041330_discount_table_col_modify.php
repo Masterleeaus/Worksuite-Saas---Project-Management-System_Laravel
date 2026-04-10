@@ -13,6 +13,9 @@ class DiscountTableColModify extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('discounts')) {
+            return;
+        }
         Schema::table('discounts', function($table) {
             $table->string('discount_title',191)->after('id')->nullable();
             $table->dropColumn('zone_id');

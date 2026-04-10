@@ -16,6 +16,9 @@ return new class extends Migration
     {
         \App\Models\Module::validateVersion(ZoomSetting::MODULE_NAME);
 
+        if (Schema::hasTable('zoom_meetings')) {
+            return;
+        }
         Schema::create('zoom_meetings', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();

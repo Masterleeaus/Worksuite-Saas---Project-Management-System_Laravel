@@ -13,6 +13,9 @@ class CreateErrorLogsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('error_logs')) {
+            return;
+        }
         Schema::create('error_logs', function (Blueprint $table) {
             $table->uuid('id')->primary()->index();
             $table->unsignedBigInteger('company_id')->nullable()->index();

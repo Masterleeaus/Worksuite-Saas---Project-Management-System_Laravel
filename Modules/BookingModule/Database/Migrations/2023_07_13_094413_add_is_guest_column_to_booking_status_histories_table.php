@@ -16,6 +16,9 @@ return new class extends Migration
     {
         \App\Models\Module::validateVersion(BookingModuleSetting::MODULE_NAME);
 
+        if (! Schema::hasTable('booking_status_histories')) {
+            return;
+        }
         Schema::table('booking_status_histories', function (Blueprint $table) {
             $table->boolean('is_guest')->default(0);
         });

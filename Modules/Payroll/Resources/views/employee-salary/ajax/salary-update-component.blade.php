@@ -51,6 +51,8 @@
 
         @foreach ($salaryGroup->salary_group->components as $key => $value)
             @php
+    try {
+
                 $compValue = $employeeVariableSalaries->where('variable_component_id', $value->component->id)->first() ?? null;
 
                 if($compValue){
@@ -59,7 +61,11 @@
                 else{
                     $componentValue = $value->component->component_value;
                 }
-            @endphp
+            
+    } catch (\Exception $e) {
+        // Table may not exist yet
+    }
+@endphp
             <div class="col-md-12 mt-1">
                 <div class="row">
                     @if ($value->component->component_type == 'earning')
@@ -246,6 +252,8 @@
             @endif
             @foreach ($salaryGroup->salary_group->components as $key => $value)
                 @php
+    try {
+
                     $compValue = $employeeVariableSalaries->where('variable_component_id', $value->component->id)->first() ?? null;
 
                     if($compValue){
@@ -254,7 +262,11 @@
                     else{
                         $componentValue = $value->component->component_value;
                     }
-                @endphp
+                
+    } catch (\Exception $e) {
+        // Table may not exist yet
+    }
+@endphp
                 <div class="col-md-12 mt-1">
                     <div class="row">
                         @if ($value->component->component_type == 'deduction')

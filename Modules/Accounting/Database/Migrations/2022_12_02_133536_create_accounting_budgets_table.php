@@ -13,6 +13,9 @@ class CreateAccountingBudgetsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('accounting_budgets')) {
+            return;
+        }
         Schema::create('accounting_budgets', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('accounting_account_id');

@@ -13,6 +13,9 @@ class CreateBankDetailsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('bank_details')) {
+            return;
+        }
         Schema::create('bank_details', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();
