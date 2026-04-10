@@ -94,7 +94,7 @@
                         <select name="settings_json[min_rating]" class="form-select">
                             <option value="">{{ __('Any') }}</option>
                             @for($i = 5; $i >= 1; $i--)
-                            <option value="{{ $i }}">{{ $i }}{{ $i === 5 ? ' ★ only' : '+ stars' }}</option>
+                            <option value="{{ $i }}">{{ $i }} {{ $i === 1 ? 'star' : 'stars' }}+</option>
                             @endfor
                         </select>
                     </div>

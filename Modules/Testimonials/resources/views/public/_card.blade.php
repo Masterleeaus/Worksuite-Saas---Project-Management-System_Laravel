@@ -40,17 +40,18 @@
         @if($t->video_url)
         <div class="t-video">
             @php
-                $videoUrl = $t->video_url;
-                // Convert YouTube watch URL to embed
-                if (preg_match('/youtube\.com\/watch\?v=([^&]+)/', $videoUrl, $m)) {
+                $videoUrl = null;
+                $rawUrl   = $t->video_url;
+                // Only allow YouTube and Vimeo; convert watch URLs to embed URLs
+                if (preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_\-]{11})/', $rawUrl, $m)) {
                     $videoUrl = 'https://www.youtube.com/embed/' . $m[1];
-                } elseif (preg_match('/youtu\.be\/([^?]+)/', $videoUrl, $m)) {
-                    $videoUrl = 'https://www.youtube.com/embed/' . $m[1];
-                } elseif (preg_match('/vimeo\.com\/(\d+)/', $videoUrl, $m)) {
+                } elseif (preg_match('/vimeo\.com\/(\d+)/', $rawUrl, $m)) {
                     $videoUrl = 'https://player.vimeo.com/video/' . $m[1];
                 }
             @endphp
+            @if($videoUrl)
             <iframe src="{{ $videoUrl }}" allowfullscreen loading="lazy"></iframe>
+            @endif
         </div>
         @endif
 

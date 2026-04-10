@@ -218,7 +218,7 @@ class TestimonialRepository implements TestimonialRepositoryInterface
 
                 $data = [
                     'source'       => 'review',
-                    'source_id'    => is_numeric($review->id) ? (int)$review->id : null,
+                    'source_id'    => $review->id,
                     'star_rating'  => 5,
                     'content'      => $review->review_comment ?? '',
                     'description'  => $review->review_comment ?? '',

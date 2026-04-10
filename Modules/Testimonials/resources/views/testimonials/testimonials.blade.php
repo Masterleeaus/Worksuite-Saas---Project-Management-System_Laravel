@@ -158,7 +158,7 @@
                             <select class="form-select" id="star_rating" name="star_rating">
                                 @for($i = 5; $i >= 1; $i--)
                                 <option value="{{ $i }}" {{ $i === 5 ? 'selected' : '' }}>
-                                    {{ str_repeat('★', $i) . str_repeat('☆', 5 - $i) }} ({{ $i }})
+                                    {{ str_repeat('★', $i) . str_repeat('☆', 5 - $i) }} ({{ $i }} {{ $i === 1 ? 'star' : 'stars' }})
                                 </option>
                                 @endfor
                             </select>
