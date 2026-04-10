@@ -43,6 +43,30 @@ class TitanZeroController extends AccountBaseController
     }
 
 
+    public function settings()
+    {
+        return view('titanzero::pages.settings', [
+            'features' => config('titanzero.cleaning_features', []),
+        ]);
+    }
+
+    public function saveSettings(\Illuminate\Http\Request $request)
+    {
+        $request->validate([
+            'enabled_features' => ['nullable', 'array'],
+        ]);
+
+        // Store per-company settings (simple JSON blob in app settings or cache)
+        $features = $request->input('enabled_features', []);
+        \Illuminate\Support\Facades\Cache::put(
+            'titanzero.features.' . (auth()->user()->company_id ?? 0),
+            $features,
+            now()->addDays(30)
+        );
+
+        return back()->with('success', __('TitanZero settings saved.'));
+    }
+
     public function ping()
     {
         return response()->json(['status' => 'ok', 'module' => 'titanzero', 'pass' => 3]);

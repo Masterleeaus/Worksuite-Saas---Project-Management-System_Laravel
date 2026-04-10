@@ -4,18 +4,18 @@
 namespace Modules\TitanZero\Http\Controllers\SuperAdmin;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Modules\TitanZero\Entities\TitanZeroUsage;
+use Modules\TitanZero\Entities\TitanAssistUsage;
 
 class SettingsController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index($settings)
+    public function index()
     {
         $today = now()->startOfDay();
 
-        $usages = TitanZeroUsage::where('created_at', '>=', $today)
+        $usages = TitanAssistUsage::where('created_at', '>=', $today)
             ->orderBy('created_at', 'desc')
             ->limit(50)
             ->get();
@@ -23,7 +23,6 @@ class SettingsController extends Controller
         $quota = config('aiassistant.quota', []);
 
         return view('titanzero::super-admin.settings.index', [
-            'settings' => $settings,
             'usages'   => $usages,
             'quota'    => $quota,
         ]);

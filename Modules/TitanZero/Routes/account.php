@@ -1,6 +1,11 @@
 
 
+<?php
+
+use Illuminate\Support\Facades\Route;
 use Modules\TitanZero\Http\Controllers\Account\CoachController;
+use Modules\TitanZero\Http\Controllers\IntentController;
+use Modules\TitanZero\Http\Controllers\WizardController;
 
 Route::get('/coaches', [CoachController::class, 'index'])->name('coaches.index');
 Route::get('/coaches/{coachKey}', [CoachController::class, 'show'])->name('coaches.show');

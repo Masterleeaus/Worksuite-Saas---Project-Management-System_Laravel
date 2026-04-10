@@ -1,8 +1,6 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Modules\TitanZero\Http\Controllers\TitanZeroController;
+// All TitanZero routes are now managed via Routes/web.php.
+// This file is intentionally left empty so the ServiceProvider's
+// account-route loader does not register conflicting routes.
 
-Route::get('/', [TitanZeroController::class, 'index'])->name('index');
-Route::get('/help', [TitanZeroController::class, 'help'])->name('help');
-Route::get('/chat', [TitanZeroController::class, 'chat'])->name('chat');
