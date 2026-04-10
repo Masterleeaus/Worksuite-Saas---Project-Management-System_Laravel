@@ -47,6 +47,8 @@ class NpsSurvey extends Model
         'completed_at' => 'datetime',
     ];
 
+    protected $appends = ['nps_category'];
+
     /** Automatically generate a UUID survey_token on creation. */
     protected static function booted(): void
     {

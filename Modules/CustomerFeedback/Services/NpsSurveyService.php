@@ -133,8 +133,10 @@ class NpsSurveyService
                     // Adjust the table/column names to match the actual bookings table.
                     $q->select('id')
                       ->from('bookings')
-                      ->where('assigned_user_id', $employeeId)
-                      ->orWhere('serviceman_id', $employeeId);
+                      ->where(function ($inner) use ($employeeId) {
+                          $inner->where('assigned_user_id', $employeeId)
+                                ->orWhere('serviceman_id', $employeeId);
+                      });
                 })
                 ->selectRaw('AVG(cleaner_rating) as avg_rating, COUNT(*) as total')
                 ->first();
@@ -182,8 +184,18 @@ class NpsSurveyService
     private function createComplaintTicket(NpsSurvey $survey): void
     {
         try {
+            $companyId = optional(optional($survey->client)->company)->id;
+
+            if (!$companyId) {
+                Log::warning('CustomerFeedback: cannot create complaint ticket — company_id unavailable', [
+                    'survey_id' => $survey->id,
+                    'client_id' => $survey->client_id,
+                ]);
+                return;
+            }
+
             FeedbackTicket::create([
-                'company_id'    => optional(optional($survey->client)->company)->id ?? 0,
+                'company_id'    => $companyId,
                 'user_id'       => $survey->client_id,
                 'title'         => 'Low NPS Survey — Score: ' . $survey->nps_score,
                 'description'   => $survey->comments
@@ -223,7 +235,8 @@ class NpsSurveyService
 
             // Use a generic "thank you / review" message if the slug exists.
             // Falls back silently if the slug is not configured.
-            $sms->sendBySlug('google-review-request', $client, [
+            $slug = config('customer-feedback.google_review_sms_slug', 'google-review-request');
+            $sms->sendBySlug($slug, $client, [
                 'client_name' => $client->name,
             ]);
         } catch (\Throwable $e) {

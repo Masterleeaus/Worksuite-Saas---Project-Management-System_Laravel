@@ -30,6 +30,9 @@ return [
     // How many days before a survey link expires (default: 7)
     'survey_expiry_days' => 7,
 
+    // SMS slug used when inviting high-NPS promoters to leave a Google Review
+    'google_review_sms_slug' => 'google-review-request',
+
     'email' => [
         'sync_interval' => 5, // minutes
         'auto_reply_enabled' => true,

@@ -178,23 +178,27 @@ class AnalyticsController extends AccountBaseController
 
     private function getNpsData($startDate, $endDate): array
     {
-        $total = NpsSurvey::whereNotNull('nps_score')
+        $agg = NpsSurvey::whereNotNull('nps_score')
             ->whereNotNull('completed_at')
             ->whereBetween('completed_at', [$startDate, $endDate])
-            ->count();
+            ->selectRaw(
+                'COUNT(*) as total,
+                 SUM(CASE WHEN nps_score >= 9 THEN 1 ELSE 0 END) as promoters,
+                 SUM(CASE WHEN nps_score BETWEEN 7 AND 8 THEN 1 ELSE 0 END) as passives,
+                 SUM(CASE WHEN nps_score <= 6 THEN 1 ELSE 0 END) as detractors'
+            )
+            ->first();
+
+        $total = (int) ($agg->total ?? 0);
 
         if ($total === 0) {
             return ['promoters' => 0, 'passives' => 0, 'detractors' => 0];
         }
 
-        $promoters  = NpsSurvey::whereNotNull('completed_at')->where('nps_score', '>=', 9)->whereBetween('completed_at', [$startDate, $endDate])->count();
-        $passives   = NpsSurvey::whereNotNull('completed_at')->whereBetween('nps_score', [7, 8])->whereBetween('completed_at', [$startDate, $endDate])->count();
-        $detractors = NpsSurvey::whereNotNull('completed_at')->where('nps_score', '<=', 6)->whereNotNull('nps_score')->whereBetween('completed_at', [$startDate, $endDate])->count();
-
         return [
-            'promoters'  => round(($promoters  / $total) * 100, 1),
-            'passives'   => round(($passives   / $total) * 100, 1),
-            'detractors' => round(($detractors / $total) * 100, 1),
+            'promoters'  => round(((int) $agg->promoters  / $total) * 100, 1),
+            'passives'   => round(((int) $agg->passives   / $total) * 100, 1),
+            'detractors' => round(((int) $agg->detractors / $total) * 100, 1),
         ];
     }
 
