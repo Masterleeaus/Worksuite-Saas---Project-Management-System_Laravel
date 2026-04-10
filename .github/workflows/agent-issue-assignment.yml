@@ -2,15 +2,18 @@ name: Agent Issue Queue
 
 # Triggers:
 #  1. An issue is closed (agent finished the work).
-#  2. A pull request is merged (agent's PR landed; the linked issue may already
-#     be closed, but this acts as a safety net).
-#  3. A label named "copilot" is added to an issue (opt-in individual issues).
-#  4. Manual dispatch — to kick-start the queue or re-process after a pause.
+#  2. A pull request is opened (agent submitted their work for review; assign
+#     the next issue immediately so the agent doesn't sit idle while waiting
+#     for the PR to be reviewed and merged).
+#  3. A pull request is merged (safety net: linked issue may not have been
+#     closed yet when the PR was opened).
+#  4. A label named "copilot" is added to an issue (opt-in individual issues).
+#  5. Manual dispatch — to kick-start the queue or re-process after a pause.
 on:
   issues:
     types: [closed, labeled]
   pull_request:
-    types: [closed]
+    types: [opened, closed]
   workflow_dispatch:
     inputs:
       label:
@@ -34,11 +37,13 @@ jobs:
     runs-on: ubuntu-latest
 
     # For the "labeled" trigger, only proceed when the added label is "copilot".
-    # For the "pull_request" trigger, only proceed when the PR was merged.
+    # For the "pull_request" trigger, proceed when the PR is opened (agent
+    # finished the issue) or when it is merged (safety net).
     if: |
       (github.event_name == 'workflow_dispatch') ||
       (github.event_name == 'issues' && github.event.action == 'closed') ||
       (github.event_name == 'issues' && github.event.action == 'labeled' && github.event.label.name == 'copilot') ||
+      (github.event_name == 'pull_request' && github.event.action == 'opened') ||
       (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
 
     steps:
