@@ -1,109 +1,86 @@
 name: Deploy
 
-# Deployment is triggered manually or on push to main/master.
-# Set up GitHub Environments ("production", "staging") with required reviewers
-# and store secrets there (see Required Secrets below).
-#
-# Required Secrets (set in GitHub → Settings → Secrets / Environments):
-#   DEPLOY_SSH_HOST        — SSH server hostname or IP
-#   DEPLOY_SSH_USER        — SSH username
-#   DEPLOY_SSH_KEY         — Private SSH key (PEM format)
-#   DEPLOY_SSH_PORT        — SSH port (default 22)
-#   DEPLOY_KNOWN_HOSTS     — Pre-recorded SSH known_hosts entry for the deploy server
-#   DEPLOY_PATH            — Absolute path to app on server (e.g. /var/www/worksuite)
-#   DEPLOY_BRANCH          — Branch to pull on server (usually main or master)
-#   APP_URL                — Production app URL used for post-deploy health check
-
 on:
   push:
-    branches:
-      - main
-      - master
+    branches: [main, master]
   workflow_dispatch:
     inputs:
-      environment:
-        description: "Target environment"
+      skip_migrations:
+        description: "Skip database migrations"
         required: true
-        default: "production"
+        default: "false"
         type: choice
-        options:
-          - production
-          - staging
+        options: ["false", "true"]
 
-# Prevent concurrent deploys to the same environment
 concurrency:
-  group: deploy-${{ github.event.inputs.environment || 'production' }}
+  group: deploy-production
   cancel-in-progress: false
 
 jobs:
   deploy:
-    name: Deploy to ${{ github.event.inputs.environment || 'production' }}
-    runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment || 'production' }}
+    name: Deploy to production
+    runs-on: self-hosted
     permissions:
       contents: read
 
-    # Only deploy from push events on main/master, or when manually dispatched
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'))
+    env:
+      DEPLOY_PATH: /home/saassmar/domains/cleansm.art/public_html
+      DEPLOY_BRANCH: main
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Check deployment secrets
-        id: secrets_check
-        env:
-          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+      - name: Verify runner context
         run: |
-          if [ -z "$DEPLOY_SSH_KEY" ]; then
-            echo "::warning::DEPLOY_SSH_KEY secret is not configured. Skipping deployment steps."
-            echo "configured=false" >> $GITHUB_OUTPUT
-          else
-            echo "configured=true" >> $GITHUB_OUTPUT
+          echo "User: $(whoami)"
+          echo "Host: $(hostname)"
+          echo "PWD: $(pwd)"
+
+      - name: Check deploy path
+        run: |
+          if [ ! -d "$DEPLOY_PATH" ]; then
+            echo "Deploy path missing: $DEPLOY_PATH"
+            exit 1
           fi
 
-      - name: Install SSH key
-        if: steps.secrets_check.outputs.configured == 'true'
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
-          known_hosts: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
-          if_key_exists: replace
-
-      - name: Deploy via SSH
-        if: steps.secrets_check.outputs.configured == 'true'
+      - name: Check app files
         run: |
-          ssh -p ${{ secrets.DEPLOY_SSH_PORT || 22 }} ${{ secrets.DEPLOY_SSH_USER }}@${{ secrets.DEPLOY_SSH_HOST }} << 'ENDSSH'
-            set -e
-            cd ${{ secrets.DEPLOY_PATH }}
+          cd "$DEPLOY_PATH"
+          ls -la
+          if [ ! -f ".env" ]; then
+            echo ".env missing"
+            exit 1
+          fi
+          if [ ! -f "artisan" ]; then
+            echo "artisan missing"
+            exit 1
+          fi
 
-            echo "==> Pulling latest code from ${{ secrets.DEPLOY_BRANCH || 'main' }}"
-            git pull origin ${{ secrets.DEPLOY_BRANCH || 'main' }}
-
-            echo "==> Installing/updating Composer dependencies"
-            composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
-
-            echo "==> Running migrations"
-            php artisan migrate --force --no-interaction
-
-            echo "==> Clearing and rebuilding caches"
-            php artisan config:clear
-            php artisan route:clear
-            php artisan view:clear
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
-
-            echo "==> Restarting queue workers (if applicable)"
-            php artisan queue:restart || true
-
-            echo "==> Deployment complete."
-          ENDSSH
-
-      - name: Post-deploy health check
-        if: steps.secrets_check.outputs.configured == 'true'
+      - name: Update code
         run: |
-          curl --fail --silent --max-time 30 ${{ secrets.APP_URL }} | grep -c "html" > /dev/null \
-            && echo "Health check passed." \
-            || echo "Warning: health check did not receive a valid HTML response."
-        continue-on-error: true
+          cd "$DEPLOY_PATH"
+          git status
+          git fetch origin
+          git pull --ff-only origin "$DEPLOY_BRANCH"
+
+      - name: Install composer dependencies
+        run: |
+          cd "$DEPLOY_PATH"
+          composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+
+      - name: Run migrations
+        if: github.event.inputs.skip_migrations != 'true'
+        run: |
+          cd "$DEPLOY_PATH"
+          php artisan migrate --force --no-interaction
+
+      - name: Rebuild Laravel caches
+        run: |
+          cd "$DEPLOY_PATH"
+          php artisan optimize:clear
+          php artisan config:cache
+          php artisan route:cache || echo "route:cache failed, skipping"
+          php artisan view:cache || echo "view:cache failed, skipping"
+
+      - name: Restart queue workers
+        run: |
+          cd "$DEPLOY_PATH"
+          php artisan queue:restart || true
