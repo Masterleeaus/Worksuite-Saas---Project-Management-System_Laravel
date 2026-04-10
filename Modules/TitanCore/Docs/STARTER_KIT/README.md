@@ -1,4 +1,4 @@
-# TitanCore Starter Kit (v0.3.1)
+# AICore Starter Kit (v0.3.1)
 
 This kit accompanies the v2.5 scan and provides scaffolds to finalize the module:
 - **Health Dashboard stubs**

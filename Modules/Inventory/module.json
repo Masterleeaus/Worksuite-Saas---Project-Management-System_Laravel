@@ -1,0 +1,16 @@
+{
+  "name": "Inventory",
+  "alias": "inventory",
+  "description": "Stock, items, warehouses, and movements for Worksuite SaaS.",
+  "keywords": [
+    "inventory",
+    "stock",
+    "warehouse"
+  ],
+  "priority": 10,
+  "providers": [
+    "Modules\\Inventory\\Providers\\InventoryServiceProvider",
+    "Modules\\Inventory\\Providers\\RouteServiceProvider"
+  ],
+  "files": []
+}

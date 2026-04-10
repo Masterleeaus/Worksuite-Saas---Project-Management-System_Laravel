@@ -1,0 +1,17 @@
+{
+  "name": "worksuite/module-suppliers",
+  "type": "library",
+  "autoload": {
+    "psr-4": {
+      "Modules\\\\Suppliers\\\\": ""
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Modules\\Suppliers\\Providers\\SuppliersServiceProvider",
+        "Modules\\Suppliers\\Providers\\RouteServiceProvider"
+      ]
+    }
+  }
+}

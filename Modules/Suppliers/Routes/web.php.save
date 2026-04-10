@@ -1,0 +1,51 @@
+# (Paste the clean version I gave you earlier, then save & exit)
+
+# 3. Remove any cached configs that still reference the broken file
+rm -f bootstrap/cache/*.php
+
+# 4. Rebuild the Composer autoload without triggering scripts
+composer dump-autoload -o --no-scripts
+
+# 5. Clear Laravel’s runtime caches
+php artisan optimize:clear
+php artisan config:clear
+php artisan cache:clear
+php artisan route:clear
+
+# 6. Enable and verify the module
+php artisan module:enable Suppliers
+php artisan module:list | grep Suppliers
+
+# 7. Run migrations for the Suppliers module
+php artisan migrate --path=Modules/Suppliers/Database/Migrations
+<?php
+
+use Illuminate\Support\Facades\Route;
+use Modules\Suppliers\Http\Controllers\SupplierController;
+use Modules\Suppliers\Http\Controllers\SupplierRatingController;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+| Loaded by the module's RouteServiceProvider.
+| Auth-required areas are grouped; adjust prefixes to match your app.
+|--------------------------------------------------------------------------
+*/
+
+// Account area (authenticated users)
+Route::middleware(['web', 'auth'])
+    ->prefix('account')
+    ->group(function () {
+        Route::get('suppliers/export', [SupplierController::class, 'export'])->name('suppliers.export');
+        Route::post('suppliers/apply-quick-action', [SupplierController::class, 'applyQuickAction'])->name('suppliers.apply_quick_action');
+        Route::resource('suppliers', SupplierController::class);
+    });
+
+// Admin area (authenticated admins; add 'can:...' or 'role:admin' if you use gates/roles)
+Route::middleware(['web', 'auth'])
+    ->prefix('admin')
+    ->group(function () {
+        Route::get('suppliers', [SupplierRatingController::class, 'index'])->name('admin.suppliers.index');
+        Route::put('suppliers/{supplierId}/rating', [SupplierRatingController::class, 'updateRating'])->name('admin.suppliers.rating.update');
+    });
