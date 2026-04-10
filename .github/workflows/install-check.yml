@@ -61,11 +61,11 @@ jobs:
           echo "QUEUE_CONNECTION=sync" >> .env
           echo "MAIL_MAILER=array" >> .env
 
-      - name: Generate app key
-        run: php artisan key:generate
-
       - name: Create SQLite database
         run: touch /tmp/worksuite_install_check.sqlite
+
+      - name: Generate app key
+        run: php artisan key:generate
 
       - name: Package discovery
         run: php artisan package:discover --ansi
