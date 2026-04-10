@@ -1,0 +1,19 @@
+{
+  "name": "FSMCalendar",
+  "alias": "fsmcalendar",
+  "description": "FSM Calendar – Interactive FullCalendar.js day/week/month/agenda view for FSM Orders with drag-and-drop rescheduling, worker resource columns, and filter bar. CleanSmartOS.",
+  "keywords": ["fsm", "calendar", "scheduling", "dispatch", "cleansmartOS"],
+  "active": 1,
+  "order": 1,
+  "providers": [
+    "Modules\\FSMCalendar\\Providers\\FSMCalendarServiceProvider",
+    "Modules\\FSMCalendar\\Providers\\RouteServiceProvider",
+    "Modules\\FSMCalendar\\Providers\\EventServiceProvider",
+    "Modules\\FSMCalendar\\Providers\\ConfigServiceProvider",
+    "Modules\\FSMCalendar\\Providers\\ViewServiceProvider"
+  ],
+  "aliases": {},
+  "files": [],
+  "requires": ["FSMCore"],
+  "version": "1.0.0"
+}
