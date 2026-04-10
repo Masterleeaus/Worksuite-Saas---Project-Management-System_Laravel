@@ -25,9 +25,12 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.1"
+          php-version: "8.2"
           extensions: mbstring, pdo, pdo_sqlite, sqlite3, dom, curl, zip, bcmath, intl, gd, exif, fileinfo
           coverage: none
+
+      - name: Ensure bootstrap/cache is writable before Composer post-install hooks
+        run: mkdir -p bootstrap/cache && chmod -R 775 storage bootstrap/cache
 
       - name: Install Composer dependencies (fresh — no cache)
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
@@ -63,9 +66,6 @@ jobs:
 
       - name: Create SQLite database
         run: touch /tmp/worksuite_install_check.sqlite
-
-      - name: Set storage and bootstrap permissions
-        run: chmod -R 775 storage bootstrap/cache
 
       - name: Package discovery
         run: php artisan package:discover --ansi
