@@ -1,12 +1,64 @@
 {
     "name": "CyberSecurity",
     "alias": "cybersecurity",
-    "description": "",
-    "keywords": [],
+    "description": "Cybersecurity and compliance — data encryption, GDPR, breach response and security auditing",
+    "keywords": ["security", "compliance", "gdpr", "privacy", "breach", "audit"],
     "priority": 0,
     "providers": [
         "Modules\\CyberSecurity\\Providers\\CyberSecurityServiceProvider",
         "Modules\\CyberSecurity\\Providers\\EventServiceProvider"
     ],
-    "files": []
+    "files": [],
+    "active": 1,
+    "order": 0,
+    "aliases": {},
+    "requires": [],
+    "permissions": [
+        "view_security_reports",
+        "manage_compliance",
+        "run_security_scan",
+        "manage_data_privacy"
+    ],
+    "roles_permissions": {
+        "admin": [
+            "view_security_reports",
+            "manage_compliance",
+            "run_security_scan",
+            "manage_data_privacy"
+        ],
+        "manager": [
+            "view_security_reports"
+        ]
+    },
+    "menus": [
+        {
+            "panel": "user",
+            "label": "Compliance Dashboard",
+            "route": "cybersecurity.compliance.index",
+            "sort_order": 200,
+            "permission": "manage_compliance"
+        },
+        {
+            "panel": "user",
+            "label": "Security Scan",
+            "route": "cybersecurity.security-scan.index",
+            "sort_order": 201,
+            "permission": "run_security_scan"
+        },
+        {
+            "panel": "user",
+            "label": "Data Privacy",
+            "route": "cybersecurity.data-privacy.index",
+            "sort_order": 202,
+            "permission": "manage_data_privacy"
+        },
+        {
+            "panel": "user",
+            "label": "Breach Response",
+            "route": "cybersecurity.breach-response.index",
+            "sort_order": 203,
+            "permission": "manage_compliance"
+        }
+    ],
+    "sidebar_menu": true
 }
