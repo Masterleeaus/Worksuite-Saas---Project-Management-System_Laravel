@@ -4,6 +4,7 @@
     "description": "TitanDocs \u2014 document workflows (templates, history, export) routed through TitanZero (no direct AI calls).",
     "keywords": [],
     "priority": 0,
+    "active": true,
     "version": 3.0,
     "providers": [
         "Modules\\TitanDocs\\Providers\\TitanDocsServiceProvider",
