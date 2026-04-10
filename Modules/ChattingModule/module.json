@@ -1,8 +1,8 @@
 {
     "name": "ChattingModule",
     "alias": "chattingmodule",
-    "description": "",
-    "keywords": [],
+    "description": "Extends the Worksuite core messaging system with FSM/cleaning-business features: booking-specific chat threads, group rooms, location messages, and broadcast messaging.",
+    "keywords": ["chat", "messaging", "fsm", "booking", "cleansmartOS"],
     "priority": 0,
     "providers": [
         "Modules\\ChattingModule\\Providers\\ChattingModuleServiceProvider",
@@ -15,9 +15,33 @@
     "requires": [],
     "active": 1,
     "order": 0,
-    "permissions": [],
+    "version": "2.0.0",
+    "permissions": [
+        "view_chat",
+        "send_message",
+        "manage_chat_rooms",
+        "broadcast_message"
+    ],
     "roles_permissions": {
-        "admin": [],
-        "manager": []
+        "admin": [
+            "view_chat",
+            "send_message",
+            "manage_chat_rooms",
+            "broadcast_message"
+        ],
+        "manager": [
+            "view_chat",
+            "send_message",
+            "manage_chat_rooms"
+        ],
+        "employee": [
+            "view_chat",
+            "send_message"
+        ],
+        "client": [
+            "view_chat",
+            "send_message"
+        ]
     }
 }
+

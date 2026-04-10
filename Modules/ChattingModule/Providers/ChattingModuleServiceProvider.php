@@ -2,9 +2,9 @@
 
 namespace Modules\ChattingModule\Providers;
 
+use App\Models\UserChat;
 use Modules\ChattingModule\Console\ActivateModuleCommand;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Database\Eloquent\Factory;
 
 class ChattingModuleServiceProvider extends ServiceProvider
 {
@@ -35,6 +35,8 @@ class ChattingModuleServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
+
+        $this->registerBookingObserver();
     }
 
     /**
@@ -97,6 +99,22 @@ class ChattingModuleServiceProvider extends ServiceProvider
     }
 
     /**
+     * Register the BookingObserver when BookingModule is active.
+     * Uses class_exists() guard so ChattingModule stays installable
+     * even without BookingModule.
+     *
+     * @return void
+     */
+    protected function registerBookingObserver(): void
+    {
+        if (class_exists(\Modules\BookingModule\Entities\Booking::class)) {
+            \Modules\BookingModule\Entities\Booking::observe(
+                \Modules\ChattingModule\Observers\BookingObserver::class
+            );
+        }
+    }
+
+    /**
      * Get the services provided by the provider.
      *
      * @return array
@@ -117,3 +135,4 @@ class ChattingModuleServiceProvider extends ServiceProvider
         return $paths;
     }
 }
+

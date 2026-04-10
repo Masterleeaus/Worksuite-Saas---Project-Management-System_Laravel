@@ -798,6 +798,14 @@
 
     @include('bookingmodule::provider.booking.partials.details._update-customer-address-modal')
 
+    @if(class_exists(\Modules\ChattingModule\Models\ChatRoom::class))
+        @push('booking-chat')
+            @include('chattingmodule::sections.booking-chat-panel')
+        @endpush
+    @endif
+
+    @stack('booking-chat')
+
 @endsection
 
 @push('script')
