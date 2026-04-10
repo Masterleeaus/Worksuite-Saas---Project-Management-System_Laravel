@@ -68,7 +68,9 @@ class RecurringController extends Controller
             'orders.stage', 'orders.location',
         ])->findOrFail($id);
 
-        return view('fsmrecurring::recurring.show', compact('recurring'));
+        $preview = $recurring->previewNextOccurrences(4);
+
+        return view('fsmrecurring::recurring.show', compact('recurring', 'preview'));
     }
 
     public function edit(int $id)
