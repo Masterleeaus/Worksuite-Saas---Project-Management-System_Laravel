@@ -1,8 +1,8 @@
 {
     "name": "ZoneManagement",
     "alias": "zonemanagement",
-    "description": "",
-    "keywords": [],
+    "description": "Manage geographic service zones, coverage maps and zone-based pricing",
+    "keywords": ["zones", "geography", "service-area", "pricing", "cleaning"],
     "priority": 0,
     "providers": [
         "Modules\\ZoneManagement\\Providers\\ZoneManagementServiceProvider",
@@ -15,9 +15,37 @@
     "requires": [],
     "active": 1,
     "order": 0,
-    "permissions": [],
+    "permissions": [
+        "zone_view",
+        "zone_add",
+        "zone_update",
+        "zone_delete",
+        "zone_manage_status",
+        "zone_export"
+    ],
     "roles_permissions": {
-        "admin": [],
-        "manager": []
-    }
+        "admin": [
+            "zone_view",
+            "zone_add",
+            "zone_update",
+            "zone_delete",
+            "zone_manage_status",
+            "zone_export"
+        ],
+        "manager": [
+            "zone_view",
+            "zone_add",
+            "zone_update",
+            "zone_manage_status"
+        ]
+    },
+    "menus": [
+        {
+            "panel": "user",
+            "label": "Service Zones",
+            "route": "admin.zone.index",
+            "sort_order": 70
+        }
+    ],
+    "sidebar_menu": true
 }

@@ -36,6 +36,10 @@ class Zone extends Model
         'center_lat',
         'center_lng',
         'radius',
+        'description',
+        'postcodes',
+        'min_booking_value',
+        'availability_window',
     ];
 
     public function scopeOfStatus($query, $status)
@@ -46,6 +50,11 @@ class Zone extends Model
     public function providers()
     {
         return $this->hasMany(Provider::class);
+    }
+
+    public function zonePricing()
+    {
+        return $this->hasMany(ZonePricing::class, 'zone_id');
     }
 
     public function categories()
