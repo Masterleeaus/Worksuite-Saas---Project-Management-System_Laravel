@@ -168,6 +168,7 @@
     </div>
 
 @include('bookingmodule::schedule.partials._timeline', ['schedule' => $schedule])
+@stack('booking-feedback')
 @endsection
 
 {{-- Today Date script --}}

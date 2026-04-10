@@ -166,22 +166,6 @@ class FeedbackTicket extends BaseModel
     }
 
     /**
-     * Get NPS response if this is an NPS survey response
-     */
-    public function npsResponse(): BelongsTo
-    {
-        return $this->belongsTo(NpsResponse::class, 'id', 'feedback_ticket_id');
-    }
-
-    /**
-     * Get CSAT response if this is a CSAT survey response
-     */
-    public function csatResponse(): BelongsTo
-    {
-        return $this->belongsTo(CsatResponse::class, 'id', 'feedback_ticket_id');
-    }
-
-    /**
      * Get AI insights for this ticket
      */
     public function insights(): HasMany

@@ -167,6 +167,7 @@ if ($viewPermission == 'all'
     <div class="content-wrapper pt-0 border-top-0 client-detail-wrapper">
         @include($view)
     </div>
+    @stack('employee-rating')
 @endsection
 
 @push('scripts')

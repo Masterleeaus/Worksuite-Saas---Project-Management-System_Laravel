@@ -21,6 +21,6 @@ class NpsSurveyCreated
 
     public function broadcastOn()
     {
-        return new PrivateChannel('feedback-' . $this->survey->company_id);
+        return new PrivateChannel('survey-created');
     }
 }

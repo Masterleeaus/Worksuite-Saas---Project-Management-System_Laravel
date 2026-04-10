@@ -7,76 +7,34 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        // NPS Surveys
+        // Per-booking NPS/rating survey instances (one row per survey sent to a client)
         Schema::create('nps_surveys', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
-            $table->string('title');
-            $table->text('description')->nullable();
-            $table->text('question')->default('How likely are you to recommend us to a friend or colleague?');
-            $table->json('meta')->nullable();
-            $table->boolean('status')->default(true);
+            $table->unsignedBigInteger('client_id');
+            $table->unsignedBigInteger('booking_id')->nullable();
+            $table->integer('nps_score')->nullable();          // 0-10
+            $table->integer('service_rating')->nullable();     // 1-5 stars
+            $table->integer('cleaner_rating')->nullable();     // 1-5 stars
+            $table->integer('punctuality_rating')->nullable(); // 1-5 stars
+            $table->text('comments')->nullable();
+            $table->string('survey_token')->unique();          // UUID for public survey link
+            $table->boolean('is_public')->default(false);      // show as testimonial
+            $table->timestamp('sent_at')->nullable();
+            $table->timestamp('completed_at')->nullable();
             $table->timestamps();
-            $table->index(['company_id']);
+
+            $table->index(['client_id']);
+            $table->index(['booking_id']);
+            $table->index(['survey_token']);
+            $table->foreign('client_id')->references('id')->on('users')->cascadeOnDelete();
         });
 
-        // NPS Responses
-        Schema::create('nps_responses', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
-            $table->foreignId('nps_survey_id')->constrained('nps_surveys')->cascadeOnDelete();
-            $table->foreignId('feedback_ticket_id')->nullable()->constrained('feedback_tickets')->nullOnDelete();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            
-            $table->integer('score')->min(1)->max(10);
-            $table->longText('feedback')->nullable();
-            $table->json('metadata')->nullable();
-            
-            $table->timestamps();
-            $table->index(['nps_survey_id']);
-            $table->index(['user_id']);
-            $table->index(['feedback_ticket_id']);
-        });
-
-        // CSAT Surveys
-        Schema::create('csat_surveys', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
-            $table->string('title');
-            $table->text('description')->nullable();
-            $table->text('question')->default('How satisfied are you with our service?');
-            $table->integer('scale_min')->default(1);
-            $table->integer('scale_max')->default(5);
-            $table->json('meta')->nullable();
-            $table->boolean('status')->default(true);
-            $table->timestamps();
-            $table->index(['company_id']);
-        });
-
-        // CSAT Responses
-        Schema::create('csat_responses', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
-            $table->foreignId('csat_survey_id')->constrained('csat_surveys')->cascadeOnDelete();
-            $table->foreignId('feedback_ticket_id')->nullable()->constrained('feedback_tickets')->nullOnDelete();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            
-            $table->integer('score');
-            $table->longText('feedback')->nullable();
-            $table->json('metadata')->nullable();
-            
-            $table->timestamps();
-            $table->index(['csat_survey_id']);
-            $table->index(['user_id']);
-            $table->index(['feedback_ticket_id']);
-        });
-
-        // Feedback Insights
+        // Feedback Insights (AI-generated per ticket)
         Schema::create('feedback_insights', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
             $table->foreignId('feedback_ticket_id')->constrained('feedback_tickets')->cascadeOnDelete();
-            
+
             $table->enum('insight_type', ['sentiment', 'category', 'priority', 'action', 'trend']);
             $table->string('title');
             $table->longText('description');
@@ -84,7 +42,7 @@ return new class extends Migration {
             $table->longText('suggested_action')->nullable();
             $table->json('tags')->nullable();
             $table->json('metadata')->nullable();
-            
+
             $table->timestamps();
             $table->index(['feedback_ticket_id']);
             $table->index(['insight_type']);
@@ -94,9 +52,6 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::dropIfExists('feedback_insights');
-        Schema::dropIfExists('csat_responses');
-        Schema::dropIfExists('csat_surveys');
-        Schema::dropIfExists('nps_responses');
         Schema::dropIfExists('nps_surveys');
     }
 };
