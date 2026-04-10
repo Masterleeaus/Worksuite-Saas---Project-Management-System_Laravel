@@ -16,11 +16,24 @@ class EmployeeZone extends Model
         return $this->belongsTo(User::class, 'employee_id');
     }
 
-    public function zone()
+    /**
+     * Relationship to the Zone model — only active when ZoneManagement module is present.
+     * Use hasZoneRelation() to check before eager-loading.
+     */
+    public function zone(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        if (class_exists(\Modules\ZoneManagement\Entities\Zone::class)) {
-            return $this->belongsTo(\Modules\ZoneManagement\Entities\Zone::class, 'zone_id');
-        }
-        return null;
+        $zoneClass = class_exists(\Modules\ZoneManagement\Entities\Zone::class)
+            ? \Modules\ZoneManagement\Entities\Zone::class
+            : self::class; // fallback to self keeps return type valid; zone_id won't match
+
+        return $this->belongsTo($zoneClass, 'zone_id');
+    }
+
+    /**
+     * Returns true when the ZoneManagement module is loaded and the zone() relation is meaningful.
+     */
+    public static function hasZoneRelation(): bool
+    {
+        return class_exists(\Modules\ZoneManagement\Entities\Zone::class);
     }
 }

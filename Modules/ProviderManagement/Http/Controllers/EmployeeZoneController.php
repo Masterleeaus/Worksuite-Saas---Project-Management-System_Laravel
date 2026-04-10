@@ -24,10 +24,12 @@ class EmployeeZoneController extends AccountBaseController
             && user()->id !== $employeeId);
 
         $this->employee      = User::findOrFail($employeeId);
-        $this->employeeZones = EmployeeZone::where('employee_id', $employeeId)->with('zone')->get();
+        $this->employeeZones = EmployeeZone::hasZoneRelation()
+            ? EmployeeZone::where('employee_id', $employeeId)->with('zone')->get()
+            : EmployeeZone::where('employee_id', $employeeId)->get();
 
         $this->availableZones = [];
-        if (class_exists(\Modules\ZoneManagement\Entities\Zone::class)) {
+        if (EmployeeZone::hasZoneRelation()) {
             $this->availableZones = \Modules\ZoneManagement\Entities\Zone::where('is_active', 1)->get();
         }
 

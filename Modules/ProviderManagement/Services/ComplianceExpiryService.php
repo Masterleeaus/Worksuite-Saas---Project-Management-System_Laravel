@@ -14,11 +14,11 @@ class ComplianceExpiryService
     const ALERT_DAYS = 30;
 
     /**
-     * Return employees whose compliance documents are expiring within ALERT_DAYS days.
+     * Return employees whose compliance documents are expiring within $days days.
      */
-    public function getExpiringSoon(?int $companyId = null): Collection
+    public function getExpiringSoon(?int $companyId = null, int $days = self::ALERT_DAYS): Collection
     {
-        $cutoff = Carbon::today()->addDays(self::ALERT_DAYS)->toDateString();
+        $cutoff = Carbon::today()->addDays($days)->toDateString();
         $today  = Carbon::today()->toDateString();
 
         $query = EmployeeDetails::with('user')

@@ -926,9 +926,12 @@ class EmployeeController extends AccountBaseController
         case 'service-zones':
             if (class_exists(\Modules\ProviderManagement\Http\Controllers\EmployeeZoneController::class)) {
                 abort_403(!in_array(user()->permission('view_provider_zones'), ['all', 'added', 'owned', 'both']) && user()->id !== $this->employee->id);
-                $this->employeeZones = \Modules\ProviderManagement\Models\EmployeeZone::where('employee_id', $this->employee->id)->with('zone')->get();
+                $employeeZoneModel = \Modules\ProviderManagement\Models\EmployeeZone::class;
+                $this->employeeZones = $employeeZoneModel::hasZoneRelation()
+                    ? $employeeZoneModel::where('employee_id', $this->employee->id)->with('zone')->get()
+                    : $employeeZoneModel::where('employee_id', $this->employee->id)->get();
                 $this->availableZones = [];
-                if (class_exists(\Modules\ZoneManagement\Entities\Zone::class)) {
+                if ($employeeZoneModel::hasZoneRelation()) {
                     $this->availableZones = \Modules\ZoneManagement\Entities\Zone::where('is_active', 1)->get();
                 }
                 $this->view = 'providermanagement::employee.zones_tab';

@@ -13,7 +13,8 @@ class CheckComplianceExpiry extends Command
 
     public function handle(ComplianceExpiryService $service): int
     {
-        $expiring = $service->getExpiringSoon();
+        $days     = (int) $this->option('days');
+        $expiring = $service->getExpiringSoon(null, $days);
 
         if ($expiring->isEmpty()) {
             $this->info('No compliance documents expiring soon.');
