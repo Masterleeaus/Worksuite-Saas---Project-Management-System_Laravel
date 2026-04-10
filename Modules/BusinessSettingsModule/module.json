@@ -1,8 +1,14 @@
 {
     "name": "BusinessSettingsModule",
     "alias": "businesssettingsmodule",
-    "description": "",
-    "keywords": [],
+    "description": "Business settings and SaaS subscription management — packages, features, billing and tenant configuration",
+    "keywords": [
+        "business",
+        "settings",
+        "subscription",
+        "packages",
+        "billing"
+    ],
     "priority": 0,
     "providers": [
         "Modules\\BusinessSettingsModule\\Providers\\BusinessSettingsModuleServiceProvider",
@@ -15,9 +21,36 @@
     "requires": [],
     "active": 1,
     "order": 0,
-    "permissions": [],
+    "permissions": [
+        "manage_business_settings",
+        "manage_subscription",
+        "view_package_features",
+        "manage_packages"
+    ],
     "roles_permissions": {
-        "admin": [],
-        "manager": []
-    }
+        "admin": [
+            "manage_business_settings",
+            "manage_subscription",
+            "view_package_features",
+            "manage_packages"
+        ],
+        "super_admin": [
+            "manage_business_settings",
+            "manage_subscription",
+            "view_package_features",
+            "manage_packages"
+        ],
+        "manager": [
+            "view_package_features"
+        ]
+    },
+    "menus": [
+        {
+            "panel": "user",
+            "label": "Business Settings",
+            "route": "admin.business-settings.get-business-information",
+            "sort_order": 5
+        }
+    ],
+    "sidebar_menu": true
 }
