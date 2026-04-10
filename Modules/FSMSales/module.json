@@ -1,0 +1,19 @@
+{
+  "name": "FSMSales",
+  "alias": "fsmsales",
+  "description": "FSM Sales & Invoicing – links completed FSM Orders to client invoices, supports recurring billing schedules, and integrates with the Accountings module for CleanSmartOS.",
+  "keywords": ["fsm", "sales", "invoicing", "billing", "recurring", "cleansmartOS"],
+  "active": 1,
+  "order": 2,
+  "providers": [
+    "Modules\\FSMSales\\Providers\\FSMSalesServiceProvider",
+    "Modules\\FSMSales\\Providers\\RouteServiceProvider",
+    "Modules\\FSMSales\\Providers\\EventServiceProvider",
+    "Modules\\FSMSales\\Providers\\ConfigServiceProvider",
+    "Modules\\FSMSales\\Providers\\ViewServiceProvider"
+  ],
+  "aliases": {},
+  "files": [],
+  "requires": ["FSMCore"],
+  "version": "1.0.0"
+}

@@ -106,6 +106,28 @@
 
     {{-- Orders chain --}}
     <div class="col-md-6">
+        {{-- Schedule Preview (next 4 occurrences) --}}
+        @if(!empty($preview))
+        <div class="card mb-3">
+            <div class="card-header fw-semibold">📅 Schedule Preview (Next {{ count($preview) }})</div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    @foreach($preview as $date)
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>{{ $date->format('D, d M Y') }}</span>
+                        <span class="badge bg-light text-muted">{{ $date->diffForHumans() }}</span>
+                    </li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+        @elseif($recurring->state === 'progress')
+        <div class="card mb-3">
+            <div class="card-header fw-semibold">📅 Schedule Preview</div>
+            <div class="card-body text-muted small">No upcoming occurrences within the next year. Check the frequency set configuration.</div>
+        </div>
+        @endif
+
         <div class="card">
             <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
                 <span>Generated Orders ({{ $recurring->orders->count() }})</span>

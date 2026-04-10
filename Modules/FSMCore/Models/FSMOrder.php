@@ -27,6 +27,11 @@ class FSMOrder extends Model
         'date_start',
         'date_end',
         'description',
+        // FSMSales fields (added by FSMSales module migration)
+        'billing_policy',
+        'billing_amount',
+        'hourly_rate',
+        'is_invoiced',
     ];
 
     protected $casts = [
@@ -115,5 +120,16 @@ class FSMOrder extends Model
     public function photos()
     {
         return $this->hasMany(FSMOrderPhoto::class, 'fsm_order_id');
+    public function invoices()
+    {
+        if (!class_exists(\Modules\FSMSales\Models\FSMSalesInvoice::class)) {
+            return null;
+        }
+        return $this->belongsToMany(
+            \Modules\FSMSales\Models\FSMSalesInvoice::class,
+            'fsm_sales_invoice_order',
+            'fsm_order_id',
+            'fsm_sales_invoice_id'
+        );
     }
 }

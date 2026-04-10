@@ -69,9 +69,21 @@ class FSMFrequency extends Model
     /**
      * Generate all occurrence dates between $start and $until (inclusive).
      * Returns an array of Carbon instances.
+     *
+     * When use_setpos is enabled for monthly/yearly rules the method enumerates
+     * all days that satisfy the weekday/month-day filters within each period and
+     * then picks the Nth one (positive = from start, negative = from end).
+     * This supports patterns such as "first Monday of the month" (monthly,
+     * weekday_mo=true, set_pos=1) or "last Friday" (set_pos=-1).
      */
     public function getOccurrences(Carbon $start, Carbon $until): array
     {
+        if ($this->use_setpos && $this->set_pos !== null
+            && in_array($this->interval_type, [self::INTERVAL_MONTHLY, self::INTERVAL_YEARLY], true)
+        ) {
+            return $this->getOccurrencesBySetPos($start, $until);
+        }
+
         $dates = [];
         $current = $start->copy();
         $interval = max(1, (int) $this->interval);
@@ -81,6 +93,65 @@ class FSMFrequency extends Model
                 $dates[] = $current->copy();
             }
             $current = $this->advance($current, $interval);
+        }
+
+        return $dates;
+    }
+
+    /**
+     * Period-based occurrence generation for monthly/yearly rules that use
+     * BYSETPOS semantics (e.g. "first Monday of the month", "last Friday").
+     *
+     * For each period (month or year) the method collects all days that satisfy
+     * the by-weekday / by-month-day / by-month filters and then selects the
+     * element at position set_pos (1-based from start; -1-based from end).
+     */
+    private function getOccurrencesBySetPos(Carbon $start, Carbon $until): array
+    {
+        $dates   = [];
+        $interval = max(1, (int) $this->interval);
+        $setPos   = (int) $this->set_pos;
+
+        // Align period cursor to the start of the first period containing $start
+        $periodStart = $this->interval_type === self::INTERVAL_MONTHLY
+            ? $start->copy()->startOfMonth()
+            : $start->copy()->startOfYear();
+
+        while ($periodStart->lessThanOrEqualTo($until)) {
+            $periodEnd = $this->interval_type === self::INTERVAL_MONTHLY
+                ? $periodStart->copy()->endOfMonth()
+                : $periodStart->copy()->endOfYear();
+
+            // Collect all days within this period that satisfy day-level filters
+            $periodDates = [];
+            $day = $periodStart->copy();
+            while ($day->lessThanOrEqualTo($periodEnd)) {
+                if ($this->matchesDate($day)) {
+                    $periodDates[] = $day->copy();
+                }
+                $day->addDay();
+            }
+
+            // Apply set-position selector.
+            // Positive set_pos is 1-based from the start (1 = first, 2 = second …).
+            // Negative set_pos counts from the end (−1 = last, −2 = second-to-last …).
+            $count = count($periodDates);
+            if ($count > 0) {
+                $idx = $setPos > 0 ? $setPos - 1 : $count + $setPos;
+                if ($idx >= 0 && $idx < $count) {
+                    $target = $periodDates[$idx];
+                    if ($target->greaterThanOrEqualTo($start) && $target->lessThanOrEqualTo($until)) {
+                        $dates[] = $target;
+                    }
+                }
+            }
+
+            // Advance to the next period
+            if ($this->interval_type === self::INTERVAL_MONTHLY) {
+                $periodStart->addMonths($interval);
+            } else {
+                $periodStart->addYears($interval);
+            }
         }
 
         return $dates;
