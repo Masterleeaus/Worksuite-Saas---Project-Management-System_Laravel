@@ -46,9 +46,8 @@ class CleaningInfoController extends AccountBaseController
                 ->find($clientDetail->preferred_cleaner_id);
         }
 
-        $this->view      = 'customermodule::client.cleaning-info';
-        $this->client    = $this->client;
-        $this->detail    = $clientDetail;
+        $this->view   = 'customermodule::client.cleaning-info';
+        $this->detail = $clientDetail;
         $this->cleaner   = $preferredCleaner;
 
         return $this->returnAjax($this->view);
