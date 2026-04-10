@@ -42,7 +42,12 @@
         "appointments assign",
         "schedule bulk assign",
         "appointment settings manage",
-        "appointment dispatch"
+        "appointment dispatch",
+        "view_bookings",
+        "create_bookings",
+        "assign_cleaners",
+        "complete_booking",
+        "cancel_booking"
     ],
     "roles_permissions": {
         "admin": [
@@ -53,13 +58,21 @@
             "view_booking_pages",
             "manage_booking_pages",
             "view_booking_page_requests",
-            "manage_dispatch_board"
+            "manage_dispatch_board",
+            "view_bookings",
+            "create_bookings",
+            "assign_cleaners",
+            "complete_booking",
+            "cancel_booking"
         ],
         "manager": [
             "view_booking",
             "edit_booking",
             "view_booking_pages",
-            "view_booking_page_requests"
+            "view_booking_page_requests",
+            "view_bookings",
+            "assign_cleaners",
+            "complete_booking"
         ]
     },
     "menus": [

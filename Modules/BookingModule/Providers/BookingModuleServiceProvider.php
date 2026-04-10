@@ -5,6 +5,8 @@ namespace Modules\BookingModule\Providers;
 use Modules\BookingModule\Console\ActivateModuleCommand;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
+use Modules\BookingModule\Services\BookingFSMService;
+use Modules\BookingModule\Services\BookingAutoInvoiceService;
 
 class BookingModuleServiceProvider extends ServiceProvider
 {
@@ -50,6 +52,10 @@ class BookingModuleServiceProvider extends ServiceProvider
         $this->app->register(RouteServiceProvider::class);
         if (class_exists(\Modules\BookingModule\Providers\AuthServiceProvider::class)) { $this->app->register(\Modules\BookingModule\Providers\AuthServiceProvider::class); }
         if (class_exists(\Modules\BookingModule\Providers\EventServiceProvider::class)) { $this->app->register(\Modules\BookingModule\Providers\EventServiceProvider::class); }
+
+        // Bind FSM services as singletons.
+        $this->app->singleton(BookingFSMService::class);
+        $this->app->singleton(BookingAutoInvoiceService::class);
     }
 
     /**

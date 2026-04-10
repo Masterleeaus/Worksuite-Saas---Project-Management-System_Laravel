@@ -254,3 +254,6 @@ $recurringEventPermission = user()->permission('manage_recurring_event');
         }
     </script>
 @endpush
+
+{{-- BookingModule: inject booking-status-coloured events when module is active --}}
+@stack('booking-calendar-events')
