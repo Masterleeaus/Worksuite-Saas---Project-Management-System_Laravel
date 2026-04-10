@@ -3,7 +3,7 @@ name: Install Check
 on:
   push:
     branches: [main, master, develop]
-  pull_request:
+  pull_request_target:
     branches: [main, master, develop]
   workflow_dispatch:
 
@@ -35,6 +35,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # pull_request_target runs in base-branch context; explicitly check out
+          # the PR head so the install check validates the proposed changes.
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
