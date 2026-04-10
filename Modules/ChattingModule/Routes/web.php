@@ -1,10 +1,9 @@
 <?php
 
-
-
 use Illuminate\Support\Facades\Route;
 use Modules\ChattingModule\Http\Controllers\Web\Admin\ChattingController;
 use Modules\ChattingModule\Http\Controllers\Web\Provider\ChattingController as ProviderChattingController;
+use Modules\ChattingModule\Http\Controllers\BookingChatController;
 
 Route::middleware(['web','auth'])->prefix('account')->group(function () {
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Web\Admin', 'middleware' => ['admin', 'actch:admin_panel']], function () {
@@ -28,4 +27,24 @@ Route::group(['prefix' => 'provider', 'as' => 'provider.', 'namespace' => 'Web\P
         Route::get('ajax-conversation', [ProviderChattingController::class, 'conversation'])->name('ajax-conversation');
     });
 });
+
+/*
+|--------------------------------------------------------------------------
+| Worksuite-native Booking Chat Routes
+| Extends the core users_chat table — no duplicate messaging system.
+|--------------------------------------------------------------------------
+*/
+Route::prefix('booking-chat')
+    ->as('chattingmodule.booking-chat.')
+    ->middleware(['auth'])
+    ->group(function () {
+        Route::get('{bookingId}/messages', [BookingChatController::class, 'index'])->name('index');
+        Route::post('send', [BookingChatController::class, 'store'])->name('store');
+        Route::delete('{id}', [BookingChatController::class, 'destroy'])->name('destroy');
+        Route::post('{bookingId}/mark-read', [BookingChatController::class, 'markRead'])->name('mark-read');
+        Route::get('unread-count', [BookingChatController::class, 'unreadCount'])->name('unread-count');
+        Route::post('rooms/{roomId}/broadcast', [BookingChatController::class, 'broadcast'])->name('broadcast');
+        Route::get('attachment/{id}', [BookingChatController::class, 'attachment'])->name('attachment');
+    });
 });
+

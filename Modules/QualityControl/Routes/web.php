@@ -10,6 +10,10 @@ use Modules\QualityControl\Http\Controllers\RecurringScheduleController;
 use Modules\QualityControl\Http\Controllers\ScheduleInspectionController;
 use Modules\QualityControl\Http\Controllers\InspectionTemplateController;
 use Modules\QualityControl\Http\Controllers\InspectionTemplateItemController;
+use Modules\QualityControl\Http\Controllers\QcDashboardController;
+use Modules\QualityControl\Http\Controllers\QcRecordController;
+use Modules\QualityControl\Http\Controllers\CleanerRatingController;
+use Modules\QualityControl\Http\Controllers\RecleanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,6 +32,41 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
         // Schedule recurring
 
     });
+
+    /*
+     |--------------------------------------------------------------------------
+     | QC Dashboard (canonical menu entry: quality-control.index)
+     |--------------------------------------------------------------------------
+     */
+    Route::get('quality-control', [QcDashboardController::class, 'index'])->name('quality-control.index');
+
+    /*
+     |--------------------------------------------------------------------------
+     | QC Records — CRUD + re-clean trigger
+     |--------------------------------------------------------------------------
+     */
+    Route::resource('qc-records', QcRecordController::class)
+        ->only(['index', 'create', 'store', 'show', 'destroy'])
+        ->names('qc-records');
+
+    Route::post('qc-records/{id}/trigger-reclean', [QcRecordController::class, 'triggerReclean'])
+        ->name('qc-records.trigger_reclean');
+
+    /*
+     |--------------------------------------------------------------------------
+     | Cleaner Ratings
+     |--------------------------------------------------------------------------
+     */
+    Route::get('cleaner-ratings', [CleanerRatingController::class, 'index'])->name('cleaner-ratings.index');
+    Route::get('cleaner-ratings/{cleanerId}', [CleanerRatingController::class, 'show'])->name('cleaner-ratings.show');
+
+    /*
+     |--------------------------------------------------------------------------
+     | Re-clean Management
+     |--------------------------------------------------------------------------
+     */
+    Route::get('reclean-management', [RecleanController::class, 'index'])->name('reclean.index');
+    Route::post('reclean-management/{id}/done', [RecleanController::class, 'markDone'])->name('reclean.done');
 
     /*
      |--------------------------------------------------------------------------

@@ -1,0 +1,11 @@
+{
+    "name": "Report",
+    "alias": "report",
+    "description": "Report module for payment and provider reports",
+    "keywords": ["report", "payment"],
+    "priority": 0,
+    "providers": [
+        "Modules\\Report\\Providers\\ReportServiceProvider"
+    ],
+    "files": []
+}

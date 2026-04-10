@@ -1,0 +1,19 @@
+{
+  "name": "FSMRoute",
+  "alias": "fsmroute",
+  "description": "FSM Route \u2013 Day Route Planning & Dispatch: Routes, Day Routes, Worker Availability for CleanSmartOS.",
+  "keywords": ["fsm","routing","dispatch","cleansmartOS"],
+  "active": 1,
+  "order": 1,
+  "providers": [
+    "Modules\\FSMRoute\\Providers\\FSMRouteServiceProvider",
+    "Modules\\FSMRoute\\Providers\\RouteServiceProvider",
+    "Modules\\FSMRoute\\Providers\\ConfigServiceProvider",
+    "Modules\\FSMRoute\\Providers\\ViewServiceProvider",
+    "Modules\\FSMRoute\\Providers\\EventServiceProvider"
+  ],
+  "aliases": {},
+  "files": [],
+  "requires": ["FSMCore"],
+  "version": "1.0.0"
+}

@@ -22,10 +22,7 @@ class SecurityServiceProvider extends ServiceProvider
 
     public function register()
     {
-        $this->app->config(['modules.Security' => array_merge(
-            config('modules.Security', []),
-            config(__DIR__ . '/Config/config.php', [])
-        )]);
+        $this->app->register(RouteServiceProvider::class);
 
         $this->registerBindings();
     }
@@ -51,11 +48,11 @@ class SecurityServiceProvider extends ServiceProvider
 
     public function registerViews()
     {
-        $viewPath = resource_path('views/modules/' . $this->moduleNameLower);
+        $viewPath   = resource_path('views/modules/' . $this->moduleNameLower);
         $sourcePath = module_path($this->moduleName, 'Resources/views');
 
         $this->publishes([
-            $sourcePath => $viewPath
+            $sourcePath => $viewPath,
         ]);
 
         $this->loadViewsFrom(array_merge($this->getPublishableViewPaths(), [$sourcePath]), $this->moduleNameLower);

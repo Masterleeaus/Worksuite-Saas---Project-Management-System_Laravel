@@ -3,6 +3,8 @@
 namespace Modules\ZoneManagement\Providers;
 
 use Modules\ZoneManagement\Console\ActivateModuleCommand;
+use Modules\ZoneManagement\Console\PurgeOldGpsDataCommand;
+use Modules\ZoneManagement\Services\GeofenceService;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
 
@@ -28,6 +30,7 @@ class ZoneManagementServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 ActivateModuleCommand::class,
+                PurgeOldGpsDataCommand::class,
             ]);
         }
 
@@ -49,6 +52,9 @@ class ZoneManagementServiceProvider extends ServiceProvider
         if (file_exists($helpers)) { require_once $helpers; }
 
         $this->app->register(RouteServiceProvider::class);
+
+        // Bind GeofenceService as a singleton so it is shared across controllers
+        $this->app->singleton(GeofenceService::class);
     }
 
     /**

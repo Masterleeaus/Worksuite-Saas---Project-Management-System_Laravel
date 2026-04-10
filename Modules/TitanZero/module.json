@@ -1,12 +1,36 @@
 {
     "name": "TitanZero",
     "alias": "titanzero",
-    "description": "Titan Zero \u2013 Titan Zero powered by Titan Core",
-    "keywords": [],
+    "description": "TitanZero \u2014 zero-config AI integration, smart scheduling suggestions and intelligent automation",
+    "keywords": ["ai", "titanzero", "automation", "scheduling", "cleaning"],
     "priority": 0,
-    "version": 3.0,
+    "version": "3.0",
+    "active": 1,
+    "requires": ["TitanCore"],
     "providers": [
-        "Modules\\TitanZero\\Providers\\TitanZeroServiceProvider"
+        "Modules\\TitanZero\\Providers\\TitanZeroServiceProvider",
+        "Modules\\TitanZero\\Providers\\RouteServiceProvider",
+        "Modules\\TitanZero\\Providers\\EventServiceProvider"
     ],
-    "files": []
+    "files": [],
+    "permissions": [
+        "use_titan_zero",
+        "configure_titan_zero"
+    ],
+    "roles_permissions": {
+        "admin": [
+            "use_titan_zero",
+            "configure_titan_zero"
+        ]
+    },
+    "menus": [
+        {
+            "panel": "user",
+            "label": "Titan Zero",
+            "route": "titan.zero.index",
+            "sort_order": 90,
+            "group": "Settings"
+        }
+    ],
+    "sidebar_menu": true
 }

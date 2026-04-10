@@ -1,0 +1,19 @@
+{
+  "name": "FSMTimesheet",
+  "alias": "fsmtimesheet",
+  "description": "FSM Timesheet – Timesheet logging for FSM Orders. Allows cleaners to log actual hours worked per job for precise payroll calculation.",
+  "keywords": ["fsm", "timesheet", "payroll", "hours", "cleansmartOS"],
+  "active": 1,
+  "order": 1,
+  "providers": [
+    "Modules\\FSMTimesheet\\Providers\\FSMTimesheetServiceProvider",
+    "Modules\\FSMTimesheet\\Providers\\RouteServiceProvider",
+    "Modules\\FSMTimesheet\\Providers\\EventServiceProvider",
+    "Modules\\FSMTimesheet\\Providers\\ConfigServiceProvider",
+    "Modules\\FSMTimesheet\\Providers\\ViewServiceProvider"
+  ],
+  "aliases": {},
+  "files": [],
+  "requires": ["FSMCore"],
+  "version": "1.0.0"
+}

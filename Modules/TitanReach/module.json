@@ -1,0 +1,16 @@
+{
+  "name": "TitanReach",
+  "alias": "titanreach",
+  "description": "TitanReach – OmniChannel Inbox & Campaign Manager (WhatsApp, SMS, Calls, Telegram)",
+  "keywords": [],
+  "active": 1,
+  "order": 0,
+  "providers": [
+    "Modules\\TitanReach\\Providers\\TitanReachServiceProvider",
+    "Modules\\TitanReach\\Providers\\RouteServiceProvider"
+  ],
+  "aliases": {},
+  "files": [],
+  "requires": [],
+  "version": "1.0.0"
+}

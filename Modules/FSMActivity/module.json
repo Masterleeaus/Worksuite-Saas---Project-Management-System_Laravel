@@ -1,0 +1,19 @@
+{
+  "name": "FSMActivity",
+  "alias": "fsmactivity",
+  "description": "FSM Activity – Structured action items and notes logged against FSM Orders for CleanSmartOS.",
+  "keywords": ["fsm", "activities", "tasks", "cleansmartOS"],
+  "active": 1,
+  "order": 1,
+  "providers": [
+    "Modules\\FSMActivity\\Providers\\FSMActivityServiceProvider",
+    "Modules\\FSMActivity\\Providers\\RouteServiceProvider",
+    "Modules\\FSMActivity\\Providers\\EventServiceProvider",
+    "Modules\\FSMActivity\\Providers\\ConfigServiceProvider",
+    "Modules\\FSMActivity\\Providers\\ViewServiceProvider"
+  ],
+  "aliases": {},
+  "files": [],
+  "requires": ["FSMCore"],
+  "version": "1.0.0"
+}

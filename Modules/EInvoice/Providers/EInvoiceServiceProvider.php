@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 use Modules\EInvoice\Console\ActivateModuleCommand;
+use Modules\EInvoice\AI\ClientInterface;
+use Modules\EInvoice\AI\Adapters\OpenAIClient;
 
 class EInvoiceServiceProvider extends ServiceProvider
 {
@@ -24,20 +26,27 @@ class EInvoiceServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        // Auto-run MenuSeeder when seeding the module
+        if ($this->app->runningInConsole()) {
+            $this->callAfterResolving('seeder', function ($seeder) {
+                $seeder->call(\Modules\EInvoice\Database\Seeders\MenuSeeder::class);
+            });
+        }
+
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
-        $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
-        Blade::componentNamespace('Modules\EInvoice\Views\Components', 'einvoice');
+        $this->loadMigrationsFrom(__DIR__ . '/../Database/Migrations');
+        Blade::componentNamespace('Modules\\EInvoice\\Views\\Components', 'einvoice');
         $this->commands([
             ActivateModuleCommand::class,
         ]);
-    
+
         // Titan Zero + Titan Go integration (capabilities registry)
         if (class_exists(\Modules\TitanZero\Services\CapabilityRegistry::class)) {
             \Modules\TitanZero\Services\CapabilityRegistry::registerModuleFromConfig('EInvoice');
         }
-}
+    }
 
     /**
      * Register the service provider.
@@ -47,6 +56,11 @@ class EInvoiceServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->register(RouteServiceProvider::class);
+
+        // Bind AI client — resolves to OpenAIClient (or swap adapter as needed)
+        $this->app->bind(ClientInterface::class, function ($app) {
+            return new OpenAIClient(config('einvoice.ai'));
+        });
     }
 
     /**
@@ -57,11 +71,11 @@ class EInvoiceServiceProvider extends ServiceProvider
     protected function registerConfig()
     {
         $this->publishes([
-            __DIR__.'/../Config/config.php' => config_path('einvoice.php'),
+            __DIR__ . '/../Config/config.php' => config_path('einvoice.php'),
         ]);
 
         $this->mergeConfigFrom(
-            __DIR__.'/../Config/config.php', 'einvoice'
+            __DIR__ . '/../Config/config.php', 'einvoice'
         );
 
         $this->mergeConfigFrom(
@@ -77,12 +91,11 @@ class EInvoiceServiceProvider extends ServiceProvider
      */
     public function registerViews()
     {
-        $viewPath = base_path('resources/views/modules/einvoice');
-
-        $sourcePath = __DIR__.'/../Resources/views';
+        $viewPath   = base_path('resources/views/modules/einvoice');
+        $sourcePath = __DIR__ . '/../Resources/views';
 
         $this->publishes([
-            $sourcePath => $viewPath
+            $sourcePath => $viewPath,
         ]);
 
         $this->loadViewsFrom(array_merge(array_map(function ($path) {
@@ -101,9 +114,8 @@ class EInvoiceServiceProvider extends ServiceProvider
 
         if (is_dir($langPath)) {
             $this->loadTranslationsFrom($langPath, 'einvoice');
-        }
-        else {
-            $this->loadTranslationsFrom(__DIR__ .'/../Resources/lang', 'einvoice');
+        } else {
+            $this->loadTranslationsFrom(__DIR__ . '/../Resources/lang', 'einvoice');
         }
     }
 
@@ -114,7 +126,7 @@ class EInvoiceServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return array();
+        return [];
     }
 
 }

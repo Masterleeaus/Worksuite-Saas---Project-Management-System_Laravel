@@ -1,0 +1,19 @@
+{
+  "name": "FSMStock",
+  "alias": "fsmstock",
+  "description": "FSM Stock & Inventory – Central warehouse catalogue, order-level stock lines, stock movement tracking, equipment site registers, and low-stock alerts for CleanSmartOS.",
+  "keywords": ["fsm", "stock", "inventory", "equipment", "cleansmartOS"],
+  "active": 1,
+  "order": 1,
+  "providers": [
+    "Modules\\FSMStock\\Providers\\FSMStockServiceProvider",
+    "Modules\\FSMStock\\Providers\\RouteServiceProvider",
+    "Modules\\FSMStock\\Providers\\EventServiceProvider",
+    "Modules\\FSMStock\\Providers\\ConfigServiceProvider",
+    "Modules\\FSMStock\\Providers\\ViewServiceProvider"
+  ],
+  "aliases": {},
+  "files": [],
+  "requires": ["FSMCore"],
+  "version": "1.0.0"
+}

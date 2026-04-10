@@ -1,8 +1,8 @@
 {
     "name": "Testimonials",
     "alias": "testimonials",
-    "description": "",
-    "keywords": [],
+    "description": "Customer testimonials — social proof, before/after showcase and public display",
+    "keywords": ["testimonials", "reviews", "social-proof", "before-after", "cleaning"],
     "priority": 0,
     "providers": [
         "Modules\\Testimonials\\Providers\\TestimonialsServiceProvider",
@@ -15,9 +15,29 @@
     "order": 0,
     "aliases": {},
     "requires": [],
-    "permissions": [],
+    "permissions": [
+        "view_testimonials",
+        "manage_testimonials",
+        "publish_testimonial"
+    ],
     "roles_permissions": {
-        "admin": [],
-        "manager": []
-    }
+        "admin": [
+            "view_testimonials",
+            "manage_testimonials",
+            "publish_testimonial"
+        ],
+        "manager": [
+            "view_testimonials"
+        ]
+    },
+    "menus": [
+        {
+            "panel": "admin",
+            "label": "Testimonials",
+            "route": "admin.testimonials",
+            "sort_order": 90,
+            "icon": "ti ti-star"
+        }
+    ],
+    "sidebar_menu": true
 }

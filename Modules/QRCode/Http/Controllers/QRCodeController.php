@@ -233,6 +233,32 @@ class QRCodeController extends AccountBaseController
         return Reply::dataOnly(['status' => 'success', 'qr' => $qr]);
     }
 
+    /**
+     * Public scan endpoint — logs the scan and redirects to the QR code's destination.
+     */
+    public function scan(int $id)
+    {
+        $qrCodeData = QrCodeData::findOrFail($id);
+
+        \Modules\QRCode\Entities\QrScanLog::create([
+            'qr_code_data_id' => $qrCodeData->id,
+            'company_id'      => $qrCodeData->company_id,
+            'user_id'         => auth()->id(),
+            'ip_address'      => request()->ip(),
+            'user_agent'      => request()->userAgent(),
+            'scanned_at'      => now(),
+        ]);
+
+        // Redirect to the stored URL for URL-based types; show text for others
+        $url = $qrCodeData->data ?? null;
+
+        if ($url && str($url)->startsWith('http')) {
+            return redirect()->away($url);
+        }
+
+        return response()->json(['data' => $url]);
+    }
+
     private function qrGenerate(QrPreview $request)
     {
         $qr = match (Type::tryFrom($request->type)) {
@@ -249,6 +275,12 @@ class QRCodeController extends AccountBaseController
             Type::whatsapp => QrCode::whatsapp($request->mobile, $request->country_phonecode, $request->message),
             Type::wifi => QrCode::wifi($request->name, $request->password, $request->encryption, $request->hidden),
             Type::zoom => QrCode::url($request->url),
+            Type::property => QrCode::url($request->url),
+            Type::asset => QrCode::url($request->url),
+            Type::booking_checkin => QrCode::url($request->url),
+            Type::booking_page => QrCode::url($request->url),
+            Type::biolink => QrCode::url($request->url),
+            Type::review => QrCode::url($request->url),
             default => QrCode::text($request->message ?: ''),
         };
 

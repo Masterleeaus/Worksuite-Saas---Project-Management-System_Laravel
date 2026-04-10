@@ -258,6 +258,9 @@ return [
 
         // WORKSUITESAAS
         App\Providers\SuperAdmin\EventServiceProvider::class,
+
+        // MCP (Model Context Protocol) server
+        App\Providers\McpServiceProvider::class,
     ],
 
     /*

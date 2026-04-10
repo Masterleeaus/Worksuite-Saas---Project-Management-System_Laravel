@@ -105,6 +105,12 @@ $viewClientOrder = user()->permission('view_order');
                             class="gdpr" />
                     </li>
                     @endif
+
+                    {{-- Complaint module pushes a 'Complaints' tab entry here --}}
+                    @stack('client-complaints-tab')
+
+                    {{-- CustomerModule FSM overlay pushes Cleaning Info, Properties and Booking History tabs here --}}
+                    @stack('client-fsm-tabs')
                 </ul>
             </nav>
         </div>

@@ -50,6 +50,16 @@ class TitanZeroServiceProvider extends ServiceProvider
             }
         }
 
+        // API routes (job-access encrypted notes + existing gateway)
+        foreach ([__DIR__ . '/../Routes/api.php', __DIR__ . '/../routes/api.php'] as $apiRoutes) {
+            if (file_exists($apiRoutes)) {
+                Route::middleware('api')
+                    ->prefix('api')
+                    ->group($apiRoutes);
+                break;
+            }
+        }
+
         // ✅ Console-only registrations MUST be inside boot()
         if ($this->app->runningInConsole()) {
             $this->commands([

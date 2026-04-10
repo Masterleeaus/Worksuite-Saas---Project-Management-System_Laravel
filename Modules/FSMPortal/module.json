@@ -1,0 +1,19 @@
+{
+  "name": "FSMPortal",
+  "alias": "fsmportal",
+  "description": "FSM Client Portal – exposes FSM Orders to the client-facing portal so clients can track jobs in real time for CleanSmartOS.",
+  "keywords": ["fsm", "portal", "client-facing", "cleansmartOS"],
+  "active": 1,
+  "order": 1,
+  "providers": [
+    "Modules\\FSMPortal\\Providers\\FSMPortalServiceProvider",
+    "Modules\\FSMPortal\\Providers\\RouteServiceProvider",
+    "Modules\\FSMPortal\\Providers\\EventServiceProvider",
+    "Modules\\FSMPortal\\Providers\\ConfigServiceProvider",
+    "Modules\\FSMPortal\\Providers\\ViewServiceProvider"
+  ],
+  "aliases": {},
+  "files": [],
+  "requires": ["FSMCore"],
+  "version": "1.0.0"
+}

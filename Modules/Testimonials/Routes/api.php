@@ -14,11 +14,26 @@ use Modules\Testimonials\app\Http\Controllers\TestimonialsController;
  *
 */
 
+// Public JSON endpoint (no auth — for embeddable widget JS)
+Route::get('/testimonials/public', [TestimonialsController::class, 'publicList'])
+    ->name('api.testimonials.public');
+
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::group(['prefix' => 'admin', 'middleware' => 'api'], function() {
-        Route::post('/testimonial-list', [TestimonialsController::class, 'index']);
-        Route::post('/save-testimonial', [TestimonialsController::class, 'store']);
-        Route::post('/delete-testimonial', [TestimonialsController::class, 'destroy']);
-        Route::post('/change-status-testimonial', [TestimonialsController::class, 'statusChange']);
+    Route::group(['prefix' => 'admin', 'middleware' => 'api'], function () {
+        // Existing CRUD
+        Route::post('/testimonial-list',            [TestimonialsController::class, 'index']);
+        Route::post('/save-testimonial',            [TestimonialsController::class, 'store']);
+        Route::post('/delete-testimonial',          [TestimonialsController::class, 'destroy']);
+        Route::post('/change-status-testimonial',   [TestimonialsController::class, 'statusChange']);
+
+        // Publish / Unpublish / Featured
+        Route::post('/publish-testimonial',         [TestimonialsController::class, 'publish']);
+        Route::post('/unpublish-testimonial',       [TestimonialsController::class, 'unpublish']);
+        Route::post('/toggle-featured-testimonial', [TestimonialsController::class, 'toggleFeatured']);
+
+        // Import
+        Route::post('/import-testimonials-reviews',  [TestimonialsController::class, 'importFromReviews']);
+        Route::post('/import-testimonials-feedback', [TestimonialsController::class, 'importFromFeedback']);
     });
 });
+

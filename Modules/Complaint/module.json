@@ -1,13 +1,16 @@
 {
     "name": "Complaint",
     "alias": "complaint",
-    "description": "",
-    "keywords": [],
+    "description": "Complaint management — extends core ticket system with booking linkage, resolution workflow, and FSM integration.",
+    "keywords": ["complaint", "ticket", "support", "fsm", "cleaning"],
+    "active": 1,
     "priority": 0,
     "providers": [
         "Modules\\Complaint\\Providers\\ComplaintServiceProvider",
+        "Modules\\Complaint\\Providers\\RouteServiceProvider",
         "Modules\\Complaint\\Providers\\EventServiceProvider"
     ],
     "files": [],
-    "version": "1.0.1"
+    "requires": [],
+    "version": "1.0.2"
 }

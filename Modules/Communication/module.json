@@ -1,9 +1,9 @@
 {
     "name": "Communication",
     "alias": "communication",
-    "active": true,
-    "description": "",
-    "keywords": [],
+    "active": 1,
+    "description": "Unified communication hub — email, SMS, chat, push notifications and message templates",
+    "keywords": ["communication", "email", "sms", "chat", "notifications", "templates"],
     "priority": 0,
     "providers": [
         "Modules\\Communication\\Providers\\CommunicationServiceProvider",
@@ -17,9 +17,18 @@
     "order": 0,
     "aliases": {},
     "requires": [],
-    "permissions": [],
+    "permissions": [
+        "view_communications",
+        "send_communication",
+        "manage_templates",
+        "view_communication_history"
+    ],
     "roles_permissions": {
-        "admin": [],
-        "manager": []
-    }
+        "admin": ["view_communications", "send_communication", "manage_templates", "view_communication_history"],
+        "manager": ["view_communications", "send_communication", "view_communication_history"]
+    },
+    "sidebar_menu": true,
+    "menus": [
+        {"panel": "user", "label": "Communications", "route": "communications.index", "sort_order": 21}
+    ]
 }
