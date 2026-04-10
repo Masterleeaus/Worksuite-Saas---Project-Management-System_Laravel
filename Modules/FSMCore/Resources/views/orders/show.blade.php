@@ -401,4 +401,14 @@
         @endif
     </div>
 </div>
+
+{{-- TitanZero: Encrypted Job Access Notes (Zero Knowledge) --}}
+@if(class_exists(\Modules\TitanZero\Entities\JobAccessNote::class) && \Illuminate\Support\Facades\Schema::hasTable('titanzero_job_access_notes'))
+<div class="row">
+    <div class="col-12">
+        @include('titanzero::partials.job-access-panel', ['order' => $order])
+    </div>
+</div>
+@endif
+
 @endsection
