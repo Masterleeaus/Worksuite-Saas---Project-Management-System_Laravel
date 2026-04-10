@@ -56,6 +56,8 @@
 <script>
 // Convert CSV field names to hidden array inputs on submit
 document.querySelector('form').addEventListener('submit', function(e) {
+    var container = document.getElementById('requiredFieldsContainer');
+    container.innerHTML = '';
     var csv = document.getElementById('requiredFieldsCsv').value;
     var fields = csv.split(',').map(f => f.trim()).filter(f => f.length > 0);
     fields.forEach(function(f) {
@@ -63,7 +65,7 @@ document.querySelector('form').addEventListener('submit', function(e) {
         input.type = 'hidden';
         input.name = 'required_fields[]';
         input.value = f;
-        document.getElementById('requiredFieldsContainer').appendChild(input);
+        container.appendChild(input);
     });
 });
 </script>
