@@ -7,6 +7,9 @@ use Modules\ServiceManagement\Http\Controllers\Web\Admin\ServiceController as Ad
 use Modules\ServiceManagement\Http\Controllers\Web\Admin\ServiceRequestController;
 use Modules\ServiceManagement\Http\Controllers\Web\Admin\FAQController;
 use Modules\ServiceManagement\Http\Controllers\Web\Provider\ServiceController;
+use Modules\ServiceManagement\Http\Controllers\CleaningServiceController;
+use Modules\ServiceManagement\Http\Controllers\ServiceAddonController;
+use Modules\ServiceManagement\Http\Controllers\ServicePricingController;
 
 Route::middleware(['web','auth'])->prefix('account')->group(function () {
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Web\Admin', 'middleware' => ['admin', 'actch:admin_panel']], function () {
@@ -56,4 +59,37 @@ Route::group(['prefix' => 'provider', 'as' => 'provider.', 'namespace' => 'Web\P
         Route::any('reviews/download', [ServiceController::class, 'reviewsDownload'])->name('reviews.download');
     });
 });
+});
+
+// Cleaning business service management routes (user panel)
+Route::middleware(['web', 'auth'])->prefix('services')->as('services.')->group(function () {
+    // Service CRUD
+    Route::get('/', [CleaningServiceController::class, 'index'])->name('index');
+    Route::get('/create', [CleaningServiceController::class, 'create'])->name('create');
+    Route::post('/', [CleaningServiceController::class, 'store'])->name('store');
+    Route::get('/{id}', [CleaningServiceController::class, 'show'])->name('show');
+    Route::get('/{id}/edit', [CleaningServiceController::class, 'edit'])->name('edit');
+    Route::put('/{id}', [CleaningServiceController::class, 'update'])->name('update');
+    Route::delete('/{id}', [CleaningServiceController::class, 'destroy'])->name('destroy');
+    Route::patch('/{id}/toggle', [CleaningServiceController::class, 'toggleActive'])->name('toggle');
+
+    // Service add-ons management
+    Route::prefix('addons')->as('addons.')->group(function () {
+        Route::get('/', [ServiceAddonController::class, 'index'])->name('index');
+        Route::get('/create', [ServiceAddonController::class, 'create'])->name('create');
+        Route::post('/', [ServiceAddonController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [ServiceAddonController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [ServiceAddonController::class, 'update'])->name('update');
+        Route::delete('/{id}', [ServiceAddonController::class, 'destroy'])->name('destroy');
+    });
+
+    // Service pricing matrix
+    Route::prefix('pricing')->as('pricing.')->group(function () {
+        Route::get('/', [ServicePricingController::class, 'index'])->name('index');
+        Route::get('/create', [ServicePricingController::class, 'create'])->name('create');
+        Route::post('/', [ServicePricingController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [ServicePricingController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [ServicePricingController::class, 'update'])->name('update');
+        Route::delete('/{id}', [ServicePricingController::class, 'destroy'])->name('destroy');
+    });
 });

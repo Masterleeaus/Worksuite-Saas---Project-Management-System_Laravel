@@ -1,8 +1,8 @@
 {
     "name": "ServiceManagement",
     "alias": "servicemanagement",
-    "description": "",
-    "keywords": [],
+    "description": "Manage cleaning service types, pricing, duration and add-ons",
+    "keywords": ["services", "cleaning", "pricing", "addons"],
     "priority": 0,
     "providers": [
         "Modules\\ServiceManagement\\Providers\\ServiceManagementServiceProvider",
@@ -15,9 +15,32 @@
     "requires": [],
     "active": 1,
     "order": 0,
-    "permissions": [],
+    "permissions": [
+        "view_services",
+        "add_service",
+        "edit_service",
+        "delete_service"
+    ],
     "roles_permissions": {
-        "admin": [],
-        "manager": []
-    }
+        "admin": [
+            "view_services",
+            "add_service",
+            "edit_service",
+            "delete_service"
+        ],
+        "manager": [
+            "view_services",
+            "add_service",
+            "edit_service"
+        ]
+    },
+    "menus": [
+        {
+            "panel": "user",
+            "label": "Services",
+            "route": "services.index",
+            "sort_order": 50
+        }
+    ],
+    "sidebar_menu": true
 }
