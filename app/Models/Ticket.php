@@ -184,6 +184,39 @@ class Ticket extends BaseModel
         return $this->hasMany(TicketActivity::class, 'ticket_id')->latest();
     }
 
+    /**
+     * The user who resolved this ticket (complaint overlay).
+     */
+    public function resolvedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'resolved_by')->withoutGlobalScope(ActiveScope::class);
+    }
+
+    /**
+     * The cleaner assigned to the service that triggered this complaint.
+     */
+    public function assignedCleaner(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_cleaner_id')->withoutGlobalScope(ActiveScope::class);
+    }
+
+    /**
+     * Scope: only complaint-category tickets.
+     */
+    public function scopeComplaints($query)
+    {
+        return $query->where('ticket_category', 'complaint');
+    }
+
+    /**
+     * Scope: complaints linked to a specific booking.
+     */
+    public function scopeForBooking($query, $bookingId)
+    {
+        return $query->where('ticket_category', 'complaint')
+                     ->where('booking_id', $bookingId);
+    }
+
     /*
      * Permissions
      */

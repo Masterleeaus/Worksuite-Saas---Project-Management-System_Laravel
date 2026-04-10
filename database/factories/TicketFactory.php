@@ -22,11 +22,14 @@ class TicketFactory extends Factory
     public function definition()
     {
         return [
-            'subject' => fake()->text(20),
-            'status' => fake()->randomElement(['open', 'pending', 'resolved', 'closed']),
-            'priority' => fake()->randomElement(['low', 'high', 'medium', 'urgent']),
-            'created_at' => fake()->randomElement([date('Y-m-d', strtotime( '+'.mt_rand(0, 7).' days')), fake()->dateTimeThisYear($max = 'now')]),
-            'updated_at' => fake()->randomElement([date('Y-m-d', strtotime( '+'.mt_rand(0, 7).' days')), fake()->dateTimeThisYear($max = 'now')]),
+            'subject'                => fake()->text(20),
+            'status'                 => fake()->randomElement(['open', 'pending', 'resolved', 'closed']),
+            'priority'               => fake()->randomElement(['low', 'high', 'medium', 'urgent']),
+            'ticket_category'        => 'support',
+            'complaint_source'       => 'client',
+            'requires_investigation' => false,
+            'created_at'             => fake()->randomElement([date('Y-m-d', strtotime( '+'.mt_rand(0, 7).' days')), fake()->dateTimeThisYear($max = 'now')]),
+            'updated_at'             => fake()->randomElement([date('Y-m-d', strtotime( '+'.mt_rand(0, 7).' days')), fake()->dateTimeThisYear($max = 'now')]),
         ];
     }
 
