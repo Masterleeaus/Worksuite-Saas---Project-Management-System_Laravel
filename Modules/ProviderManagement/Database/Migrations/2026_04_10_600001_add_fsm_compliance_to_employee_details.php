@@ -43,10 +43,9 @@ return new class extends Migration
     {
         Schema::table('employee_details', function (Blueprint $table) {
             $cols = ['police_check_date', 'police_check_expiry', 'insurance_expiry', 'wwcc_expiry', 'abn', 'max_jobs_per_day', 'is_subcontractor', 'fsm_zone_ids', 'star_rating'];
-            foreach ($cols as $col) {
-                if (Schema::hasColumn('employee_details', $col)) {
-                    $table->dropColumn($col);
-                }
+            $toDrop = array_filter($cols, fn($col) => Schema::hasColumn('employee_details', $col));
+            if (!empty($toDrop)) {
+                $table->dropColumn(array_values($toDrop));
             }
         });
     }

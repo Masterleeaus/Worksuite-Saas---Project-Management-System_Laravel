@@ -39,7 +39,7 @@ class ComplianceController extends AccountBaseController
 
         $validated = $request->validate([
             'police_check_date'   => 'nullable|date',
-            'police_check_expiry' => 'nullable|date|after_or_equal:police_check_date',
+            'police_check_expiry' => ['nullable', 'date', $request->filled('police_check_date') ? 'after_or_equal:police_check_date' : ''],
             'insurance_expiry'    => 'nullable|date',
             'wwcc_expiry'         => 'nullable|date',
             'abn'                 => 'nullable|string|max:20',

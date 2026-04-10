@@ -59,9 +59,9 @@ class ComplianceExpiryService
 
         $query = EmployeeDetails::with('user')
             ->where(function ($q) use ($today) {
-                $q->where('police_check_expiry', '<', $today)
-                  ->orWhere('insurance_expiry',  '<', $today)
-                  ->orWhere('wwcc_expiry',       '<', $today);
+                $q->where(fn($sub) => $sub->whereNotNull('police_check_expiry')->where('police_check_expiry', '<', $today))
+                  ->orWhere(fn($sub) => $sub->whereNotNull('insurance_expiry')->where('insurance_expiry', '<', $today))
+                  ->orWhere(fn($sub) => $sub->whereNotNull('wwcc_expiry')->where('wwcc_expiry', '<', $today));
             });
 
         if ($companyId) {

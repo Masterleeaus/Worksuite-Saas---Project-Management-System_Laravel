@@ -50,11 +50,15 @@ class EmployeeZoneController extends AccountBaseController
 
         EmployeeZone::where('employee_id', $employeeId)->delete();
 
-        foreach ($zoneIds as $zoneId) {
-            EmployeeZone::create([
+        if (!empty($zoneIds)) {
+            $records = array_map(fn($zoneId) => [
                 'employee_id' => $employeeId,
-                'zone_id'     => $zoneId,
-            ]);
+                'zone_id'     => (int) $zoneId,
+                'created_at'  => now(),
+                'updated_at'  => now(),
+            ], $zoneIds);
+
+            \Illuminate\Support\Facades\DB::table('employee_zones')->insert($records);
         }
 
         return response()->json(['status' => 'success', 'message' => 'Zone assignments updated.']);

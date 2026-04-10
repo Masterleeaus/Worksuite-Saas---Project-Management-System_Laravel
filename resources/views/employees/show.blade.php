@@ -142,7 +142,7 @@ if ($viewPermission == 'all'
                     @endif
 
                     @if(class_exists(\Modules\ProviderManagement\Http\Controllers\ComplianceController::class))
-                        @if(user()->permission('manage_provider_compliance') === 'all' || user()->id == $employee->id)
+                        @if(user()->permission('manage_provider_compliance') === 'all' || user()->id === $employee->id)
                             <li>
                                 <x-tab :href="route('employees.show', $employee->id) . '?tab=compliance'" :text="__('Compliance')" class="compliance" />
                             </li>
