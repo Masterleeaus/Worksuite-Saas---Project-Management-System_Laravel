@@ -46,7 +46,7 @@
                 <td>{{ $lead->contact_name ?? '—' }}</td>
                 <td>
                     @php
-                        $stageColors = ['new' => 'secondary', 'qualified' => 'info', 'won' => 'success', 'lost' => 'danger'];
+                        $stageColors = \Modules\FSMCRM\Models\FSMLead::stageColors();
                         $stageColor = $stageColors[$lead->stage] ?? 'secondary';
                     @endphp
                     <span class="badge bg-{{ $stageColor }}">{{ $stages[$lead->stage] ?? $lead->stage }}</span>
@@ -55,9 +55,8 @@
                 <td>{{ $lead->close_date?->format('d M Y') ?? '—' }}</td>
                 <td>{{ $lead->fsmLocation?->name ?? '—' }}</td>
                 <td>
-                    @php $orderCount = $lead->orders()->count(); @endphp
-                    @if($orderCount > 0)
-                        <a href="{{ route('fsmcrm.leads.show', $lead->id) }}" class="badge bg-primary text-decoration-none">{{ $orderCount }}</a>
+                    @if($lead->orders_count > 0)
+                        <a href="{{ route('fsmcrm.leads.show', $lead->id) }}" class="badge bg-primary text-decoration-none">{{ $lead->orders_count }}</a>
                     @else
                         <span class="text-muted">0</span>
                     @endif

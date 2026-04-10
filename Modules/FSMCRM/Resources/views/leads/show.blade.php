@@ -2,7 +2,7 @@
 
 @section('fsmcrm_content')
 @php
-    $stageColors = ['new' => 'secondary', 'qualified' => 'info', 'won' => 'success', 'lost' => 'danger'];
+    $stageColors = \Modules\FSMCRM\Models\FSMLead::stageColors();
     $stageBadge  = $stageColors[$lead->stage] ?? 'secondary';
     $stageLabel  = \Modules\FSMCRM\Models\FSMLead::stages()[$lead->stage] ?? $lead->stage;
 @endphp

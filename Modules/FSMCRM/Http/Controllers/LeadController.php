@@ -12,7 +12,7 @@ class LeadController extends Controller
 {
     public function index(Request $request)
     {
-        $q = FSMLead::query()->with(['fsmLocation', 'serviceType']);
+        $q = FSMLead::query()->with(['fsmLocation', 'serviceType'])->withCount('orders');
 
         if ($request->filled('stage')) {
             $q->where('stage', $request->string('stage')->toString());

@@ -89,4 +89,14 @@ class FSMLead extends Model
             self::STAGE_LOST      => 'Lost',
         ];
     }
+
+    public static function stageColors(): array
+    {
+        return [
+            self::STAGE_NEW       => 'secondary',
+            self::STAGE_QUALIFIED => 'info',
+            self::STAGE_WON       => 'success',
+            self::STAGE_LOST      => 'danger',
+        ];
+    }
 }
