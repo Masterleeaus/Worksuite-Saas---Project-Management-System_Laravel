@@ -109,7 +109,17 @@ class OrderController extends Controller
             'tag_ids.*'            => 'integer|exists:fsm_tags,id',
         ]);
 
-        // Auto-generate order reference
+        // FSMSales billing fields (optional, only when module is installed)
+        if (class_exists(\Modules\FSMSales\Models\FSMSalesInvoice::class)
+            && \Illuminate\Support\Facades\Schema::hasColumn('fsm_orders', 'billing_policy')
+        ) {
+            $billingData = $request->validate([
+                'billing_policy' => 'nullable|string|in:manual,on_completion,on_timesheet',
+                'billing_amount' => 'nullable|numeric|min:0',
+                'hourly_rate'    => 'nullable|numeric|min:0',
+            ]);
+            $data = array_merge($data, array_filter($billingData, fn($v) => $v !== null));
+        }
         $last = FSMOrder::max('id') ?? 0;
         $prefix = config('fsmcore.order_reference_prefix', 'ORD');
         $data['name'] = $prefix . '-' . str_pad((int) $last + 1, 5, '0', STR_PAD_LEFT);
@@ -195,7 +205,17 @@ class OrderController extends Controller
             'tag_ids.*'            => 'integer|exists:fsm_tags,id',
         ]);
 
-        $order->update($data);
+        // FSMSales billing fields (optional, only when module is installed)
+        if (class_exists(\Modules\FSMSales\Models\FSMSalesInvoice::class)
+            && \Illuminate\Support\Facades\Schema::hasColumn('fsm_orders', 'billing_policy')
+        ) {
+            $billingData = $request->validate([
+                'billing_policy' => 'nullable|string|in:manual,on_completion,on_timesheet',
+                'billing_amount' => 'nullable|numeric|min:0',
+                'hourly_rate'    => 'nullable|numeric|min:0',
+            ]);
+            $data = array_merge($data, array_filter($billingData, fn($v) => $v !== null));
+        }
         $order->equipment()->sync($data['equipment_ids'] ?? []);
         $order->tags()->sync($data['tag_ids'] ?? []);
 
