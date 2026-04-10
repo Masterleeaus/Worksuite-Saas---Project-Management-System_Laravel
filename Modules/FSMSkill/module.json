@@ -1,0 +1,19 @@
+{
+  "name": "FSMSkill",
+  "alias": "fsmskill",
+  "description": "FSM Skill – Staff Certifications & Skill-Based Job Matching for CleanSmartOS. Tracks cleaner skills, expiry dates and validates assignment eligibility.",
+  "keywords": ["fsm", "skills", "certifications", "compliance", "cleansmartOS"],
+  "active": 1,
+  "order": 1,
+  "providers": [
+    "Modules\\FSMSkill\\Providers\\FSMSkillServiceProvider",
+    "Modules\\FSMSkill\\Providers\\RouteServiceProvider",
+    "Modules\\FSMSkill\\Providers\\EventServiceProvider",
+    "Modules\\FSMSkill\\Providers\\ConfigServiceProvider",
+    "Modules\\FSMSkill\\Providers\\ViewServiceProvider"
+  ],
+  "aliases": {},
+  "files": [],
+  "requires": ["FSMCore"],
+  "version": "1.0.0"
+}

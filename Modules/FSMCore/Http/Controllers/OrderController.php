@@ -124,8 +124,16 @@ class OrderController extends Controller
             $order->tags()->sync($data['tag_ids']);
         }
 
-        return redirect()->route('fsmcore.orders.show', $order->id)
+        $redirect = redirect()->route('fsmcore.orders.show', $order->id)
             ->with('success', 'Order created successfully.');
+
+        // Skill match warning (FSMSkill module optional integration)
+        $skillWarning = $this->getSkillMatchWarning($data['person_id'] ?? null, $order->id);
+        if ($skillWarning) {
+            $redirect = $redirect->with('skill_warning', $skillWarning);
+        }
+
+        return $redirect;
     }
 
     public function show(int $id)
@@ -176,8 +184,16 @@ class OrderController extends Controller
         $order->equipment()->sync($data['equipment_ids'] ?? []);
         $order->tags()->sync($data['tag_ids'] ?? []);
 
-        return redirect()->route('fsmcore.orders.show', $order->id)
+        $redirect = redirect()->route('fsmcore.orders.show', $order->id)
             ->with('success', 'Order updated successfully.');
+
+        // Skill match warning (FSMSkill module optional integration)
+        $skillWarning = $this->getSkillMatchWarning($data['person_id'] ?? null, $order->id);
+        if ($skillWarning) {
+            $redirect = $redirect->with('skill_warning', $skillWarning);
+        }
+
+        return $redirect;
     }
 
     public function destroy(int $id)
@@ -196,5 +212,38 @@ class OrderController extends Controller
         $order->save();
 
         return response()->json(['ok' => true]);
+    }
+
+    /**
+     * Check whether the assigned worker meets all skill requirements for the order.
+     * Returns a warning message string when FSMSkill is installed and there are issues,
+     * or null when the module is not present / no issues found.
+     */
+    private function getSkillMatchWarning(?int $userId, int $orderId): ?string
+    {
+        if ($userId === null) {
+            return null;
+        }
+
+        if (!class_exists(\Modules\FSMSkill\Services\SkillMatchService::class)) {
+            return null;
+        }
+
+        if (!\Illuminate\Support\Facades\Schema::hasTable('fsm_order_skill_requirements')) {
+            return null;
+        }
+
+        $result = app(\Modules\FSMSkill\Services\SkillMatchService::class)
+            ->checkOrderMatch($userId, $orderId);
+
+        if (!$result['match']) {
+            return 'Skill mismatch: ' . implode('; ', $result['issues']);
+        }
+
+        if (!empty($result['warnings'])) {
+            return 'Skill notice: ' . implode('; ', $result['warnings']);
+        }
+
+        return null;
     }
 }
