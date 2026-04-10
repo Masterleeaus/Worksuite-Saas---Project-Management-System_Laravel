@@ -914,6 +914,29 @@ class EmployeeController extends AccountBaseController
             $this->view = 'employees.ajax.immigration';
             break;
 
+        case 'compliance':
+            if (class_exists(\Modules\ProviderManagement\Http\Controllers\ComplianceController::class)) {
+                abort_403(user()->permission('manage_provider_compliance') !== 'all' && user()->id !== $this->employee->id);
+                $this->employeeDetail = $this->employee->employeeDetail;
+                $this->view = 'providermanagement::employee.compliance_tab';
+            } else {
+                $this->view = 'employees.ajax.profile';
+            }
+            break;
+        case 'service-zones':
+            if (class_exists(\Modules\ProviderManagement\Http\Controllers\EmployeeZoneController::class)) {
+                abort_403(!in_array(user()->permission('view_provider_zones'), ['all', 'added', 'owned', 'both']) && user()->id !== $this->employee->id);
+                $this->employeeZones = \Modules\ProviderManagement\Models\EmployeeZone::where('employee_id', $this->employee->id)->with('zone')->get();
+                $this->availableZones = [];
+                if (class_exists(\Modules\ZoneManagement\Entities\Zone::class)) {
+                    $this->availableZones = \Modules\ZoneManagement\Entities\Zone::where('is_active', 1)->get();
+                }
+                $this->view = 'providermanagement::employee.zones_tab';
+            } else {
+                $this->view = 'employees.ajax.profile';
+            }
+            break;
+
         default:
             $this->view = 'employees.ajax.profile';
             break;

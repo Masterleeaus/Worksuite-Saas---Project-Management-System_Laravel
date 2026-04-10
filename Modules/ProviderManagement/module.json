@@ -1,12 +1,14 @@
 {
     "name": "ProviderManagement",
     "alias": "providermanagement",
-    "description": "",
-    "keywords": [],
+    "description": "FSM Provider Management — Extends core Employee with compliance tracking, zone assignment and star rating aggregation for cleaners/contractors.",
+    "keywords": ["fsm", "providers", "compliance", "zones", "cleaners"],
     "priority": 0,
     "providers": [
         "Modules\\ProviderManagement\\Providers\\ProviderManagementServiceProvider",
-        "Modules\\ProviderManagement\\Providers\\EventServiceProvider"
+        "Modules\\ProviderManagement\\Providers\\EventServiceProvider",
+        "Modules\\ProviderManagement\\Providers\\ConfigServiceProvider",
+        "Modules\\ProviderManagement\\Providers\\ViewServiceProvider"
     ],
     "aliases": {},
     "files": [
@@ -15,9 +17,12 @@
     "requires": [],
     "active": 1,
     "order": 0,
-    "permissions": [],
+    "permissions": [
+        "manage_provider_compliance",
+        "view_provider_zones"
+    ],
     "roles_permissions": {
-        "admin": [],
-        "manager": []
+        "admin": ["manage_provider_compliance", "view_provider_zones"],
+        "manager": ["view_provider_zones"]
     }
 }
