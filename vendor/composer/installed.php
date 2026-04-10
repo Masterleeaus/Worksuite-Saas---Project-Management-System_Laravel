@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'laravel/laravel',
-        'pretty_version' => 'dev-copilot/fix-approval-workflows',
-        'version' => 'dev-copilot/fix-approval-workflows',
-        'reference' => '831457a2d8f2248d2bc665ec80f033c8ea916be3',
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
+        'reference' => 'ba0a09976a9710cb6a8209a6b99963682af73b70',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -976,7 +976,8 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../ivanomatteo/laravel-device-tracking',
             'aliases' => array(
-                0 => '9999999-dev',
+                0 => '1.0.1',
+                1 => '9999999-dev',
             ),
             'dev_requirement' => false,
         ),
@@ -1030,6 +1031,15 @@
             'install_path' => __DIR__ . '/../larastan/larastan',
             'aliases' => array(),
             'dev_requirement' => true,
+        ),
+        'laravel-lang/lang' => array(
+            'pretty_version' => '6.1.4',
+            'version' => '6.1.4.0',
+            'reference' => '18a7845e813e737a56a7f164301d5014b536950c',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../laravel-lang/lang',
+            'aliases' => array(),
+            'dev_requirement' => false,
         ),
         'laravel-notification-channels/onesignal' => array(
             'pretty_version' => 'v2.8.0',
@@ -1095,9 +1105,9 @@
             'dev_requirement' => false,
         ),
         'laravel/laravel' => array(
-            'pretty_version' => 'dev-copilot/fix-approval-workflows',
-            'version' => 'dev-copilot/fix-approval-workflows',
-            'reference' => '831457a2d8f2248d2bc665ec80f033c8ea916be3',
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => 'ba0a09976a9710cb6a8209a6b99963682af73b70',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

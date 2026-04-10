@@ -6272,6 +6272,55 @@
             "install-path": "../larastan/larastan"
         },
         {
+            "name": "laravel-lang/lang",
+            "version": "6.1.4",
+            "version_normalized": "6.1.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Laravel-Lang/lang.git",
+                "reference": "18a7845e813e737a56a7f164301d5014b536950c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Laravel-Lang/lang/zipball/18a7845e813e737a56a7f164301d5014b536950c",
+                "reference": "18a7845e813e737a56a7f164301d5014b536950c",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*"
+            },
+            "suggest": {
+                "andrey-helldar/laravel-lang-publisher": "Easy installation and update of translation files for your project",
+                "arcanedev/laravel-lang": "Translations manager and checker for Laravel 5",
+                "overtrue/laravel-lang": "Command to add languages in your project"
+            },
+            "time": "2020-07-13T14:35:32+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "caouecs",
+                    "email": "caouecs@caouecs.net"
+                }
+            ],
+            "description": "Languages for Laravel",
+            "keywords": [
+                "lang",
+                "languages",
+                "laravel",
+                "lpm"
+            ],
+            "support": {
+                "issues": "https://github.com/Laravel-Lang/lang/issues",
+                "source": "https://github.com/Laravel-Lang/lang/tree/6.1.4"
+            },
+            "install-path": "../laravel-lang/lang"
+        },
+        {
             "name": "laravel-notification-channels/onesignal",
             "version": "v2.8.0",
             "version_normalized": "2.8.0.0",
@@ -10503,7 +10552,7 @@
                     ]
                 }
             },
-            "installation-source": "source",
+            "installation-source": "dist",
             "autoload": {
                 "files": [
                     "./src/Adapters/Phpunit/Autoload.php"
@@ -13165,7 +13214,7 @@
                     "dev-main": "10.5-dev"
                 }
             },
-            "installation-source": "source",
+            "installation-source": "dist",
             "autoload": {
                 "files": [
                     "src/Framework/Assert/Functions.php"
