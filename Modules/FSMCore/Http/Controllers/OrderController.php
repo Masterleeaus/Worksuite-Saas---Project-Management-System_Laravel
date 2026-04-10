@@ -14,6 +14,25 @@ use Modules\FSMCore\Models\FSMEquipment;
 
 class OrderController extends Controller
 {
+    private function getVehicles(): \Illuminate\Support\Collection
+    {
+        if (class_exists(\Modules\FSMVehicle\Models\FSMVehicle::class)
+            && \Illuminate\Support\Facades\Schema::hasTable('fsm_vehicles')
+        ) {
+            return \Modules\FSMVehicle\Models\FSMVehicle::where('active', true)->orderBy('name')->get();
+        }
+        return collect();
+    }
+
+    private function vehicleValidationRule(): string
+    {
+        if (class_exists(\Modules\FSMVehicle\Models\FSMVehicle::class)
+            && \Illuminate\Support\Facades\Schema::hasTable('fsm_vehicles')
+        ) {
+            return 'nullable|integer|exists:fsm_vehicles,id';
+        }
+        return 'nullable|integer';
+    }
     public function index(Request $request)
     {
         $q = FSMOrder::query()->with(['location', 'person', 'team', 'stage']);
@@ -65,8 +84,9 @@ class OrderController extends Controller
         $templates = FSMTemplate::where('active', true)->orderBy('name')->get();
         $tags = FSMTag::orderBy('name')->get();
         $equipment = FSMEquipment::where('active', true)->orderBy('name')->get();
+        $vehicles = $this->getVehicles();
 
-        return view('fsmcore::orders.create', compact('stages', 'locations', 'teams', 'templates', 'tags', 'equipment'));
+        return view('fsmcore::orders.create', compact('stages', 'locations', 'teams', 'templates', 'tags', 'equipment', 'vehicles'));
     }
 
     public function store(Request $request)
@@ -74,6 +94,7 @@ class OrderController extends Controller
         $data = $request->validate([
             'location_id'          => 'nullable|integer|exists:fsm_locations,id',
             'person_id'            => 'nullable|integer',
+            'vehicle_id'           => $this->vehicleValidationRule(),
             'team_id'              => 'nullable|integer|exists:fsm_teams,id',
             'stage_id'             => 'nullable|integer|exists:fsm_stages,id',
             'template_id'          => 'nullable|integer|exists:fsm_templates,id',
@@ -122,8 +143,9 @@ class OrderController extends Controller
         $templates = FSMTemplate::where('active', true)->orderBy('name')->get();
         $tags = FSMTag::orderBy('name')->get();
         $equipment = FSMEquipment::where('active', true)->orderBy('name')->get();
+        $vehicles = $this->getVehicles();
 
-        return view('fsmcore::orders.edit', compact('order', 'stages', 'locations', 'teams', 'templates', 'tags', 'equipment'));
+        return view('fsmcore::orders.edit', compact('order', 'stages', 'locations', 'teams', 'templates', 'tags', 'equipment', 'vehicles'));
     }
 
     public function update(Request $request, int $id)
@@ -133,6 +155,7 @@ class OrderController extends Controller
         $data = $request->validate([
             'location_id'          => 'nullable|integer|exists:fsm_locations,id',
             'person_id'            => 'nullable|integer',
+            'vehicle_id'           => $this->vehicleValidationRule(),
             'team_id'              => 'nullable|integer|exists:fsm_teams,id',
             'stage_id'             => 'nullable|integer|exists:fsm_stages,id',
             'template_id'          => 'nullable|integer|exists:fsm_templates,id',
