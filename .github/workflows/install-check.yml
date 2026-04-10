@@ -78,9 +78,7 @@ jobs:
 
       - name: Run migrations
         run: php artisan migrate --force --no-interaction
-        continue-on-error: true
-        # Note: Some migrations may use MySQL-specific syntax.
-        # This step surfaces migration issues without blocking the install check.
+        # Migrations must succeed so the install check validates a usable schema state.
 
       - name: Validate route list (app bootstrap check)
         run: php artisan route:list --compact 2>&1 | tail -5
