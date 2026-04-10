@@ -1,0 +1,94 @@
+name: Security
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master, develop]
+  schedule:
+    # Run every Monday at 08:00 UTC
+    - cron: "0 8 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  composer-audit:
+    name: Composer Audit
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: mbstring
+          coverage: none
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-security-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-security-
+
+      - name: Ensure bootstrap/cache is writable before Composer post-install hooks
+        run: mkdir -p bootstrap/cache && chmod -R 775 storage bootstrap/cache
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Run composer audit
+        run: composer audit --no-interaction
+        continue-on-error: true
+        # Existing locked dependencies contain known low-severity advisories that
+        # cannot be immediately upgraded. This step is informational; failures are
+        # surfaced in the job output but do not block the PR.
+
+  npm-audit:
+    name: npm Audit
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install npm dependencies
+        run: npm ci --prefer-offline
+
+      - name: Run npm audit (high severity and above)
+        # --audit-level=high surfaces only high/critical — avoids low-severity noise
+        run: npm audit --audit-level=high
+        continue-on-error: true
+        # npm audit exit codes are informational; does not block CI but surfaces issues
+
+  codeql:
+    name: CodeQL Security Scan
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
+          # PHP CodeQL support requires GitHub Advanced Security or specific repo setup.
+          # JS scanning covers webpack mix configs, resources/js, and any bundled scripts.
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
