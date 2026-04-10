@@ -38,13 +38,10 @@ class EInvoiceController extends AccountBaseController
 
     public function aiHealth()
     {
-        /** @var \\Modules\\EInvoice\\AI\\ClientInterface $ai */
-        $ai = app(\\Modules\\EInvoice\\AI\\ClientInterface::class);
+        /** @var \Modules\EInvoice\AI\ClientInterface $ai */
+        $ai = app(\Modules\EInvoice\AI\ClientInterface::class);
         return response()->json($ai->health());
     }
-
-    
-{
 
     public function __construct()
     {
@@ -155,7 +152,8 @@ class EInvoiceController extends AccountBaseController
         $clientDetails->saveQuietly();
 
         return Reply::success(__('messages.updateSuccess'));
-    
+    }
+
     public function generateNote($invoiceId)
     {
         $viewPermission = user()->permission('view_invoices');
@@ -164,7 +162,8 @@ class EInvoiceController extends AccountBaseController
         GenerateInvoiceNote::dispatch((int)$invoiceId, optional(user())->id);
 
         return response()->json(['ok' => true, 'queued' => true]);
-    
+    }
+
     public function latestNote($invoiceId)
     {
         $viewPermission = user()->permission('view_invoices');
@@ -179,7 +178,8 @@ class EInvoiceController extends AccountBaseController
             return response()->json(['note' => null], 404);
         }
         return response()->json(['note' => $note]);
-    
+    }
+
     /**
      * Build an invoice DRAFT from a natural-language prompt.
      * Returns JSON with structured items; stores a draft row.

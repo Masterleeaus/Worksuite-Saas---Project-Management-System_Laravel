@@ -53,6 +53,8 @@ class BudgetExport implements FromView
                 'fy_year' => $this->fy_year,
                 'account_types' => $this->account_types,
             ]);
+        } else {
+            throw new \InvalidArgumentException('Unsupported budget export view type: ' . $this->view_type);
         }
     }
 }
