@@ -14,8 +14,11 @@ class StoreEvidenceRequest extends FormRequest
     public function rules(): array
     {
         $maxKb    = (int) config('evidence_vault.max_photo_kb', 10240);
+        // Normalise: config may store full MIME types ('image/jpeg') or short
+        // names ('jpeg').  Strip the 'image/' prefix when present so that
+        // Laravel's 'mimes' validation rule always receives short names.
         $mimes    = implode(',', array_map(
-            fn($m) => str_replace('image/', '', $m),
+            fn($m) => preg_replace('/^image\//', '', $m),
             config('evidence_vault.allowed_photo_types', ['jpeg', 'png', 'webp'])
         ));
 

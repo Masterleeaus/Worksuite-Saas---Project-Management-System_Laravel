@@ -49,11 +49,17 @@
 
         <div id="ev-photo-preview" class="row mb-3"></div>
 
-        {{-- Locked-site photo checkbox --}}
+        {{-- Locked-site photo flag: applies to the whole submission.
+             When checked, ALL uploaded photos are tagged is_site_locked_photo=true,
+             serving as the alternative proof-of-completion in place of a client
+             signature (e.g., for unmanned/locked premises). --}}
         <div class="form-check mb-3">
             <input class="form-check-input" type="checkbox" id="ev-is-locked-site-photo">
             <label class="form-check-label f-13" for="ev-is-locked-site-photo">
-                This photo shows the locked/secured site (alternative to client signature)
+                These photos show the locked/secured site
+                <small class="text-muted d-block mt-1">
+                    Check this if the client is not present and you are using site photos as proof of completion.
+                </small>
             </label>
         </div>
 
@@ -129,11 +135,12 @@
     'use strict';
 
     // -----------------------------------------------------------------------
-    // Config
+    // Config (passed from PHP)
     // -----------------------------------------------------------------------
     const API_SUBMIT_URL = '{{ route('api.evidence-vault.submit') }}';
     const JOB_ID         = {{ isset($jobId) ? (int)$jobId : 'null' }};
     const JOB_REF        = '{{ addslashes($jobReference ?? '') }}';
+    const REQUIRE_PHOTO  = {{ config('evidence_vault.require_photo_on_completion', true) ? 'true' : 'false' }};
     const CSRF_TOKEN     = $('meta[name="csrf-token"]').attr('content');
 
     // -----------------------------------------------------------------------
@@ -196,11 +203,11 @@
         const idx = $(this).data('idx');
         selectedFiles.splice(idx, 1);
         $('#ev-photo-preview').empty();
-        selectedFiles.forEach(renderPreview);
+        selectedFiles.forEach(function (file, i) { renderPreview(file, i); });
     });
 
     $('#ev-next-to-signature').on('click', function () {
-        if (selectedFiles.length === 0) {
+        if (REQUIRE_PHOTO && selectedFiles.length === 0) {
             toastr.error('Please add at least one photo before continuing.');
             return;
         }
@@ -273,13 +280,12 @@
         if (JOB_ID)  { formData.append('job_id', JOB_ID); }
         if (JOB_REF) { formData.append('job_reference', JOB_REF); }
 
-        selectedFiles.forEach(function (file, i) {
+        // The locked-site flag is submission-level: it applies to all uploaded
+        // photos when the "locked site" checkbox is checked.
+        const isLockedSite = $('#ev-is-locked-site-photo').is(':checked') ? '1' : '0';
+        selectedFiles.forEach(function (file) {
             formData.append('photos[]', file);
-            if ($('#ev-is-locked-site-photo').is(':checked')) {
-                formData.append('is_site_locked_photo[]', '1');
-            } else {
-                formData.append('is_site_locked_photo[]', '0');
-            }
+            formData.append('is_site_locked_photo[]', isLockedSite);
         });
 
         // Signature
