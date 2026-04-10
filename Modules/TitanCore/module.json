@@ -1,7 +1,7 @@
 {
     "name": "TitanCore",
     "alias": "titancore",
-    "description": "Titan Core module (providers, settings, health checks, quotas, adapters).",
+    "description": "TitanCore \u2014 unified AI gateway, rate limiting, tenant isolation and shared AI infrastructure",
     "keywords": [
         "ai",
         "titancore",
@@ -10,10 +10,51 @@
         "health"
     ],
     "priority": 10,
+    "active": 1,
+    "order": 0,
+    "version": "1.0.0",
+    "aliases": {},
+    "requires": [],
     "providers": [
         "Modules\\TitanCore\\Providers\\TitanCoreServiceProvider"
     ],
     "files": [
         "start.php"
-    ]
+    ],
+    "permissions": [
+        "use_ai_features",
+        "manage_ai_settings",
+        "view_ai_usage"
+    ],
+    "roles_permissions": {
+        "admin": [
+            "use_ai_features",
+            "manage_ai_settings",
+            "view_ai_usage"
+        ]
+    },
+    "menus": [
+        {
+            "panel": "user",
+            "label": "AI Settings",
+            "route": "titancore.settings.index",
+            "sort_order": 300,
+            "permission": "manage_ai_settings"
+        },
+        {
+            "panel": "user",
+            "label": "AI Usage",
+            "route": "titancore.usage.index",
+            "sort_order": 301,
+            "permission": "view_ai_usage"
+        },
+        {
+            "panel": "user",
+            "label": "AI Dashboard",
+            "route": "titancore.dashboard.index",
+            "sort_order": 302,
+            "permission": "manage_ai_settings"
+        }
+    ],
+    "sidebar_menu": true
 }
