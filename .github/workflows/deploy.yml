@@ -6,15 +6,14 @@ name: Deploy
 #
 # Trigger: push to main/master  OR  manual dispatch (workflow_dispatch).
 #
-# Required GitHub repository variable (Settings → Variables → Repository):
+# Required GitHub repository variables (Settings → Variables → Repository):
 #   DEPLOY_BRANCH   — branch to pull on the server (default: main)
+#   DEPLOY_PATH     — absolute path to the web root on the server
+#                     (default: /home/saassmar/domains/cleansm.art/public_html)
 #
 # Optional GitHub repository secret (Settings → Secrets → Repository):
 #   APP_URL         — production URL used for the post-deploy health check
 #                     (e.g. https://cleansm.art)
-#
-# The deployment path is fixed to the production web root:
-#   /home/saassmar/domains/cleansm.art/public_html
 #
 # Safety guarantees:
 #   • .env is NEVER created or overwritten — it must pre-exist on the server.
@@ -55,7 +54,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'))
 
     env:
-      DEPLOY_PATH: /home/saassmar/domains/cleansm.art/public_html
+      DEPLOY_PATH: ${{ vars.DEPLOY_PATH || '/home/saassmar/domains/cleansm.art/public_html' }}
       DEPLOY_BRANCH: ${{ vars.DEPLOY_BRANCH || 'main' }}
 
     steps:
@@ -138,7 +137,7 @@ jobs:
           php artisan route:cache || echo "::warning::route:cache failed (possible route closures). Skipping."
 
           echo "==> Caching views"
-          php artisan view:cache || echo "::warning::view:cache failed. Skipping."
+          php artisan view:cache || echo "::warning::view:cache failed (possible un-compiled Blade components or syntax errors). Skipping."
 
       # -----------------------------------------------------------------------
       # 7. Restart queue workers so they pick up the new code.
