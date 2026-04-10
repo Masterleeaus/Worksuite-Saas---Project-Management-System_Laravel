@@ -111,4 +111,9 @@ class FSMOrder extends Model
         }
         return $this->belongsTo(\Modules\FSMCRM\Models\FSMLead::class, 'lead_id');
     }
+
+    public function photos()
+    {
+        return $this->hasMany(FSMOrderPhoto::class, 'fsm_order_id');
+    }
 }
