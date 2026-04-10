@@ -13,7 +13,7 @@
 </div>
 
 @if(session('skill_warning'))
-    @php $sw = session('skill_warning'); $isError = str_starts_with($sw, 'Skill mismatch'); @endphp
+    @php $sw = (string) session('skill_warning'); $isError = str_starts_with($sw, 'Skill mismatch'); @endphp
     <div class="alert {{ $isError ? 'alert-danger' : 'alert-warning' }} alert-dismissible fade show" role="alert">
         ⚠ {{ $sw }}
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -98,7 +98,6 @@
             $skillReqs = \Modules\FSMSkill\Models\FSMOrderSkillRequirement::with(['skill.skillType', 'skillLevel'])
                 ->where('fsm_order_id', $order->id)->get();
         @endphp
-        @if($skillReqs->isNotEmpty() || true)
         <div class="card mb-3">
             <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
                 <span>Skill Requirements</span>
@@ -143,7 +142,6 @@
             </div>
             @endif
         </div>
-        @endif
         @endif
     </div>
 
