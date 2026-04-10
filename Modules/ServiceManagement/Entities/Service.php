@@ -35,9 +35,28 @@ class Service extends Model
         'rating_count' => 'integer',
         'avg_rating' => 'float',
         'slug'      => 'string',
+        'duration_minutes' => 'integer',
+        'base_price' => 'float',
+        'eco_friendly' => 'boolean',
     ];
 
-    protected $fillable = ['slug'];
+    protected $fillable = [
+        'slug',
+        'name',
+        'short_description',
+        'description',
+        'category_id',
+        'sub_category_id',
+        'duration_minutes',
+        'base_price',
+        'frequency',
+        'eco_friendly',
+        'is_active',
+        'zone_id',
+        'thumbnail',
+        'cover_image',
+        'tax',
+    ];
 
     protected $appends = ['thumbnail_full_path', 'cover_image_full_path'];
 
@@ -136,6 +155,16 @@ class Service extends Model
     public function faqs(): HasMany
     {
         return $this->hasMany(Faq::class);
+    }
+
+    public function addons(): HasMany
+    {
+        return $this->hasMany(ServiceAddon::class, 'service_id', 'id');
+    }
+
+    public function pricingRules(): HasMany
+    {
+        return $this->hasMany(ServicePricingRule::class, 'service_id', 'id');
     }
 
     public function reviews(): HasMany
