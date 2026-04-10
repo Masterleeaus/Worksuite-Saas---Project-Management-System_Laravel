@@ -17,7 +17,7 @@
             @endforeach
         </select>
     </div>
-    @if(!empty($vehicles) && $vehicles->count())
+    @if(!empty($vehicles ?? null) && ($vehicles ?? collect())->count())
     <div class="col-md-6">
         <label class="form-label">Worker / Cleaner</label>
         <select name="person_id" id="order_person_id" class="form-select">

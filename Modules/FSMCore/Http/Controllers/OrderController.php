@@ -14,12 +14,24 @@ use Modules\FSMCore\Models\FSMEquipment;
 
 class OrderController extends Controller
 {
-    private function getVehicles(): \Illuminate\Database\Eloquent\Collection
+    private function getVehicles(): \Illuminate\Support\Collection
     {
-        if (class_exists(\Modules\FSMVehicle\Models\FSMVehicle::class)) {
+        if (class_exists(\Modules\FSMVehicle\Models\FSMVehicle::class)
+            && \Illuminate\Support\Facades\Schema::hasTable('fsm_vehicles')
+        ) {
             return \Modules\FSMVehicle\Models\FSMVehicle::where('active', true)->orderBy('name')->get();
         }
         return collect();
+    }
+
+    private function vehicleValidationRule(): string
+    {
+        if (class_exists(\Modules\FSMVehicle\Models\FSMVehicle::class)
+            && \Illuminate\Support\Facades\Schema::hasTable('fsm_vehicles')
+        ) {
+            return 'nullable|integer|exists:fsm_vehicles,id';
+        }
+        return 'nullable|integer';
     }
     public function index(Request $request)
     {
@@ -82,7 +94,7 @@ class OrderController extends Controller
         $data = $request->validate([
             'location_id'          => 'nullable|integer|exists:fsm_locations,id',
             'person_id'            => 'nullable|integer',
-            'vehicle_id'           => 'nullable|integer|exists:fsm_vehicles,id',
+            'vehicle_id'           => $this->vehicleValidationRule(),
             'team_id'              => 'nullable|integer|exists:fsm_teams,id',
             'stage_id'             => 'nullable|integer|exists:fsm_stages,id',
             'template_id'          => 'nullable|integer|exists:fsm_templates,id',
@@ -143,7 +155,7 @@ class OrderController extends Controller
         $data = $request->validate([
             'location_id'          => 'nullable|integer|exists:fsm_locations,id',
             'person_id'            => 'nullable|integer',
-            'vehicle_id'           => 'nullable|integer|exists:fsm_vehicles,id',
+            'vehicle_id'           => $this->vehicleValidationRule(),
             'team_id'              => 'nullable|integer|exists:fsm_teams,id',
             'stage_id'             => 'nullable|integer|exists:fsm_stages,id',
             'template_id'          => 'nullable|integer|exists:fsm_templates,id',
