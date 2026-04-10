@@ -172,6 +172,43 @@
             </div>
         </div>
         @endif
+
+        {{-- FSMRecurring: show recurring schedule panel when module is installed --}}
+        @if(class_exists(\Modules\FSMRecurring\Models\FSMRecurring::class) && \Illuminate\Support\Facades\Schema::hasTable('fsm_recurrings'))
+        @php
+            $orderRecurringId = $order->fsm_recurring_id ?? null;
+            $recurring = $orderRecurringId
+                ? \Modules\FSMRecurring\Models\FSMRecurring::with(['frequencySet', 'location'])->find($orderRecurringId)
+                : null;
+        @endphp
+        @if($recurring)
+        <div class="card mt-3">
+            <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+                <span>♻ Recurring Schedule</span>
+                <a href="{{ route('fsmrecurring.recurring.show', $recurring->id) }}" class="btn btn-sm btn-outline-info">View Chain</a>
+            </div>
+            <div class="card-body">
+                @php
+                    $stateColors = ['draft' => 'secondary', 'progress' => 'success', 'suspend' => 'warning', 'close' => 'dark'];
+                @endphp
+                <dl class="row mb-0 small">
+                    <dt class="col-5">Schedule</dt>
+                    <dd class="col-7"><a href="{{ route('fsmrecurring.recurring.show', $recurring->id) }}">{{ $recurring->name }}</a></dd>
+                    <dt class="col-5">State</dt>
+                    <dd class="col-7">
+                        <span class="badge bg-{{ $stateColors[$recurring->state] ?? 'secondary' }}">
+                            {{ \Modules\FSMRecurring\Models\FSMRecurring::$states[$recurring->state] ?? $recurring->state }}
+                        </span>
+                    </dd>
+                    <dt class="col-5">Frequency</dt>
+                    <dd class="col-7">{{ $recurring->frequencySet?->name ?? '—' }}</dd>
+                    <dt class="col-5">Orders</dt>
+                    <dd class="col-7"><span class="badge bg-info text-dark">{{ $recurring->orders()->count() }}</span></dd>
+                </dl>
+            </div>
+        </div>
+        @endif
+        @endif
     </div>
 </div>
 @endsection
