@@ -96,4 +96,20 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
             Route::resource('pay-codes', PayCodeController::class);
         }
     );
+
+    // Variable Rate Engine routes
+    Route::resource('cleaner-rate-configs', \Modules\Payroll\Http\Controllers\CleanerRateConfigController::class);
+
+    Route::get('public-holidays', [\Modules\Payroll\Http\Controllers\PublicHolidayController::class, 'index'])->name('public-holidays.index');
+    Route::post('public-holidays', [\Modules\Payroll\Http\Controllers\PublicHolidayController::class, 'store'])->name('public-holidays.store');
+    Route::delete('public-holidays/{id}', [\Modules\Payroll\Http\Controllers\PublicHolidayController::class, 'destroy'])->name('public-holidays.destroy');
+
+    Route::get('payroll-runs/{id}/preview', [\Modules\Payroll\Http\Controllers\PayrollRunController::class, 'preview'])->name('payroll-runs.preview');
+    Route::post('payroll-runs/{id}/preview', [\Modules\Payroll\Http\Controllers\PayrollRunController::class, 'preview'])->name('payroll-runs.preview.post');
+    Route::post('payroll-runs/{run}/approve', [\Modules\Payroll\Http\Controllers\PayrollRunController::class, 'approve'])->name('payroll-runs.approve');
+    Route::post('payroll-runs/{run}/line-items/{item}/override', [\Modules\Payroll\Http\Controllers\PayrollRunController::class, 'overrideLineItem'])->name('payroll-runs.override-line-item');
+    Route::get('payroll-runs/{id}/export-csv', [\Modules\Payroll\Http\Controllers\PayrollRunController::class, 'exportCsv'])->name('payroll-runs.export-csv');
+    Route::get('payroll-runs/{id}/export-pdf', [\Modules\Payroll\Http\Controllers\PayrollRunController::class, 'exportPdf'])->name('payroll-runs.export-pdf');
+    Route::resource('payroll-runs', \Modules\Payroll\Http\Controllers\PayrollRunController::class);
+
 });

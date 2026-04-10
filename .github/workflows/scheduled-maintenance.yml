@@ -1,0 +1,106 @@
+name: Scheduled Maintenance
+
+on:
+  schedule:
+    # Every Monday at 07:00 UTC
+    - cron: "0 7 * * 1"
+  workflow_dispatch:
+
+jobs:
+  dependency-audit:
+    name: Weekly Dependency Audit
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: mbstring
+          coverage: none
+
+      - name: Ensure bootstrap/cache is writable before Composer post-install hooks
+        run: mkdir -p bootstrap/cache && chmod -R 775 storage bootstrap/cache
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Composer audit
+        run: composer audit --no-interaction
+        continue-on-error: true
+        # Known locked advisories (e.g. firebase/php-jwt, laravelcollective/html) cannot be
+        # immediately upgraded without broader refactoring. Failures are surfaced as a warning
+        # (matching the behaviour in security.yml) so the weekly run doesn't go permanently red.
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install npm dependencies
+        run: npm ci --prefer-offline
+
+      - name: npm audit
+        run: npm audit --audit-level=moderate || true
+
+  smoke-install:
+    name: Weekly Smoke Install
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: worksuite_smoke
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: mbstring, pdo, pdo_mysql, dom, curl, zip, bcmath, intl
+          coverage: none
+
+      - name: Ensure bootstrap/cache is writable before Composer post-install hooks
+        run: mkdir -p bootstrap/cache && chmod -R 775 storage bootstrap/cache
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Prepare .env
+        run: |
+          cp .env.example .env
+          sed -i 's/^APP_ENV=.*/APP_ENV=testing/' .env
+          sed -i 's/^DB_CONNECTION=.*/DB_CONNECTION=mysql/' .env
+          sed -i 's/^DB_HOST=.*/DB_HOST=127.0.0.1/' .env
+          sed -i 's/^DB_PORT=.*/DB_PORT=3306/' .env
+          sed -i 's/^DB_DATABASE=.*/DB_DATABASE=worksuite_smoke/' .env
+          sed -i 's/^DB_USERNAME=.*/DB_USERNAME=root/' .env
+          sed -i 's/^DB_PASSWORD=.*/DB_PASSWORD=root/' .env
+          echo "CACHE_DRIVER=array" >> .env
+          echo "SESSION_DRIVER=array" >> .env
+          echo "QUEUE_CONNECTION=sync" >> .env
+          echo "MAIL_MAILER=array" >> .env
+          php artisan key:generate --quiet
+
+      - name: Bootstrap check
+        run: |
+          php artisan config:clear
+          php artisan route:clear
+          php artisan about

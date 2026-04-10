@@ -1,0 +1,106 @@
+name: Install Check
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request_target:
+    branches: [main, master, develop]
+  workflow_dispatch:
+
+concurrency:
+  group: install-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  install-check:
+    name: Fresh Install Bootstrap
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: worksuite_install_check
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # pull_request_target runs in base-branch context; explicitly check out
+          # the PR head so the install check validates the proposed changes.
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: mbstring, pdo, pdo_mysql, dom, curl, zip, bcmath, intl, gd, exif, fileinfo
+          coverage: none
+
+      - name: Ensure bootstrap/cache is writable before Composer post-install hooks
+        run: mkdir -p bootstrap/cache && chmod -R 775 storage bootstrap/cache
+
+      - name: Install Composer dependencies (fresh — no cache)
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install npm dependencies
+        run: npm ci --prefer-offline
+
+      - name: Build frontend assets
+        run: npm run production
+        env:
+          NODE_ENV: production
+
+      - name: Prepare .env from example
+        run: |
+          cp .env.example .env
+          sed -i 's/^APP_ENV=.*/APP_ENV=testing/' .env
+          sed -i 's/^APP_DEBUG=.*/APP_DEBUG=true/' .env
+          sed -i 's/^DB_CONNECTION=.*/DB_CONNECTION=mysql/' .env
+          sed -i 's/^DB_HOST=.*/DB_HOST=127.0.0.1/' .env
+          sed -i 's/^DB_PORT=.*/DB_PORT=3306/' .env
+          sed -i 's/^DB_DATABASE=.*/DB_DATABASE=worksuite_install_check/' .env
+          sed -i 's/^DB_USERNAME=.*/DB_USERNAME=root/' .env
+          sed -i 's/^DB_PASSWORD=.*/DB_PASSWORD=root/' .env
+          echo "CACHE_DRIVER=array" >> .env
+          echo "SESSION_DRIVER=array" >> .env
+          echo "QUEUE_CONNECTION=sync" >> .env
+          echo "MAIL_MAILER=array" >> .env
+
+      - name: Generate app key
+        run: php artisan key:generate
+
+      - name: Package discovery
+        run: php artisan package:discover --ansi
+
+      - name: Clear caches (config / route / view)
+        run: |
+          php artisan config:clear
+          php artisan route:clear
+          php artisan view:clear
+
+      - name: Run migrations
+        run: php artisan migrate --force --no-interaction
+        # Migrations must succeed so the install check validates a usable schema state.
+
+      - name: Validate route list (app bootstrap check)
+        run: php artisan route:list --compact 2>&1 | tail -5
+
+      - name: Run artisan about (Laravel 9.21+)
+        run: php artisan about

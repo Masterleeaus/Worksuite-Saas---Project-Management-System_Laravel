@@ -1,0 +1,19 @@
+{
+    "name": "EvidenceVault",
+    "alias": "evidence_vault",
+    "description": "Mandatory photographic proof and digital client signature capture for job completion. Stores evidence securely, linked to each job card, and makes it reviewable by admin.",
+    "keywords": ["evidence", "photo", "signature", "job", "completion", "cleansmartOS"],
+    "permissions": [
+        "view_evidence_vault",
+        "add_evidence_vault",
+        "delete_evidence_vault"
+    ],
+    "priority": 0,
+    "providers": [
+        "Modules\\EvidenceVault\\Providers\\EvidenceVaultServiceProvider",
+        "Modules\\EvidenceVault\\Providers\\EventServiceProvider",
+        "Modules\\EvidenceVault\\Providers\\RouteServiceProvider"
+    ],
+    "files": [],
+    "version": "1.0.0"
+}

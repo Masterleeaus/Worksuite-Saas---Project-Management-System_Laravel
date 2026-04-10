@@ -1,0 +1,21 @@
+{
+    "name": "worksuite/evidence-vault",
+    "description": "Evidence Vault – photo and digital signature proof for job completion.",
+    "authors": [
+        {
+            "name": "Worksuite",
+            "email": "support@worksuite.biz"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {}
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\EvidenceVault\\": ""
+        }
+    }
+}

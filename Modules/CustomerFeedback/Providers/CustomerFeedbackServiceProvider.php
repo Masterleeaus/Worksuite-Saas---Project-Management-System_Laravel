@@ -12,7 +12,7 @@ class CustomerFeedbackServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        //
+        $this->app->register(RouteServiceProvider::class);
     }
 
     public function boot()

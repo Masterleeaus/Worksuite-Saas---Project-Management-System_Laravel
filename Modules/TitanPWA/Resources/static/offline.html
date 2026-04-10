@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#1a5276">
+    <title>Offline — CleanSmartOS</title>
+    <link rel="icon" href="/vendor/titanpwa/icons/icon-192x192.png">
+    <link rel="stylesheet" href="/vendor/titanpwa/css/pwa.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f4f8;
+            color: #2d3748;
+            display: flex;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            padding: 48px 32px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+        }
+        .card img { width: 80px; height: 80px; border-radius: 20px; margin-bottom: 24px; }
+        .card h1  { font-size: 24px; font-weight: 700; margin: 0 0 12px; color: #1a5276; }
+        .card p   { font-size: 15px; color: #718096; line-height: 1.6; margin: 0 0 28px; }
+        .retry-btn {
+            display: inline-block;
+            background: #1a5276;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 28px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .retry-btn:hover { background: #2471a3; }
+        .features { margin-top: 36px; border-top: 1px solid #e8ecf0; padding-top: 24px; text-align: left; }
+        .features h2 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #a0aec0; margin: 0 0 10px; }
+        .features ul { list-style: none; padding: 0; margin: 0; }
+        .features li { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #4a5568; padding: 5px 0; }
+        .features li::before { content: '✓'; color: #27ae60; font-weight: 700; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <img src="/vendor/titanpwa/icons/icon-192x192.png" alt="CleanSmartOS">
+    <h1>You're offline</h1>
+    <p>No internet connection detected. You can still view cached job cards — everything will sync when you reconnect.</p>
+    <button class="retry-btn" onclick="window.location.reload()">Try again</button>
+    <div class="features">
+        <h2>Available offline</h2>
+        <ul>
+            <li>View today's job cards &amp; checklists</li>
+            <li>Mark checklist items complete</li>
+            <li>Record notes and observations</li>
+            <li>Actions sync automatically on reconnect</li>
+        </ul>
+    </div>
+</div>
+</body>
+</html>

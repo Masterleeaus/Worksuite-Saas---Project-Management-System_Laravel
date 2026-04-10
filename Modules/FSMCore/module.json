@@ -1,0 +1,19 @@
+{
+  "name": "FSMCore",
+  "alias": "fsmcore",
+  "description": "FSM Core \u2013 Field Service Management: Orders, Locations, Workers, Teams, Stages, Equipment, Templates, Territories for CleanSmartOS.",
+  "keywords": ["fsm", "field-service", "cleansmartOS"],
+  "active": 1,
+  "order": 0,
+  "providers": [
+    "Modules\\FSMCore\\Providers\\FSMCoreServiceProvider",
+    "Modules\\FSMCore\\Providers\\RouteServiceProvider",
+    "Modules\\FSMCore\\Providers\\EventServiceProvider",
+    "Modules\\FSMCore\\Providers\\ConfigServiceProvider",
+    "Modules\\FSMCore\\Providers\\ViewServiceProvider"
+  ],
+  "aliases": {},
+  "files": [],
+  "requires": [],
+  "version": "1.0.0"
+}
