@@ -1,8 +1,8 @@
 {
     "name": "QRCode",
     "alias": "qrcode",
-    "description": "",
-    "keywords": [],
+    "description": "QR code generation — job site check-in, asset tags, booking links and property access",
+    "keywords": ["qrcode", "qr", "check-in", "asset", "booking", "property"],
     "active": 1,
     "order": 2,
     "providers": [
@@ -14,11 +14,31 @@
         "start.php"
     ],
     "permissions": [
+        "add_qrcode",
+        "view_qrcode",
+        "edit_qrcode",
+        "delete_qrcode"
     ],
     "roles_permissions": {
         "admin": [
+            "add_qrcode",
+            "view_qrcode",
+            "edit_qrcode",
+            "delete_qrcode"
         ],
         "manager": [
+            "view_qrcode",
+            "add_qrcode",
+            "edit_qrcode"
         ]
-    }
+    },
+    "menus": [
+        {
+            "panel": "user",
+            "label": "QR Codes",
+            "route": "qrcode.index",
+            "sort_order": 93
+        }
+    ],
+    "sidebar_menu": true
 }
