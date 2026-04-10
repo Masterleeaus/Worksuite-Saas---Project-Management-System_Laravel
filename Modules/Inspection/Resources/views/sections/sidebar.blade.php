@@ -18,6 +18,10 @@
                 $rInspections = Route::has('schedule-inspection.index')
                     ? route('schedule-inspection.index')
                     : null;
+
+                $rQualityInspections = Route::has('inspections.index')
+                    ? route('inspections.index')
+                    : null;
             @endphp
 
             @if($rRecurring)
@@ -30,6 +34,10 @@
 
             @if($rInspections)
                 <x-sub-menu-item :link="$rInspections" :text="__('inspection::sidebar.inspections')"/>
+            @endif
+
+            @if($rQualityInspections)
+                <x-sub-menu-item :link="$rQualityInspections" :text="__('inspection::sidebar.quality_inspections')"/>
             @endif
         </div>
     </x-menu-item>

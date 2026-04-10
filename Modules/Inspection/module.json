@@ -1,13 +1,52 @@
 {
     "name": "Inspection",
     "alias": "inspections",
-    "description": "",
-    "keywords": [],
+    "description": "Post-job inspection, quality scoring and re-clean authorisation",
+    "keywords": ["inspection", "quality", "cleaning", "reclean"],
     "priority": 0,
     "providers": [
         "Modules\\Inspection\\Providers\\InspectionServiceProvider",
         "Modules\\Inspection\\Providers\\EventServiceProvider"
     ],
     "files": [],
-    "version": "1.0.1"
+    "active": 1,
+    "version": "1.0.2",
+    "permissions": [
+        "add_inspection",
+        "view_inspection",
+        "edit_inspection",
+        "delete_inspection",
+        "view_inspections",
+        "create_inspection",
+        "approve_inspection",
+        "request_reclean"
+    ],
+    "roles_permissions": {
+        "admin": [
+            "add_inspection",
+            "view_inspection",
+            "edit_inspection",
+            "delete_inspection",
+            "view_inspections",
+            "create_inspection",
+            "approve_inspection",
+            "request_reclean"
+        ],
+        "manager": [
+            "view_inspection",
+            "edit_inspection",
+            "view_inspections",
+            "create_inspection",
+            "approve_inspection"
+        ]
+    },
+    "menus": [
+        {
+            "panel": "user",
+            "label": "Inspections",
+            "route": "inspections.index",
+            "sort_order": 85
+        }
+    ],
+    "sidebar_menu": true
 }

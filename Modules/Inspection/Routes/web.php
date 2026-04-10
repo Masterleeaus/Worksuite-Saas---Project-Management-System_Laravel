@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Inspection\Http\Controllers\InspectionController;
 use Modules\Inspection\Http\Controllers\ScheduleReplyController;
 use Modules\Inspection\Http\Controllers\ScheduleController;
 use Modules\Inspection\Http\Controllers\ScheduleFileController;
@@ -63,6 +64,18 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
 
 
     Route::get('schedule-files/download/{id}', [ScheduleFileController::class, 'download'])->name('schedule-files.download');
+
+    /*
+     |--------------------------------------------------------------------------
+     | Inspections (Quality Checks — post-job)
+     |--------------------------------------------------------------------------
+     */
+    Route::resource('inspections', InspectionController::class)
+        ->names('inspections');
+    Route::post('inspections/{inspection}/approve', [InspectionController::class, 'approve'])
+        ->name('inspections.approve');
+    Route::post('inspections/{inspection}/request-reclean', [InspectionController::class, 'requestReclean'])
+        ->name('inspections.request_reclean');
     
 /*
  |--------------------------------------------------------------------------

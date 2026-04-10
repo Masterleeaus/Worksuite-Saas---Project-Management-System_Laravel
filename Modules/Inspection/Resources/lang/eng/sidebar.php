@@ -6,4 +6,5 @@ return [
     'recurring' => 'Recurring Schedule',
     'schedules' => 'Schedules',
     'inspections' => 'Inspections',
+    'quality_inspections' => 'Quality Inspections',
 ];
