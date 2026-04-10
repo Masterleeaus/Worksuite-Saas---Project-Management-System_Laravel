@@ -4,7 +4,7 @@ namespace Modules\CustomerModule\Providers;
 
 use Modules\CustomerModule\Console\ActivateModuleCommand;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Database\Eloquent\Factory;
+use Illuminate\Support\Facades\View;
 
 class CustomerModuleServiceProvider extends ServiceProvider
 {
@@ -35,6 +35,7 @@ class CustomerModuleServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
+        $this->registerViewComposers();
     }
 
     /**
@@ -97,6 +98,23 @@ class CustomerModuleServiceProvider extends ServiceProvider
     }
 
     /**
+     * Register Blade view composers that inject FSM tab entries into the core clients/show.blade.php.
+     *
+     * Pushes three tab nav entries to @stack('client-fsm-tabs'):
+     *   - Cleaning Info
+     *   - Properties
+     *   - Booking History
+     */
+    protected function registerViewComposers(): void
+    {
+        View::composer('clients.show', function (\Illuminate\View\View $view) {
+            $view->getFactory()->startPush('client-fsm-tabs');
+            echo view('customermodule::client.fsm-tabs', $view->getData())->render();
+            $view->getFactory()->stopPush();
+        });
+    }
+
+    /**
      * Get the services provided by the provider.
      *
      * @return array
@@ -117,3 +135,4 @@ class CustomerModuleServiceProvider extends ServiceProvider
         return $paths;
     }
 }
+
