@@ -22,14 +22,14 @@ class AccountingAccountType extends Model
 
     public function getAccountTypeDescriptionAttribute()
     {
-        if (empty($this->descriptiion)) {
+        if (empty($this->description)) {
             return '';
         }
 
-        $descriptiion = ! empty($this->business_id) ?
-        $this->descriptiion : __('accounting::lang.'.$this->descriptiion);
+        $description = ! empty($this->business_id) ?
+        $this->description : __('accounting::lang.'.$this->description);
 
-        return $descriptiion;
+        return $description;
     }
 
     /**
