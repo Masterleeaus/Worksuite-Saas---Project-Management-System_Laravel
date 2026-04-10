@@ -1,0 +1,143 @@
+name: Agent Issue Queue
+
+# Triggers:
+#  1. An issue is closed (agent finished the work).
+#  2. A pull request is merged (agent's PR landed; the linked issue may already
+#     be closed, but this acts as a safety net).
+#  3. A label named "copilot" is added to an issue (opt-in individual issues).
+#  4. Manual dispatch — to kick-start the queue or re-process after a pause.
+on:
+  issues:
+    types: [closed, labeled]
+  pull_request:
+    types: [closed]
+  workflow_dispatch:
+    inputs:
+      label:
+        description: 'Label to filter issues (default: copilot)'
+        required: false
+        default: 'copilot'
+
+# Only one run of this workflow at a time to avoid double-assignment races.
+concurrency:
+  group: agent-issue-queue
+  cancel-in-progress: false
+
+permissions:
+  issues: write
+  pull-requests: read
+  contents: read
+
+jobs:
+  assign-next-issue:
+    name: Assign Copilot agent to next open issue
+    runs-on: ubuntu-latest
+
+    # For the "labeled" trigger, only proceed when the added label is "copilot".
+    # For the "pull_request" trigger, only proceed when the PR was merged.
+    if: |
+      (github.event_name == 'workflow_dispatch') ||
+      (github.event_name == 'issues' && github.event.action == 'closed') ||
+      (github.event_name == 'issues' && github.event.action == 'labeled' && github.event.label.name == 'copilot') ||
+      (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+
+    steps:
+      - name: Find and assign next open issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const LABEL        = context.payload.inputs?.label ?? 'copilot';
+            const AGENT_LOGIN  = 'copilot';   // GitHub Copilot coding-agent handle
+            const TRIGGER_BODY =
+              `@github-copilot Please work on this issue. ` +
+              `When you are done, close the issue or open a pull request that references it.`;
+
+            // ----------------------------------------------------------------
+            // 1. Fetch all open issues that carry the target label.
+            //    Fall back to ALL open unassigned issues if none are labelled.
+            // ----------------------------------------------------------------
+            async function fetchOpenIssues(label) {
+              const { data } = await github.rest.issues.listForRepo({
+                owner: context.repo.owner,
+                repo:  context.repo.repo,
+                state: 'open',
+                labels: label,
+                sort:  'created',
+                direction: 'asc',
+                per_page: 100,
+              });
+              // issues endpoint returns PRs too — exclude them
+              return data.filter(i => !i.pull_request);
+            }
+
+            let issues = await fetchOpenIssues(LABEL);
+
+            if (issues.length === 0 && LABEL !== '') {
+              core.info(`No open issues with label "${LABEL}". ` +
+                        `Falling back to open issues without an assignee.`);
+              const { data: all } = await github.rest.issues.listForRepo({
+                owner: context.repo.owner,
+                repo:  context.repo.repo,
+                state: 'open',
+                sort:  'created',
+                direction: 'asc',
+                per_page: 100,
+              });
+              issues = all.filter(i => !i.pull_request && i.assignees.length === 0);
+            }
+
+            if (issues.length === 0) {
+              core.info('🎉 No more open issues to process. Queue is empty.');
+              return;
+            }
+
+            // ----------------------------------------------------------------
+            // 2. Pick the oldest open issue that the agent is NOT already
+            //    assigned to (prevents re-assigning an in-progress issue).
+            // ----------------------------------------------------------------
+            const next = issues.find(
+              i => !i.assignees.some(a => a.login === AGENT_LOGIN)
+            );
+
+            if (!next) {
+              core.info(
+                `All ${issues.length} open issue(s) in the queue are already ` +
+                `assigned to @${AGENT_LOGIN}. Nothing to do.`
+              );
+              return;
+            }
+
+            core.info(`Assigning @${AGENT_LOGIN} to issue #${next.number}: "${next.title}"`);
+
+            // ----------------------------------------------------------------
+            // 3. Add the agent as an assignee.
+            // ----------------------------------------------------------------
+            await github.rest.issues.addAssignees({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              issue_number: next.number,
+              assignees: [AGENT_LOGIN],
+            });
+
+            // ----------------------------------------------------------------
+            // 4. Post a trigger comment so the agent picks up the issue.
+            // ----------------------------------------------------------------
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              issue_number: next.number,
+              body: TRIGGER_BODY,
+            });
+
+            // ----------------------------------------------------------------
+            // 5. Report remaining queue depth.
+            // ----------------------------------------------------------------
+            const remaining = issues.filter(
+              i => i.number !== next.number &&
+                   !i.assignees.some(a => a.login === AGENT_LOGIN)
+            ).length;
+
+            core.info(
+              `✅ Issue #${next.number} assigned. ` +
+              `${remaining} issue(s) still waiting in the queue.`
+            );
