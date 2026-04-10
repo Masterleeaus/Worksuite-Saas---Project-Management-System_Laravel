@@ -42,4 +42,40 @@
         </div>
     </div>
 </div>
+
+@if(class_exists(\Modules\FSMStock\Models\FSMLocationEquipmentRegister::class) && \Illuminate\Support\Facades\Schema::hasTable('fsm_location_equipment_registers'))
+<div class="row g-3 mt-1">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+                <span>🔧 Site Equipment Register</span>
+                <a href="{{ route('fsmstock.location-equipment.index', $location->id) }}" class="btn btn-sm btn-outline-info">Manage</a>
+            </div>
+            <div class="card-body">
+                @php
+                    $siteEquipment = \Modules\FSMStock\Models\FSMLocationEquipmentRegister::with(['equipment', 'checkEvents' => fn($q) => $q->latest('checked_at')->take(1)])
+                        ->where('location_id', $location->id)->where('active', true)->get();
+                @endphp
+                @if($siteEquipment->isEmpty())
+                    <span class="text-muted">No equipment registered at this site.</span>
+                @else
+                <table class="table table-sm mb-0">
+                    <thead class="table-light"><tr><th>Equipment</th><th>Last Check</th><th>Check Type</th></tr></thead>
+                    <tbody>
+                    @foreach($siteEquipment as $reg)
+                        @php $lastCheck = $reg->checkEvents->first(); @endphp
+                        <tr>
+                            <td>{{ $reg->equipment?->name ?? '—' }}</td>
+                            <td>{{ $lastCheck?->checked_at?->format('d M Y H:i') ?? '—' }}</td>
+                            <td>{{ $lastCheck ? ($lastCheck->event_type === 'check_in' ? '✅ In' : '🔒 Out') : '—' }}</td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 @endsection

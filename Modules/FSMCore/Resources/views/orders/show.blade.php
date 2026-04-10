@@ -4,6 +4,9 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>Order: {{ $order->name }}</h2>
     <div class="d-flex gap-2">
+        @if(class_exists(\Modules\FSMStock\Http\Controllers\OrderStockLineController::class))
+            <a href="{{ route('fsmstock.order-stock-lines.index', $order->id) }}" class="btn btn-outline-warning">📦 Stock Lines</a>
+        @endif
         @if(class_exists(\Modules\FSMSkill\Http\Controllers\OrderSkillController::class))
             <a href="{{ route('fsmskill.order-skills.index', $order->id) }}" class="btn btn-outline-info">Skill Requirements</a>
         @endif
@@ -144,6 +147,51 @@
                 @endif
                 <div class="mt-2 text-muted small">{{ $tsLines->count() }} line(s) logged</div>
             </div>
+        </div>
+        @endif
+
+        @if(class_exists(\Modules\FSMStock\Models\FSMOrderStockLine::class) && \Illuminate\Support\Facades\Schema::hasTable('fsm_order_stock_lines'))
+        @php
+            $stockLines = \Modules\FSMStock\Models\FSMOrderStockLine::with('product')
+                ->where('fsm_order_id', $order->id)->get();
+            $lowStockWarnings = $stockLines->filter(fn($l) => $l->product && $l->product->isBelowMinQty());
+        @endphp
+        <div class="card mb-3">
+            <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+                <span>📦 Stock Lines</span>
+                <a href="{{ route('fsmstock.order-stock-lines.index', $order->id) }}" class="btn btn-sm btn-outline-info">Manage</a>
+            </div>
+            @if($stockLines->isEmpty())
+                <div class="card-body text-muted">No stock lines added to this order.</div>
+            @else
+            <div class="card-body p-0">
+                @if($lowStockWarnings->isNotEmpty())
+                    <div class="alert alert-warning mb-0 rounded-0">
+                        ⚠ {{ $lowStockWarnings->count() }} item(s) currently below minimum stock level.
+                    </div>
+                @endif
+                <table class="table table-sm mb-0">
+                    <thead class="table-light">
+                        <tr><th>Product</th><th>Unit</th><th>Planned</th><th>Used</th><th>State</th><th>Billable</th></tr>
+                    </thead>
+                    <tbody>
+                    @foreach($stockLines as $line)
+                        @php
+                            $stateColor = ['planned'=>'warning','consumed'=>'success','returned'=>'secondary'][$line->state] ?? 'light';
+                        @endphp
+                        <tr>
+                            <td>{{ $line->product?->name ?? '—' }}</td>
+                            <td>{{ $line->product?->unit ?? '—' }}</td>
+                            <td>{{ $line->qty_planned }}</td>
+                            <td>{{ $line->qty_used ?? '—' }}</td>
+                            <td><span class="badge bg-{{ $stateColor }}">{{ $line->state }}</span></td>
+                            <td><span class="badge bg-{{ $line->billable ? 'info' : 'light text-dark' }}">{{ $line->billable ? 'Yes' : 'No' }}</span></td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
+            @endif
         </div>
         @endif
 
