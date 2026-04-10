@@ -17,6 +17,10 @@
     const IDB_NAME  = 'titanpwa-db';
     const IDB_VER   = 1;
 
+    // Storage key constants — centralised to avoid typos and ease future changes
+    const STORAGE_KEY_INSTALLED    = 'titanpwa-installed';
+    const STORAGE_KEY_DISMISS      = 'titanpwa-dismiss-install';
+
     let deferredInstallPrompt = null;
     let swRegistration        = null;
 
@@ -84,7 +88,7 @@
         e.preventDefault();
         deferredInstallPrompt = e;
 
-        if (!localStorage.getItem('titanpwa-installed') && !localStorage.getItem('titanpwa-dismiss-install')) {
+        if (!localStorage.getItem(STORAGE_KEY_INSTALLED) && !localStorage.getItem(STORAGE_KEY_DISMISS)) {
             // Delay banner by 3 s to avoid showing it before the user has
             // had any meaningful interaction with the app.
             setTimeout(showInstallBanner, 3000);
@@ -93,7 +97,7 @@
 
     global.addEventListener('appinstalled', function () {
         deferredInstallPrompt = null;
-        localStorage.setItem('titanpwa-installed', '1');
+        localStorage.setItem(STORAGE_KEY_INSTALLED, '1');
         hideInstallBanner();
     });
 
@@ -113,11 +117,17 @@
         deferredInstallPrompt.prompt();
         deferredInstallPrompt.userChoice.then(function (choice) {
             if (choice.outcome === 'accepted') {
-                localStorage.setItem('titanpwa-installed', '1');
+                localStorage.setItem(STORAGE_KEY_INSTALLED, '1');
             }
             deferredInstallPrompt = null;
             hideInstallBanner();
         });
+    };
+
+    /** Public: dismiss the install prompt banner without installing */
+    global.titanPWADismissInstall = function () {
+        localStorage.setItem(STORAGE_KEY_DISMISS, '1');
+        hideInstallBanner();
     };
 
     /* ───────────────────────────────────────────────────────────
@@ -364,7 +374,11 @@
             }).then(function (subscription) {
                 if (!subscription) return null;
 
-                var csrfToken = (document.querySelector('meta[name="csrf-token"]') || {}).content || '';
+                var csrfMeta  = document.querySelector('meta[name="csrf-token"]');
+                var csrfToken = csrfMeta ? csrfMeta.content : '';
+                if (!csrfToken) {
+                    console.warn('[TitanPWA] CSRF token meta tag not found — push subscription request may be rejected by the server.');
+                }
 
                 return fetch('/api/titanpwa/push/subscribe', {
                     method:  'POST',
@@ -389,7 +403,11 @@
                 .then(function (subscription) {
                     if (!subscription) return;
 
-                    var csrfToken = (document.querySelector('meta[name="csrf-token"]') || {}).content || '';
+                    var csrfMeta  = document.querySelector('meta[name="csrf-token"]');
+                    var csrfToken = csrfMeta ? csrfMeta.content : '';
+                    if (!csrfToken) {
+                        console.warn('[TitanPWA] CSRF token meta tag not found — unsubscribe request may be rejected by the server.');
+                    }
                     var endpoint  = subscription.endpoint;
 
                     return subscription.unsubscribe().then(function () {

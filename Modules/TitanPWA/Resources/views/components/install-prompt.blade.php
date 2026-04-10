@@ -35,7 +35,7 @@
         </button>
         <button class="titanpwa-btn titanpwa-btn-secondary"
                 type="button"
-                onclick="document.getElementById('titanpwa-install-banner').classList.add('titanpwa-hidden'); localStorage.setItem('titanpwa-dismiss-install','1');">
+                onclick="titanPWADismissInstall()">
             Not now
         </button>
     </div>

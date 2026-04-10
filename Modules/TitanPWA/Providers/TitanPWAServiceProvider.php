@@ -19,7 +19,12 @@ class TitanPWAServiceProvider extends ServiceProvider
         $this->registerViews();
         $this->registerTranslations();
         $this->publishAssets();
-        $this->loadMigrationsFrom(module_path($this->name, 'Database/Migrations'));
+
+        // Only load migrations when the directory exists
+        $migrationsPath = module_path($this->name, 'Database/Migrations');
+        if (is_dir($migrationsPath)) {
+            $this->loadMigrationsFrom($migrationsPath);
+        }
 
         // Web routes
         $web = module_path($this->name, 'Routes/web.php');

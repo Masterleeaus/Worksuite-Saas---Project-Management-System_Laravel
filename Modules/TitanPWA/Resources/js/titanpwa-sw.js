@@ -40,10 +40,15 @@ self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(STATIC_CACHE)
             .then((cache) => {
-                // addAll ignores individual failures so a missing icon doesn't
-                // abort the entire install.
+                // Use Promise.allSettled so a single missing asset doesn't abort
+                // the entire install. Failures are logged to aid debugging.
                 return Promise.allSettled(
-                    STATIC_PRECACHE.map((url) => cache.add(url).catch(() => null))
+                    STATIC_PRECACHE.map((url) =>
+                        cache.add(url).catch((err) => {
+                            console.warn('[TitanPWA SW] Pre-cache failed for', url, '—', err.message);
+                            return null;
+                        })
+                    )
                 );
             })
             .then(() => self.skipWaiting())

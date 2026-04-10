@@ -49,6 +49,11 @@ class PushSubscriptionController extends Controller
 
         $sub = $validated['subscription'];
 
+        // Web Push endpoints must always use HTTPS (RFC 8030)
+        if (! str_starts_with($sub['endpoint'], 'https://')) {
+            return response()->json(['error' => 'Push subscription endpoint must use HTTPS.'], 422);
+        }
+
         PushSubscription::updateOrCreate(
             [
                 'user_id'  => Auth::id(),
