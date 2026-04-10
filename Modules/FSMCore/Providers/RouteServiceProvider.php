@@ -18,6 +18,12 @@ class RouteServiceProvider extends ServiceProvider
                     ->namespace('Modules\FSMCore\Http\Controllers')
                     ->group($web);
             }
+
+            $api = $base . '/api.php';
+            if (file_exists($api)) {
+                Route::namespace('Modules\FSMCore\Http\Controllers\Api')
+                    ->group($api);
+            }
         });
     }
 }
