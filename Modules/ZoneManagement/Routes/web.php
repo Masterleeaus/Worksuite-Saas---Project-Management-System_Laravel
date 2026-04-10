@@ -1,9 +1,10 @@
 <?php
 
-
-
 use Illuminate\Support\Facades\Route;
 use Modules\ZoneManagement\Http\Controllers\Web\Admin\ZoneController;
+use Modules\ZoneManagement\Http\Controllers\Web\Admin\DispatchMapController;
+use Modules\ZoneManagement\Http\Controllers\Web\Admin\GpsSettingsController;
+use Modules\ZoneManagement\Http\Controllers\Web\Admin\RouteReplayController;
 
 Route::middleware(['web','auth'])->prefix('account')->group(function () {
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Web\Admin', 'middleware' => ['admin', 'actch:admin_panel']], function () {
@@ -18,5 +19,11 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Web\Admin',
         Route::get('download', [ZoneController::class, 'download'])->name('download');
         Route::get('table', [ZoneController::class, 'getTable'])->name('table');
     });
+
+    // GPS / dispatch-map admin pages
+    Route::get('gps/dispatch-map', [DispatchMapController::class, 'index'])->name('gps.dispatch-map');
+    Route::get('gps/settings', [GpsSettingsController::class, 'index'])->name('gps.settings');
+    Route::post('gps/settings', [GpsSettingsController::class, 'update'])->name('gps.settings.update');
+    Route::get('gps/route-replay/{booking_id}', [RouteReplayController::class, 'show'])->name('gps.route-replay');
 });
 });
