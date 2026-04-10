@@ -19,13 +19,20 @@ class BroadcastServiceProvider extends ServiceProvider
 
                 if (!in_array(config('app.env'), ['demo', 'development'])) {
 
-                    $driver = ($pusherSetting->status == 1) ? 'pusher' : 'null';
+                    // Prefer Reverb when configured; fall back to external Pusher.
+                    $useReverb = config('reverb.apps.apps.0.key') !== null
+                        && env('REVERB_APP_KEY') !== null;
 
-                    Config::set('broadcasting.default', $driver);
-                    Config::set('broadcasting.connections.pusher.key', $pusherSetting->pusher_app_key);
-                    Config::set('broadcasting.connections.pusher.secret', $pusherSetting->pusher_app_secret);
-                    Config::set('broadcasting.connections.pusher.app_id', $pusherSetting->pusher_app_id);
-                    Config::set('broadcasting.connections.pusher.options.host', 'api-'.$pusherSetting->pusher_cluster.'.pusher.com');
+                    if ($useReverb) {
+                        Config::set('broadcasting.default', 'reverb');
+                    } else {
+                        $driver = ($pusherSetting->status == 1) ? 'pusher' : 'null';
+                        Config::set('broadcasting.default', $driver);
+                        Config::set('broadcasting.connections.pusher.key', $pusherSetting->pusher_app_key);
+                        Config::set('broadcasting.connections.pusher.secret', $pusherSetting->pusher_app_secret);
+                        Config::set('broadcasting.connections.pusher.app_id', $pusherSetting->pusher_app_id);
+                        Config::set('broadcasting.connections.pusher.options.host', 'api-'.$pusherSetting->pusher_cluster.'.pusher.com');
+                    }
                 }
             }
         }
@@ -41,7 +48,7 @@ class BroadcastServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Broadcast::routes();
+        Broadcast::routes(['middleware' => ['auth:sanctum,web']]);
 
         require base_path('routes/channels.php');
     }
