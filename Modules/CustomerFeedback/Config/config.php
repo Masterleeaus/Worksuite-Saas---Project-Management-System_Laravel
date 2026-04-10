@@ -5,7 +5,6 @@ return [
 
     'module_settings' => [
         'enable_nps' => true,
-        'enable_csat' => true,
         'enable_ai_insights' => true,
         'enable_email_sync' => true,
     ],
@@ -19,15 +18,20 @@ return [
     'survey' => [
         'nps' => [
             'default_question' => 'How likely are you to recommend us to a friend or colleague?',
-            'scale_min' => 1,
-            'scale_max' => 10,
+            'score_min' => 0,
+            'score_max' => 10,
         ],
-        'csat' => [
-            'default_question' => 'How satisfied are you with our service?',
-            'scale_min' => 1,
-            'scale_max' => 5,
+        'star_rating' => [
+            'min' => 1,
+            'max' => 5,
         ],
     ],
+
+    // How many days before a survey link expires (default: 7)
+    'survey_expiry_days' => 7,
+
+    // SMS slug used when inviting high-NPS promoters to leave a Google Review
+    'google_review_sms_slug' => 'google-review-request',
 
     'email' => [
         'sync_interval' => 5, // minutes

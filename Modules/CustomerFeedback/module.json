@@ -5,6 +5,7 @@
     "keywords": ["feedback", "complaint", "nps", "csat", "survey", "customer-satisfaction", "analytics", "ai"],
     "priority": 50,
     "version": "1.0.0",
+    "active": 1,
     "providers": [
         "Modules\\CustomerFeedback\\Providers\\CustomerFeedbackServiceProvider",
         "Modules\\CustomerFeedback\\Providers\\EventServiceProvider"
@@ -29,9 +30,5 @@
         "Type discrimination for ticket categorization",
         "Soft deletes and company multi-tenancy",
         "Full backward compatibility with legacy Complaint module"
-    ],
-    "entities": 15,
-    "tables": 19,
-    "controllers": 5,
-    "migrations": 4
+    ]
 }

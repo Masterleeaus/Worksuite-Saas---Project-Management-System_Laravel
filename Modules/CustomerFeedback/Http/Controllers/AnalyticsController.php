@@ -4,11 +4,9 @@ namespace Modules\CustomerFeedback\Http\Controllers;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\AccountBaseController;
 use Modules\CustomerFeedback\Entities\FeedbackTicket;
-use Modules\CustomerFeedback\Entities\NpsResponse;
-use Modules\CustomerFeedback\Entities\CsatResponse;
+use Modules\CustomerFeedback\Entities\NpsSurvey;
 
 class AnalyticsController extends AccountBaseController
 {
@@ -28,52 +26,51 @@ class AnalyticsController extends AccountBaseController
     public function dashboard()
     {
         $startDate = request()->start_date ? Carbon::parse(request()->start_date) : now()->subDays(30);
-        $endDate = request()->end_date ? Carbon::parse(request()->end_date) : now();
+        $endDate   = request()->end_date   ? Carbon::parse(request()->end_date)   : now();
 
-        // Key metrics
-        $this->totalTickets = FeedbackTicket::whereBetween('created_at', [$startDate, $endDate])
-            ->count();
-        $this->openTickets = FeedbackTicket::whereBetween('created_at', [$startDate, $endDate])
-            ->unresolved()
-            ->count();
+        $this->totalTickets          = FeedbackTicket::whereBetween('created_at', [$startDate, $endDate])->count();
+        $this->openTickets           = FeedbackTicket::whereBetween('created_at', [$startDate, $endDate])->unresolved()->count();
         $this->averageResolutionTime = $this->getAverageResolutionTime($startDate, $endDate);
-        $this->satisfactionScore = $this->getAverageSatisfaction($startDate, $endDate);
+        $this->satisfactionScore     = $this->getAverageNpsScore($startDate, $endDate);
 
-        // Charts data
-        $this->ticketsOverTime = $this->getTicketsOverTime($startDate, $endDate);
-        $this->statusBreakdown = $this->getStatusBreakdown();
+        $this->ticketsOverTime  = $this->getTicketsOverTime($startDate, $endDate);
+        $this->statusBreakdown  = $this->getStatusBreakdown();
         $this->priorityBreakdown = $this->getPriorityBreakdown();
-        $this->typeBreakdown = $this->getFeedbackTypeBreakdown();
-        $this->topAgents = $this->getTopAgents(5);
-        $this->npsChart = $this->getNpsData($startDate, $endDate);
-        $this->csatChart = $this->getCsatData($startDate, $endDate);
+        $this->typeBreakdown    = $this->getFeedbackTypeBreakdown();
+        $this->topAgents        = $this->getTopAgents(5);
+        $this->npsChart         = $this->getNpsData($startDate, $endDate);
 
         return view('customer-feedback::analytics.dashboard', $this->data);
     }
 
     /**
-     * NPS analytics
+     * NPS analytics using completed nps_surveys
      */
     public function nps()
     {
         $startDate = request()->start_date ? Carbon::parse(request()->start_date) : now()->subDays(90);
-        $endDate = request()->end_date ? Carbon::parse(request()->end_date) : now();
+        $endDate   = request()->end_date   ? Carbon::parse(request()->end_date)   : now();
 
-        $responses = NpsResponse::whereBetween('created_at', [$startDate, $endDate])->get();
+        $completed = NpsSurvey::whereNotNull('completed_at')
+            ->whereNotNull('nps_score')
+            ->whereBetween('completed_at', [$startDate, $endDate])
+            ->get();
 
-        $total = $responses->count();
-        if ($total > 0) {
-            $this->promoters = $responses->where('score', '>=', 9)->count();
-            $this->passives = $responses->where('score', '>=', 7)->where('score', '<=', 8)->count();
-            $this->detractors = $responses->where('score', '<=', 6)->count();
-            $this->npsScore = (($this->promoters - $this->detractors) / $total) * 100;
-        }
+        $total = $completed->count();
 
-        $this->scoresOverTime = $this->getNpsScoresOverTime($startDate, $endDate);
-        $this->scoreDistribution = $this->getNpsScoreDistribution();
-        $this->feedback = NpsResponse::where('feedback', '!=', null)
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->orderBy('created_at', 'desc')
+        $this->promoters   = $total > 0 ? $completed->where('nps_score', '>=', 9)->count() : 0;
+        $this->passives    = $total > 0 ? $completed->whereBetween('nps_score', [7, 8])->count() : 0;
+        $this->detractors  = $total > 0 ? $completed->where('nps_score', '<=', 6)->count() : 0;
+        $this->npsScore    = $total > 0
+            ? round((($this->promoters - $this->detractors) / $total) * 100, 1)
+            : null;
+
+        $this->scoresOverTime     = $this->getNpsScoresOverTime($startDate, $endDate);
+        $this->scoreDistribution  = $this->getNpsScoreDistribution();
+        $this->recentComments     = NpsSurvey::whereNotNull('comments')
+            ->whereNotNull('completed_at')
+            ->whereBetween('completed_at', [$startDate, $endDate])
+            ->orderByDesc('completed_at')
             ->limit(20)
             ->get();
 
@@ -81,212 +78,147 @@ class AnalyticsController extends AccountBaseController
     }
 
     /**
-     * CSAT analytics
+     * CSAT analytics (service / cleaner / punctuality star ratings)
      */
     public function csat()
     {
         $startDate = request()->start_date ? Carbon::parse(request()->start_date) : now()->subDays(90);
-        $endDate = request()->end_date ? Carbon::parse(request()->end_date) : now();
+        $endDate   = request()->end_date   ? Carbon::parse(request()->end_date)   : now();
 
-        $responses = CsatResponse::whereBetween('created_at', [$startDate, $endDate])->get();
+        $completed = NpsSurvey::whereNotNull('completed_at')
+            ->whereBetween('completed_at', [$startDate, $endDate])
+            ->get();
 
-        $this->averageScore = $responses->avg('score');
-        $this->responses = $responses->count();
-        $this->satisfiedCount = $responses->where('score', '>=', 4)->count();
-        $this->satisfactionRate = $this->responses > 0
-            ? round(($this->satisfiedCount / $this->responses) * 100, 2)
+        $this->avgServiceRating     = $completed->whereNotNull('service_rating')->avg('service_rating');
+        $this->avgCleanerRating     = $completed->whereNotNull('cleaner_rating')->avg('cleaner_rating');
+        $this->avgPunctualityRating = $completed->whereNotNull('punctuality_rating')->avg('punctuality_rating');
+        $this->totalResponses       = $completed->count();
+        $this->satisfiedCount       = $completed->where('service_rating', '>=', 4)->count();
+        $this->satisfactionRate     = $this->totalResponses > 0
+            ? round(($this->satisfiedCount / $this->totalResponses) * 100, 1)
             : 0;
-
-        $this->scoresOverTime = $this->getCsatScoresOverTime($startDate, $endDate);
-        $this->scoreDistribution = $this->getCsatScoreDistribution();
 
         return view('customer-feedback::analytics.csat', $this->data);
     }
 
-    /**
-     * Get average resolution time in hours
-     */
-    private function getAverageResolutionTime($startDate, $endDate)
+    // ─────────────────────────────────────────────────────────────────────────
+    // Private helpers
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private function getAverageResolutionTime($startDate, $endDate): float
     {
         $resolved = FeedbackTicket::whereNotNull('resolved_at')
             ->whereBetween('created_at', [$startDate, $endDate])
             ->get();
 
         if ($resolved->isEmpty()) {
-            return 0;
+            return 0.0;
         }
 
-        $totalHours = $resolved->sum(function ($ticket) {
-            return $ticket->resolved_at->diffInHours($ticket->created_at);
-        });
+        $totalHours = $resolved->sum(
+            fn ($ticket) => $ticket->resolved_at->diffInHours($ticket->created_at)
+        );
 
         return round($totalHours / $resolved->count(), 2);
     }
 
-    /**
-     * Get average satisfaction (NPS + CSAT combined)
-     */
-    private function getAverageSatisfaction($startDate, $endDate)
+    private function getAverageNpsScore($startDate, $endDate): ?float
     {
-        $npsAvg = NpsResponse::whereBetween('created_at', [$startDate, $endDate])
-            ->avg('score') ?? 0;
+        $avg = NpsSurvey::whereNotNull('nps_score')
+            ->whereNotNull('completed_at')
+            ->whereBetween('completed_at', [$startDate, $endDate])
+            ->avg('nps_score');
 
-        $csatAvg = CsatResponse::whereBetween('created_at', [$startDate, $endDate])
-            ->avg('score') ?? 0;
-
-        return round(($npsAvg + $csatAvg) / 2, 2);
+        return $avg !== null ? round((float) $avg, 1) : null;
     }
 
-    /**
-     * Get tickets over time (daily)
-     */
     private function getTicketsOverTime($startDate, $endDate)
     {
         return FeedbackTicket::selectRaw('DATE(created_at) as date, COUNT(*) as count')
             ->whereBetween('created_at', [$startDate, $endDate])
             ->groupBy('date')
             ->get()
-            ->map(fn ($item) => [
-                'date' => $item->date,
-                'count' => $item->count,
-            ]);
+            ->map(fn ($item) => ['date' => $item->date, 'count' => $item->count]);
     }
 
-    /**
-     * Get status breakdown
-     */
     private function getStatusBreakdown()
     {
         return FeedbackTicket::selectRaw('status, COUNT(*) as count')
             ->groupBy('status')
             ->get()
-            ->map(fn ($item) => [
-                'status' => $item->status,
-                'count' => $item->count,
-            ]);
+            ->map(fn ($item) => ['status' => $item->status, 'count' => $item->count]);
     }
 
-    /**
-     * Get priority breakdown
-     */
     private function getPriorityBreakdown()
     {
         return FeedbackTicket::selectRaw('priority, COUNT(*) as count')
             ->groupBy('priority')
             ->get()
-            ->map(fn ($item) => [
-                'priority' => $item->priority,
-                'count' => $item->count,
-            ]);
+            ->map(fn ($item) => ['priority' => $item->priority, 'count' => $item->count]);
     }
 
-    /**
-     * Get feedback type breakdown
-     */
     private function getFeedbackTypeBreakdown()
     {
         return FeedbackTicket::selectRaw('feedback_type, COUNT(*) as count')
             ->groupBy('feedback_type')
             ->get()
-            ->map(fn ($item) => [
-                'type' => $item->feedback_type,
-                'count' => $item->count,
-            ]);
+            ->map(fn ($item) => ['type' => $item->feedback_type, 'count' => $item->count]);
     }
 
-    /**
-     * Get top performing agents
-     */
-    private function getTopAgents($limit = 5)
+    private function getTopAgents(int $limit = 5)
     {
         return FeedbackTicket::whereNotNull('agent_id')
-            ->selectRaw('agent_id, COUNT(*) as handled, SUM(CASE WHEN status IN ("resolved", "closed") THEN 1 ELSE 0 END) as resolved')
+            ->selectRaw('agent_id, COUNT(*) as handled, SUM(CASE WHEN status IN ("resolved","closed") THEN 1 ELSE 0 END) as resolved')
             ->groupBy('agent_id')
-            ->orderBy('resolved', 'desc')
+            ->orderByDesc('resolved')
             ->limit($limit)
             ->with('agent')
             ->get();
     }
 
-    /**
-     * Get NPS data for charts
-     */
-    private function getNpsData($startDate, $endDate)
+    private function getNpsData($startDate, $endDate): array
     {
-        $responses = NpsResponse::whereBetween('created_at', [$startDate, $endDate])->get();
-        $total = $responses->count();
+        $agg = NpsSurvey::whereNotNull('nps_score')
+            ->whereNotNull('completed_at')
+            ->whereBetween('completed_at', [$startDate, $endDate])
+            ->selectRaw(
+                'COUNT(*) as total,
+                 SUM(CASE WHEN nps_score >= 9 THEN 1 ELSE 0 END) as promoters,
+                 SUM(CASE WHEN nps_score BETWEEN 7 AND 8 THEN 1 ELSE 0 END) as passives,
+                 SUM(CASE WHEN nps_score <= 6 THEN 1 ELSE 0 END) as detractors'
+            )
+            ->first();
+
+        $total = (int) ($agg->total ?? 0);
+
+        if ($total === 0) {
+            return ['promoters' => 0, 'passives' => 0, 'detractors' => 0];
+        }
 
         return [
-            'promoters' => $total > 0 ? ($responses->where('score', '>=', 9)->count() / $total) * 100 : 0,
-            'passives' => $total > 0 ? ($responses->where('score', '>=', 7)->where('score', '<=', 8)->count() / $total) * 100 : 0,
-            'detractors' => $total > 0 ? ($responses->where('score', '<=', 6)->count() / $total) * 100 : 0,
+            'promoters'  => round(((int) $agg->promoters  / $total) * 100, 1),
+            'passives'   => round(((int) $agg->passives   / $total) * 100, 1),
+            'detractors' => round(((int) $agg->detractors / $total) * 100, 1),
         ];
     }
 
-    /**
-     * Get CSAT data for charts
-     */
-    private function getCsatData($startDate, $endDate)
-    {
-        $responses = CsatResponse::whereBetween('created_at', [$startDate, $endDate])->get();
-        $total = $responses->count();
-
-        return [
-            'satisfied' => $total > 0 ? ($responses->where('score', '>=', 4)->count() / $total) * 100 : 0,
-            'neutral' => $total > 0 ? ($responses->where('score', 3)->count() / $total) * 100 : 0,
-            'dissatisfied' => $total > 0 ? ($responses->where('score', '<=', 2)->count() / $total) * 100 : 0,
-        ];
-    }
-
-    /**
-     * Get NPS scores over time
-     */
     private function getNpsScoresOverTime($startDate, $endDate)
     {
-        return NpsResponse::selectRaw('DATE(created_at) as date, AVG(score) as avg_score, COUNT(*) as count')
-            ->whereBetween('created_at', [$startDate, $endDate])
+        return NpsSurvey::whereNotNull('nps_score')
+            ->whereNotNull('completed_at')
+            ->whereBetween('completed_at', [$startDate, $endDate])
+            ->selectRaw('DATE(completed_at) as date, AVG(nps_score) as avg_score, COUNT(*) as count')
             ->groupBy('date')
             ->get();
     }
 
-    /**
-     * Get NPS score distribution
-     */
     private function getNpsScoreDistribution()
     {
-        return NpsResponse::selectRaw('score, COUNT(*) as count')
-            ->groupBy('score')
-            ->orderBy('score')
+        return NpsSurvey::whereNotNull('nps_score')
+            ->selectRaw('nps_score as score, COUNT(*) as count')
+            ->groupBy('nps_score')
+            ->orderBy('nps_score')
             ->get()
-            ->map(fn ($item) => [
-                'score' => $item->score,
-                'count' => $item->count,
-            ]);
-    }
-
-    /**
-     * Get CSAT scores over time
-     */
-    private function getCsatScoresOverTime($startDate, $endDate)
-    {
-        return CsatResponse::selectRaw('DATE(created_at) as date, AVG(score) as avg_score, COUNT(*) as count')
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->groupBy('date')
-            ->get();
-    }
-
-    /**
-     * Get CSAT score distribution
-     */
-    private function getCsatScoreDistribution()
-    {
-        return CsatResponse::selectRaw('score, COUNT(*) as count')
-            ->groupBy('score')
-            ->orderBy('score')
-            ->get()
-            ->map(fn ($item) => [
-                'score' => $item->score,
-                'count' => $item->count,
-            ]);
+            ->map(fn ($item) => ['score' => $item->score, 'count' => $item->count]);
     }
 }
