@@ -98,7 +98,7 @@ class InstallController extends Controller
             DB::commit();
 
             $output = ['success' => 1,
-                'msg' => 'Accounting module installed succesfully',
+                'msg' => 'Accounting module installed successfully',
             ];
         } catch (\Exception $e) {
             DB::rollBack();
