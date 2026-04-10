@@ -18,6 +18,20 @@ jobs:
     permissions:
       contents: read
 
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: worksuite_install_check
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,7 +40,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.2"
-          extensions: mbstring, pdo, pdo_sqlite, sqlite3, dom, curl, zip, bcmath, intl, gd, exif, fileinfo
+          extensions: mbstring, pdo, pdo_mysql, dom, curl, zip, bcmath, intl, gd, exif, fileinfo
           coverage: none
 
       - name: Ensure bootstrap/cache is writable before Composer post-install hooks
@@ -54,15 +68,16 @@ jobs:
           cp .env.example .env
           sed -i 's/^APP_ENV=.*/APP_ENV=testing/' .env
           sed -i 's/^APP_DEBUG=.*/APP_DEBUG=true/' .env
-          sed -i 's/^DB_CONNECTION=.*/DB_CONNECTION=sqlite/' .env
-          echo "DB_DATABASE=/tmp/worksuite_install_check.sqlite" >> .env
+          sed -i 's/^DB_CONNECTION=.*/DB_CONNECTION=mysql/' .env
+          sed -i 's/^DB_HOST=.*/DB_HOST=127.0.0.1/' .env
+          sed -i 's/^DB_PORT=.*/DB_PORT=3306/' .env
+          sed -i 's/^DB_DATABASE=.*/DB_DATABASE=worksuite_install_check/' .env
+          sed -i 's/^DB_USERNAME=.*/DB_USERNAME=root/' .env
+          sed -i 's/^DB_PASSWORD=.*/DB_PASSWORD=root/' .env
           echo "CACHE_DRIVER=array" >> .env
           echo "SESSION_DRIVER=array" >> .env
           echo "QUEUE_CONNECTION=sync" >> .env
           echo "MAIL_MAILER=array" >> .env
-
-      - name: Create SQLite database
-        run: touch /tmp/worksuite_install_check.sqlite
 
       - name: Generate app key
         run: php artisan key:generate

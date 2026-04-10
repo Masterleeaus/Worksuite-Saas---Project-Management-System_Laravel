@@ -50,7 +50,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Check deployment secrets
+        id: secrets_check
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          if [ -z "$DEPLOY_SSH_KEY" ]; then
+            echo "::warning::DEPLOY_SSH_KEY secret is not configured. Skipping deployment steps."
+            echo "configured=false" >> $GITHUB_OUTPUT
+          else
+            echo "configured=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: Install SSH key
+        if: steps.secrets_check.outputs.configured == 'true'
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.DEPLOY_SSH_KEY }}
@@ -58,6 +71,7 @@ jobs:
           if_key_exists: replace
 
       - name: Deploy via SSH
+        if: steps.secrets_check.outputs.configured == 'true'
         run: |
           ssh -p ${{ secrets.DEPLOY_SSH_PORT || 22 }} ${{ secrets.DEPLOY_SSH_USER }}@${{ secrets.DEPLOY_SSH_HOST }} << 'ENDSSH'
             set -e
@@ -87,6 +101,7 @@ jobs:
           ENDSSH
 
       - name: Post-deploy health check
+        if: steps.secrets_check.outputs.configured == 'true'
         run: |
           curl --fail --silent --max-time 30 ${{ secrets.APP_URL }} | grep -c "html" > /dev/null \
             && echo "Health check passed." \
