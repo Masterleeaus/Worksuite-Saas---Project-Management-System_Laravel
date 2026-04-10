@@ -14,4 +14,18 @@ return [
         'medium' => ['draft_note', 'prepare_quote_scope', 'generate_checklist'],
         'high' => ['create_invoice', 'send_message', 'delete_record', 'run_campaign'],
     ],
+
+    // Cleaning business intelligence features
+    'cleaning_features' => [
+        'booking_slots',
+        'cleaner_match',
+        'auto_fill_instructions',
+        'price_suggestion',
+        'rebooking_suggestion',
+        'sms_draft',
+        'complaint_triage',
+        'anomaly_detection',
+        'automation_rules',
+    ],
 ];
+

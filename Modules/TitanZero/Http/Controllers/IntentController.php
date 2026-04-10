@@ -39,7 +39,7 @@ class IntentController extends Controller
         ]);
 
         return response()->json($res);
-    
+    }
 
     public function confirm(Request $request)
     {
