@@ -47,6 +47,12 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
+      - name: Reinstall PHPUnit and Collision to ensure complete vendor files
+        # The committed vendor may have an incomplete phpunit installation (missing Event/Events/Test/*).
+        # composer install skips reinstall when installed.json says the version is present.
+        # Force a clean reinstall of both packages to guarantee all files exist.
+        run: composer reinstall phpunit/phpunit nunomaduro/collision --no-interaction --prefer-dist --optimize-autoloader
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
