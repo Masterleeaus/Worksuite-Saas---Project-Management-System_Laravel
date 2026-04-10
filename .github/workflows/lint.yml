@@ -1,0 +1,104 @@
+name: Lint
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+concurrency:
+  group: lint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  php-syntax:
+    name: PHP Syntax Check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.1"
+          extensions: mbstring
+          coverage: none
+
+      - name: Check PHP syntax (parallel-lint via find)
+        run: |
+          ERRORS=$(find app config database routes tests -name "*.php" -print0 \
+            | xargs -0 -P4 php -l 2>&1 \
+            | grep -v "No syntax errors detected" || true)
+          if [ -n "$ERRORS" ]; then
+            echo "PHP syntax errors found:"
+            echo "$ERRORS"
+            exit 1
+          fi
+          echo "All PHP files are syntax-clean."
+
+  pint:
+    name: Laravel Pint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.1"
+          extensions: mbstring
+          coverage: none
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-lint-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-lint-
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Run Laravel Pint (check only — no auto-fix)
+        run: vendor/bin/pint --test
+        # Pint is in composer require-dev; --test exits non-zero if files need formatting
+
+  phpstan:
+    name: PHPStan Static Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.1"
+          extensions: mbstring, pdo, pdo_sqlite, sqlite3, dom, curl, zip, bcmath
+          coverage: none
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-phpstan-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-phpstan-
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Prepare .env for PHPStan
+        run: |
+          cp .env.example .env
+          sed -i 's/^APP_ENV=.*/APP_ENV=testing/' .env
+          sed -i 's/^DB_CONNECTION=.*/DB_CONNECTION=sqlite/' .env
+          echo "DB_DATABASE=/tmp/phpstan.sqlite" >> .env
+          php artisan key:generate --quiet
+
+      - name: Run PHPStan
+        run: vendor/bin/phpstan analyse --configuration=phpstan.neon.dist --memory-limit=-1 --no-progress

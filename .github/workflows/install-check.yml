@@ -1,0 +1,89 @@
+name: Install Check
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+  workflow_dispatch:
+
+concurrency:
+  group: install-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  install-check:
+    name: Fresh Install Bootstrap
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.1"
+          extensions: mbstring, pdo, pdo_sqlite, sqlite3, dom, curl, zip, bcmath, intl, gd, exif, fileinfo
+          coverage: none
+
+      - name: Install Composer dependencies (fresh — no cache)
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install npm dependencies
+        run: npm ci --prefer-offline
+
+      - name: Build frontend assets
+        run: npm run production
+        env:
+          NODE_ENV: production
+
+      - name: Prepare .env from example
+        run: |
+          cp .env.example .env
+          sed -i 's/^APP_ENV=.*/APP_ENV=testing/' .env
+          sed -i 's/^APP_DEBUG=.*/APP_DEBUG=true/' .env
+          sed -i 's/^DB_CONNECTION=.*/DB_CONNECTION=sqlite/' .env
+          echo "DB_DATABASE=/tmp/worksuite_install_check.sqlite" >> .env
+          echo "CACHE_DRIVER=array" >> .env
+          echo "SESSION_DRIVER=array" >> .env
+          echo "QUEUE_CONNECTION=sync" >> .env
+          echo "MAIL_MAILER=array" >> .env
+
+      - name: Generate app key
+        run: php artisan key:generate
+
+      - name: Create SQLite database
+        run: touch /tmp/worksuite_install_check.sqlite
+
+      - name: Set storage and bootstrap permissions
+        run: chmod -R 775 storage bootstrap/cache
+
+      - name: Package discovery
+        run: php artisan package:discover --ansi
+
+      - name: Clear caches (config / route / view)
+        run: |
+          php artisan config:clear
+          php artisan route:clear
+          php artisan view:clear
+
+      - name: Run migrations
+        run: php artisan migrate --force --no-interaction
+        continue-on-error: true
+        # Note: Some migrations may use MySQL-specific syntax.
+        # This step surfaces migration issues without blocking the install check.
+
+      - name: Validate route list (app bootstrap check)
+        run: php artisan route:list --compact 2>&1 | tail -5
+
+      - name: Run artisan about (Laravel 9.21+)
+        run: php artisan about

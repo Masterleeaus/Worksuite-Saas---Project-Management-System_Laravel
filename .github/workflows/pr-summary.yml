@@ -1,0 +1,107 @@
+name: PR Summary
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  summarize:
+    name: PR Change Summary
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed areas
+        id: changes
+        run: |
+          BASE="${{ github.event.pull_request.base.sha }}"
+          HEAD="${{ github.event.pull_request.head.sha }}"
+
+          MIGRATIONS=$(git diff --name-only "$BASE" "$HEAD" | grep "^database/migrations/" | wc -l | tr -d ' ')
+          PHP_FILES=$(git diff --name-only "$BASE" "$HEAD" | grep "\.php$" | wc -l | tr -d ' ')
+          JS_FILES=$(git diff --name-only "$BASE" "$HEAD" | grep -E "\.(js|ts|vue)$" | wc -l | tr -d ' ')
+          SCSS_FILES=$(git diff --name-only "$BASE" "$HEAD" | grep -E "\.(scss|css)$" | wc -l | tr -d ' ')
+          COMPOSER=$(git diff --name-only "$BASE" "$HEAD" | grep -c "composer\.\(json\|lock\)" || true)
+          NPM=$(git diff --name-only "$BASE" "$HEAD" | grep -c "package\(-lock\)\?\.json" || true)
+          BLADE=$(git diff --name-only "$BASE" "$HEAD" | grep "\.blade\.php$" | wc -l | tr -d ' ')
+          CONFIG=$(git diff --name-only "$BASE" "$HEAD" | grep "^config/" | wc -l | tr -d ' ')
+          ROUTES=$(git diff --name-only "$BASE" "$HEAD" | grep "^routes/" | wc -l | tr -d ' ')
+
+          echo "migrations=$MIGRATIONS" >> $GITHUB_OUTPUT
+          echo "php=$PHP_FILES" >> $GITHUB_OUTPUT
+          echo "js=$JS_FILES" >> $GITHUB_OUTPUT
+          echo "scss=$SCSS_FILES" >> $GITHUB_OUTPUT
+          echo "composer=$COMPOSER" >> $GITHUB_OUTPUT
+          echo "npm=$NPM" >> $GITHUB_OUTPUT
+          echo "blade=$BLADE" >> $GITHUB_OUTPUT
+          echo "config=$CONFIG" >> $GITHUB_OUTPUT
+          echo "routes=$ROUTES" >> $GITHUB_OUTPUT
+
+      - name: Post PR summary comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const migrations = '${{ steps.changes.outputs.migrations }}';
+            const php        = '${{ steps.changes.outputs.php }}';
+            const js         = '${{ steps.changes.outputs.js }}';
+            const scss       = '${{ steps.changes.outputs.scss }}';
+            const composer   = '${{ steps.changes.outputs.composer }}';
+            const npm        = '${{ steps.changes.outputs.npm }}';
+            const blade      = '${{ steps.changes.outputs.blade }}';
+            const config     = '${{ steps.changes.outputs.config }}';
+            const routes     = '${{ steps.changes.outputs.routes }}';
+
+            const warnings = [];
+            if (parseInt(migrations) > 0)
+              warnings.push(`⚠️ **${migrations} migration file(s) changed** — review for destructive operations, index additions, or MySQL-specific syntax before merging.`);
+            if (parseInt(composer) > 0)
+              warnings.push(`📦 **composer.json / composer.lock changed** — reviewers should verify no vulnerable or breaking package changes were introduced.`);
+            if (parseInt(npm) > 0)
+              warnings.push(`📦 **package.json / package-lock.json changed** — reviewers should verify frontend dependency changes.`);
+            if (parseInt(config) > 0)
+              warnings.push(`⚙️ **${config} config file(s) changed** — check that new config keys are also added to \`.env.example\`.`);
+
+            const summary = [
+              `## 📋 PR Change Summary`,
+              ``,
+              `| Area | Changed Files |`,
+              `|------|--------------|`,
+              `| 🐘 PHP classes | ${php} |`,
+              `| 🖼️ Blade templates | ${blade} |`,
+              `| 🗄️ Migrations | ${migrations} |`,
+              `| ⚙️ Config files | ${config} |`,
+              `| 🛣️ Routes | ${routes} |`,
+              `| ⚡ JS / TS | ${js} |`,
+              `| 🎨 SCSS / CSS | ${scss} |`,
+              ``,
+              warnings.length > 0 ? `### ⚠️ Warnings\n\n${warnings.join('\n')}` : `✅ No significant risk flags detected.`,
+            ].join('\n');
+
+            // Delete previous bot comment if it exists (to keep PR clean)
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            for (const c of comments) {
+              if (c.user.type === 'Bot' && c.body.startsWith('## 📋 PR Change Summary')) {
+                await github.rest.issues.deleteComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: c.id,
+                });
+              }
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: summary,
+            });

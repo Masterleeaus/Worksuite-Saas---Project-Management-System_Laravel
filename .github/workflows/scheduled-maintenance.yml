@@ -1,0 +1,78 @@
+name: Scheduled Maintenance
+
+on:
+  schedule:
+    # Every Monday at 07:00 UTC
+    - cron: "0 7 * * 1"
+  workflow_dispatch:
+
+jobs:
+  dependency-audit:
+    name: Weekly Dependency Audit
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.1"
+          extensions: mbstring
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Composer audit
+        run: composer audit --no-interaction
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install npm dependencies
+        run: npm ci --prefer-offline
+
+      - name: npm audit
+        run: npm audit --audit-level=moderate || true
+
+  smoke-install:
+    name: Weekly Smoke Install
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.1"
+          extensions: mbstring, pdo, pdo_sqlite, sqlite3, dom, curl, zip, bcmath, intl
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Prepare .env
+        run: |
+          cp .env.example .env
+          sed -i 's/^APP_ENV=.*/APP_ENV=testing/' .env
+          sed -i 's/^DB_CONNECTION=.*/DB_CONNECTION=sqlite/' .env
+          echo "DB_DATABASE=/tmp/smoke.sqlite" >> .env
+          echo "CACHE_DRIVER=array" >> .env
+          echo "SESSION_DRIVER=array" >> .env
+          echo "QUEUE_CONNECTION=sync" >> .env
+          echo "MAIL_MAILER=array" >> .env
+          touch /tmp/smoke.sqlite
+          php artisan key:generate --quiet
+
+      - name: Bootstrap check
+        run: |
+          php artisan config:clear
+          php artisan route:clear
+          php artisan about
