@@ -1,8 +1,8 @@
 {
     "name": "CustomerModule",
     "alias": "customermodule",
-    "description": "",
-    "keywords": [],
+    "description": "FSM client overlay — adds cleaning-specific fields, property management and job history to core Worksuite clients",
+    "keywords": ["fsm", "client", "cleaning", "customer"],
     "priority": 0,
     "providers": [
         "Modules\\CustomerModule\\Providers\\CustomerModuleServiceProvider",
@@ -15,9 +15,21 @@
     "requires": [],
     "active": 1,
     "order": 0,
-    "permissions": [],
+    "permissions": [
+        "view_clients",
+        "add_clients",
+        "edit_clients",
+        "delete_clients"
+    ],
     "roles_permissions": {
-        "admin": [],
-        "manager": []
-    }
+        "admin": ["view_clients", "add_clients", "edit_clients", "delete_clients"],
+        "manager": ["view_clients", "add_clients", "edit_clients"]
+    },
+    "menus": [
+        {
+            "title": "Clients",
+            "route": "clients.index",
+            "icon": "users"
+        }
+    ]
 }
