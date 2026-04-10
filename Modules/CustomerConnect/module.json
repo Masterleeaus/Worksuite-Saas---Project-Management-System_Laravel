@@ -1,8 +1,9 @@
 {
     "name": "CustomerConnect",
     "alias": "customerconnect",
-    "description": "Multi-channel customer communications: campaign marketing, inbox management, inbound webhooks, SLA monitoring, and TitanZero AI bridge.",
-    "keywords": ["crm", "inbox", "campaigns", "sms", "whatsapp", "telegram", "email", "twilio", "vonage", "marketing"],
+    "description": "Customer self-service portal — rebooking, invoices, payments and property management. Also provides multi-channel campaign marketing, inbox management, inbound webhooks, SLA monitoring, and TitanZero AI bridge.",
+    "keywords": ["crm", "inbox", "campaigns", "sms", "whatsapp", "telegram", "email", "twilio", "vonage", "marketing", "portal", "customer-portal", "self-service"],
+    "active": 1,
     "order": 0,
     "version": "5.0.0",
     "providers": [
@@ -10,5 +11,59 @@
     ],
     "aliases": {},
     "files": [],
-    "requires": []
+    "requires": [],
+    "permissions": [
+        "view_customerconnect",
+        "access_customer_portal",
+        "rebook_online",
+        "view_own_invoices",
+        "manage_own_properties"
+    ],
+    "roles_permissions": {
+        "admin": [
+            "view_customerconnect",
+            "access_customer_portal",
+            "rebook_online",
+            "view_own_invoices",
+            "manage_own_properties"
+        ],
+        "manager": [
+            "view_customerconnect",
+            "access_customer_portal",
+            "view_own_invoices"
+        ],
+        "client": [
+            "access_customer_portal",
+            "rebook_online",
+            "view_own_invoices",
+            "manage_own_properties"
+        ]
+    },
+    "menus": [
+        {
+            "panel": "user",
+            "label": "Customer Connect",
+            "route": "customerconnect.dashboard.index",
+            "sort_order": 60
+        },
+        {
+            "panel": "user",
+            "label": "Inbox",
+            "route": "customerconnect.inbox.index",
+            "sort_order": 61
+        },
+        {
+            "panel": "user",
+            "label": "Campaigns",
+            "route": "customerconnect.campaigns.index",
+            "sort_order": 62
+        },
+        {
+            "panel": "user",
+            "label": "Audiences",
+            "route": "customerconnect.audiences.index",
+            "sort_order": 63
+        }
+    ],
+    "sidebar_menu": true
 }
