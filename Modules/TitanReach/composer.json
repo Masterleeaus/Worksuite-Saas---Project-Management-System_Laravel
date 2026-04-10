@@ -1,0 +1,17 @@
+{
+    "name": "masterleeaus/titanreach",
+    "description": "TitanReach OmniChannel module for WorkSuite",
+    "autoload": {
+        "psr-4": {
+            "Modules\\TitanReach\\": ""
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Modules\\TitanReach\\Providers\\TitanReachServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev"
+}
