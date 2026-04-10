@@ -34,13 +34,6 @@ class AiTemplateController extends Controller
         }
     }
 
-
-            return $resp->json();
-        } catch (\Throwable $e) {
-            return ['status' => 'error', 'message' => 'TitanZero gateway exception', 'details' => $e->getMessage()];
-        }
-    }
-
     /**
      * Display a listing of the resource.
      * @return Renderable
@@ -405,8 +398,6 @@ class AiTemplateController extends Controller
                 return $data;
             }
         }
-
-        */
     }
     public function regenerate_response(Request $request)
     {
