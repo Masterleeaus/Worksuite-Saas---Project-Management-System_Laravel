@@ -107,7 +107,7 @@ class VariableRateEngine
 
         while ($current < $jobEnd) {
             // Determine the next "boundary" – midnight, night cutoff, or end of job
-            $nextMidnight = $current->copy()->endOfDay()->addSecond(); // start of next day
+            $nextMidnight = $current->copy()->startOfDay()->addDay(); // start of next day
             $nightCutoff = $this->nightCutoffForDate($current, $config->night_rate_cutoff);
 
             // Collect all candidate boundaries that are strictly after $current

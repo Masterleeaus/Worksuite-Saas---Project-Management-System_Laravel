@@ -46,7 +46,6 @@
                             <div class="col-md-2">
                                 <select name="job_cards[0][user_id]" class="form-control form-control-sm" required>
                                     <option value="">@lang('app.employee')</option>
-                                    @php $employees = \App\Models\User::join('employee_details','employee_details.user_id','users.id')->select('users.id','users.name')->get(); @endphp
                                     @foreach($employees as $emp)
                                         <option value="{{ $emp->id }}">{{ $emp->name }}</option>
                                     @endforeach
@@ -232,7 +231,7 @@
         });
     });
 
-    // Add job card row
+    // Add job card row — jobCardIndex tracks the next index to use (first row uses [0])
     let jobCardIndex = 1;
     $('#addJobCard').click(function () {
         var template = $('.job-card-row:first').html()

@@ -104,6 +104,9 @@ class PayrollRunController extends AccountBaseController
         });
 
         $this->states = VariableRateEngine::AU_STATES;
+        $this->employees = User::join('employee_details', 'employee_details.user_id', 'users.id')
+            ->select('users.id', 'users.name')
+            ->get();
 
         return view('payroll::payroll-run.preview', $this->data);
     }
