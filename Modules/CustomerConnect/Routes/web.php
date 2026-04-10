@@ -3,6 +3,13 @@
 
 
 use Illuminate\Support\Facades\Route;
+use Modules\CustomerConnect\Http\Controllers\Portal\PortalBookingController;
+use Modules\CustomerConnect\Http\Controllers\Portal\PortalDashboardController;
+use Modules\CustomerConnect\Http\Controllers\Portal\PortalInvoiceController;
+use Modules\CustomerConnect\Http\Controllers\Portal\PortalPaymentController;
+use Modules\CustomerConnect\Http\Controllers\Portal\PortalPreferencesController;
+use Modules\CustomerConnect\Http\Controllers\Portal\PortalPropertyController;
+use Modules\CustomerConnect\Http\Controllers\Portal\PortalReviewController;
 use Modules\CustomerConnect\Http\Controllers\AudienceController;
 use Modules\CustomerConnect\Http\Controllers\BulkActionsController;
 use Modules\CustomerConnect\Http\Controllers\CampaignController;
@@ -142,3 +149,48 @@ Route::group([
     Route::get('/privacy/contacts/{contactId}/export.csv', [PrivacyExportController::class, 'exportContactCsv'])->name('privacy.contact.export');
 });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Customer Self-Service Portal Routes
+// ─────────────────────────────────────────────────────────────────────────────
+// These routes are available to authenticated customers (clients) and provide
+// the self-service portal: bookings, invoices, payments, properties, preferences.
+// All routes are behind standard web + auth middleware.
+
+Route::middleware(['web', 'auth'])
+    ->prefix('portal/customer')
+    ->name('customerconnect.portal.')
+    ->group(function () {
+
+        // ── Portal Dashboard ──────────────────────────────────────────────────
+        Route::get('/', [PortalDashboardController::class, 'index'])->name('dashboard');
+
+        // ── My Bookings ───────────────────────────────────────────────────────
+        Route::get('/bookings', [PortalBookingController::class, 'index'])->name('bookings.index');
+        Route::get('/bookings/rebook', [PortalBookingController::class, 'rebook'])->name('bookings.rebook');
+        Route::post('/bookings/rebook', [PortalBookingController::class, 'storeRebook'])->name('bookings.rebook.store');
+        Route::post('/bookings/{id}/cancel', [PortalBookingController::class, 'cancel'])->name('bookings.cancel');
+
+        // ── Invoices ──────────────────────────────────────────────────────────
+        Route::get('/invoices', [PortalInvoiceController::class, 'index'])->name('invoices.index');
+        Route::get('/invoices/{id}/download', [PortalInvoiceController::class, 'download'])->name('invoices.download');
+
+        // ── Payments ──────────────────────────────────────────────────────────
+        Route::get('/payments', [PortalPaymentController::class, 'index'])->name('payments.index');
+        Route::post('/payments/invoice/{invoiceId}', [PortalPaymentController::class, 'payInvoice'])->name('payments.pay-invoice');
+
+        // ── My Properties ─────────────────────────────────────────────────────
+        Route::get('/properties', [PortalPropertyController::class, 'index'])->name('properties.index');
+        Route::get('/properties/create', [PortalPropertyController::class, 'create'])->name('properties.create');
+        Route::post('/properties', [PortalPropertyController::class, 'store'])->name('properties.store');
+        Route::get('/properties/{id}/edit', [PortalPropertyController::class, 'edit'])->name('properties.edit');
+        Route::put('/properties/{id}', [PortalPropertyController::class, 'update'])->name('properties.update');
+
+        // ── Preferences & Settings ────────────────────────────────────────────
+        Route::get('/preferences', [PortalPreferencesController::class, 'index'])->name('preferences.index');
+        Route::put('/preferences', [PortalPreferencesController::class, 'update'])->name('preferences.update');
+
+        // ── Reviews ───────────────────────────────────────────────────────────
+        Route::get('/reviews/create', [PortalReviewController::class, 'create'])->name('reviews.create');
+        Route::post('/reviews', [PortalReviewController::class, 'store'])->name('reviews.store');
+    });
