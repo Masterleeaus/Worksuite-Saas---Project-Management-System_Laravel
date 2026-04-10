@@ -10,6 +10,9 @@
         @if(class_exists(\Modules\FSMTimesheet\Http\Controllers\TimesheetController::class))
             <a href="{{ route('fsmtimesheet.timesheets.index', $order->id) }}" class="btn btn-outline-secondary">⏱ Timesheets</a>
         @endif
+        @if(class_exists(\Modules\FSMActivity\Http\Controllers\ActivityController::class))
+            <a href="{{ route('fsmactivity.activities.index', $order->id) }}" class="btn btn-outline-warning">Activities</a>
+        @endif
         <a href="{{ route('fsmcore.orders.edit', $order->id) }}" class="btn btn-primary">Edit</a>
         <a href="{{ route('fsmcore.orders.index') }}" class="btn btn-outline-secondary">Back</a>
     </div>
@@ -189,6 +192,61 @@
                             <td>{{ $req->skill?->skillType?->name ?? '—' }}</td>
                             <td>{{ $req->skillLevel?->name ?? 'Any' }}</td>
                             @if($order->person_id)<td>{{ $matchIcon }}</td>@endif
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
+            @endif
+        </div>
+        @endif
+
+        @if(class_exists(\Modules\FSMActivity\Models\FSMActivity::class) && \Illuminate\Support\Facades\Schema::hasTable('fsm_activities'))
+        @php
+            $activities = \Modules\FSMActivity\Models\FSMActivity::with(['activityType', 'assignedUser'])
+                ->where('fsm_order_id', $order->id)
+                ->orderBy('due_date')
+                ->get();
+            $openActivities = $activities->whereIn('state', ['open', 'overdue']);
+        @endphp
+        <div class="card mb-3">
+            <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+                <span>Activities</span>
+                <a href="{{ route('fsmactivity.activities.create', $order->id) }}" class="btn btn-sm btn-outline-success">+ Log Activity</a>
+            </div>
+            @if($activities->isEmpty())
+                <div class="card-body text-muted">No activities logged.</div>
+            @else
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                    <thead class="table-light">
+                        <tr><th>Type</th><th>Summary</th><th>Due</th><th>Assigned To</th><th>State</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                    @foreach($activities as $act)
+                        @php
+                            $rowClass = $act->isOverdue() ? 'table-danger' : '';
+                            $badgeClass = match($act->state) {
+                                'done' => 'bg-success',
+                                'cancelled' => 'bg-secondary',
+                                'overdue' => 'bg-danger',
+                                default => 'bg-primary',
+                            };
+                        @endphp
+                        <tr class="{{ $rowClass }}">
+                            <td>{{ $act->activityType?->name ?? '—' }}</td>
+                            <td>{{ $act->summary ?? '—' }}</td>
+                            <td>{{ $act->due_date?->format('d M Y') ?? '—' }}</td>
+                            <td>{{ $act->assignedUser?->name ?? '—' }}</td>
+                            <td><span class="badge {{ $badgeClass }}">{{ \Modules\FSMActivity\Models\FSMActivity::STATES[$act->state] ?? $act->state }}</span></td>
+                            <td>
+                                @if(in_array($act->state, ['open','overdue']))
+                                    <form method="POST" action="{{ route('fsmactivity.activities.done', [$order->id, $act->id]) }}" class="d-inline">
+                                        @csrf
+                                        <button class="btn btn-xs btn-success py-0 px-1" title="Mark Done">✔</button>
+                                    </form>
+                                @endif
+                            </td>
                         </tr>
                     @endforeach
                     </tbody>
