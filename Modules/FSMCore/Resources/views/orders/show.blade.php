@@ -19,6 +19,14 @@
         @if(class_exists(\Modules\FSMActivity\Http\Controllers\ActivityController::class))
             <a href="{{ route('fsmactivity.activities.index', $order->id) }}" class="btn btn-outline-warning">Activity Log</a>
         @endif
+        @if(class_exists(\Modules\FSMSales\Http\Controllers\InvoiceController::class) && \Illuminate\Support\Facades\Schema::hasTable('fsm_sales_invoices'))
+            @php
+                $fsmSalesInvoiceCount = \Modules\FSMSales\Models\FSMSalesInvoice::whereHas('orders', fn($q) => $q->where('fsm_orders.id', $order->id))->count();
+            @endphp
+            <a href="{{ route('fsmsales.invoices.index') }}" class="btn btn-outline-success">
+                💰 Invoices{{ $fsmSalesInvoiceCount > 0 ? " ({$fsmSalesInvoiceCount})" : '' }}
+            </a>
+        @endif
         <a href="{{ route('fsmcore.orders.edit', $order->id) }}" class="btn btn-primary">Edit</a>
         <a href="{{ route('fsmcore.orders.index') }}" class="btn btn-outline-secondary">Back</a>
     </div>
@@ -412,6 +420,84 @@
         @endif
     </div>
 </div>
+
+{{-- FSMSales: Billing tab --}}
+@if(class_exists(\Modules\FSMSales\Models\FSMSalesInvoice::class) && \Illuminate\Support\Facades\Schema::hasTable('fsm_sales_invoices') && \Illuminate\Support\Facades\Schema::hasTable('fsm_orders') && \Illuminate\Support\Facades\Schema::hasColumn('fsm_orders', 'billing_policy'))
+<div class="row">
+    <div class="col-12">
+        @php
+            $fsmSalesBillingPolicies = config('fsmsales.billing_policies', []);
+            $fsmSalesInvoices = \Modules\FSMSales\Models\FSMSalesInvoice::with('lines')
+                ->whereHas('orders', fn($q) => $q->where('fsm_orders.id', $order->id))
+                ->latest()
+                ->get();
+        @endphp
+        <div class="card mb-3">
+            <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+                <span>💰 Billing</span>
+                <div class="d-flex gap-2">
+                    @if(!$order->is_invoiced)
+                    <form method="POST" action="{{ route('fsmsales.invoices.from-order', $order->id) }}">
+                        @csrf
+                        <button class="btn btn-sm btn-outline-success">Create Invoice</button>
+                    </form>
+                    @endif
+                    <a href="{{ route('fsmsales.invoices.create', ['order_id' => $order->id]) }}" class="btn btn-sm btn-outline-primary">Manual Invoice</a>
+                </div>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-2">
+                    <dt class="col-sm-3">Billing Policy</dt>
+                    <dd class="col-sm-9">
+                        <span class="badge bg-secondary">{{ $fsmSalesBillingPolicies[$order->billing_policy ?? 'manual'] ?? ($order->billing_policy ?? 'manual') }}</span>
+                    </dd>
+                    @if($order->billing_amount !== null)
+                    <dt class="col-sm-3">Fixed Amount</dt>
+                    <dd class="col-sm-9">${{ number_format($order->billing_amount, 2) }}</dd>
+                    @endif
+                    @if($order->hourly_rate !== null && ($order->billing_policy ?? 'manual') === 'on_timesheet')
+                    <dt class="col-sm-3">Hourly Rate</dt>
+                    <dd class="col-sm-9">${{ number_format($order->hourly_rate, 2) }}/hr</dd>
+                    @endif
+                    <dt class="col-sm-3">Invoiced</dt>
+                    <dd class="col-sm-9">
+                        @if($order->is_invoiced)
+                            <span class="badge bg-success">Yes</span>
+                        @else
+                            <span class="badge bg-warning text-dark">Pending</span>
+                        @endif
+                    </dd>
+                </dl>
+
+                @if($fsmSalesInvoices->isNotEmpty())
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead class="table-light">
+                            <tr><th>Invoice</th><th>Date</th><th>Due</th><th class="text-end">Total</th><th>Status</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach($fsmSalesInvoices as $fsmInv)
+                            @php $fsmInvSl = $fsmInv->statusLabel(); @endphp
+                            <tr>
+                                <td>{{ $fsmInv->number }}</td>
+                                <td>{{ $fsmInv->invoice_date->format('d M Y') }}</td>
+                                <td>{{ $fsmInv->due_date?->format('d M Y') ?? '—' }}</td>
+                                <td class="text-end">${{ number_format($fsmInv->total, 2) }}</td>
+                                <td><span class="badge {{ $fsmInvSl['class'] }}">{{ $fsmInvSl['label'] }}</span></td>
+                                <td><a href="{{ route('fsmsales.invoices.show', $fsmInv->id) }}" class="btn btn-xs btn-sm btn-outline-primary">View</a></td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                @else
+                    <div class="text-muted small">No invoices raised for this order yet.</div>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 
 {{-- TitanZero: Encrypted Job Access Notes (Zero Knowledge) --}}
 @if(class_exists(\Modules\TitanZero\Entities\JobAccessNote::class) && \Illuminate\Support\Facades\Schema::hasTable('titanzero_job_access_notes'))

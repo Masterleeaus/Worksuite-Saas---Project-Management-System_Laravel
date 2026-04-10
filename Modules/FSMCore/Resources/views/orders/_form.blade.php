@@ -145,3 +145,29 @@
         <small class="text-muted">Hold Ctrl/Cmd to select multiple.</small>
     </div>
 </div>
+
+{{-- FSMSales: billing fields (shown only when module is active) --}}
+@if(class_exists(\Modules\FSMSales\Models\FSMSalesInvoice::class) && \Illuminate\Support\Facades\Schema::hasTable('fsm_sales_invoices') && \Illuminate\Support\Facades\Schema::hasColumn('fsm_orders', 'billing_policy'))
+<hr>
+<h6 class="text-muted fw-semibold mb-3">💰 Billing</h6>
+<div class="row g-3">
+    <div class="col-md-4">
+        <label class="form-label">Billing Policy</label>
+        <select name="billing_policy" class="form-select">
+            @foreach(config('fsmsales.billing_policies', []) as $key => $label)
+                <option value="{{ $key }}" {{ old('billing_policy', $order?->billing_policy ?? 'manual') === $key ? 'selected' : '' }}>{{ $label }}</option>
+            @endforeach
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">Fixed Billing Amount ($)</label>
+        <input type="number" step="0.01" min="0" name="billing_amount" class="form-control"
+               value="{{ old('billing_amount', $order?->billing_amount) }}" placeholder="Leave blank to use template price">
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">Hourly Rate ($ / hr)</label>
+        <input type="number" step="0.01" min="0" name="hourly_rate" class="form-control"
+               value="{{ old('hourly_rate', $order?->hourly_rate) }}" placeholder="Used for on_timesheet billing">
+    </div>
+</div>
+@endif
