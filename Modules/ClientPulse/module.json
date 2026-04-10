@@ -1,0 +1,19 @@
+{
+  "name": "ClientPulse",
+  "alias": "clientpulse",
+  "description": "ClientPulse – extends the core client portal with cleaning history timeline, 5-star post-job ratings, and extras requests for CleanSmartOS.",
+  "keywords": ["cleansmartOS", "client-portal", "ratings", "feedback", "extras", "crm"],
+  "active": 1,
+  "order": 2,
+  "providers": [
+    "Modules\\ClientPulse\\Providers\\ClientPulseServiceProvider",
+    "Modules\\ClientPulse\\Providers\\RouteServiceProvider",
+    "Modules\\ClientPulse\\Providers\\EventServiceProvider",
+    "Modules\\ClientPulse\\Providers\\ConfigServiceProvider",
+    "Modules\\ClientPulse\\Providers\\ViewServiceProvider"
+  ],
+  "aliases": {},
+  "files": [],
+  "requires": ["FSMCore"],
+  "version": "1.0.0"
+}
