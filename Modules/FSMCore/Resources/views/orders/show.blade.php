@@ -73,10 +73,18 @@
 
         @if($order->equipment->isNotEmpty())
         <div class="card mb-3">
-            <div class="card-header fw-semibold">Equipment</div>
+            <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+                <span>Equipment</span>
+            </div>
             <div class="card-body">
                 @foreach($order->equipment as $eq)
-                    <span class="badge bg-info text-dark me-1">{{ $eq->name }}</span>
+                    <div class="d-inline-flex align-items-center gap-2 me-2 mb-1">
+                        <span class="badge bg-info text-dark">{{ $eq->name }}</span>
+                        @if(class_exists(\Modules\FSMEquipment\Http\Controllers\RepairOrderController::class))
+                            <a href="{{ route('fsmequipment.repair-orders.create', ['equipment_id' => $eq->id, 'fsm_order_id' => $order->id]) }}"
+                               class="btn btn-sm btn-outline-danger py-0">🔧 Report Fault</a>
+                        @endif
+                    </div>
                 @endforeach
             </div>
         </div>
