@@ -254,6 +254,7 @@ return [
         Barryvdh\TranslationManager\ManagerServiceProvider::class,
         Macellan\Zip\ZipServiceProvider::class,
         Froiden\LaravelInstaller\Providers\LaravelInstallerServiceProvider::class,
+        Nwidart\Modules\LaravelModulesServiceProvider::class,
 
         // WORKSUITESAAS
         App\Providers\SuperAdmin\EventServiceProvider::class,
