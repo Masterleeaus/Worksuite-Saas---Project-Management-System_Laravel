@@ -1,0 +1,12 @@
+{
+    "name": "Security",
+    "alias": "security",
+    "description": "Unified Security & Access Control Module - Consolidated from 7 modules (AccessCard, InOutPermit, WorkPermits, Package, Parking, Notes, Security)",
+    "keywords": ["security", "access", "permissions", "approvals", "audit"],
+    "priority": 0,
+    "providers": [
+        "Modules\\Security\\Providers\\SecurityServiceProvider",
+        "Modules\\Security\\Providers\\EventServiceProvider"
+    ],
+    "files": []
+}

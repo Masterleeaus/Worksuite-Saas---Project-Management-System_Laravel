@@ -1,0 +1,14 @@
+{
+    "name": "TitanDocs",
+    "alias": "titandocs",
+    "description": "TitanDocs \u2014 document workflows (templates, history, export) routed through TitanZero (no direct AI calls).",
+    "keywords": [],
+    "priority": 0,
+    "version": 3.0,
+    "providers": [
+        "Modules\\TitanDocs\\Providers\\TitanDocsServiceProvider",
+        "Modules\\TitanDocs\\Providers\\EventServiceProvider"
+    ],
+    "files": [],
+    "displayName": "TitanDocs"
+}

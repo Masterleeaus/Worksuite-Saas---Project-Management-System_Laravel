@@ -1,0 +1,104 @@
+{
+    "name": "BookingModule",
+    "alias": "bookingmodule",
+    "description": "Booking management module for Worksuite \u2014 handles service bookings, scheduling, payments, and provider assignment.",
+    "keywords": [
+        "booking",
+        "service",
+        "scheduling"
+    ],
+    "priority": 0,
+    "providers": [
+        "Modules\\BookingModule\\Providers\\BookingModuleServiceProvider",
+        "Modules\\BookingModule\\Providers\\EventServiceProvider"
+    ],
+    "aliases": {},
+    "files": [
+        "start.php"
+    ],
+    "requires": [
+        "CategoryManagement",
+        "ProviderManagement",
+        "ServiceManagement",
+        "UserManagement",
+        "ZoneManagement"
+    ],
+    "active": 1,
+    "order": 0,
+    "permissions": [
+        "add_booking",
+        "view_booking",
+        "edit_booking",
+        "delete_booking",
+        "view_booking_pages",
+        "manage_booking_pages",
+        "view_booking_page_requests",
+        "manage_dispatch_board",
+        "appointment dashboard manage",
+        "appointment manage",
+        "appointments show",
+        "question manage",
+        "schedule manage",
+        "appointments assign",
+        "schedule bulk assign",
+        "appointment settings manage",
+        "appointment dispatch"
+    ],
+    "roles_permissions": {
+        "admin": [
+            "add_booking",
+            "view_booking",
+            "edit_booking",
+            "delete_booking",
+            "view_booking_pages",
+            "manage_booking_pages",
+            "view_booking_page_requests",
+            "manage_dispatch_board"
+        ],
+        "manager": [
+            "view_booking",
+            "edit_booking",
+            "view_booking_pages",
+            "view_booking_page_requests"
+        ]
+    },
+    "menus": [
+        {
+            "panel": "user",
+            "label": "Booking & Dispatch",
+            "route": "bookings.index",
+            "sort_order": 100
+        },
+        {
+            "panel": "user",
+            "label": "Booking Dashboard",
+            "route": "appointment.dashboard",
+            "sort_order": 101
+        },
+        {
+            "panel": "user",
+            "label": "Appointments",
+            "route": "appointments.index",
+            "sort_order": 102
+        },
+        {
+            "panel": "user",
+            "label": "Schedules",
+            "route": "schedules.index",
+            "sort_order": 103
+        },
+        {
+            "panel": "user",
+            "label": "Availability",
+            "route": "appointment.settings.staff_capacity",
+            "sort_order": 104
+        },
+        {
+            "panel": "user",
+            "label": "Reminders",
+            "route": "appointment.settings.notification_preferences",
+            "sort_order": 105
+        }
+    ],
+    "sidebar_menu": true
+}

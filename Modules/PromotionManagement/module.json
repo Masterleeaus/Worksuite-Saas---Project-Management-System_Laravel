@@ -1,0 +1,23 @@
+{
+    "name": "PromotionManagement",
+    "alias": "promotionmanagement",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\PromotionManagement\\Providers\\PromotionManagementServiceProvider",
+        "Modules\\PromotionManagement\\Providers\\EventServiceProvider"
+    ],
+    "aliases": {},
+    "files": [
+        "start.php"
+    ],
+    "requires": [],
+    "active": 1,
+    "order": 0,
+    "permissions": [],
+    "roles_permissions": {
+        "admin": [],
+        "manager": []
+    }
+}

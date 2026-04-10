@@ -1,0 +1,20 @@
+{
+    "name": "TitanAgents",
+    "alias": "titanagents",
+    "version": "1.0.0",
+    "description": "TitanAgents — specialist agents (quoting, dispatch, training) invoked via TitanZero (no direct AI calls).",
+    "displayName": "TitanAgents",
+    "documentationUrl": "https://czappstudio.com/",
+    "changelogUrl": "https://czappstudio.com/",
+    "tutorialUrl": "https://czappstudio.com/",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\TitanAgents\\Providers\\TitanAgentsServiceProvider"
+    ],
+    "files": [],
+    "category": "Communication & Collaboration",
+    "dependencies": [
+        "AICore"
+    ]
+}
