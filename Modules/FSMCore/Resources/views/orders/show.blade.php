@@ -11,7 +11,7 @@
             <a href="{{ route('fsmtimesheet.timesheets.index', $order->id) }}" class="btn btn-outline-secondary">⏱ Timesheets</a>
         @endif
         @if(class_exists(\Modules\FSMActivity\Http\Controllers\ActivityController::class))
-            <a href="{{ route('fsmactivity.activities.index', $order->id) }}" class="btn btn-outline-warning">Activities</a>
+            <a href="{{ route('fsmactivity.activities.index', $order->id) }}" class="btn btn-outline-warning">Activity Log</a>
         @endif
         <a href="{{ route('fsmcore.orders.edit', $order->id) }}" class="btn btn-primary">Edit</a>
         <a href="{{ route('fsmcore.orders.index') }}" class="btn btn-outline-secondary">Back</a>

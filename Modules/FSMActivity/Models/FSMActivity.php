@@ -73,7 +73,7 @@ class FSMActivity extends Model
 
     public function scopeOverdue($q)
     {
-        return $q->where('state', 'open')
+        return $q->whereIn('state', ['open', 'overdue'])
                  ->whereDate('due_date', '<', now()->toDateString());
     }
 }
