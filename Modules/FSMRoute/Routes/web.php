@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use Modules\FSMRoute\Http\Controllers\RouteController;
 use Modules\FSMRoute\Http\Controllers\DayRouteController;
 use Modules\FSMRoute\Http\Controllers\AvailabilityController;
+use Modules\FSMRoute\Http\Controllers\WorkerStatusController;
+use Modules\FSMRoute\Http\Controllers\DispatchMapController;
 
 Route::middleware(['web', 'auth'])
     ->prefix('account/fsm-route')
@@ -33,5 +35,17 @@ Route::middleware(['web', 'auth'])
         Route::get('/availability',        [AvailabilityController::class, 'index'])->name('fsmroute.availability.index');
         Route::post('/availability',       [AvailabilityController::class, 'store'])->name('fsmroute.availability.store');
         Route::post('/availability/delete',[AvailabilityController::class, 'destroy'])->name('fsmroute.availability.destroy');
+
+        // Live Dispatch Map
+        Route::get('/dispatch-map',           [DispatchMapController::class, 'index'])->name('fsmroute.dispatch_map.index');
+        Route::get('/dispatch-map/locations', [DispatchMapController::class, 'locations'])->name('fsmroute.dispatch_map.locations');
+
+        // Worker Status — en route, check-in, check-out
+        Route::post('/orders/{id}/en-route',  [WorkerStatusController::class, 'enRoute'])->name('fsmroute.orders.enRoute');
+        Route::post('/orders/{id}/check-in',  [WorkerStatusController::class, 'checkIn'])->name('fsmroute.orders.checkIn');
+        Route::post('/orders/{id}/check-out', [WorkerStatusController::class, 'checkOut'])->name('fsmroute.orders.checkOut');
+
+        // Worker Location Ping (used by mobile workers to broadcast their GPS position)
+        Route::post('/worker/location', [WorkerStatusController::class, 'pingLocation'])->name('fsmroute.worker.location');
 
     });
