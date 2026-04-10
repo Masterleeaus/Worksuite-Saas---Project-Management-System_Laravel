@@ -35,10 +35,11 @@ return new class extends Migration
                     ->onDelete('set null')->onUpdate('cascade');
 
                 $table->unsignedBigInteger('project_id')->nullable()->index();
-                $table->unsignedBigInteger('client_id')->nullable()->index();
 
+                // client_id stores the user ID of the client (clients are users in WorkSuite).
+                $table->unsignedInteger('client_id')->nullable()->index();
                 $table->foreign('client_id')
-                    ->references('id')->on('clients')
+                    ->references('id')->on('users')
                     ->onDelete('set null')->onUpdate('cascade');
 
                 $table->enum('status', ['draft', 'in_review', 'approved', 'rejected', 'archived'])

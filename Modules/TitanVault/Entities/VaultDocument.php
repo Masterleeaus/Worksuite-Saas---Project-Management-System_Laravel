@@ -84,7 +84,8 @@ class VaultDocument extends BaseModel
 
     public function client(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Client::class, 'client_id');
+        // In WorkSuite, clients are users. client_id references the users table.
+        return $this->belongsTo(User::class, 'client_id');
     }
 
     public function latestVersion(): HasOne
