@@ -26,6 +26,37 @@
     </div>
 </div>
 
+@if(class_exists(\Modules\FSMActivity\Models\FSMActivity::class) && \Illuminate\Support\Facades\Schema::hasTable('fsm_activities'))
+@php
+    $activitiesToday = \Modules\FSMActivity\Models\FSMActivity::where('state', 'open')
+        ->whereDate('due_date', now()->toDateString())
+        ->count();
+    $activitiesOverdue = \Modules\FSMActivity\Models\FSMActivity::whereIn('state', ['open', 'overdue'])
+        ->whereDate('due_date', '<', now()->toDateString())
+        ->count();
+@endphp
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h5 class="card-title">Activities Due Today</h5>
+                <p class="card-text display-6">{{ $activitiesToday }}</p>
+                <a href="{{ route('fsmactivity.dashboard') }}" class="text-white small">View →</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-danger">
+            <div class="card-body">
+                <h5 class="card-title">Overdue Activities</h5>
+                <p class="card-text display-6">{{ $activitiesOverdue }}</p>
+                <a href="{{ route('fsmactivity.global.index', ['state' => 'overdue']) }}" class="text-white small">View →</a>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
 <div class="row mb-4">
     <div class="col">
         <h4>Orders by Stage</h4>
