@@ -1,0 +1,19 @@
+{
+  "name": "FSMAvailability",
+  "alias": "fsmavailability",
+  "description": "FSM Availability – Worker Availability Rules, Leave/Unavailability Exceptions, Dispatch Warnings and Australian Public Holiday Import for CleanSmartOS.",
+  "keywords": ["fsm", "availability", "leave", "scheduling", "cleansmartOS"],
+  "active": 1,
+  "order": 2,
+  "providers": [
+    "Modules\\FSMAvailability\\Providers\\FSMAvailabilityServiceProvider",
+    "Modules\\FSMAvailability\\Providers\\RouteServiceProvider",
+    "Modules\\FSMAvailability\\Providers\\EventServiceProvider",
+    "Modules\\FSMAvailability\\Providers\\ConfigServiceProvider",
+    "Modules\\FSMAvailability\\Providers\\ViewServiceProvider"
+  ],
+  "aliases": {},
+  "files": [],
+  "requires": ["FSMCore"],
+  "version": "1.0.0"
+}

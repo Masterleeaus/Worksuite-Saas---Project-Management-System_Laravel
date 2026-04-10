@@ -10,12 +10,43 @@
     </div>
 </div>
 
+{{-- FSMAvailability: flag banner when worker is unavailable --}}
+@if(isset($dayRoute->availability_flagged) && $dayRoute->availability_flagged)
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        ⚠ <strong>Worker Unavailability Flag:</strong> The assigned worker has an approved leave/unavailability exception that overlaps this Day Route.
+        This route requires reassignment.
+        @if($dayRoute->person_id && class_exists(\Modules\FSMAvailability\Http\Controllers\AvailabilityCalendarController::class))
+            <a href="{{ route('fsmavailability.calendar.index', ['person_id' => $dayRoute->person_id, 'week' => $dayRoute->date->toDateString()]) }}"
+               class="alert-link ms-2">View Worker Calendar →</a>
+        @endif
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
+
 <div class="row mb-3">
     <div class="col-md-6">
         <table class="table table-bordered table-sm">
             <tr><th>Route</th><td>{{ $dayRoute->route?->name ?? '—' }}</td></tr>
             <tr><th>Date</th><td>{{ $dayRoute->date->format('D, M j Y') }}</td></tr>
-            <tr><th>Worker</th><td>{{ $dayRoute->person?->name ?? '—' }}</td></tr>
+            <tr>
+                <th>Worker</th>
+                <td>
+                    {{ $dayRoute->person?->name ?? '—' }}
+                    @if($dayRoute->person_id && class_exists(\Modules\FSMAvailability\Services\AvailabilityService::class) && \Illuminate\Support\Facades\Schema::hasTable('fsm_availability_exceptions'))
+                        @php
+                            $dayStart = $dayRoute->date->copy()->startOfDay();
+                            $dayEnd   = $dayRoute->date->copy()->endOfDay();
+                            $avail    = app(\Modules\FSMAvailability\Services\AvailabilityService::class)
+                                ->checkAvailability($dayRoute->person_id, $dayStart, $dayEnd);
+                        @endphp
+                        @if(!$avail['available'])
+                            <span class="badge bg-danger ms-1" title="{{ $avail['reason'] }}">Unavailable</span>
+                        @else
+                            <span class="badge bg-success ms-1">Available</span>
+                        @endif
+                    @endif
+                </td>
+            </tr>
             <tr><th>State</th><td><span class="badge bg-secondary">{{ ucfirst($dayRoute->state) }}</span></td></tr>
             <tr><th>Planned Start</th><td>{{ $dayRoute->date_start_planned?->format('H:i') ?? '—' }}</td></tr>
             <tr><th>Work Time</th><td>{{ $dayRoute->work_time }}h</td></tr>

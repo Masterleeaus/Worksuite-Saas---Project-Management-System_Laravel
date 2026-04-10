@@ -7,6 +7,9 @@
         @if(class_exists(\Modules\FSMSkill\Http\Controllers\OrderSkillController::class))
             <a href="{{ route('fsmskill.order-skills.index', $order->id) }}" class="btn btn-outline-info">Skill Requirements</a>
         @endif
+        @if($order->person_id && class_exists(\Modules\FSMAvailability\Http\Controllers\AvailabilityCalendarController::class))
+            <a href="{{ route('fsmavailability.calendar.index', ['person_id' => $order->person_id]) }}" class="btn btn-outline-warning">🗓 Availability</a>
+        @endif
         @if(class_exists(\Modules\FSMTimesheet\Http\Controllers\TimesheetController::class))
             <a href="{{ route('fsmtimesheet.timesheets.index', $order->id) }}" class="btn btn-outline-secondary">⏱ Timesheets</a>
         @endif
@@ -17,6 +20,13 @@
         <a href="{{ route('fsmcore.orders.index') }}" class="btn btn-outline-secondary">Back</a>
     </div>
 </div>
+
+@if(session('availability_warning'))
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        🗓 {{ session('availability_warning') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
 
 @if(session('skill_warning'))
     @php $sw = (string) session('skill_warning'); $isError = str_starts_with($sw, 'Skill mismatch'); @endphp
@@ -258,6 +268,34 @@
     </div>
 
     <div class="col-md-4">
+        {{-- FSMAvailability: show worker availability status when module is installed --}}
+        @if($order->person_id && class_exists(\Modules\FSMAvailability\Services\AvailabilityService::class) && \Illuminate\Support\Facades\Schema::hasTable('fsm_availability_exceptions'))
+        @php
+            $availResult = app(\Modules\FSMAvailability\Services\AvailabilityService::class)->checkAvailability(
+                $order->person_id,
+                $order->scheduled_date_start ? \Carbon\Carbon::parse($order->scheduled_date_start) : now(),
+                $order->scheduled_date_end   ? \Carbon\Carbon::parse($order->scheduled_date_end)   : now()->addHour()
+            );
+        @endphp
+        <div class="card mb-3">
+            <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+                <span>🗓 Worker Availability</span>
+                <a href="{{ route('fsmavailability.calendar.index', ['person_id' => $order->person_id]) }}"
+                   class="btn btn-sm btn-outline-info">View Calendar</a>
+            </div>
+            <div class="card-body">
+                @if($availResult['available'])
+                    <div class="text-success fw-semibold">✔ Worker is available for this job window.</div>
+                @else
+                    <div class="text-danger fw-semibold">✘ Worker is unavailable</div>
+                    @if($availResult['reason'])
+                        <div class="text-muted small mt-1">{{ $availResult['reason'] }}</div>
+                    @endif
+                @endif
+            </div>
+        </div>
+        @endif
+
         @if($order->location)
         <div class="card">
             <div class="card-header fw-semibold">Location</div>
