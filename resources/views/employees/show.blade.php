@@ -140,6 +140,19 @@ if ($viewPermission == 'all'
                             <x-tab :href="route('employees.show', $employee->id) . '?tab=immigration'" :text="__('modules.employees.immigration')" class="immigration" />
                         </li>
                     @endif
+
+                    @if(class_exists(\Modules\ProviderManagement\Http\Controllers\ComplianceController::class))
+                        @if(user()->permission('manage_provider_compliance') === 'all' || user()->id === $employee->id)
+                            <li>
+                                <x-tab :href="route('employees.show', $employee->id) . '?tab=compliance'" :text="__('Compliance')" class="compliance" />
+                            </li>
+                        @endif
+                        @if(!in_array(user()->permission('view_provider_zones'), ['none', false]))
+                            <li>
+                                <x-tab :href="route('employees.show', $employee->id) . '?tab=service-zones'" :text="__('Service Zones')" class="service-zones" />
+                            </li>
+                        @endif
+                    @endif
                 </ul>
             </nav>
         </div>

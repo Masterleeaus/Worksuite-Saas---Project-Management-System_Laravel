@@ -3,6 +3,7 @@
 namespace Modules\ProviderManagement\Providers;
 
 use Modules\ProviderManagement\Console\ActivateModuleCommand;
+use Modules\ProviderManagement\Console\Commands\CheckComplianceExpiry;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
 
@@ -28,6 +29,7 @@ class ProviderManagementServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 ActivateModuleCommand::class,
+                CheckComplianceExpiry::class,
             ]);
         }
 
