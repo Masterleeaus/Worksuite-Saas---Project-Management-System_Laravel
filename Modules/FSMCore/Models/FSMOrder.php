@@ -13,6 +13,7 @@ class FSMOrder extends Model
         'name',
         'location_id',
         'person_id',
+        'vehicle_id',
         'team_id',
         'stage_id',
         'template_id',
@@ -30,6 +31,7 @@ class FSMOrder extends Model
         'company_id' => 'integer',
         'location_id' => 'integer',
         'person_id' => 'integer',
+        'vehicle_id' => 'integer',
         'team_id' => 'integer',
         'stage_id' => 'integer',
         'template_id' => 'integer',
@@ -84,5 +86,10 @@ class FSMOrder extends Model
     public function agreement()
     {
         return $this->belongsTo(\Modules\FSMServiceAgreement\Models\FSMServiceAgreement::class, 'agreement_id');
+    }
+
+    public function vehicle()
+    {
+        return $this->belongsTo(\Modules\FSMVehicle\Models\FSMVehicle::class, 'vehicle_id');
     }
 }

@@ -8,7 +8,7 @@ class FSMDayRoute extends Model
 {
     protected $table = 'fsm_day_routes';
     protected $fillable = [
-        'company_id', 'name', 'route_id', 'date', 'person_id',
+        'company_id', 'name', 'route_id', 'date', 'person_id', 'vehicle_id',
         'state', 'date_start_planned', 'work_time', 'max_allow_time',
     ];
     protected $casts = [
@@ -26,6 +26,11 @@ class FSMDayRoute extends Model
     public function person()
     {
         return $this->belongsTo(\App\Models\User::class, 'person_id');
+    }
+
+    public function vehicle()
+    {
+        return $this->belongsTo(\Modules\FSMVehicle\Models\FSMVehicle::class, 'vehicle_id');
     }
 
     public function orders()

@@ -34,6 +34,22 @@
                     <dt class="col-sm-4">Location</dt><dd class="col-sm-8">{{ $order->location?->name ?? '—' }}</dd>
                     <dt class="col-sm-4">Team</dt><dd class="col-sm-8">{{ $order->team?->name ?? '—' }}</dd>
                     <dt class="col-sm-4">Worker</dt><dd class="col-sm-8">{{ $order->person?->name ?? '—' }}</dd>
+                    <dt class="col-sm-4">Vehicle / Van</dt>
+                    <dd class="col-sm-8">
+                        @if($order->vehicle_id && class_exists(\Modules\FSMVehicle\Models\FSMVehicle::class))
+                            @php $vehicle = $order->vehicle; @endphp
+                            @if($vehicle)
+                                <a href="{{ route('fsmvehicle.vehicles.show', $vehicle->id) }}">{{ $vehicle->name }}</a>
+                                @if($vehicle->license_plate)
+                                    <span class="text-muted">({{ $vehicle->license_plate }})</span>
+                                @endif
+                            @else
+                                —
+                            @endif
+                        @else
+                            —
+                        @endif
+                    </dd>
                     <dt class="col-sm-4">Template</dt><dd class="col-sm-8">{{ $order->template?->name ?? '—' }}</dd>
                     <dt class="col-sm-4">Scheduled Start</dt><dd class="col-sm-8">{{ $order->scheduled_date_start?->format('d M Y H:i') ?? '—' }}</dd>
                     <dt class="col-sm-4">Scheduled End</dt><dd class="col-sm-8">{{ $order->scheduled_date_end?->format('d M Y H:i') ?? '—' }}</dd>

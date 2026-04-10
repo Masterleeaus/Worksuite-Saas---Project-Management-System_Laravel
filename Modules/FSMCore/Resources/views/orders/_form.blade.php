@@ -17,6 +17,64 @@
             @endforeach
         </select>
     </div>
+    @if(!empty($vehicles) && $vehicles->count())
+    <div class="col-md-6">
+        <label class="form-label">Worker / Cleaner</label>
+        <select name="person_id" id="order_person_id" class="form-select">
+            <option value="">— None —</option>
+            @foreach(\App\Models\User::orderBy('name')->get() as $user)
+                <option value="{{ $user->id }}" {{ old('person_id', $order?->person_id) == $user->id ? 'selected' : '' }}>
+                    {{ $user->name }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+    <div class="col-md-6">
+        <label class="form-label">Vehicle / Van</label>
+        <select name="vehicle_id" id="order_vehicle_id" class="form-select">
+            <option value="">— None —</option>
+            @foreach($vehicles as $vehicle)
+                <option value="{{ $vehicle->id }}"
+                        data-driver="{{ $vehicle->person_id }}"
+                        {{ old('vehicle_id', $order?->vehicle_id) == $vehicle->id ? 'selected' : '' }}>
+                    {{ $vehicle->name }}{{ $vehicle->license_plate ? ' ('.$vehicle->license_plate.')' : '' }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+    <script>
+    (function () {
+        var personSel  = document.getElementById('order_person_id');
+        var vehicleSel = document.getElementById('order_vehicle_id');
+        if (!personSel || !vehicleSel) return;
+        personSel.addEventListener('change', function () {
+            var personId = this.value;
+            if (!personId) return;
+            // Only auto-fill when vehicle is currently empty
+            if (vehicleSel.value) return;
+            var opts = vehicleSel.querySelectorAll('option[data-driver]');
+            for (var i = 0; i < opts.length; i++) {
+                if (opts[i].getAttribute('data-driver') === personId) {
+                    vehicleSel.value = opts[i].value;
+                    break;
+                }
+            }
+        });
+    })();
+    </script>
+    @else
+    <div class="col-md-6">
+        <label class="form-label">Worker / Cleaner</label>
+        <select name="person_id" class="form-select">
+            <option value="">— None —</option>
+            @foreach(\App\Models\User::orderBy('name')->get() as $user)
+                <option value="{{ $user->id }}" {{ old('person_id', $order?->person_id) == $user->id ? 'selected' : '' }}>
+                    {{ $user->name }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+    @endif
     <div class="col-md-6">
         <label class="form-label">Stage</label>
         <select name="stage_id" class="form-select">

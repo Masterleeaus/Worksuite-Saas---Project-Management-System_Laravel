@@ -1,0 +1,18 @@
+{
+  "name": "FSMVehicle",
+  "alias": "fsmvehicle",
+  "description": "FSM Vehicle \u2013 Fleet & Van Management: Vehicles, Mileage Logs, Service Alerts for CleanSmartOS.",
+  "keywords": ["fsm", "vehicle", "fleet", "mileage", "cleansmartOS"],
+  "active": 1,
+  "order": 2,
+  "providers": [
+    "Modules\\FSMVehicle\\Providers\\FSMVehicleServiceProvider",
+    "Modules\\FSMVehicle\\Providers\\RouteServiceProvider",
+    "Modules\\FSMVehicle\\Providers\\ConfigServiceProvider",
+    "Modules\\FSMVehicle\\Providers\\ViewServiceProvider"
+  ],
+  "aliases": {},
+  "files": [],
+  "requires": ["FSMCore"],
+  "version": "1.0.0"
+}
