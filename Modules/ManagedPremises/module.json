@@ -1,13 +1,14 @@
 {
     "name": "ManagedPremises",
     "alias": "managedpremises",
-    "description": "Property & jobsite profiles for tradies, real estate agents, and cleaners.",
+    "description": "Manage client premises — access details, photos, special requirements",
     "keywords": [
         "property",
         "jobsite",
         "tradies",
         "real-estate",
-        "cleaning"
+        "cleaning",
+        "premises"
     ],
     "priority": 0,
     "providers": [
@@ -18,5 +19,37 @@
         "Modules\\ManagedPremises\\Providers\\RouteServiceProvider"
     ],
     "files": [],
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "active": 1,
+    "order": 0,
+    "aliases": {},
+    "requires": [],
+    "permissions": [
+        "view_premises",
+        "add_premise",
+        "edit_premise",
+        "delete_premise"
+    ],
+    "roles_permissions": {
+        "admin": [
+            "view_premises",
+            "add_premise",
+            "edit_premise",
+            "delete_premise"
+        ],
+        "manager": [
+            "view_premises",
+            "add_premise",
+            "edit_premise"
+        ]
+    },
+    "menus": [
+        {
+            "panel": "user",
+            "label": "Premises",
+            "route": "managedpremises.dashboard",
+            "sort_order": 35
+        }
+    ],
+    "sidebar_menu": true
 }
