@@ -18,7 +18,7 @@
                     <span class="badge badge-warning ml-1">{{ $bookingComplaints->count() }}</span>
                 @endif
             </h5>
-            @if (user()->permission('add_complaint') !== 'none')
+            @if (user()->permission('manage_complaints') !== 'none')
                 <a href="{{ route('complaint.create') }}?booking_id={{ $bookingDetails->id }}"
                    class="btn btn-primary btn-sm f-12">
                     + {{ __('complaint::app.complaint.addComplaint') }}
