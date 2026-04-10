@@ -19,6 +19,7 @@ class FSMOrder extends Model
         'template_id',
         'agreement_id',
         'fsm_recurring_id',
+        'lead_id',
         'priority',
         'color',
         'scheduled_date_start',
@@ -37,6 +38,7 @@ class FSMOrder extends Model
         'stage_id' => 'integer',
         'template_id' => 'integer',
         'agreement_id' => 'integer',
+        'lead_id' => 'integer',
         'color' => 'integer',
         'scheduled_date_start' => 'datetime',
         'scheduled_date_end' => 'datetime',
@@ -100,5 +102,13 @@ class FSMOrder extends Model
             return null;
         }
         return $this->belongsTo(\Modules\FSMRecurring\Models\FSMRecurring::class, 'fsm_recurring_id');
+    }
+
+    public function lead()
+    {
+        if (!class_exists(\Modules\FSMCRM\Models\FSMLead::class)) {
+            return null;
+        }
+        return $this->belongsTo(\Modules\FSMCRM\Models\FSMLead::class, 'lead_id');
     }
 }

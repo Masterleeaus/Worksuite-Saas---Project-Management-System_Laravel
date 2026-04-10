@@ -1,0 +1,19 @@
+{
+  "name": "FSMCRM",
+  "alias": "fsmcrm",
+  "description": "FSM CRM – Lead-to-Job Pipeline: converts won CRM leads into FSM Orders (Job Cards), bridging sales and field operations for CleanSmartOS.",
+  "keywords": ["fsm", "crm", "leads", "pipeline", "cleansmartOS"],
+  "active": 1,
+  "order": 2,
+  "providers": [
+    "Modules\\FSMCRM\\Providers\\FSMCRMServiceProvider",
+    "Modules\\FSMCRM\\Providers\\RouteServiceProvider",
+    "Modules\\FSMCRM\\Providers\\EventServiceProvider",
+    "Modules\\FSMCRM\\Providers\\ConfigServiceProvider",
+    "Modules\\FSMCRM\\Providers\\ViewServiceProvider"
+  ],
+  "aliases": {},
+  "files": [],
+  "requires": ["FSMCore"],
+  "version": "1.0.0"
+}
