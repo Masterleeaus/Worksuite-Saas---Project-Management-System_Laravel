@@ -23,15 +23,15 @@ jobs:
           BASE="${{ github.event.pull_request.base.sha }}"
           HEAD="${{ github.event.pull_request.head.sha }}"
 
-          MIGRATIONS=$(git diff --name-only "$BASE" "$HEAD" | grep "^database/migrations/" | wc -l | tr -d ' ')
-          PHP_FILES=$(git diff --name-only "$BASE" "$HEAD" | grep "\.php$" | wc -l | tr -d ' ')
-          JS_FILES=$(git diff --name-only "$BASE" "$HEAD" | grep -E "\.(js|ts|vue)$" | wc -l | tr -d ' ')
-          SCSS_FILES=$(git diff --name-only "$BASE" "$HEAD" | grep -E "\.(scss|css)$" | wc -l | tr -d ' ')
+          MIGRATIONS=$(git diff --name-only "$BASE" "$HEAD" | grep -c "^database/migrations/" || true)
+          PHP_FILES=$(git diff --name-only "$BASE" "$HEAD" | grep -c "\.php$" || true)
+          JS_FILES=$(git diff --name-only "$BASE" "$HEAD" | grep -E -c "\.(js|ts|vue)$" || true)
+          SCSS_FILES=$(git diff --name-only "$BASE" "$HEAD" | grep -E -c "\.(scss|css)$" || true)
           COMPOSER=$(git diff --name-only "$BASE" "$HEAD" | grep -c "composer\.\(json\|lock\)" || true)
           NPM=$(git diff --name-only "$BASE" "$HEAD" | grep -c "package\(-lock\)\?\.json" || true)
-          BLADE=$(git diff --name-only "$BASE" "$HEAD" | grep "\.blade\.php$" | wc -l | tr -d ' ')
-          CONFIG=$(git diff --name-only "$BASE" "$HEAD" | grep "^config/" | wc -l | tr -d ' ')
-          ROUTES=$(git diff --name-only "$BASE" "$HEAD" | grep "^routes/" | wc -l | tr -d ' ')
+          BLADE=$(git diff --name-only "$BASE" "$HEAD" | grep -c "\.blade\.php$" || true)
+          CONFIG=$(git diff --name-only "$BASE" "$HEAD" | grep -c "^config/" || true)
+          ROUTES=$(git diff --name-only "$BASE" "$HEAD" | grep -c "^routes/" || true)
 
           echo "migrations=$MIGRATIONS" >> $GITHUB_OUTPUT
           echo "php=$PHP_FILES" >> $GITHUB_OUTPUT
