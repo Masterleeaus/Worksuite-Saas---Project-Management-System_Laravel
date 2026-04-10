@@ -1,0 +1,23 @@
+{
+    "name": "Newsletter",
+    "alias": "newsletter",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Newsletter\\Providers\\NewsletterServiceProvider",
+        "Modules\\Newsletter\\Providers\\EventServiceProvider"
+    ],
+    "files": [
+        "start.php"
+    ],
+    "active": 1,
+    "order": 0,
+    "aliases": {},
+    "requires": [],
+    "permissions": [],
+    "roles_permissions": {
+        "admin": [],
+        "manager": []
+    }
+}

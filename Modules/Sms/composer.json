@@ -1,0 +1,22 @@
+{
+    "name": "nwidart/sms",
+    "description": "Unified SMS module \u2014 tenant notification settings (Worksuite), multi-provider gateway config (SaaS), TitanZero AI bridge, and automation manifest.",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {}
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Sms\\": "",
+            "Modules\\Sms\\Database\\Factories\\": "database/factories/"
+        }
+    }
+}

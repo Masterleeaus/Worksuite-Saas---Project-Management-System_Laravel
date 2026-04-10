@@ -1,0 +1,12 @@
+{
+    "name": "TitanZero",
+    "alias": "titanzero",
+    "description": "Titan Zero \u2013 Titan Zero powered by Titan Core",
+    "keywords": [],
+    "priority": 0,
+    "version": 3.0,
+    "providers": [
+        "Modules\\TitanZero\\Providers\\TitanZeroServiceProvider"
+    ],
+    "files": []
+}

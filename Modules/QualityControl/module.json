@@ -1,0 +1,15 @@
+{
+    "name": "QualityControl",
+    "alias": "quality_control",
+    "description": "Inspection schedules, recurring quality checks, templates, and QC outcomes for Worksuite service businesses.",
+    "keywords": ["quality", "inspection", "templates", "service", "worksuite"],
+    "permissions": ["view_quality_control", "add_quality_control", "edit_quality_control", "delete_quality_control"],
+    "priority": 0,
+    "providers": [
+        "Modules\\QualityControl\\Providers\\QualityControlServiceProvider",
+        "Modules\\QualityControl\\Providers\\EventServiceProvider",
+        "Modules\\QualityControl\\Providers\\RouteServiceProvider"
+    ],
+    "files": [],
+    "version": "1.0.1"
+}

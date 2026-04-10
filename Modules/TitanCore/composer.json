@@ -1,0 +1,23 @@
+{
+  "name": "modules/titancore",
+  "type": "library",
+  "description": "nWidart module TitanCore",
+  "autoload": {
+    "psr-4": {
+      "Modules\\TitanCore\\": ""
+    },
+    "classmap": [
+      "Database/Seeders"
+    ]
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Modules\\TitanCore\\Providers\\TitanCoreServiceProvider"
+      ]
+    }
+  },
+  "require": {
+    "guzzlehttp/guzzle": "^7.9"
+  }
+}

@@ -1,0 +1,11 @@
+{
+    "name": "security-module",
+    "version": "1.0.0",
+    "description": "Unified Security & Access Control Module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build"
+    },
+    "dependencies": {},
+    "devDependencies": {}
+}

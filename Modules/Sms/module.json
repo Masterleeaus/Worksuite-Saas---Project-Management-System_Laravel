@@ -1,0 +1,16 @@
+{
+    "name": "Sms",
+    "alias": "sms",
+    "description": "Unified SMS module — tenant notification settings (Worksuite), multi-provider gateway config (SaaS), TitanZero AI bridge, and automation manifest.",
+    "keywords": ["sms", "gateway", "twilio", "nexmo", "msg91", "whatsapp", "telegram", "notifications"],
+    "order": 0,
+    "version": "5.0.0",
+    "providers": [
+        "Modules\\Sms\\Providers\\SmsServiceProvider"
+    ],
+    "aliases": {},
+    "files": [
+        "start.php"
+    ],
+    "requires": []
+}

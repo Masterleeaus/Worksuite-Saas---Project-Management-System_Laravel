@@ -1,0 +1,10 @@
+{
+  "name": "modules/aitools",
+  "description": "Worksuite Aitools compatibility shim (powered by Titan Zero)",
+  "type": "library",
+  "autoload": {
+    "psr-4": {
+      "Modules\\Aitools\\": ""
+    }
+  }
+}
