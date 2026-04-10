@@ -144,7 +144,16 @@ class OrderController extends Controller
 
     public function show(int $id)
     {
-        $order = FSMOrder::with(['location', 'person', 'team', 'stage', 'template', 'equipment', 'tags'])->findOrFail($id);
+        $relations = ['location', 'person', 'team', 'stage', 'template', 'equipment', 'tags'];
+
+        // Conditionally eager-load source lead if FSMCRM is installed
+        if (class_exists(\Modules\FSMCRM\Models\FSMLead::class)
+            && \Illuminate\Support\Facades\Schema::hasTable('fsm_leads')
+        ) {
+            $relations[] = 'lead';
+        }
+
+        $order = FSMOrder::with($relations)->findOrFail($id);
         return view('fsmcore::orders.show', compact('order'));
     }
 

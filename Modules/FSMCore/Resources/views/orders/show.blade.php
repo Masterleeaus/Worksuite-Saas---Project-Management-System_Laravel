@@ -86,6 +86,17 @@
                     <dt class="col-sm-4">Actual Start</dt><dd class="col-sm-8">{{ $order->date_start?->format('d M Y H:i') ?? '—' }}</dd>
                     <dt class="col-sm-4">Actual End</dt><dd class="col-sm-8">{{ $order->date_end?->format('d M Y H:i') ?? '—' }}</dd>
                     <dt class="col-sm-4">Description</dt><dd class="col-sm-8">{{ $order->description ?? '—' }}</dd>
+                    @if(class_exists(\Modules\FSMCRM\Models\FSMLead::class) && \Illuminate\Support\Facades\Schema::hasTable('fsm_leads') && $order->lead_id)
+                        @php $sourceLead = $order->lead; @endphp
+                        @if($sourceLead)
+                            <dt class="col-sm-4">Source Lead</dt>
+                            <dd class="col-sm-8">
+                                <a href="{{ route('fsmcrm.leads.show', $sourceLead->id) }}">{{ $sourceLead->name }}</a>
+                                @php $sc = \Modules\FSMCRM\Models\FSMLead::stageColors(); @endphp
+                                <span class="badge bg-{{ $sc[$sourceLead->stage] ?? 'secondary' }} ms-1">{{ \Modules\FSMCRM\Models\FSMLead::stages()[$sourceLead->stage] ?? $sourceLead->stage }}</span>
+                            </dd>
+                        @endif
+                    @endif
                 </dl>
             </div>
         </div>
