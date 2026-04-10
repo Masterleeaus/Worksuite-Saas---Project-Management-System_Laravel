@@ -8,7 +8,7 @@
         <input type="number" name="sequence" class="form-control" min="0" value="{{ old('sequence', $stage?->sequence ?? 0) }}">
     </div>
     <div class="col-md-2">
-        <label class="form-label">Colour</label>
+        <label class="form-label">Color</label>
         <input type="color" name="color" class="form-control form-control-color" value="{{ old('color', $stage?->color ?? '#6c757d') }}">
     </div>
     <div class="col-md-2 d-flex align-items-end">
