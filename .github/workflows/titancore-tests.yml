@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - 'Modules/TitanCore/**'
-  pull_request:
+  pull_request_target:
     paths:
       - 'Modules/TitanCore/**'
 
@@ -34,7 +34,12 @@ jobs:
           --health-retries=5
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # pull_request_target runs in base-branch context; explicitly check out
+          # the PR head so tests run against the proposed changes.
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2

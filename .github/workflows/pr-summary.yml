@@ -1,7 +1,7 @@
 name: PR Summary
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, synchronize, reopened]
 
 permissions:
@@ -13,9 +13,13 @@ jobs:
     name: PR Change Summary
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          # pull_request_target runs in base-branch context; explicitly check out
+          # the PR head so the summary reflects the proposed changes.
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Detect changed areas
         id: changes

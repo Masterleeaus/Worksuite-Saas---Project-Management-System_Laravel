@@ -9,10 +9,14 @@ name: Agent Issue Queue
 #     closed yet when the PR was opened).
 #  4. A label named "copilot" is added to an issue (opt-in individual issues).
 #  5. Manual dispatch — to kick-start the queue or re-process after a pause.
+#
+# NOTE: pull_request_target is used instead of pull_request so this workflow
+# runs in the context of the base branch and is never held for approval even
+# when the PR author is a bot (e.g. the Copilot coding agent).
 on:
   issues:
     types: [closed, labeled]
-  pull_request:
+  pull_request_target:
     types: [opened, closed]
   workflow_dispatch:
     inputs:
@@ -37,14 +41,14 @@ jobs:
     runs-on: ubuntu-latest
 
     # For the "labeled" trigger, only proceed when the added label is "copilot".
-    # For the "pull_request" trigger, proceed when the PR is opened (agent
+    # For the "pull_request_target" trigger, proceed when the PR is opened (agent
     # finished the issue) or when it is merged (safety net).
     if: |
       (github.event_name == 'workflow_dispatch') ||
       (github.event_name == 'issues' && github.event.action == 'closed') ||
       (github.event_name == 'issues' && github.event.action == 'labeled' && github.event.label.name == 'copilot') ||
-      (github.event_name == 'pull_request' && github.event.action == 'opened') ||
-      (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+      (github.event_name == 'pull_request_target' && github.event.action == 'opened') ||
+      (github.event_name == 'pull_request_target' && github.event.pull_request.merged == true)
 
     steps:
       - name: Find and assign next open issue
