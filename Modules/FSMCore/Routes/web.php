@@ -66,6 +66,7 @@ Route::middleware(['web', 'auth'])
         Route::get('/equipment',             [EquipmentController::class, 'index'])->name('fsmcore.equipment.index');
         Route::get('/equipment/create',      [EquipmentController::class, 'create'])->name('fsmcore.equipment.create');
         Route::post('/equipment',            [EquipmentController::class, 'store'])->name('fsmcore.equipment.store');
+        Route::get('/equipment/{id}',        [EquipmentController::class, 'show'])->name('fsmcore.equipment.show');
         Route::get('/equipment/{id}/edit',   [EquipmentController::class, 'edit'])->name('fsmcore.equipment.edit');
         Route::post('/equipment/{id}',       [EquipmentController::class, 'update'])->name('fsmcore.equipment.update');
         Route::post('/equipment/{id}/delete',[EquipmentController::class, 'destroy'])->name('fsmcore.equipment.destroy');

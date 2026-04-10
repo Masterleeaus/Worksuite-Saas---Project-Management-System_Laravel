@@ -1,0 +1,19 @@
+{
+  "name": "FSMEquipment",
+  "alias": "fsmequipment",
+  "description": "FSM Equipment & Repair – Repair orders, repair templates, equipment warranties, downtime reports and fault reporting for CleanSmartOS.",
+  "keywords": ["fsm", "equipment", "repair", "warranty", "cleansmartOS"],
+  "active": 1,
+  "order": 2,
+  "providers": [
+    "Modules\\FSMEquipment\\Providers\\FSMEquipmentServiceProvider",
+    "Modules\\FSMEquipment\\Providers\\RouteServiceProvider",
+    "Modules\\FSMEquipment\\Providers\\EventServiceProvider",
+    "Modules\\FSMEquipment\\Providers\\ConfigServiceProvider",
+    "Modules\\FSMEquipment\\Providers\\ViewServiceProvider"
+  ],
+  "aliases": {},
+  "files": [],
+  "requires": ["FSMCore"],
+  "version": "1.0.0"
+}

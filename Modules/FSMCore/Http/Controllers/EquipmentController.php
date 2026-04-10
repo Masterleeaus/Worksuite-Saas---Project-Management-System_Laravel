@@ -47,6 +47,12 @@ class EquipmentController extends Controller
             ->with('success', 'Equipment created.');
     }
 
+    public function show(int $id)
+    {
+        $item = FSMEquipment::with('location')->findOrFail($id);
+        return view('fsmcore::equipment.show', compact('item'));
+    }
+
     public function edit(int $id)
     {
         $item = FSMEquipment::findOrFail($id);
