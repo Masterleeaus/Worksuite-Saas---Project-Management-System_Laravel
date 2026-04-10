@@ -300,8 +300,9 @@
             success: function (res) {
                 if (res.status === 'success') {
                     const url = res.proof_url || '';
-                    alert('@lang('titan_vault::titan_vault.sent_for_review')\n\n' + url);
-                    window.location.reload();
+                    const msg = '@lang('titan_vault::titan_vault.sent_for_review')' + (url ? '\n\n' + url : '');
+                    toastr.success(msg);
+                    setTimeout(function () { window.location.reload(); }, 2000);
                 }
             }
         });

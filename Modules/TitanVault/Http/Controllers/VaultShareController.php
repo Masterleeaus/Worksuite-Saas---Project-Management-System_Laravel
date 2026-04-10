@@ -40,7 +40,7 @@ class VaultShareController extends AccountBaseController
         abort_403(!$this->user->permission('edit_vault_documents'));
 
         $request->validate([
-            'expires_at' => 'nullable|date|after:now',
+            'expires_at' => 'nullable|date|after_or_equal:today',
             'password'   => 'nullable|string|min:4',
             'max_views'  => 'nullable|integer|min:1',
         ]);
