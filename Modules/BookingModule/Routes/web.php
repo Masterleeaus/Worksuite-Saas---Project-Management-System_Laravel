@@ -172,3 +172,15 @@ Route::group(['middleware' => ['web','throttle:appointment-public','appointment.
 });
 
 Route::middleware('web')->get('/portal/{slug}', [ClientPortalController::class, 'show'])->name('booking.portal.show');
+
+// ── FSM Cleaning Bookings ────────────────────────────────────────────────────
+Route::middleware(['web', 'auth'])->prefix('account')->group(function () {
+    Route::prefix('cleaning-bookings')->as('cleaning-bookings.')->group(function () {
+        Route::post('/', [\Modules\BookingModule\Http\Controllers\Cleaning\CleaningBookingController::class, 'store'])
+             ->name('store');
+        Route::patch('{booking}/status', [\Modules\BookingModule\Http\Controllers\Cleaning\CleaningBookingController::class, 'updateStatus'])
+             ->name('update-status');
+        Route::patch('{booking}/assign', [\Modules\BookingModule\Http\Controllers\Cleaning\CleaningBookingController::class, 'assignCleaner'])
+             ->name('assign-cleaner');
+    });
+});

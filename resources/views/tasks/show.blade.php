@@ -47,3 +47,6 @@
 
     </script>
 @endpush
+
+{{-- BookingModule: inject booking-specific fields panel when task_type='booking' --}}
+@stack('booking-details-tab')
