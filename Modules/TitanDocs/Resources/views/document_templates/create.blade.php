@@ -58,7 +58,7 @@
 document.querySelector('form').addEventListener('submit', function(e) {
     var csv = document.getElementById('requiredFieldsCsv').value;
     var fields = csv.split(',').map(f => f.trim()).filter(f => f.length > 0);
-    fields.forEach(function(f, i) {
+    fields.forEach(function(f) {
         var input = document.createElement('input');
         input.type = 'hidden';
         input.name = 'required_fields[]';
