@@ -31,7 +31,7 @@
     $activitiesToday = \Modules\FSMActivity\Models\FSMActivity::where('state', 'open')
         ->whereDate('due_date', now()->toDateString())
         ->count();
-    $activitiesOverdue = \Modules\FSMActivity\Models\FSMActivity::where('state', 'open')
+    $activitiesOverdue = \Modules\FSMActivity\Models\FSMActivity::whereIn('state', ['open', 'overdue'])
         ->whereDate('due_date', '<', now()->toDateString())
         ->count();
 @endphp

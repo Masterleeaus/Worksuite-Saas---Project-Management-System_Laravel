@@ -19,7 +19,7 @@ class ActivityDashboardController extends Controller
 
         $dueTodayCount = $dueToday->count();
 
-        $overdueCount = FSMActivity::where('state', 'open')
+        $overdueCount = FSMActivity::whereIn('state', ['open', 'overdue'])
             ->whereDate('due_date', '<', $today)
             ->count();
 
