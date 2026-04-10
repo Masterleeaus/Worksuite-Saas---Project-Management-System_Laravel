@@ -52,6 +52,21 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: worksuite_smoke
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
     steps:
       - uses: actions/checkout@v4
 
@@ -59,7 +74,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.2"
-          extensions: mbstring, pdo, pdo_sqlite, sqlite3, dom, curl, zip, bcmath, intl
+          extensions: mbstring, pdo, pdo_mysql, dom, curl, zip, bcmath, intl
           coverage: none
 
       - name: Ensure bootstrap/cache is writable before Composer post-install hooks
@@ -72,13 +87,16 @@ jobs:
         run: |
           cp .env.example .env
           sed -i 's/^APP_ENV=.*/APP_ENV=testing/' .env
-          sed -i 's/^DB_CONNECTION=.*/DB_CONNECTION=sqlite/' .env
-          echo "DB_DATABASE=/tmp/smoke.sqlite" >> .env
+          sed -i 's/^DB_CONNECTION=.*/DB_CONNECTION=mysql/' .env
+          sed -i 's/^DB_HOST=.*/DB_HOST=127.0.0.1/' .env
+          sed -i 's/^DB_PORT=.*/DB_PORT=3306/' .env
+          sed -i 's/^DB_DATABASE=.*/DB_DATABASE=worksuite_smoke/' .env
+          sed -i 's/^DB_USERNAME=.*/DB_USERNAME=root/' .env
+          sed -i 's/^DB_PASSWORD=.*/DB_PASSWORD=root/' .env
           echo "CACHE_DRIVER=array" >> .env
           echo "SESSION_DRIVER=array" >> .env
           echo "QUEUE_CONNECTION=sync" >> .env
           echo "MAIL_MAILER=array" >> .env
-          touch /tmp/smoke.sqlite
           php artisan key:generate --quiet
 
       - name: Bootstrap check

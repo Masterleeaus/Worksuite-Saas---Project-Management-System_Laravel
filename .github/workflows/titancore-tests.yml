@@ -1,0 +1,69 @@
+name: TitanCore Tests
+
+on:
+  push:
+    paths:
+      - 'Modules/TitanCore/**'
+  pull_request:
+    paths:
+      - 'Modules/TitanCore/**'
+
+concurrency:
+  group: titancore-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  php-tests:
+    name: TitanCore PHP Tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: worksuite_titancore
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, pdo, pdo_mysql, curl, json, gd, zip
+          coverage: none
+
+      - name: Ensure bootstrap/cache is writable before Composer post-install hooks
+        run: mkdir -p bootstrap/cache && chmod -R 775 storage bootstrap/cache
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Prepare .env
+        run: |
+          cp .env.example .env
+          sed -i 's/^APP_ENV=.*/APP_ENV=testing/' .env
+          sed -i 's/^DB_CONNECTION=.*/DB_CONNECTION=mysql/' .env
+          sed -i 's/^DB_HOST=.*/DB_HOST=127.0.0.1/' .env
+          sed -i 's/^DB_PORT=.*/DB_PORT=3306/' .env
+          sed -i 's/^DB_DATABASE=.*/DB_DATABASE=worksuite_titancore/' .env
+          sed -i 's/^DB_USERNAME=.*/DB_USERNAME=root/' .env
+          sed -i 's/^DB_PASSWORD=.*/DB_PASSWORD=root/' .env
+          echo "CACHE_DRIVER=array" >> .env
+          echo "SESSION_DRIVER=array" >> .env
+          echo "QUEUE_CONNECTION=sync" >> .env
+          echo "MAIL_MAILER=array" >> .env
+          php artisan key:generate --quiet
+
+      - name: Run TitanCore tests
+        run: php artisan test Modules/TitanCore/Tests
