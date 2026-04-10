@@ -68,7 +68,7 @@
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ optional($rule->service)->name ?? '-' }}</td>
-                                            <td>{{ $rule->zone_id ?? __('app.allZones', [], 'All') }}</td>
+                                            <td>{{ optional($rule->zone)->name ?? __('app.allZones', [], 'All') }}</td>
                                             <td>{{ $rule->label ?? '-' }}</td>
                                             <td>{{ $rule->base_price_override ? number_format($rule->base_price_override, 2) : '-' }}</td>
                                             <td>{{ $rule->per_bedroom_price ? number_format($rule->per_bedroom_price, 2) : '-' }}</td>

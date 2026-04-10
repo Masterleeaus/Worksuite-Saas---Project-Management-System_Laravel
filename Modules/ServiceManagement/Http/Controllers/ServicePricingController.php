@@ -14,7 +14,10 @@ class ServicePricingController extends Controller
 {
     public function index(Request $request): View
     {
-        $rules = ServicePricingRule::with('service')
+        $rules = ServicePricingRule::with(array_filter([
+                'service',
+                class_exists(\Modules\ZoneManagement\Entities\Zone::class) ? 'zone' : null,
+            ]))
             ->when($request->filled('service_id'), fn ($q) => $q->where('service_id', $request->service_id))
             ->when($request->filled('zone_id'), fn ($q) => $q->where('zone_id', $request->zone_id))
             ->latest()

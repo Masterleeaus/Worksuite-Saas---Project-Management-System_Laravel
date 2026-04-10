@@ -36,6 +36,14 @@ class ServicePricingRule extends Model
         return $this->belongsTo(Service::class, 'service_id', 'id')->withoutGlobalScopes();
     }
 
+    public function zone()
+    {
+        if (class_exists(\Modules\ZoneManagement\Entities\Zone::class)) {
+            return $this->belongsTo(\Modules\ZoneManagement\Entities\Zone::class, 'zone_id', 'id');
+        }
+        return null;
+    }
+
     /**
      * Calculate price based on number of bedrooms and bathrooms.
      */
