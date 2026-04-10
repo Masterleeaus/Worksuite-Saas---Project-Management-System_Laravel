@@ -1,8 +1,8 @@
 {
     "name": "ServicemanModule",
     "alias": "servicemanmodule",
-    "description": "",
-    "keywords": [],
+    "description": "Mobile-optimised FSM job interface for cleaners — GPS check-in/out, photo upload, checklists.",
+    "keywords": ["fsm", "cleaner", "job", "serviceman", "mobile"],
     "priority": 0,
     "providers": [
         "Modules\\ServicemanModule\\Providers\\ServicemanModuleServiceProvider",
@@ -15,9 +15,27 @@
     "requires": [],
     "active": 1,
     "order": 0,
-    "permissions": [],
+    "permissions": [
+        "view_cleaner_jobs",
+        "checkin_cleaner_jobs",
+        "upload_job_photos",
+        "complete_job_checklist"
+    ],
     "roles_permissions": {
-        "admin": [],
-        "manager": []
+        "admin": [
+            "view_cleaner_jobs",
+            "checkin_cleaner_jobs",
+            "upload_job_photos",
+            "complete_job_checklist"
+        ],
+        "manager": [
+            "view_cleaner_jobs"
+        ],
+        "employee": [
+            "view_cleaner_jobs",
+            "checkin_cleaner_jobs",
+            "upload_job_photos",
+            "complete_job_checklist"
+        ]
     }
 }
