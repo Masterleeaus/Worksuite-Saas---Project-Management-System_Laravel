@@ -1,9 +1,40 @@
 {
     "name": "QualityControl",
     "alias": "quality_control",
-    "description": "Inspection schedules, recurring quality checks, templates, and QC outcomes for Worksuite service businesses.",
-    "keywords": ["quality", "inspection", "templates", "service", "worksuite"],
-    "permissions": ["view_quality_control", "add_quality_control", "edit_quality_control", "delete_quality_control"],
+    "description": "Quality control checklists, cleaner ratings and re-clean workflow",
+    "keywords": ["quality", "inspection", "templates", "service", "cleaning", "reclean", "ratings"],
+    "active": 1,
+    "permissions": [
+        "view_quality_control",
+        "add_quality_control",
+        "edit_quality_control",
+        "delete_quality_control",
+        "view_qc_reports",
+        "manage_qc_templates",
+        "trigger_reclean",
+        "view_cleaner_ratings"
+    ],
+    "roles_permissions": {
+        "admin": [
+            "view_quality_control",
+            "add_quality_control",
+            "edit_quality_control",
+            "delete_quality_control",
+            "view_qc_reports",
+            "manage_qc_templates",
+            "trigger_reclean",
+            "view_cleaner_ratings"
+        ],
+        "manager": [
+            "view_quality_control",
+            "add_quality_control",
+            "edit_quality_control",
+            "view_qc_reports",
+            "manage_qc_templates",
+            "trigger_reclean",
+            "view_cleaner_ratings"
+        ]
+    },
     "priority": 0,
     "providers": [
         "Modules\\QualityControl\\Providers\\QualityControlServiceProvider",
@@ -11,5 +42,14 @@
         "Modules\\QualityControl\\Providers\\RouteServiceProvider"
     ],
     "files": [],
-    "version": "1.0.1"
+    "menus": [
+        {
+            "panel": "user",
+            "label": "Quality Control",
+            "route": "quality-control.index",
+            "sort_order": 86
+        }
+    ],
+    "sidebar_menu": true,
+    "version": "1.1.0"
 }
