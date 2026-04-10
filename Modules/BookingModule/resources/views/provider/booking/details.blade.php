@@ -798,6 +798,9 @@
 
     @include('bookingmodule::provider.booking.partials.details._update-customer-address-modal')
 
+    {{-- Complaint module injects linked complaint list here --}}
+    @stack('booking-complaints')
+
 @endsection
 
 @push('script')

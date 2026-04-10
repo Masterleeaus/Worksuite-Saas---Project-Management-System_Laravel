@@ -105,6 +105,9 @@ $viewClientOrder = user()->permission('view_order');
                             class="gdpr" />
                     </li>
                     @endif
+
+                    {{-- Complaint module pushes a 'Complaints' tab entry here --}}
+                    @stack('client-complaints-tab')
                 </ul>
             </nav>
         </div>

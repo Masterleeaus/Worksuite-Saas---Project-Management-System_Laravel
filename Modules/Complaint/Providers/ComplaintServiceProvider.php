@@ -3,6 +3,7 @@
 namespace Modules\Complaint\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
+use Illuminate\Support\Facades\View;
 
 class ComplaintServiceProvider extends ServiceProvider
 {
@@ -27,6 +28,7 @@ class ComplaintServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
+        $this->registerViewComposers();
     }
 
     /**
@@ -88,6 +90,35 @@ class ComplaintServiceProvider extends ServiceProvider
             $this->loadTranslationsFrom(module_path($this->moduleName, 'Resources/lang'), $this->moduleNameLower);
             $this->loadJsonTranslationsFrom(module_path($this->moduleName, 'Resources/lang'), $this->moduleNameLower);
         }
+    }
+
+    /**
+     * Register Blade view composers that push Complaint content into core view stacks.
+     *
+     * - booking-complaints  → BookingModule booking details view
+     * - client-complaints-tab → clients/show tab list
+     */
+    protected function registerViewComposers(): void
+    {
+        // Push the complaint panel into the BookingModule booking details page
+        View::composer(
+            'bookingmodule::provider.booking.details',
+            function (\Illuminate\View\View $view) {
+                $view->getFactory()->startPush('booking-complaints');
+                echo view('complaint::booking.linked-complaints', $view->getData())->render();
+                $view->getFactory()->stopPush();
+            }
+        );
+
+        // Push the Complaints tab into the clients/show tab bar
+        View::composer(
+            'clients.show',
+            function (\Illuminate\View\View $view) {
+                $view->getFactory()->startPush('client-complaints-tab');
+                echo view('complaint::client.complaints-tab', $view->getData())->render();
+                $view->getFactory()->stopPush();
+            }
+        );
     }
 
     /**
