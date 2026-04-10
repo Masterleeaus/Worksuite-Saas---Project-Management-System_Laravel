@@ -52,7 +52,12 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Modules\Sms\Console\ActivateModuleCommand;
+use Modules\Sms\Console\UpcomingCleaningReminderCommand;
 use Modules\Sms\Http\Traits\SmsSettingTrait;
+use Modules\Sms\Events\CleanerDispatchedEvent;
+use Modules\Sms\Events\CleanerCheckedInEvent;
+use Modules\Sms\Events\CleaningJobCompleteEvent;
+use Modules\Sms\Events\CleaningUpcomingReminderEvent;
 use Modules\Sms\Listeners\AttendanceReminderListener;
 use Modules\Sms\Listeners\AutoFollowUpReminderListener;
 use Modules\Sms\Listeners\AutoTaskReminderListener;
@@ -98,6 +103,11 @@ use Modules\Sms\Listeners\TaskReminderListener;
 use Modules\Sms\Listeners\TicketReplyListener;
 use Modules\Sms\Listeners\TicketRequesterListener;
 use Modules\Sms\Listeners\TwoFactorCodeListener;
+use Modules\Sms\Listeners\CleanerDispatchedListener;
+use Modules\Sms\Listeners\CleanerCheckedInListener;
+use Modules\Sms\Listeners\CleaningJobCompleteListener;
+use Modules\Sms\Listeners\CleaningUpcomingReminderListener;
+use Modules\Sms\Observers\FSMOrderObserver;
 
 class SmsServiceProvider extends ServiceProvider
 {
@@ -162,6 +172,19 @@ class SmsServiceProvider extends ServiceProvider
         Event::listen(NewCompanyCreatedEvent::class,               CompanyCreatedListener::class);
         Event::listen(TwoFactorCodeEvent::class,                   TwoFactorCodeListener::class);
         Event::listen(TaskNoteMentionEvent::class,                 TaskNoteMentionListener::class);
+
+        // ---------------------------------------------------------------
+        // Cleaning-specific notification events (CleanSmartOS)
+        // ---------------------------------------------------------------
+        Event::listen(CleanerDispatchedEvent::class,       CleanerDispatchedListener::class);
+        Event::listen(CleanerCheckedInEvent::class,        CleanerCheckedInListener::class);
+        Event::listen(CleaningJobCompleteEvent::class,     CleaningJobCompleteListener::class);
+        Event::listen(CleaningUpcomingReminderEvent::class, CleaningUpcomingReminderListener::class);
+
+        // Register FSMOrder observer when FSMCore is installed
+        if (class_exists(\Modules\FSMCore\Models\FSMOrder::class)) {
+            \Modules\FSMCore\Models\FSMOrder::observe(FSMOrderObserver::class);
+        }
 
         // ---------------------------------------------------------------
         // Config bootstrap: load SmsSetting into Laravel config at boot
@@ -266,6 +289,9 @@ class SmsServiceProvider extends ServiceProvider
      */
     private function registerCommands(): void
     {
-        $this->commands([ActivateModuleCommand::class]);
+        $this->commands([
+            ActivateModuleCommand::class,
+            UpcomingCleaningReminderCommand::class,
+        ]);
     }
 }
