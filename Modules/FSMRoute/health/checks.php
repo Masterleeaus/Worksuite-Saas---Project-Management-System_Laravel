@@ -28,7 +28,7 @@ return [
         'id'       => 'fsmroute:migrations',
         'label'    => 'Migrations present',
         'severity' => 'warn',
-        'ok'       => count(glob(__DIR__ . '/../Database/Migrations/*.php')) >= 5,
-        'hint'     => 'Expected at least 5 migration files for FSMRoute tables.',
+        'ok'       => count(glob(__DIR__ . '/../Database/Migrations/*.php')) >= 6,
+        'hint'     => 'Expected at least 6 migration files for FSMRoute tables.',
     ],
 ];

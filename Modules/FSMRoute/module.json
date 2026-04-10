@@ -9,7 +9,8 @@
     "Modules\\FSMRoute\\Providers\\FSMRouteServiceProvider",
     "Modules\\FSMRoute\\Providers\\RouteServiceProvider",
     "Modules\\FSMRoute\\Providers\\ConfigServiceProvider",
-    "Modules\\FSMRoute\\Providers\\ViewServiceProvider"
+    "Modules\\FSMRoute\\Providers\\ViewServiceProvider",
+    "Modules\\FSMRoute\\Providers\\EventServiceProvider"
   ],
   "aliases": {},
   "files": [],

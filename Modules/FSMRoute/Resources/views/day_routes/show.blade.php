@@ -4,6 +4,7 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>{{ $dayRoute->name }}</h2>
     <div>
+        <a href="{{ route('fsmroute.dispatch_map.index', ['date' => $dayRoute->date->format('Y-m-d')]) }}" class="btn btn-outline-success btn-sm me-1">🗺 Live Map</a>
         <a href="{{ route('fsmroute.day_routes.board', ['date' => $dayRoute->date->format('Y-m-d')]) }}" class="btn btn-outline-info btn-sm me-1">📋 Board</a>
         <a href="{{ route('fsmroute.day_routes.print', $dayRoute->id) }}" class="btn btn-outline-secondary btn-sm me-1" target="_blank">🖨 Print</a>
         <a href="{{ route('fsmroute.day_routes.edit', $dayRoute->id) }}" class="btn btn-outline-primary btn-sm">Edit</a>
@@ -59,7 +60,7 @@
 <ol class="list-group list-group-numbered">
     @forelse($dayRoute->orders as $order)
         <li class="list-group-item d-flex justify-content-between align-items-start">
-            <div>
+            <div class="flex-grow-1">
                 <a href="{{ route('fsmcore.orders.show', $order->id) }}" class="fw-semibold text-decoration-none">
                     {{ $order->name }}
                 </a>
@@ -68,8 +69,33 @@
                         @if($order->location->street) — {{ $order->location->street }}, {{ $order->location->city }} @endif
                     </small>
                 @endif
+                @if($order->date_start)
+                    <br><small class="text-success">✓ Checked in: {{ $order->date_start->format('H:i') }}</small>
+                @endif
+                @if($order->date_end)
+                    <br><small class="text-primary">✓ Complete: {{ $order->date_end->format('H:i') }}</small>
+                @endif
             </div>
-            <span class="badge bg-light text-dark">#{{ $order->route_sequence + 1 }}</span>
+            <div class="d-flex align-items-center gap-1 ms-2">
+                <span class="badge bg-light text-dark">#{{ $order->route_sequence + 1 }}</span>
+                @if(!$order->date_start)
+                    <form method="POST" action="{{ route('fsmroute.orders.enRoute', $order->id) }}" class="d-inline">
+                        @csrf
+                        <button class="btn btn-sm btn-outline-primary py-0 px-1" title="Mark en route (sends ETA SMS)">🚗 En Route</button>
+                    </form>
+                    <form method="POST" action="{{ route('fsmroute.orders.checkIn', $order->id) }}" class="d-inline">
+                        @csrf
+                        <button class="btn btn-sm btn-outline-warning py-0 px-1" title="Check in">✓ In</button>
+                    </form>
+                @elseif(!$order->date_end)
+                    <form method="POST" action="{{ route('fsmroute.orders.checkOut', $order->id) }}" class="d-inline">
+                        @csrf
+                        <button class="btn btn-sm btn-outline-success py-0 px-1" title="Mark complete">✓ Done</button>
+                    </form>
+                @else
+                    <span class="badge bg-success">Complete</span>
+                @endif
+            </div>
         </li>
     @empty
         <li class="list-group-item text-muted">No orders assigned.</li>
