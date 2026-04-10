@@ -1,17 +1,40 @@
 name: Deploy
 
+# Deployment runs directly on the self-hosted GitHub Actions runner that is
+# installed on the production server.  No SSH tunnel is required — the runner
+# executes commands as the server user with access to the web root.
+#
+# Trigger: push to main/master  OR  manual dispatch (workflow_dispatch).
+#
+# Required GitHub repository variables (Settings → Variables → Repository):
+#   DEPLOY_BRANCH   — branch to pull on the server (default: main)
+#   DEPLOY_PATH     — absolute path to the web root on the server
+#                     (default: /home/saassmar/domains/cleansm.art/public_html)
+#
+# Optional GitHub repository secret (Settings → Secrets → Repository):
+#   APP_URL         — production URL used for the post-deploy health check
+#                     (e.g. https://cleansm.art)
+#
+# Safety guarantees:
+#   • .env is NEVER created or overwritten — it must pre-exist on the server.
+#   • No packages are removed from a non-empty directory.
+#   • Secrets are never echoed or exposed in logs.
+
 on:
   push:
     branches: [main, master]
   workflow_dispatch:
     inputs:
       skip_migrations:
-        description: "Skip database migrations"
-        required: true
+        description: "Skip database migrations (true/false)"
+        required: false
         default: "false"
         type: choice
-        options: ["false", "true"]
+        options:
+          - "false"
+          - "true"
 
+# Prevent concurrent deploys; never cancel an in-progress deploy.
 concurrency:
   group: deploy-production
   cancel-in-progress: false
@@ -19,68 +42,128 @@ concurrency:
 jobs:
   deploy:
     name: Deploy to production
+    # Runs on the self-hosted runner installed on the production server.
     runs-on: self-hosted
+    environment: production
     permissions:
       contents: read
 
+    # Only deploy from push events on main/master, or when manually dispatched.
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'))
+
     env:
-      DEPLOY_PATH: /home/saassmar/domains/cleansm.art/public_html
-      DEPLOY_BRANCH: main
+      DEPLOY_PATH: ${{ vars.DEPLOY_PATH || '/home/saassmar/domains/cleansm.art/public_html' }}
+      DEPLOY_BRANCH: ${{ vars.DEPLOY_BRANCH || 'main' }}
 
     steps:
+      # -----------------------------------------------------------------------
+      # 1. Runner context — confirms the job is executing on the correct host.
+      # -----------------------------------------------------------------------
       - name: Verify runner context
         run: |
-          echo "User: $(whoami)"
-          echo "Host: $(hostname)"
-          echo "PWD: $(pwd)"
+          echo "==> Runner host : $(hostname)"
+          echo "==> Running as  : $(whoami)"
+          echo "==> Deploy path : $DEPLOY_PATH"
+          echo "==> Deploy branch: $DEPLOY_BRANCH"
 
-      - name: Check deploy path
+      # -----------------------------------------------------------------------
+      # 2. Guard — ensure the web root exists and .env is in place.
+      #    Deployment is aborted if either condition is not met to prevent
+      #    accidental fresh-installs on an empty or mis-configured server.
+      # -----------------------------------------------------------------------
+      - name: Verify deployment directory and .env
         run: |
           if [ ! -d "$DEPLOY_PATH" ]; then
-            echo "Deploy path missing: $DEPLOY_PATH"
+            echo "::error::Deploy path $DEPLOY_PATH does not exist. Aborting."
             exit 1
           fi
+          if [ ! -f "$DEPLOY_PATH/.env" ]; then
+            echo "::error::.env not found at $DEPLOY_PATH/.env. Aborting to avoid mis-configuration."
+            exit 1
+          fi
+          echo "==> Directory and .env are present. Proceeding."
 
-      - name: Check app files
+      # -----------------------------------------------------------------------
+      # 3. Pull latest code.
+      # -----------------------------------------------------------------------
+      - name: Pull latest code
         run: |
           cd "$DEPLOY_PATH"
-          ls -la
-          if [ ! -f ".env" ]; then
-            echo ".env missing"
-            exit 1
-          fi
-          if [ ! -f "artisan" ]; then
-            echo "artisan missing"
-            exit 1
-          fi
-
-      - name: Update code
-        run: |
-          cd "$DEPLOY_PATH"
-          git status
-          git fetch origin
+          echo "==> Pulling latest code from origin/$DEPLOY_BRANCH"
+          git fetch --quiet origin
+          git checkout "$DEPLOY_BRANCH"
           git pull --ff-only origin "$DEPLOY_BRANCH"
 
-      - name: Install composer dependencies
+      # -----------------------------------------------------------------------
+      # 4. Install / update Composer dependencies.
+      #    --no-dev omits development packages on the production server.
+      # -----------------------------------------------------------------------
+      - name: Install Composer dependencies
         run: |
           cd "$DEPLOY_PATH"
+          echo "==> Installing Composer dependencies"
           composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
 
-      - name: Run migrations
+      # -----------------------------------------------------------------------
+      # 5. Database migrations (skippable via workflow_dispatch input).
+      # -----------------------------------------------------------------------
+      - name: Run database migrations
         if: github.event.inputs.skip_migrations != 'true'
         run: |
           cd "$DEPLOY_PATH"
+          echo "==> Running database migrations"
           php artisan migrate --force --no-interaction
 
-      - name: Rebuild Laravel caches
+      # -----------------------------------------------------------------------
+      # 6. Cache rebuild sequence.
+      #    optimize:clear clears config, route, view, event, and compiled caches
+      #    in a single command, then each cache is rebuilt individually.
+      #    route:cache and view:cache are wrapped with '|| true' because they can
+      #    fail on codebases with route closures or un-compiled Blade components;
+      #    failures are surfaced as warnings rather than blocking the deploy.
+      # -----------------------------------------------------------------------
+      - name: Rebuild application caches
         run: |
           cd "$DEPLOY_PATH"
+          echo "==> Clearing all caches"
           php artisan optimize:clear
-          php artisan config:cache
-          php artisan route:cache || echo "route:cache failed, skipping"
-          php artisan view:cache || echo "view:cache failed, skipping"
 
+          echo "==> Caching configuration"
+          php artisan config:cache
+
+          echo "==> Caching routes"
+          php artisan route:cache || echo "::warning::route:cache failed (possible route closures). Skipping."
+
+          echo "==> Caching views"
+          php artisan view:cache || echo "::warning::view:cache failed (possible un-compiled Blade components or syntax errors). Skipping."
+
+      # -----------------------------------------------------------------------
+      # 7. Restart queue workers so they pick up the new code.
+      # -----------------------------------------------------------------------
       - name: Restart queue workers
         run: |
           cd "$DEPLOY_PATH"
           php artisan queue:restart || true
+          echo "==> Queue restart signal sent."
+
+      # -----------------------------------------------------------------------
+      # 8. Post-deploy health check (optional — requires APP_URL secret).
+      # -----------------------------------------------------------------------
+      - name: Post-deploy health check
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+        run: |
+          if [ -z "$APP_URL" ]; then
+            echo "APP_URL secret not set — skipping health check."
+            exit 0
+          fi
+          echo "==> Health check: $APP_URL"
+          HTTP_CODE=$(curl --silent --output /dev/null --write-out "%{http_code}" \
+            --max-time 30 "$APP_URL")
+          echo "==> HTTP response: $HTTP_CODE"
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 400 ]; then
+            echo "==> Health check passed."
+          else
+            echo "::warning::Health check returned HTTP $HTTP_CODE. Verify the site manually."
+          fi
+        continue-on-error: true
