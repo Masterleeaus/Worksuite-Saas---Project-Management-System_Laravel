@@ -7,6 +7,9 @@
         @if(class_exists(\Modules\FSMSkill\Http\Controllers\OrderSkillController::class))
             <a href="{{ route('fsmskill.order-skills.index', $order->id) }}" class="btn btn-outline-info">Skill Requirements</a>
         @endif
+        @if(class_exists(\Modules\FSMTimesheet\Http\Controllers\TimesheetController::class))
+            <a href="{{ route('fsmtimesheet.timesheets.index', $order->id) }}" class="btn btn-outline-secondary">⏱ Timesheets</a>
+        @endif
         <a href="{{ route('fsmcore.orders.edit', $order->id) }}" class="btn btn-primary">Edit</a>
         <a href="{{ route('fsmcore.orders.index') }}" class="btn btn-outline-secondary">Back</a>
     </div>
@@ -97,6 +100,49 @@
                 @foreach($order->tags as $tag)
                     <span class="badge me-1" style="background:{{ $tag->color ?? '#6c757d' }};">{{ $tag->name }}</span>
                 @endforeach
+            </div>
+        </div>
+        @endif
+
+        @if(class_exists(\Modules\FSMTimesheet\Models\FSMTimesheetLine::class) && \Illuminate\Support\Facades\Schema::hasTable('fsm_timesheet_lines'))
+        @php
+            $tsLines        = \Modules\FSMTimesheet\Models\FSMTimesheetLine::where('fsm_order_id', $order->id)->get();
+            $effectiveHours = (float) $tsLines->sum('unit_amount');
+            $plannedHours   = ($order->scheduled_date_start && $order->scheduled_date_end)
+                ? round($order->scheduled_date_start->diffInMinutes($order->scheduled_date_end) / 60, 2)
+                : 0.0;
+            $tsProgress     = $plannedHours > 0 ? min(100, round(($effectiveHours / $plannedHours) * 100)) : 0;
+            $tsProgressClass = $tsProgress >= 100 ? 'bg-danger' : ($tsProgress >= 75 ? 'bg-warning' : 'bg-success');
+        @endphp
+        <div class="card mb-3">
+            <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+                <span>Timesheets</span>
+                <a href="{{ route('fsmtimesheet.timesheets.index', $order->id) }}" class="btn btn-sm btn-outline-primary">Manage</a>
+            </div>
+            <div class="card-body">
+                <div class="row text-center mb-2">
+                    <div class="col">
+                        <div class="fw-bold">{{ number_format($plannedHours, 2) }} h</div>
+                        <div class="text-muted small">Planned</div>
+                    </div>
+                    <div class="col">
+                        <div class="fw-bold text-primary">{{ number_format($effectiveHours, 2) }} h</div>
+                        <div class="text-muted small">Logged</div>
+                    </div>
+                    <div class="col">
+                        <div class="fw-bold {{ ($plannedHours - $effectiveHours) <= 0 ? 'text-danger' : 'text-success' }}">
+                            {{ number_format(max(0, $plannedHours - $effectiveHours), 2) }} h
+                        </div>
+                        <div class="text-muted small">Remaining</div>
+                    </div>
+                </div>
+                @if($plannedHours > 0)
+                <div class="progress" style="height: 14px;">
+                    <div class="progress-bar {{ $tsProgressClass }}" role="progressbar"
+                         style="width: {{ $tsProgress }}%;">{{ $tsProgress }}%</div>
+                </div>
+                @endif
+                <div class="mt-2 text-muted small">{{ $tsLines->count() }} line(s) logged</div>
             </div>
         </div>
         @endif
