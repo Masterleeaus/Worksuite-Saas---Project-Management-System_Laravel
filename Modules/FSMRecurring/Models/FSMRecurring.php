@@ -125,12 +125,12 @@ class FSMRecurring extends Model
 
     public function actionSuspend(): void
     {
-        // Cancel open orders tied to this recurring schedule
+        // Detach open (non-completed) orders from this recurring schedule
         if (class_exists(\Modules\FSMCore\Models\FSMStage::class)) {
-            $closedStageIds = \Modules\FSMCore\Models\FSMStage::where('is_closed', true)
+            $completionStageIds = \Modules\FSMCore\Models\FSMStage::where('is_completion_stage', true)
                 ->pluck('id')->toArray();
             $this->orders()
-                ->whereNotIn('stage_id', $closedStageIds)
+                ->whereNotIn('stage_id', $completionStageIds)
                 ->get()
                 ->each(fn($o) => $o->update(['stage_id' => null]));
         }
@@ -258,6 +258,39 @@ class FSMRecurring extends Model
         }
 
         return $created;
+    }
+
+    // ─── Schedule preview ─────────────────────────────────────────────────────
+
+    /**
+     * Return the next $n upcoming occurrence dates for this recurring schedule,
+     * looking forward from today (or the start_date if that is in the future).
+     *
+     * Useful for the schedule preview panel on the show page.
+     *
+     * @return Carbon[]
+     */
+    public function previewNextOccurrences(int $n = 4): array
+    {
+        if (!$this->frequencySet) {
+            return [];
+        }
+
+        // Start from today or the schedule's own start date, whichever is later
+        $from = Carbon::now()->startOfDay();
+        if ($this->start_date && Carbon::parse($this->start_date)->greaterThan($from)) {
+            $from = Carbon::parse($this->start_date)->startOfDay();
+        }
+
+        // Look up to a year ahead; cap at end_date if set
+        $until = $from->copy()->addYear();
+        if ($this->end_date && Carbon::parse($this->end_date)->lessThan($until)) {
+            $until = Carbon::parse($this->end_date);
+        }
+
+        $occurrences = $this->frequencySet->getOccurrences($from, $until);
+
+        return array_slice($occurrences, 0, $n);
     }
 
     // ─── Cron helpers ────────────────────────────────────────────────────────
