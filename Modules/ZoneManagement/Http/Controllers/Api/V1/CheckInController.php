@@ -6,6 +6,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Modules\ZoneManagement\Entities\CleanerLocation;
 use Modules\ZoneManagement\Entities\GpsSetting;
@@ -123,6 +124,27 @@ class CheckInController extends Controller
             }
         }
 
+        // FSMTimesheet integration: open a timesheet line when fsm_order_id is supplied
+        if (
+            $request->filled('fsm_order_id')
+            && class_exists(\Modules\FSMTimesheet\Models\FSMTimesheetLine::class)
+            && Schema::hasTable('fsm_timesheet_lines')
+        ) {
+            try {
+                \Modules\FSMTimesheet\Models\FSMTimesheetLine::create([
+                    'company_id'   => $companyId,
+                    'fsm_order_id' => (int) $request->get('fsm_order_id'),
+                    'user_id'      => $user->id,
+                    'date'         => now()->toDateString(),
+                    'name'         => 'Auto-created on check-in',
+                    'unit_amount'  => 0,
+                    'start_time'   => now()->format('H:i'),
+                ]);
+            } catch (\Throwable) {
+                // Non-critical — log silently and continue
+            }
+        }
+
         return response()->json([
             'check_in_id'    => $checkIn->id,
             'checked_in_at'  => $checkIn->checked_in_at,
@@ -170,6 +192,27 @@ class CheckInController extends Controller
             'check_out_accuracy'=> $request->accuracy,
             'checked_out_at'    => now(),
         ]);
+
+        // FSMTimesheet integration: close the open timesheet line for this user/order
+        if (
+            class_exists(\Modules\FSMTimesheet\Models\FSMTimesheetLine::class)
+            && Schema::hasTable('fsm_timesheet_lines')
+        ) {
+            try {
+                $openLine = \Modules\FSMTimesheet\Models\FSMTimesheetLine::where('user_id', $user->id)
+                    ->whereNull('end_time')
+                    ->whereDate('date', now()->toDateString())
+                    ->latest()
+                    ->first();
+
+                if ($openLine) {
+                    $openLine->end_time = now()->format('H:i');
+                    $openLine->save(); // triggers computed_hours → unit_amount via model boot
+                }
+            } catch (\Throwable) {
+                // Non-critical — ignore silently
+            }
+        }
 
         return response()->json([
             'check_in_id'    => $checkIn->id,
