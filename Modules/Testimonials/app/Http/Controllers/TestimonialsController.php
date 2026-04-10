@@ -17,20 +17,24 @@ class TestimonialsController extends Controller
         $this->testimonialRepo = $testimonialRepo;
     }
 
+    // -----------------------------------------------------------------------
+    // Admin CRUD (API / AJAX)
+    // -----------------------------------------------------------------------
+
     public function index(Request $request): JsonResponse
     {
         try {
             $data = $this->testimonialRepo->getAll($request);
             return response()->json([
-                'code' => 200,
+                'code'    => 200,
                 'message' => __('Testimonials details retrieved successfully.'),
-                'data' => $data,
+                'data'    => $data,
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'code' => 500,
+                'code'    => 500,
                 'message' => __('An error occurred while retrieving testimonials.'),
-                'error' => $e->getMessage(),
+                'error'   => $e->getMessage(),
             ]);
         }
     }
@@ -40,14 +44,14 @@ class TestimonialsController extends Controller
         try {
             $result = $this->testimonialRepo->store($request);
             return response()->json([
-                'code' => 200,
-                'message' => $result['message']
+                'code'    => 200,
+                'message' => $result['message'],
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'code' => 500,
+                'code'    => 500,
                 'message' => __('testimonial_save_error', [], $request->input('language_code', 'en')),
-                'error' => $e->getMessage()
+                'error'   => $e->getMessage(),
             ]);
         }
     }
@@ -57,15 +61,15 @@ class TestimonialsController extends Controller
         try {
             $result = $this->testimonialRepo->destroy($request);
             return response()->json([
-                'code' => 200,
+                'code'    => 200,
                 'success' => true,
-                'message' => $result['message']
+                'message' => $result['message'],
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'code' => 500,
+                'code'    => 500,
                 'success' => false,
-                'message' => __('testimonial_delete_error', [], $request->input('language_code', 'en'))
+                'message' => __('testimonial_delete_error', [], $request->input('language_code', 'en')),
             ]);
         }
     }
@@ -75,14 +79,91 @@ class TestimonialsController extends Controller
         try {
             $result = $this->testimonialRepo->statusChange($request);
             return response()->json([
-                'code' => 200,
-                'message' => $result['message']
+                'code'    => 200,
+                'message' => $result['message'],
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'code' => 500,
-                'message' => __('testimonial_status_error', [], $request->input('language_code', 'en'))
+                'code'    => 500,
+                'message' => __('testimonial_status_error', [], $request->input('language_code', 'en')),
             ]);
         }
     }
+
+    // -----------------------------------------------------------------------
+    // Publish / Unpublish / Featured
+    // -----------------------------------------------------------------------
+
+    public function publish(Request $request): JsonResponse
+    {
+        try {
+            $result = $this->testimonialRepo->publish((int) $request->input('id'));
+            return response()->json(['code' => 200, 'message' => $result['message']]);
+        } catch (\Exception $e) {
+            return response()->json(['code' => 500, 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function unpublish(Request $request): JsonResponse
+    {
+        try {
+            $result = $this->testimonialRepo->unpublish((int) $request->input('id'));
+            return response()->json(['code' => 200, 'message' => $result['message']]);
+        } catch (\Exception $e) {
+            return response()->json(['code' => 500, 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function toggleFeatured(Request $request): JsonResponse
+    {
+        try {
+            $result = $this->testimonialRepo->toggleFeatured((int) $request->input('id'));
+            return response()->json(['code' => 200, 'message' => $result['message']]);
+        } catch (\Exception $e) {
+            return response()->json(['code' => 500, 'message' => $e->getMessage()]);
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // Import
+    // -----------------------------------------------------------------------
+
+    public function importFromReviews(Request $request): JsonResponse
+    {
+        try {
+            $result = $this->testimonialRepo->importFromReviews();
+            return response()->json(['code' => 200, 'message' => $result['message'], 'imported' => $result['imported']]);
+        } catch (\Exception $e) {
+            return response()->json(['code' => 500, 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function importFromFeedback(Request $request): JsonResponse
+    {
+        try {
+            $result = $this->testimonialRepo->importFromFeedback();
+            return response()->json(['code' => 200, 'message' => $result['message'], 'imported' => $result['imported']]);
+        } catch (\Exception $e) {
+            return response()->json(['code' => 500, 'message' => $e->getMessage()]);
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // Public (no auth required)
+    // -----------------------------------------------------------------------
+
+    /**
+     * Public JSON endpoint — returns published testimonials for embedding.
+     */
+    public function publicList(Request $request): JsonResponse
+    {
+        try {
+            $filters = $request->only(['service_type', 'min_rating', 'featured_only', 'limit']);
+            $data    = $this->testimonialRepo->getPublished($filters);
+            return response()->json(['code' => 200, 'data' => $data]);
+        } catch (\Exception $e) {
+            return response()->json(['code' => 500, 'message' => $e->getMessage()]);
+        }
+    }
 }
+
