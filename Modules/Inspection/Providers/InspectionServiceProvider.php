@@ -20,13 +20,14 @@ class InspectionServiceProvider extends ServiceProvider
     {
         $this->registerTranslations();
         $this->registerViews();
+        $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
         $this->scheduleCommands();
-    
+
         // Titan Zero + Titan Go integration (capabilities registry)
         if (class_exists(\Modules\TitanZero\Services\CapabilityRegistry::class)) {
             \Modules\TitanZero\Services\CapabilityRegistry::registerModuleFromConfig('Inspection');
         }
-}
+    }
 
     protected function registerConfig(): void
     {

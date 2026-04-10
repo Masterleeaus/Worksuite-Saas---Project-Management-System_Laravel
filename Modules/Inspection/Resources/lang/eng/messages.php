@@ -16,4 +16,11 @@ return [
     'template_deleted' => 'Template deleted.',
     'template_item_added' => 'Checklist item added.',
     'template_item_removed' => 'Checklist item removed.',
+
+    // Inspection quality-check messages
+    'inspection_created' => 'Inspection created.',
+    'inspection_updated' => 'Inspection updated.',
+    'inspection_deleted' => 'Inspection deleted.',
+    'inspection_approved' => 'Inspection approved successfully.',
+    'reclean_requested' => 'Re-clean booking requested.',
 ];
