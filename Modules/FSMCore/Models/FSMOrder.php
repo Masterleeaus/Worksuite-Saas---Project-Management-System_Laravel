@@ -16,6 +16,7 @@ class FSMOrder extends Model
         'team_id',
         'stage_id',
         'template_id',
+        'agreement_id',
         'priority',
         'color',
         'scheduled_date_start',
@@ -32,6 +33,7 @@ class FSMOrder extends Model
         'team_id' => 'integer',
         'stage_id' => 'integer',
         'template_id' => 'integer',
+        'agreement_id' => 'integer',
         'color' => 'integer',
         'scheduled_date_start' => 'datetime',
         'scheduled_date_end' => 'datetime',
@@ -77,5 +79,10 @@ class FSMOrder extends Model
     public function isUrgent(): bool
     {
         return $this->priority === '1';
+    }
+
+    public function agreement()
+    {
+        return $this->belongsTo(\Modules\FSMServiceAgreement\Models\FSMServiceAgreement::class, 'agreement_id');
     }
 }

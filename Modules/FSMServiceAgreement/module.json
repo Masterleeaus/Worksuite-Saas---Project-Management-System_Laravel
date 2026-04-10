@@ -1,0 +1,19 @@
+{
+  "name": "FSMServiceAgreement",
+  "alias": "fsmserviceagreement",
+  "description": "FSM Service Agreements – manage client cleaning contracts: scope, frequency, pricing, SLA, and recurring order generation for CleanSmartOS.",
+  "keywords": ["fsm", "service-agreement", "contracts", "cleansmartOS"],
+  "active": 1,
+  "order": 1,
+  "providers": [
+    "Modules\\FSMServiceAgreement\\Providers\\FSMServiceAgreementServiceProvider",
+    "Modules\\FSMServiceAgreement\\Providers\\RouteServiceProvider",
+    "Modules\\FSMServiceAgreement\\Providers\\EventServiceProvider",
+    "Modules\\FSMServiceAgreement\\Providers\\ConfigServiceProvider",
+    "Modules\\FSMServiceAgreement\\Providers\\ViewServiceProvider"
+  ],
+  "aliases": {},
+  "files": [],
+  "requires": ["FSMCore"],
+  "version": "1.0.0"
+}
