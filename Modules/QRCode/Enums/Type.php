@@ -18,6 +18,14 @@ enum Type: string
     case wifi = 'wifi';
     case zoom = 'zoom';
 
+    // Cleaning business types
+    case property = 'property';
+    case asset = 'asset';
+    case booking_checkin = 'booking_checkin';
+    case booking_page = 'booking_page';
+    case biolink = 'biolink';
+    case review = 'review';
+
     public function iconClass(): string
     {
         return match ($this) {
@@ -34,6 +42,12 @@ enum Type: string
             self::whatsapp => 'fab fa-whatsapp',
             self::wifi => 'fa fa-wifi',
             self::zoom => 'fa fa-video',
+            self::property => 'fa fa-home',
+            self::asset => 'fa fa-tools',
+            self::booking_checkin => 'fa fa-clipboard-check',
+            self::booking_page => 'fa fa-calendar-plus',
+            self::biolink => 'fa fa-id-card',
+            self::review => 'fa fa-star',
             default => 'fa fa-align-left',
         };
     }
@@ -54,6 +68,12 @@ enum Type: string
             self::whatsapp => __('qrcode::app.type.whatsapp'),
             self::wifi => __('qrcode::app.type.wifi'),
             self::zoom => __('qrcode::app.type.zoom'),
+            self::property => __('qrcode::app.type.property'),
+            self::asset => __('qrcode::app.type.asset'),
+            self::booking_checkin => __('qrcode::app.type.booking_checkin'),
+            self::booking_page => __('qrcode::app.type.booking_page'),
+            self::biolink => __('qrcode::app.type.biolink'),
+            self::review => __('qrcode::app.type.review'),
             default => __('qrcode::app.type.text'),
         };
     }
@@ -84,6 +104,12 @@ enum Type: string
             self::whatsapp => 'badge-info',
             self::wifi => 'badge-warning',
             self::zoom => 'badge-danger',
+            self::property => 'badge-success',
+            self::asset => 'badge-warning',
+            self::booking_checkin => 'badge-primary',
+            self::booking_page => 'badge-info',
+            self::biolink => 'badge-secondary',
+            self::review => 'badge-danger',
             default => 'badge-light',
         };
     }
