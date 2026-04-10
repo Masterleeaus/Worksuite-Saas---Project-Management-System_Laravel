@@ -1,0 +1,21 @@
+{
+    "name": "titanzero/bookingmodule",
+    "description": "Booking management module for TitanZero / Worksuite SAAS",
+    "authors": [
+        {
+            "name": "TitanZero",
+            "email": "dev@titanzero.ai"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {}
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\BookingModule\\": ""
+        }
+    }
+}

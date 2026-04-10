@@ -1,0 +1,19 @@
+{
+    "name": "TitanCore",
+    "alias": "titancore",
+    "description": "Titan Core module (providers, settings, health checks, quotas, adapters).",
+    "keywords": [
+        "ai",
+        "titancore",
+        "providers",
+        "adapters",
+        "health"
+    ],
+    "priority": 10,
+    "providers": [
+        "Modules\\TitanCore\\Providers\\TitanCoreServiceProvider"
+    ],
+    "files": [
+        "start.php"
+    ]
+}

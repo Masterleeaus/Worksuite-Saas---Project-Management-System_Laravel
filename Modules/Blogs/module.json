@@ -1,0 +1,23 @@
+{
+    "name": "Blogs",
+    "alias": "blogs",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Blogs\\Providers\\BlogsServiceProvider",
+        "Modules\\Blogs\\Providers\\EventServiceProvider"
+    ],
+    "files": [
+        "start.php"
+    ],
+    "active": 1,
+    "order": 0,
+    "aliases": {},
+    "requires": [],
+    "permissions": [],
+    "roles_permissions": {
+        "admin": [],
+        "manager": []
+    }
+}

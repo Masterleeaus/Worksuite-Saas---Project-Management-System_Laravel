@@ -1,0 +1,14 @@
+{
+    "name": "CustomerConnect",
+    "alias": "customerconnect",
+    "description": "Multi-channel customer communications: campaign marketing, inbox management, inbound webhooks, SLA monitoring, and TitanZero AI bridge.",
+    "keywords": ["crm", "inbox", "campaigns", "sms", "whatsapp", "telegram", "email", "twilio", "vonage", "marketing"],
+    "order": 0,
+    "version": "5.0.0",
+    "providers": [
+        "Modules\\CustomerConnect\\Providers\\CustomerConnectServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

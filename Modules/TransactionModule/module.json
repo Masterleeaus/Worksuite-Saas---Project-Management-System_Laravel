@@ -1,0 +1,23 @@
+{
+    "name": "TransactionModule",
+    "alias": "transactionmodule",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\TransactionModule\\Providers\\TransactionModuleServiceProvider",
+        "Modules\\TransactionModule\\Providers\\EventServiceProvider"
+    ],
+    "aliases": {},
+    "files": [
+        "start.php"
+    ],
+    "requires": [],
+    "active": 1,
+    "order": 0,
+    "permissions": [],
+    "roles_permissions": {
+        "admin": [],
+        "manager": []
+    }
+}

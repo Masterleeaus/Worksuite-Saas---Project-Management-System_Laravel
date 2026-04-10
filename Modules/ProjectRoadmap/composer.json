@@ -1,0 +1,13 @@
+{
+  "name": "modules/projectroadmap",
+  "description": "ProjectRoadmap Worksuite module (auto-patched)",
+  "type": "library",
+  "autoload": {
+    "psr-4": {
+      "Modules\\ProjectRoadmap\\": ""
+    }
+  },
+  "require": {
+    "php": ">=8.0"
+  }
+}
