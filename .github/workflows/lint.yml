@@ -29,7 +29,7 @@ jobs:
       - name: Check PHP syntax (parallel-lint via find)
         run: |
           ERRORS=$(find app config database routes tests -name "*.php" -print0 \
-            | xargs -0 -P4 php -l 2>&1 \
+            | xargs -0 -r -n1 -P4 php -l 2>&1 \
             | grep -v "No syntax errors detected" || true)
           if [ -n "$ERRORS" ]; then
             echo "PHP syntax errors found:"
