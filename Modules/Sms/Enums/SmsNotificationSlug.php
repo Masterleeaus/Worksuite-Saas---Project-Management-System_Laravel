@@ -71,6 +71,11 @@ enum SmsNotificationSlug: string
     case TwoFactorCode = 'two-factor-code';
     case RemovalRequestRejectUser = 'removal-request-reject-user';
     case RemovalRequestApprovedUser = 'removal-request-approved-user';
+    // Cleaning-specific triggers (CleanSmartOS)
+    case CleanerDispatched = 'cleaner-dispatched';
+    case CleanerCheckedIn = 'cleaner-checked-in';
+    case CleaningJobComplete = 'cleaning-job-complete';
+    case CleaningUpcomingReminder = 'cleaning-upcoming-reminder';
     // phpcs:enable
 
     public function whatsappTemplate(): string
@@ -142,6 +147,10 @@ enum SmsNotificationSlug: string
             self::TwoFactorCode => __($this->translationString(), ['code' => '{{1}}']),
             self::RemovalRequestRejectUser => __($this->translationString()),
             self::RemovalRequestApprovedUser => __($this->translationString()),
+            self::CleanerDispatched => __($this->translationString(), ['client' => '{{1}}', 'cleanerName' => '{{2}}', 'eta' => '{{3}}']),
+            self::CleanerCheckedIn => __($this->translationString(), ['address' => '{{1}}', 'time' => '{{2}}']),
+            self::CleaningJobComplete => __($this->translationString(), ['address' => '{{1}}', 'link' => '{{2}}']),
+            self::CleaningUpcomingReminder => __($this->translationString(), ['time' => '{{1}}']),
             default => __($this->translationString()),
         };
 
@@ -216,6 +225,10 @@ enum SmsNotificationSlug: string
             self::TwoFactorCode => __($this->translationString(), ['code' => '##two_factor_code##']),
             self::RemovalRequestRejectUser => __($this->translationString()),
             self::RemovalRequestApprovedUser => __($this->translationString()),
+            self::CleanerDispatched => __($this->translationString(), ['client' => '##client##', 'cleanerName' => '##cleaner_name##', 'eta' => '##eta##']),
+            self::CleanerCheckedIn => __($this->translationString(), ['address' => '##address##', 'time' => '##time##']),
+            self::CleaningJobComplete => __($this->translationString(), ['address' => '##address##', 'link' => '##link##']),
+            self::CleaningUpcomingReminder => __($this->translationString(), ['time' => '##time##']),
             default => __($this->translationString()),
         };
     }
