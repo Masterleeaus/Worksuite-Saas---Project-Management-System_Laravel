@@ -94,8 +94,6 @@ jobs:
 
       - name: Run migrations
         run: php artisan migrate --force --no-interaction
-        continue-on-error: true
-        # Migrations may reference MySQL-specific features; failures are surfaced but do not block test run
 
       - name: Run tests
         run: php artisan test --no-interaction
