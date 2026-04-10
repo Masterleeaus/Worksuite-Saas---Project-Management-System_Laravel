@@ -11,7 +11,11 @@ class PropertyPhoto extends BaseModel
     public const FILE_PATH = 'property-management/photos';
 
     protected $table = 'pm_property_photos';
-    protected $fillable = ['company_id','user_id','property_id','property_job_id','path','caption'];
+    protected $fillable = ['company_id','user_id','property_id','property_job_id','path','file_path','caption','uploaded_at'];
+
+    protected $casts = [
+        'uploaded_at' => 'datetime',
+    ];
 
     public function property()
     {
