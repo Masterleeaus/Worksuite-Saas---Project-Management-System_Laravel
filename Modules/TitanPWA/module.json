@@ -1,0 +1,26 @@
+{
+    "name": "TitanPWA",
+    "alias": "titanpwa",
+    "description": "Full PWA system for CleanSmartOS — offline-first architecture, service worker, app manifest, background sync, push notifications, and install prompt.",
+    "keywords": [
+        "pwa",
+        "offline",
+        "service-worker",
+        "manifest",
+        "push-notifications",
+        "background-sync",
+        "cleansmartOS"
+    ],
+    "priority": 11,
+    "providers": [
+        "Modules\\TitanPWA\\Providers\\TitanPWAServiceProvider"
+    ],
+    "files": [
+        "start.php"
+    ],
+    "active": 1,
+    "order": 0,
+    "aliases": {},
+    "requires": [],
+    "permissions": []
+}

@@ -1,0 +1,181 @@
+/* =========================================================================
+ * TitanPWA — Offline Indicator, Install Prompt & Update Banner
+ * ========================================================================= */
+
+/* ── Utility ──────────────────────────────────────────────────────────── */
+.titanpwa-hidden {
+    display: none !important;
+}
+
+/* ── Offline / Online status banner ─────────────────────────────────── */
+.titanpwa-offline-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    background: #c0392b;
+    color: #fff;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    line-height: 1.4;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.titanpwa-offline-banner.titanpwa-hidden {
+    display: none !important;
+}
+
+.titanpwa-offline-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.titanpwa-offline-text {
+    flex: 1;
+    font-weight: 600;
+}
+
+.titanpwa-queue-badge {
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 12px;
+    padding: 2px 10px;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+/* ── Connection status dot (always visible, bottom-right) ──────────── */
+.titanpwa-status-dot {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    z-index: 9998;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.85);
+    transition: background-color 0.3s ease;
+}
+
+.titanpwa-status-dot.titanpwa-online  { background-color: #27ae60; }
+.titanpwa-status-dot.titanpwa-offline { background-color: #c0392b; }
+
+/* ── Install Prompt Banner ───────────────────────────────────────────── */
+.titanpwa-install-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9997;
+    background: #1a5276;
+    color: #fff;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.titanpwa-install-banner.titanpwa-hidden {
+    display: none !important;
+}
+
+.titanpwa-install-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.titanpwa-install-icon {
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+
+.titanpwa-install-text {
+    display: flex;
+    flex-direction: column;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.titanpwa-install-text strong {
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.titanpwa-install-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* ── Update Available Banner ─────────────────────────────────────────── */
+.titanpwa-update-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10000;
+    background: #2471a3;
+    color: #fff;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 14px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.titanpwa-update-banner.titanpwa-hidden {
+    display: none !important;
+}
+
+/* ── Shared Button Styles ────────────────────────────────────────────── */
+.titanpwa-btn {
+    border: none;
+    border-radius: 6px;
+    padding: 6px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+    white-space: nowrap;
+}
+
+.titanpwa-btn:hover,
+.titanpwa-btn:focus {
+    opacity: 0.85;
+    outline: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.titanpwa-btn-primary   { background: #27ae60; color: #fff; }
+.titanpwa-btn-secondary { background: rgba(255, 255, 255, 0.2); color: #fff; }
+
+/* ── Responsive ─────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+    .titanpwa-install-banner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .titanpwa-install-actions {
+        align-self: flex-end;
+    }
+
+    .titanpwa-update-banner {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+/* ── Dark-mode overrides ─────────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+    .titanpwa-offline-banner  { background: #922b21; }
+    .titanpwa-install-banner  { background: #154360; }
+    .titanpwa-update-banner   { background: #1a5276; }
+}

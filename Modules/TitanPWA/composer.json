@@ -1,0 +1,19 @@
+{
+    "name": "Modules/TitanPWA",
+    "description": "Full PWA system for CleanSmartOS — offline-first architecture, service worker, app manifest, background sync, push notifications.",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Modules\\TitanPWA\\": ""
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Modules\\TitanPWA\\Providers\\TitanPWAServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
