@@ -37,7 +37,7 @@
                     </td>
                     <td class="text-truncate" style="max-width:320px;">
                         @if($msg->subject)<strong>{{ $msg->subject }}</strong><br>@endif
-                        <small class="text-muted">{{ IlluminateSupportStr::limit(strip_tags($msg->body), 100) }}</small>
+                        <small class="text-muted">{{ \Illuminate\Support\Str::limit(strip_tags($msg->body), 100) }}</small>
                     </td>
                     <td>
                         @php $badgeMap = ['queued'=>'secondary','sent'=>'info','delivered'=>'primary','failed'=>'danger','read'=>'success']; @endphp
