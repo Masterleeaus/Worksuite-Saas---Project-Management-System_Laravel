@@ -127,6 +127,12 @@ class OrderController extends Controller
         $redirect = redirect()->route('fsmcore.orders.show', $order->id)
             ->with('success', 'Order created successfully.');
 
+        // Availability warning (FSMAvailability module optional integration)
+        $availWarning = $this->getAvailabilityWarning($data['person_id'] ?? null, $order);
+        if ($availWarning) {
+            $redirect = $redirect->with('availability_warning', $availWarning);
+        }
+
         // Skill match warning (FSMSkill module optional integration)
         $skillWarning = $this->getSkillMatchWarning($data['person_id'] ?? null, $order->id);
         if ($skillWarning) {
@@ -187,6 +193,12 @@ class OrderController extends Controller
         $redirect = redirect()->route('fsmcore.orders.show', $order->id)
             ->with('success', 'Order updated successfully.');
 
+        // Availability warning (FSMAvailability module optional integration)
+        $availWarning = $this->getAvailabilityWarning($data['person_id'] ?? null, $order);
+        if ($availWarning) {
+            $redirect = $redirect->with('availability_warning', $availWarning);
+        }
+
         // Skill match warning (FSMSkill module optional integration)
         $skillWarning = $this->getSkillMatchWarning($data['person_id'] ?? null, $order->id);
         if ($skillWarning) {
@@ -212,6 +224,33 @@ class OrderController extends Controller
         $order->save();
 
         return response()->json(['ok' => true]);
+    }
+
+    /**
+     * Check whether the assigned worker is available during the order's scheduled window.
+     * Returns a warning message string when FSMAvailability is installed and there are issues,
+     * or null when the module is not present / no issues found.
+     */
+    private function getAvailabilityWarning(?int $userId, FSMOrder $order): ?string
+    {
+        if ($userId === null) {
+            return null;
+        }
+
+        if (!class_exists(\Modules\FSMAvailability\Services\AvailabilityService::class)) {
+            return null;
+        }
+
+        if (!\Illuminate\Support\Facades\Schema::hasTable('fsm_availability_exceptions')) {
+            return null;
+        }
+
+        return app(\Modules\FSMAvailability\Services\AvailabilityService::class)
+            ->getOrderWarning(
+                $userId,
+                $order->scheduled_date_start ? \Carbon\Carbon::parse($order->scheduled_date_start) : null,
+                $order->scheduled_date_end   ? \Carbon\Carbon::parse($order->scheduled_date_end)   : null
+            );
     }
 
     /**
