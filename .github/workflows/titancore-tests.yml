@@ -9,7 +9,7 @@ on:
       - 'Modules/TitanCore/**'
 
 concurrency:
-  group: titancore-${{ github.ref }}
+  group: titancore-tests-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -66,4 +66,4 @@ jobs:
           php artisan key:generate --quiet
 
       - name: Run TitanCore tests
-        run: php artisan test --testsuite=Unit --testsuite=Feature
+        run: php artisan test Modules/TitanCore/Tests
