@@ -4,6 +4,7 @@ namespace Modules\ManagedPremises\Entities;
 
 use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Modules\ManagedPremises\Entities\Concerns\BelongsToCompany;
 
 class Property extends BaseModel
@@ -67,7 +68,7 @@ class Property extends BaseModel
         return $this->hasMany(PropertyMeterReading::class, 'property_id')->orderByDesc('reading_date');
     }
 
-    public function accessDetails(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function accessDetails(): HasOne
     {
         return $this->hasOne(PremiseAccess::class, 'premise_id');
     }

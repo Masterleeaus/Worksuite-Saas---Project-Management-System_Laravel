@@ -63,13 +63,13 @@ return new class extends Migration {
 
             // Alarm and gate codes (secure access)
             if (!Schema::hasColumn('pm_properties', 'alarm_code')) {
-                $table->string('alarm_code', 120)->nullable()->after('lockbox_code');
+                $table->string('alarm_code', 120)->nullable();
             }
             if (!Schema::hasColumn('pm_properties', 'gate_code')) {
-                $table->string('gate_code', 120)->nullable()->after('alarm_code');
+                $table->string('gate_code', 120)->nullable();
             }
             if (!Schema::hasColumn('pm_properties', 'intercom_code')) {
-                $table->string('intercom_code', 120)->nullable()->after('gate_code');
+                $table->string('intercom_code', 120)->nullable();
             }
         });
     }

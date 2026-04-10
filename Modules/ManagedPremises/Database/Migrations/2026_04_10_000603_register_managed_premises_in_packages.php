@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        // Register managed_premises as a module in the modules table (SA module list)
+        // Register managedpremises as a module in the modules table (Super Admin module list)
         if (Schema::hasTable('modules')) {
             $exists = DB::table('modules')->where('module_name', 'managedpremises')->exists();
             if (!$exists) {
