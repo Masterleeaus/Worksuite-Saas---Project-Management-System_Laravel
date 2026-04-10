@@ -23,13 +23,19 @@ class Zone extends Model
     use HasUuid;
 
     protected $casts = [
-        'is_active' => 'integer',
+        'is_active'  => 'integer',
         'coordinates' => Polygon::class,
-
+        'center_lat' => 'float',
+        'center_lng' => 'float',
+        'radius'     => 'integer',
     ];
 
     protected $fillable = [
-        'coordinates'
+        'coordinates',
+        'zone_type',
+        'center_lat',
+        'center_lng',
+        'radius',
     ];
 
     public function scopeOfStatus($query, $status)
