@@ -1,0 +1,19 @@
+{
+  "name": "FSMRecurring",
+  "alias": "fsmrecurring",
+  "description": "FSM Recurring – Recurring Work Order Generation for CleanSmartOS. Extends FSM Orders with frequency-based recurrence, auto-generates next orders on completion.",
+  "keywords": ["fsm", "recurring", "scheduling", "cleansmartOS"],
+  "active": 1,
+  "order": 2,
+  "providers": [
+    "Modules\\FSMRecurring\\Providers\\FSMRecurringServiceProvider",
+    "Modules\\FSMRecurring\\Providers\\RouteServiceProvider",
+    "Modules\\FSMRecurring\\Providers\\EventServiceProvider",
+    "Modules\\FSMRecurring\\Providers\\ConfigServiceProvider",
+    "Modules\\FSMRecurring\\Providers\\ViewServiceProvider"
+  ],
+  "aliases": {},
+  "files": [],
+  "requires": ["FSMCore"],
+  "version": "1.0.0"
+}

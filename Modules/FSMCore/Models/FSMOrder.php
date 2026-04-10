@@ -18,6 +18,7 @@ class FSMOrder extends Model
         'stage_id',
         'template_id',
         'agreement_id',
+        'fsm_recurring_id',
         'priority',
         'color',
         'scheduled_date_start',
@@ -91,5 +92,13 @@ class FSMOrder extends Model
     public function vehicle()
     {
         return $this->belongsTo(\Modules\FSMVehicle\Models\FSMVehicle::class, 'vehicle_id');
+    }
+
+    public function recurringSchedule()
+    {
+        if (!class_exists(\Modules\FSMRecurring\Models\FSMRecurring::class)) {
+            return null;
+        }
+        return $this->belongsTo(\Modules\FSMRecurring\Models\FSMRecurring::class, 'fsm_recurring_id');
     }
 }

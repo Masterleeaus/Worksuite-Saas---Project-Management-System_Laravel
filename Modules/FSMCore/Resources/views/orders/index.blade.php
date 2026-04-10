@@ -53,6 +53,9 @@
             <th>Stage</th>
             <th>Priority</th>
             <th>Scheduled Start</th>
+            @if(class_exists(\Modules\FSMRecurring\Models\FSMRecurring::class) && \Illuminate\Support\Facades\Schema::hasTable('fsm_recurrings'))
+            <th>Recurring</th>
+            @endif
             <th>Actions</th>
         </tr>
         </thead>
@@ -78,6 +81,16 @@
                     @endif
                 </td>
                 <td>{{ $order->scheduled_date_start?->format('d M Y H:i') ?? '—' }}</td>
+                @if(class_exists(\Modules\FSMRecurring\Models\FSMRecurring::class) && \Illuminate\Support\Facades\Schema::hasTable('fsm_recurrings'))
+                <td>
+                    @if($order->fsm_recurring_id ?? null)
+                        <a href="{{ route('fsmrecurring.recurring.show', $order->fsm_recurring_id) }}"
+                           class="badge bg-primary text-decoration-none" title="Part of a recurring schedule">♻</a>
+                    @else
+                        <span class="text-muted">—</span>
+                    @endif
+                </td>
+                @endif
                 <td>
                     <a href="{{ route('fsmcore.orders.edit', $order->id) }}" class="btn btn-sm btn-outline-primary">Edit</a>
                     <form method="POST" action="{{ route('fsmcore.orders.destroy', $order->id) }}" class="d-inline" onsubmit="return confirm('Delete this order?')">
