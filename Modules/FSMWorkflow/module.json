@@ -1,0 +1,19 @@
+{
+  "name": "FSMWorkflow",
+  "alias": "fsmworkflow",
+  "description": "FSM Workflow – Stage-based automation, enriched Kanban cards, and job size/scope classification for CleanSmartOS.",
+  "keywords": ["fsm", "workflow", "automation", "kanban", "size", "cleansmartOS"],
+  "active": 1,
+  "order": 3,
+  "providers": [
+    "Modules\\FSMWorkflow\\Providers\\FSMWorkflowServiceProvider",
+    "Modules\\FSMWorkflow\\Providers\\RouteServiceProvider",
+    "Modules\\FSMWorkflow\\Providers\\EventServiceProvider",
+    "Modules\\FSMWorkflow\\Providers\\ConfigServiceProvider",
+    "Modules\\FSMWorkflow\\Providers\\ViewServiceProvider"
+  ],
+  "aliases": {},
+  "files": [],
+  "requires": ["FSMCore"],
+  "version": "1.0.0"
+}

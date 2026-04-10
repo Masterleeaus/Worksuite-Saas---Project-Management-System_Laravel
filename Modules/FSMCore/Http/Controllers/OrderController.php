@@ -33,6 +33,16 @@ class OrderController extends Controller
         }
         return 'nullable|integer';
     }
+
+    private function getSizes(): \Illuminate\Support\Collection
+    {
+        if (class_exists(\Modules\FSMWorkflow\Models\FSMSize::class)
+            && \Illuminate\Support\Facades\Schema::hasTable('fsm_sizes')
+        ) {
+            return \Modules\FSMWorkflow\Models\FSMSize::active()->orderBy('sequence')->get();
+        }
+        return collect();
+    }
     public function index(Request $request)
     {
         $q = FSMOrder::query()->with(['location', 'person', 'team', 'stage']);
@@ -85,8 +95,9 @@ class OrderController extends Controller
         $tags = FSMTag::orderBy('name')->get();
         $equipment = FSMEquipment::where('active', true)->orderBy('name')->get();
         $vehicles = $this->getVehicles();
+        $sizes = $this->getSizes();
 
-        return view('fsmcore::orders.create', compact('stages', 'locations', 'teams', 'templates', 'tags', 'equipment', 'vehicles'));
+        return view('fsmcore::orders.create', compact('stages', 'locations', 'teams', 'templates', 'tags', 'equipment', 'vehicles', 'sizes'));
     }
 
     public function store(Request $request)
@@ -119,6 +130,18 @@ class OrderController extends Controller
                 'hourly_rate'    => 'nullable|numeric|min:0',
             ]);
             $data = array_merge($data, array_filter($billingData, fn($v) => $v !== null));
+        }
+
+        // FSMWorkflow size fields (optional, only when module is installed)
+        if (class_exists(\Modules\FSMWorkflow\Models\FSMSize::class)
+            && \Illuminate\Support\Facades\Schema::hasColumn('fsm_orders', 'size_id')
+        ) {
+            $sizeData = $request->validate([
+                'size_id'       => 'nullable|integer|exists:fsm_sizes,id',
+                'estimated_sqm' => 'nullable|integer|min:0',
+                'room_count'    => 'nullable|integer|min:0',
+            ]);
+            $data = array_merge($data, array_filter($sizeData, fn($v) => $v !== null));
         }
         $last = FSMOrder::max('id') ?? 0;
         $prefix = config('fsmcore.order_reference_prefix', 'ORD');
@@ -177,8 +200,9 @@ class OrderController extends Controller
         $tags = FSMTag::orderBy('name')->get();
         $equipment = FSMEquipment::where('active', true)->orderBy('name')->get();
         $vehicles = $this->getVehicles();
+        $sizes = $this->getSizes();
 
-        return view('fsmcore::orders.edit', compact('order', 'stages', 'locations', 'teams', 'templates', 'tags', 'equipment', 'vehicles'));
+        return view('fsmcore::orders.edit', compact('order', 'stages', 'locations', 'teams', 'templates', 'tags', 'equipment', 'vehicles', 'sizes'));
     }
 
     public function update(Request $request, int $id)
@@ -215,6 +239,18 @@ class OrderController extends Controller
                 'hourly_rate'    => 'nullable|numeric|min:0',
             ]);
             $data = array_merge($data, array_filter($billingData, fn($v) => $v !== null));
+        }
+
+        // FSMWorkflow size fields (optional, only when module is installed)
+        if (class_exists(\Modules\FSMWorkflow\Models\FSMSize::class)
+            && \Illuminate\Support\Facades\Schema::hasColumn('fsm_orders', 'size_id')
+        ) {
+            $sizeData = $request->validate([
+                'size_id'       => 'nullable|integer|exists:fsm_sizes,id',
+                'estimated_sqm' => 'nullable|integer|min:0',
+                'room_count'    => 'nullable|integer|min:0',
+            ]);
+            $data = array_merge($data, array_filter($sizeData, fn($v) => $v !== null));
         }
         $order->equipment()->sync($data['equipment_ids'] ?? []);
         $order->tags()->sync($data['tag_ids'] ?? []);

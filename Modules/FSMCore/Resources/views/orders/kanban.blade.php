@@ -6,12 +6,22 @@
     <div class="d-flex gap-2">
         <a href="{{ route('fsmcore.orders.index') }}" class="btn btn-outline-secondary">List View</a>
         <a href="{{ route('fsmcore.orders.create') }}" class="btn btn-success">+ New Order</a>
+        @if(class_exists(\Modules\FSMWorkflow\Http\Controllers\KanbanConfigController::class))
+            <a href="{{ route('fsmworkflow.kanban_config.index') }}" class="btn btn-outline-secondary" title="Configure Kanban card fields"><i class="fas fa-cog"></i></a>
+        @endif
     </div>
 </div>
 
+@php
+    // Load kanban config once (FSMWorkflow optional integration)
+    $kanbanCfg = class_exists(\Modules\FSMWorkflow\Models\FSMKanbanConfig::class)
+        ? \Modules\FSMWorkflow\Models\FSMKanbanConfig::forTeam(null)
+        : null;
+@endphp
+
 <div class="d-flex gap-3 overflow-auto pb-3" id="kanban-board" style="align-items: flex-start;">
     @foreach($stages as $stage)
-        <div class="kanban-column flex-shrink-0" style="width:260px;" data-stage-id="{{ $stage->id }}">
+        <div class="kanban-column flex-shrink-0" style="width:280px;" data-stage-id="{{ $stage->id }}">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center"
                      style="border-top: 4px solid {{ $stage->color ?? '#6c757d' }};">
@@ -36,6 +46,9 @@
                                 @endif
                                 @if($order->scheduled_date_start)
                                     <div class="small text-muted"><i class="fas fa-clock"></i> {{ $order->scheduled_date_start->format('d M H:i') }}</div>
+                                @endif
+                                @if($kanbanCfg)
+                                    @include('fsmworkflow::partials.kanban_card_extras', ['order' => $order, 'cfg' => $kanbanCfg])
                                 @endif
                             </div>
                         </div>
@@ -80,3 +93,4 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 @endsection
+
