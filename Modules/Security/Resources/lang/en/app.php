@@ -15,4 +15,8 @@ return [
     'access_log_details' => 'Access Log Details',
     'denied_access_attempts' => 'Denied Access Attempts',
     'activity_summary' => 'Activity Summary',
+    'security' => 'Security',
+    'modules' => [
+        'security' => 'Security',
+    ],
 ];
