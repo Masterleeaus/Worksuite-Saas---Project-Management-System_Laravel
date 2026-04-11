@@ -76,6 +76,7 @@ enum SmsNotificationSlug: string
     case CleanerCheckedIn = 'cleaner-checked-in';
     case CleaningJobComplete = 'cleaning-job-complete';
     case CleaningUpcomingReminder = 'cleaning-upcoming-reminder';
+    case ReviewRequest = 'review-request';
     // phpcs:enable
 
     public function whatsappTemplate(): string
@@ -151,6 +152,7 @@ enum SmsNotificationSlug: string
             self::CleanerCheckedIn => __($this->translationString(), ['address' => '{{1}}', 'time' => '{{2}}']),
             self::CleaningJobComplete => __($this->translationString(), ['address' => '{{1}}', 'link' => '{{2}}']),
             self::CleaningUpcomingReminder => __($this->translationString(), ['time' => '{{1}}']),
+            self::ReviewRequest => __($this->translationString(), ['name' => '{{1}}', 'link' => '{{2}}']),
             default => __($this->translationString()),
         };
 
@@ -229,6 +231,7 @@ enum SmsNotificationSlug: string
             self::CleanerCheckedIn => __($this->translationString(), ['address' => '##address##', 'time' => '##time##']),
             self::CleaningJobComplete => __($this->translationString(), ['address' => '##address##', 'link' => '##link##']),
             self::CleaningUpcomingReminder => __($this->translationString(), ['time' => '##time##']),
+            self::ReviewRequest => __($this->translationString(), ['name' => '##name##', 'link' => '##link##']),
             default => __($this->translationString()),
         };
     }

@@ -15,8 +15,12 @@ Route::middleware(['web', 'auth'])->prefix('account')->group(function () {
     });
 });
 
-// Public tokenised review submission — no authentication required
-Route::middleware(['web'])->prefix('account')->group(function () {
-    Route::get('review/submit/{token}', [ReviewController::class, 'publicForm'])->name('reviews.public_form');
-    Route::post('review/submit/{token}', [ReviewController::class, 'publicStore'])->name('reviews.public_store');
+// Public routes — no authentication required
+Route::middleware(['web'])->group(function () {
+    // Tokenised review submission link (sent via email/SMS)
+    Route::get('account/review/submit/{token}', [ReviewController::class, 'publicForm'])->name('reviews.public_form');
+    Route::post('account/review/submit/{token}', [ReviewController::class, 'publicStore'])->name('reviews.public_store');
+
+    // Embeddable review widget — public page showing published reviews
+    Route::get('reviews/widget/{companyId?}', [ReviewController::class, 'widget'])->name('reviews.widget');
 });

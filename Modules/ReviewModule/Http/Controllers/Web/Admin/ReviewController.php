@@ -5,7 +5,9 @@ namespace Modules\ReviewModule\Http\Controllers\Web\Admin;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Modules\ReviewModule\Entities\Review;
 use Modules\ReviewModule\Entities\ReviewReply;
 
@@ -101,17 +103,59 @@ class ReviewController extends Controller
 
     /**
      * Publish a review (makes it visible publicly).
+     * Auto-promotes 5-star reviews as Testimonials.
      */
     public function publish(Request $request, $id)
     {
         abort_if(user()->permission('publish_review') == 'none', 403);
 
-        $review = $this->review->findOrFail($id);
+        $review = $this->review->with(['customer', 'service'])->findOrFail($id);
         $review->moderation_status = 'published';
         $review->is_active = 1;
         $review->save();
 
+        // Auto-create Testimonial for 5-star published reviews
+        if ($review->review_rating >= 5) {
+            $this->promoteToTestimonial($review);
+        }
+
         return response()->json(['status' => 'success', 'message' => __('reviewmodule::modules.review_published')]);
+    }
+
+    /**
+     * Promote a 5-star review to a Testimonial (guarded inter-module call).
+     */
+    private function promoteToTestimonial($review): void
+    {
+        if (!class_exists(\Modules\Testimonials\app\Models\Testimonial::class)) {
+            return;
+        }
+
+        try {
+            $exists = \Modules\Testimonials\app\Models\Testimonial::where('source', 'review')
+                ->where('source_id', $review->id)
+                ->exists();
+
+            if ($exists) {
+                return;
+            }
+
+            \Modules\Testimonials\app\Models\Testimonial::create([
+                'company_id'    => $review->company_id ?? (user()->company_id ?? null),
+                'client_name'   => $review->customer?->name ?? $review->customer?->f_name ?? 'Customer',
+                'customer_name' => $review->customer?->name ?? $review->customer?->f_name ?? 'Customer',
+                'description'   => $review->review_comment ?? '',
+                'content'       => $review->review_comment ?? '',
+                'star_rating'   => $review->review_rating,
+                'status'        => true,
+                'is_published'  => false, // requires explicit publish by admin
+                'source'        => 'review',
+                'source_id'     => $review->id,
+                'booking_id'    => $review->booking_id,
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('ReviewModule: testimonial promotion failed', ['error' => $e->getMessage()]);
+        }
     }
 
     /**
@@ -191,6 +235,32 @@ class ReviewController extends Controller
     }
 
     /**
+     * Public embeddable review widget — shows published reviews for a company.
+     * Embed via iframe: <iframe src="/reviews/widget/{companyId}" ...></iframe>
+     */
+    public function widget($companyId = null)
+    {
+        $query = $this->review
+            ->with(['customer', 'reviewReply'])
+            ->where('moderation_status', 'published')
+            ->where('is_active', 1)
+            ->orderBy('created_at', 'desc')
+            ->limit(20);
+
+        if ($companyId) {
+            $query->where('company_id', $companyId);
+        }
+
+        $reviews    = $query->get();
+        $avgRating  = round($reviews->avg('review_rating'), 1);
+        $totalCount = $reviews->count();
+
+        return response()
+            ->view('reviewmodule::public.widget', compact('reviews', 'avgRating', 'totalCount', 'companyId'))
+            ->header('X-Frame-Options', 'ALLOWALL');
+    }
+
+    /**
      * Store public review submission.
      */
     public function publicStore(Request $request, $token)
@@ -220,6 +290,83 @@ class ReviewController extends Controller
         $review->submitted_at         = now();
         $review->save();
 
+        // Update provider avg_rating
+        $this->updateProviderRating($review->provider_id);
+
+        // Auto-create complaint for negative reviews (< 3 stars)
+        if ($request->review_rating < 3) {
+            $this->createComplaintForNegativeReview($review);
+        }
+
         return view('reviewmodule::public.thankyou', compact('review'));
+    }
+
+    /**
+     * Update provider's avg_rating from all submitted reviews.
+     */
+    private function updateProviderRating(?string $providerId): void
+    {
+        if (!$providerId) {
+            return;
+        }
+
+        if (!class_exists(\Modules\ProviderManagement\Entities\Provider::class)) {
+            return;
+        }
+
+        try {
+            $ratingData = DB::table('reviews')
+                ->where('provider_id', $providerId)
+                ->whereNotNull('submitted_at')
+                ->selectRaw('COUNT(*) as count, AVG(review_rating) as avg')
+                ->first();
+
+            if ($ratingData && $ratingData->count > 0) {
+                \Modules\ProviderManagement\Entities\Provider::where('id', $providerId)->update([
+                    'rating_count' => $ratingData->count,
+                    'avg_rating'   => round($ratingData->avg, 2),
+                ]);
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('ReviewModule: provider rating update failed', ['error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Auto-create a complaint record when a review is < 3 stars.
+     * Guarded — Complaint module may not be installed.
+     */
+    private function createComplaintForNegativeReview($review): void
+    {
+        if (!class_exists(\Modules\Complaint\Entities\Complaint::class)) {
+            return;
+        }
+
+        if ($review->complaint_created) {
+            return;
+        }
+
+        try {
+            $subject = 'Low Review: ' . $review->review_rating . '/5 stars';
+            if ($review->review_comment) {
+                $subject .= ' — ' . \Illuminate\Support\Str::limit($review->review_comment, 80);
+            }
+
+            \Modules\Complaint\Entities\Complaint::create([
+                'company_id'      => $review->company_id ?? null,
+                'user_id'         => $review->customer_id ?? null,
+                'subject'         => $subject,
+                'status'          => 'open',
+                'priority'        => $review->review_rating == 1 ? 'urgent' : 'high',
+                'complaint_number' => rand(100000, 999999),
+                'no_hp'           => '',
+                'added_by'        => $review->customer_id ?? null,
+            ]);
+
+            $review->complaint_created = true;
+            $review->save();
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('ReviewModule: complaint creation failed', ['error' => $e->getMessage()]);
+        }
     }
 }

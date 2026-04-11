@@ -65,4 +65,10 @@ return [
     'two-factor-code' => 'Your two factor code is :code' . "\n" . 'This code will expire in 10 minutes.' . "\n" . 'If you have not tried to login, ignore this message.',
     'removal-request-reject-user' => 'Removal Request Rejected' . "\n" . 'Your removal request has been rejected',
     'removal-request-approved-user' => 'Removal Request Approval' . "\n" . 'Your removal request has been approved',
+    // Cleaning-specific notifications
+    'cleaner-dispatched' => 'Hi :client, your cleaner :cleanerName is on the way. ETA: :eta.',
+    'cleaner-checked-in' => 'Your cleaner has arrived at :address at :time.',
+    'cleaning-job-complete' => 'Your cleaning at :address is complete. Leave a review: :link',
+    'cleaning-upcoming-reminder' => 'Reminder: Your cleaning is scheduled for :time.',
+    'review-request' => 'Hi :name, how was your recent clean? We\'d love your feedback! Leave a review: :link',
 ];

@@ -3,8 +3,9 @@
 namespace Modules\ReviewModule\Providers;
 
 use Modules\ReviewModule\Console\ActivateModuleCommand;
+use Modules\ReviewModule\Console\SendReviewRequestsCommand;
+use Modules\ReviewModule\Observers\BookingObserver;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Database\Eloquent\Factory;
 
 class ReviewModuleServiceProvider extends ServiceProvider
 {
@@ -28,6 +29,7 @@ class ReviewModuleServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 ActivateModuleCommand::class,
+                SendReviewRequestsCommand::class,
             ]);
         }
 
@@ -35,6 +37,11 @@ class ReviewModuleServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
+
+        // Register booking observer (guarded — BookingModule may not be installed)
+        if (class_exists(\Modules\BookingModule\Entities\Booking::class)) {
+            \Modules\BookingModule\Entities\Booking::observe(BookingObserver::class);
+        }
     }
 
     /**
