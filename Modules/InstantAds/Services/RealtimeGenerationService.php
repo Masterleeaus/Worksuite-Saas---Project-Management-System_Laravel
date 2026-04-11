@@ -122,7 +122,7 @@ class RealtimeGenerationService
                 str_contains($contentType, 'webp') => 'webp',
                 default                            => 'jpg',
             };
-            $directory   = $userId ? "media/images/u-{$userId}" : 'guest';
+            $directory   = $userId ? "media/images/u-{$userId}" : 'media/images/guest';
             $filename    = $directory . '/' . uniqid('rt_', true) . '.' . $extension;
 
             Storage::disk('public')->put($filename, $fileContent);
