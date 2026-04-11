@@ -19,6 +19,11 @@ return new class extends Migration
         if (! Schema::hasTable('bookings')) {
             return;
         }
+
+        if (Schema::hasColumn('bookings', 'service_location')) {
+            return;
+        }
+
         Schema::table('bookings', function (Blueprint $table) {
             $table->string('service_location')->default('customer')->comment('customer,provider');
         });

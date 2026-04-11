@@ -19,9 +19,13 @@ return new class extends Migration
         if (! Schema::hasTable('bookings')) {
             return;
         }
+
+        if (Schema::hasColumn('bookings', 'service_address_location')) {
+            return;
+        }
+
         Schema::table('bookings', function (Blueprint $table) {
             $table->text('service_address_location')->nullable();
-
         });
     }
 
