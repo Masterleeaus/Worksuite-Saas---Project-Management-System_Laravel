@@ -62,6 +62,8 @@
 
     <div class="row g-3">
         @foreach([
+            ['route' => 'titanagents.chatbot.builder', 'icon' => 'ti-layout-grid', 'label' => 'Builder', 'desc' => 'Visual chatbot builder & embed code'],
+            ['route' => 'titanagents.chatbot.inbox.index', 'icon' => 'ti-inbox', 'label' => 'Inbox', 'desc' => 'View all conversations'],
             ['route' => 'titanagents.chatbot.analytics.index', 'icon' => 'ti-chart-bar', 'label' => 'Analytics', 'desc' => 'View conversation stats'],
             ['route' => 'titanagents.chatbot.channels.index', 'icon' => 'ti-git-branch', 'label' => 'Channels', 'desc' => 'Configure deployment channels'],
             ['route' => 'titanagents.chatbot.kb.index', 'icon' => 'ti-books', 'label' => 'Knowledge Base', 'desc' => 'Manage KB articles'],

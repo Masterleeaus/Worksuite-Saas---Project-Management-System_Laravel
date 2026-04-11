@@ -55,6 +55,16 @@ Route::middleware(['web', 'auth'])->prefix('account/chatbots')->name('titanagent
     Route::get('/{chatbot}/customers', [ChatbotCustomerController::class, 'index'])->name('customers.index');
     Route::get('/{chatbot}/customers/{customer}', [ChatbotCustomerController::class, 'show'])->name('customers.show');
     Route::delete('/{chatbot}/customers/{customer}', [ChatbotCustomerController::class, 'destroy'])->name('customers.destroy');
+
+    // Builder
+    Route::get('/{chatbot}/builder', [\Modules\TitanAgents\Http\Controllers\Chatbot\ChatbotBuilderController::class, 'show'])->name('builder');
+    Route::put('/{chatbot}/builder', [\Modules\TitanAgents\Http\Controllers\Chatbot\ChatbotBuilderController::class, 'update'])->name('builder.update');
+
+    // Conversation Inbox
+    Route::get('/{chatbot}/inbox', [\Modules\TitanAgents\Http\Controllers\Chatbot\ConversationInboxController::class, 'index'])->name('inbox.index');
+    Route::get('/{chatbot}/inbox/{conversation}', [\Modules\TitanAgents\Http\Controllers\Chatbot\ConversationInboxController::class, 'show'])->name('inbox.show');
+    Route::post('/{chatbot}/inbox/{conversation}/resolve', [\Modules\TitanAgents\Http\Controllers\Chatbot\ConversationInboxController::class, 'resolve'])->name('inbox.resolve');
+    Route::post('/{chatbot}/inbox/{conversation}/escalate', [\Modules\TitanAgents\Http\Controllers\Chatbot\ConversationInboxController::class, 'escalate'])->name('inbox.escalate');
 });
 
 // Public API routes (no auth required — embed widget)
@@ -64,3 +74,7 @@ Route::prefix('api/chatbot')->name('chatbot.api.')->group(function () {
     Route::post('/message', [ChatbotApiController::class, 'sendMessage'])->name('message');
     Route::get('/widget/{chatbotId}/canned', [ChatbotApiController::class, 'getCannedResponses'])->name('canned');
 });
+
+// Public widget frame (served in iframe)
+Route::get('/chatbot-widget/{chatbotId}/frame', [\Modules\TitanAgents\Http\Controllers\Chatbot\ChatbotPublicWidgetController::class, 'frame'])
+    ->name('chatbot.widget.frame');
