@@ -96,9 +96,11 @@ class AiImagePro extends Model
 
         if ($like) {
             $like->delete();
-            if ($this->likes_count > 0) {
-                $this->decrement('likes_count');
-            }
+            \Illuminate\Support\Facades\DB::table('ai_image_pro')
+                ->where('id', $this->id)
+                ->where('likes_count', '>', 0)
+                ->decrement('likes_count');
+            $this->refresh();
             return false;
         }
 

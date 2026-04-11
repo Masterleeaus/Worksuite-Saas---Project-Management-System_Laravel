@@ -324,7 +324,6 @@ class InstantAdsController extends Controller
             return ['allowed' => false, 'current' => $current, 'limit' => $limit];
         }
 
-        Cache::increment($key);
         Cache::put($key, $current + $count, now()->endOfDay());
 
         return ['allowed' => true, 'current' => $current + $count, 'limit' => $limit];

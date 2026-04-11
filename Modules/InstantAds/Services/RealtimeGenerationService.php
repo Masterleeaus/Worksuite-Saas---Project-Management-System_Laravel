@@ -62,8 +62,7 @@ class RealtimeGenerationService
     private function generateViaTogether(AiImagePro $record, string $prompt): AiImagePro
     {
         $response = Http::withHeaders([
-            'Authorization'     => 'Bearer ' . $this->getApiKey(),
-            'x-ratelimit-limit' => 10,
+            'Authorization' => 'Bearer ' . $this->getApiKey(),
         ])->post(self::API_URL, [
             'prompt' => $prompt,
             'model'  => self::DEFAULT_MODEL,
@@ -117,8 +116,14 @@ class RealtimeGenerationService
             }
 
             $fileContent = $response->body();
+            $contentType = $response->header('Content-Type') ?? 'image/jpeg';
+            $extension   = match (true) {
+                str_contains($contentType, 'png')  => 'png',
+                str_contains($contentType, 'webp') => 'webp',
+                default                            => 'jpg',
+            };
             $directory   = $userId ? "media/images/u-{$userId}" : 'guest';
-            $filename    = $directory . '/' . uniqid('rt_', true) . '.jpeg';
+            $filename    = $directory . '/' . uniqid('rt_', true) . '.' . $extension;
 
             Storage::disk('public')->put($filename, $fileContent);
 
