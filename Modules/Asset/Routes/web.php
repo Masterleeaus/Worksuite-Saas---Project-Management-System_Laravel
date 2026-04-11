@@ -1,10 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Asset\Http\Controllers\AssetAllocationController;
 use Modules\Asset\Http\Controllers\AssetController;
-use Modules\Asset\Http\Controllers\AssetTypeController;
 use Modules\Asset\Http\Controllers\AssetHistoryController;
+use Modules\Asset\Http\Controllers\AssetMaintenanceController;
+use Modules\Asset\Http\Controllers\AssetScanController;
 use Modules\Asset\Http\Controllers\AssetSettingController;
+use Modules\Asset\Http\Controllers\AssetTypeController;
+use Modules\Asset\Http\Controllers\RevokeAllocatedAssetController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,7 +36,24 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
         ]);
 
         Route::resource('asset-type', AssetTypeController::class);
+
+        // Maintenance schedule routes
+        Route::resource('asset-maintenances', AssetMaintenanceController::class);
+
+        // Asset allocation (assignment to cleaner/vehicle)
+        Route::resource('asset-allocations', AssetAllocationController::class);
+        Route::resource('asset-revocations', RevokeAllocatedAssetController::class);
+
+        // QR scan quick-actions
+        Route::get('/scan/{asset}', [AssetScanController::class, 'show'])->name('assets.scan');
+        Route::post('/scan/{asset}/issue', [AssetScanController::class, 'issue'])->name('assets.scan.issue');
+        Route::post('/scan/{asset}/return', [AssetScanController::class, 'returnAsset'])->name('assets.scan.return');
+        Route::post('/scan/{asset}/report', [AssetScanController::class, 'report'])->name('assets.scan.report');
+        Route::post('/scan/{asset}/send-to-maintenance', [AssetScanController::class, 'sendToMaintenance'])->name('assets.scan.send-to-maintenance');
+        Route::post('/scan/{asset}/complete-maintenance', [AssetScanController::class, 'completeMaintenance'])->name('assets.scan.complete-maintenance');
+        Route::post('/scan/{asset}/allocate', [AssetScanController::class, 'allocate'])->name('assets.scan.allocate');
+        Route::post('/scan/{asset}/revoke-allocation', [AssetScanController::class, 'revokeAllocation'])->name('assets.scan.revoke-allocation');
     });
-    
+
     Route::resource('/asset-setting', AssetSettingController::class);
 });
