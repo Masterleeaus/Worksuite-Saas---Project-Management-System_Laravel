@@ -7,6 +7,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
 use Modules\Performance\Console\ActivateModuleCommand;
 use Modules\Performance\Console\CheckInReminderCommand;
+use Modules\Performance\Console\ComputeKpiScoresCommand;
 use Modules\Performance\Console\SetObjectiveStatusCommand;
 
 class PerformanceServiceProvider extends ServiceProvider
@@ -50,6 +51,7 @@ class PerformanceServiceProvider extends ServiceProvider
             ActivateModuleCommand::class,
             CheckInReminderCommand::class,
             SetObjectiveStatusCommand::class,
+            ComputeKpiScoresCommand::class,
         ]);
     }
 
@@ -63,6 +65,7 @@ class PerformanceServiceProvider extends ServiceProvider
             // $schedule->command('inspire')->hourly();
             $schedule->command('performance:send-check-in-reminder')->dailyAt('00:05');
             $schedule->command('performance:set-objective-status')->dailyAt('00:05');
+            $schedule->command('performance:compute-kpi-scores')->dailyAt('01:00');
         });
     }
 

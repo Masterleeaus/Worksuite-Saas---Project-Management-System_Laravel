@@ -42,6 +42,7 @@ class BiometricServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->register(RouteServiceProvider::class);
+        $this->app->singleton(\Modules\Biometric\Services\GeofenceService::class);
     }
 
     /**

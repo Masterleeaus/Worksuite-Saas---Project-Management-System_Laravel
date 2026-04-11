@@ -302,3 +302,5 @@ $projectArchived = $project->trashed();
         *******************************************************/
     </script>
 @endpush
+
+@stack('project-team-performance')
