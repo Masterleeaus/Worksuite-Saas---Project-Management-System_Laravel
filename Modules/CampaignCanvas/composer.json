@@ -1,0 +1,15 @@
+{
+    "name": "nwidart/campaigncanvas",
+    "description": "CampaignCanvas module for Worksuite",
+    "authors": [{"name": "Worksuite"}],
+    "extra": {
+        "laravel": {
+            "providers": ["Modules\\CampaignCanvas\\Providers\\CampaignCanvasServiceProvider"]
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\CampaignCanvas\\": ""
+        }
+    }
+}

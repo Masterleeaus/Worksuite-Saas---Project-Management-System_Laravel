@@ -1,0 +1,33 @@
+{
+  "name": "CampaignCanvas",
+  "alias": "campaigncanvas",
+  "description": "Drag-and-drop visual design compositor for marketing campaigns and social media graphics.",
+  "keywords": ["canvas", "design", "campaign", "social-media", "graphics"],
+  "active": 1,
+  "order": 0,
+  "version": "1.0.0",
+  "providers": [
+    "Modules\\CampaignCanvas\\Providers\\CampaignCanvasServiceProvider"
+  ],
+  "aliases": {},
+  "files": [],
+  "requires": [],
+  "permissions": [
+    "view_campaigncanvas",
+    "manage_campaigncanvas"
+  ],
+  "roles_permissions": {
+    "admin": ["view_campaigncanvas", "manage_campaigncanvas"],
+    "manager": ["view_campaigncanvas", "manage_campaigncanvas"],
+    "employee": ["view_campaigncanvas"]
+  },
+  "menus": [
+    {
+      "panel": "user",
+      "label": "Campaign Canvas",
+      "route": "campaigncanvas.gallery.index",
+      "sort_order": 70
+    }
+  ],
+  "sidebar_menu": true
+}
