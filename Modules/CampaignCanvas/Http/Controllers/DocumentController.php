@@ -28,14 +28,11 @@ class DocumentController extends AccountBaseController
     {
         $doc = $this->findOwned($uuid);
 
-        $doc->updateOrCreate(
-            ['uuid' => $uuid],
-            array_filter([
-                'name'    => $request->input('name', $doc->name),
-                'payload' => $request->input('payload', $doc->payload),
-                'preview' => $request->input('preview', $doc->preview),
-            ], fn($v) => $v !== null)
-        );
+        $doc->update(array_filter([
+            'name'    => $request->input('name', $doc->name),
+            'payload' => $request->input('payload', $doc->payload),
+            'preview' => $request->input('preview', $doc->preview),
+        ], fn($v) => $v !== null));
 
         $doc->refresh();
 
