@@ -1,13 +1,41 @@
 {
     "name": "Biolinks",
     "alias": "biolinks",
-    "description": "",
-    "keywords": [],
+    "description": "Social link page — centralised link hub for booking, reviews, social media and contact",
+    "keywords": ["biolinks", "linktree", "social", "links"],
     "priority": 0,
     "providers": [
         "Modules\\Biolinks\\Providers\\BiolinksServiceProvider",
         "Modules\\Biolinks\\Providers\\EventServiceProvider"
-
     ],
-    "files": []
+    "aliases": {},
+    "files": [],
+    "requires": [],
+    "active": 1,
+    "order": 0,
+    "permissions": [
+        "view_biolinks",
+        "add_biolinks",
+        "edit_biolinks",
+        "delete_biolinks",
+        "manage_biolinks"
+    ],
+    "roles_permissions": {
+        "admin": [
+            "view_biolinks",
+            "add_biolinks",
+            "edit_biolinks",
+            "delete_biolinks",
+            "manage_biolinks"
+        ]
+    },
+    "menus": [
+        {
+            "panel": "user",
+            "label": "Social Links",
+            "route": "biolinks.index",
+            "sort_order": 97
+        }
+    ],
+    "sidebar_menu": true
 }
