@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('titanhello_call_notes')) {
+            return;
+        }
         Schema::create('titanhello_call_notes', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('call_id');

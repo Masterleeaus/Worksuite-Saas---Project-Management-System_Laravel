@@ -8,6 +8,9 @@ return new class extends Migration {
     public function up(): void
     {
         // Per-booking NPS/rating survey instances (one row per survey sent to a client)
+        if (Schema::hasTable('nps_surveys')) {
+            return;
+        }
         Schema::create('nps_surveys', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('client_id');

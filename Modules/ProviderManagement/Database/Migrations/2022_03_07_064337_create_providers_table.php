@@ -13,6 +13,9 @@ class CreateProvidersTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('providers')) {
+            return;
+        }
         Schema::create('providers', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();

@@ -4,6 +4,9 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
   public function up(){
+    if (Schema::hasTable('ai_kb_chunks')) {
+        return;
+    }
     Schema::create('ai_kb_chunks', function(Blueprint $t){
       $t->bigIncrements('id');
       $t->unsignedBigInteger('document_id');

@@ -13,6 +13,9 @@ class TnxAdd extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('transactions')) {
+            return;
+        }
         Schema::create('transactions', function (Blueprint $table) {
             $table->uuid('id')->primary()->index();
             $table->unsignedBigInteger('company_id')->nullable()->index();

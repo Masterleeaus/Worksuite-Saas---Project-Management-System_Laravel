@@ -13,6 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('salary_group_components')) {
+            return;
+        }
         Schema::create('salary_group_components', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('salary_group_id');

@@ -4,6 +4,9 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
   public function up(){
+    if (Schema::hasTable('ai_usage_ledger')) {
+        return;
+    }
     Schema::create('ai_usage_ledger', function(Blueprint $t){
       $t->bigIncrements('id');
       $t->unsignedBigInteger('tenant_id')->nullable();

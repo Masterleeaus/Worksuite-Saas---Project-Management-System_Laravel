@@ -16,6 +16,9 @@ return new class extends Migration
     {
         \App\Models\Module::validateVersion(BookingModuleSetting::MODULE_NAME);
 
+        if (Schema::hasTable('booking_repeat_histories')) {
+            return;
+        }
         Schema::create('booking_repeat_histories', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();

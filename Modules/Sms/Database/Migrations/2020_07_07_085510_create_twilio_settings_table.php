@@ -16,6 +16,9 @@ return new class extends Migration
     {
         \App\Models\Module::validateVersion(SmsSetting::MODULE_NAME);
 
+        if (Schema::hasTable('sms_settings')) {
+            return;
+        }
         Schema::create('sms_settings', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();

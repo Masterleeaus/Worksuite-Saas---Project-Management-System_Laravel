@@ -13,6 +13,9 @@ class CreateChannelListsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('channel_lists')) {
+            return;
+        }
         Schema::create('channel_lists', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();

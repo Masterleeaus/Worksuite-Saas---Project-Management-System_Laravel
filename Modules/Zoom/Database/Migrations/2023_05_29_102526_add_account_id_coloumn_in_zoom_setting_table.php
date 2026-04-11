@@ -14,6 +14,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('zoom_setting')) {
+            return;
+        }
         Schema::table('zoom_setting', function (Blueprint $table) {
             $table->string('account_id')->nullable();
             $table->string('meeting_client_id')->nullable();

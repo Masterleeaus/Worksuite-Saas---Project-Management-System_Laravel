@@ -12,6 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('categories')) {
+            return;
+        }
         Schema::table('categories', function (Blueprint $table) {
             $table->string('slug')->nullable()->after('name');
         });

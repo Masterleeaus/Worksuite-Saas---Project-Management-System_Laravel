@@ -13,6 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('zoom_setting')) {
+            return;
+        }
         Schema::table('zoom_setting', function (Blueprint $table) {
             $table->string('meeting_app')->default('in_app');
         });

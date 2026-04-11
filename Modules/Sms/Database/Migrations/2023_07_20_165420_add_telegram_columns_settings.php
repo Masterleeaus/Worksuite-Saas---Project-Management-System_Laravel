@@ -13,6 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('sms_settings')) {
+            return;
+        }
         Schema::table('sms_settings', function (Blueprint $table) {
             $table->string('telegram_bot_name')->nullable()->after('telegram_bot_token');
         });

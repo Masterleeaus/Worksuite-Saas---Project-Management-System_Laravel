@@ -13,6 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('payroll_settings')) {
+            return;
+        }
         Schema::create('payroll_settings', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('tds_salary');

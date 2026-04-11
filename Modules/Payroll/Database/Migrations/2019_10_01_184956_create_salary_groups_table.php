@@ -16,6 +16,9 @@ return new class extends Migration
     {
         \App\Models\Module::validateVersion(PayrollSetting::MODULE_NAME);
 
+        if (Schema::hasTable('salary_groups')) {
+            return;
+        }
         Schema::create('salary_groups', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('group_name');

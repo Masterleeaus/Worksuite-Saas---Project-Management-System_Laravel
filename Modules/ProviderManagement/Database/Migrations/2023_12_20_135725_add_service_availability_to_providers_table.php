@@ -13,6 +13,9 @@ class AddServiceAvailabilityToProvidersTable extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('providers')) {
+            return;
+        }
         Schema::table('providers', function (Blueprint $table) {
             $table->boolean('service_availability')->default(1);
         });

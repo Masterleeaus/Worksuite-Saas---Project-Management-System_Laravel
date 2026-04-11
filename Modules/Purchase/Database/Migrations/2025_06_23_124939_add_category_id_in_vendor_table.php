@@ -13,6 +13,9 @@ return new class extends Migration
     {
 
         // purchase_vendors in this table add category_id
+        if (! Schema::hasTable('purchase_vendors')) {
+            return;
+        }
         Schema::table('purchase_vendors', function (Blueprint $table) {
             $table->integer('category_id')->unsigned()->nullable();
             $table->foreign('category_id')->references('id')->on('purchase_vendor_categories')->onDelete('set null');

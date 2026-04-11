@@ -13,6 +13,9 @@ class CreateCategoryZoneTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('category_zone')) {
+            return;
+        }
         Schema::create('category_zone', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();

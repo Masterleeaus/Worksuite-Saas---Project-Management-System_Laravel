@@ -13,6 +13,9 @@ class AddColToAccountsTable extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('accounts')) {
+            return;
+        }
         Schema::table('accounts', function (Blueprint $table) {
             $table->decimal('total_expense',24,2)->default(0)->after('total_withdrawn');
         });

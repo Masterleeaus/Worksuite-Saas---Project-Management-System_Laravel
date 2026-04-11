@@ -13,6 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('email_notification_settings')) {
+            return;
+        }
         Schema::table('email_notification_settings', function (Blueprint $table) {
             $table->enum('send_twilio', ['yes', 'no'])->default('no');
         });

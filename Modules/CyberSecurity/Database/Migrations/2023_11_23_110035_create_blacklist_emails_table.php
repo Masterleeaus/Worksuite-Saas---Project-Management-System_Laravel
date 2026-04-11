@@ -14,6 +14,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('blacklist_emails')) {
+            return;
+        }
         Schema::create('blacklist_emails', function (Blueprint $table) {
             $table->id();
             $table->string('email');

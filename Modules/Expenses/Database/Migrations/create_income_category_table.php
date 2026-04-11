@@ -22,6 +22,9 @@ class CreateIncomeCategoryTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('income_category')) {
+            return;
+        }
         Schema::create('income_category', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('category');

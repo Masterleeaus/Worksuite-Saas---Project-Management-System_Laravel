@@ -14,6 +14,9 @@ return new class extends Migration
     public function up()
     {
 
+        if (! Schema::hasTable('sms_settings')) {
+            return;
+        }
         Schema::table('sms_settings', function (Blueprint $table) {
             $table->integer('added_by')->unsigned()->nullable();
             $table->foreign('added_by')->references('id')->on('users')->onDelete('SET NULL')->onUpdate('cascade');

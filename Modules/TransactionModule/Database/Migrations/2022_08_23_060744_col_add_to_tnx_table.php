@@ -13,6 +13,9 @@ class ColAddToTnxTable extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('transactions')) {
+            return;
+        }
         Schema::table('transactions', function (Blueprint $table) {
             $table->string('from_user_account')->nullable();
             $table->string('to_user_account')->nullable();

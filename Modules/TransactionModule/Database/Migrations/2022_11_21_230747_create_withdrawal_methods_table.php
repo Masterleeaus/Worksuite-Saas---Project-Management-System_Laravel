@@ -13,6 +13,9 @@ class CreateWithdrawalMethodsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('withdrawal_methods')) {
+            return;
+        }
         Schema::create('withdrawal_methods', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();

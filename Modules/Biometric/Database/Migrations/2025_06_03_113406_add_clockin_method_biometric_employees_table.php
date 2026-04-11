@@ -12,6 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('biometric_employees')) {
+            return;
+        }
         Schema::table('biometric_employees', function (Blueprint $table) {
             $table->boolean('force_biometric_clockin')->default(true)->after('company_id');
         });

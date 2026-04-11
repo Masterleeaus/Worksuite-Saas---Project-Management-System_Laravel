@@ -13,6 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('user_zoom_meeting')) {
+            return;
+        }
         Schema::create('user_zoom_meeting', function (Blueprint $table) {            $table->unsignedBigInteger('company_id')->nullable()->index();
 
             $table->integer('user_id')->unsigned();

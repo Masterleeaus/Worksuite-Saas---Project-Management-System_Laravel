@@ -12,6 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('performance_settings')) {
+            return;
+        }
         Schema::table('performance_settings', function (Blueprint $table) {
             $table->enum('meeting_slack_notification', ['yes', 'no'])->default('no')->after('send_email_notification');
             $table->enum('meeting_push_notification', ['yes', 'no'])->default('no')->after('meeting_slack_notification');

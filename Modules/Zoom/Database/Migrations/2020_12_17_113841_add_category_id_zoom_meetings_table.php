@@ -13,6 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('zoom_meetings')) {
+            return;
+        }
         Schema::table('zoom_meetings', function (Blueprint $table) {
             $table->unsignedBigInteger('category_id')->nullable();
             $table->foreign('category_id')->references('id')->on('zoom_categories')->onDelete('cascade')->onUpdate('cascade');

@@ -13,6 +13,9 @@ return new class extends Migration {
      */
     public function up(): void
     {
+        if (! Schema::hasTable('biolink_blocks')) {
+            return;
+        }
         Schema::table('biolink_blocks', function (Blueprint $table) {
             $table->string('placeholder')->nullable();
             $table->string('name_placeholder')->nullable();

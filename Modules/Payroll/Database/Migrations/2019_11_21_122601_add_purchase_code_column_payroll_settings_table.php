@@ -13,6 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('payroll_settings')) {
+            return;
+        }
         Schema::table('payroll_settings', function (Blueprint $table) {
             $table->string('purchase_code')->nullable();
         });

@@ -11,6 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('recruit_jobs')) {
+            return;
+        }
         Schema::table('recruit_jobs', function (Blueprint $table) {
             $table->unsignedInteger('recruiter_id')->nullable()->change();
             $table->foreign('recruiter_id')

@@ -13,6 +13,9 @@ class CreateChannelConversationsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('channel_conversations')) {
+            return;
+        }
         Schema::create('channel_conversations', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();

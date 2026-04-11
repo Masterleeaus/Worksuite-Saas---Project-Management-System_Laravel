@@ -13,6 +13,9 @@ class AddToColTransactionIdToPackageSubscriberLogsTabel extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('package_subscriber_logs')) {
+            return;
+        }
         Schema::table('package_subscriber_logs', function (Blueprint $table) {
             $table->foreignUuid('primary_transaction_id')->default(0);
         });

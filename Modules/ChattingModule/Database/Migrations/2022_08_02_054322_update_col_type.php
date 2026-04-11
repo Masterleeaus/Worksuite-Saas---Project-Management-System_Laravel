@@ -13,6 +13,9 @@ class UpdateColType extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('channel_lists')) {
+            return;
+        }
         Schema::table('channel_lists', function (Blueprint $table) {
             $table->uuid('reference_id')->nullable()->change();
         });

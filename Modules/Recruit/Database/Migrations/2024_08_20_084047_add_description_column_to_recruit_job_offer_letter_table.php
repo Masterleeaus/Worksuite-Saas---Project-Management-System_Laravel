@@ -11,6 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('recruit_job_offer_letter')) {
+            return;
+        }
         Schema::table('recruit_job_offer_letter', function (Blueprint $table) {
             $table->longText('description')->nullable();
         });

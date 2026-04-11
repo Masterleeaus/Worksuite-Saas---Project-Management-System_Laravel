@@ -15,6 +15,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('key_results')) {
+            return;
+        }
         Schema::table('key_results', function (Blueprint $table) {
             $table->decimal('target_value', 16, 2)->nullable()->change();
             $table->decimal('current_value', 16, 2)->nullable()->change();

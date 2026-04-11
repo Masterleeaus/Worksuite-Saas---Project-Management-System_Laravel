@@ -13,6 +13,9 @@ class ColAddToServicesTable extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('services')) {
+            return;
+        }
         Schema::table('services', function (Blueprint $table) {
             $table->softDeletes()->after('avg_rating');
         });

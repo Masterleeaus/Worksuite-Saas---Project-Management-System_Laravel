@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (! Schema::hasTable('titanhello_calls')) {
+            return;
+        }
         Schema::table('titanhello_calls', function (Blueprint $table) {
             $table->boolean('voicemail_flag')->default(false)->index();
             $table->timestamp('voicemail_received_at')->nullable()->index();

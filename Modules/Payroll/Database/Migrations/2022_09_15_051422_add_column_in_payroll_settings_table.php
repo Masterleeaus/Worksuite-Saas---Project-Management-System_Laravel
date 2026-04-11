@@ -16,6 +16,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('payroll_settings')) {
+            return;
+        }
         Schema::table('payroll_settings', function (Blueprint $table) {
             $table->unsignedInteger('currency_id')->nullable()->default(null)->after('semi_monthly_end');
             $table->foreign('currency_id')->references('id')->on('currencies')->onDelete('cascade')->onDelete('cascade');

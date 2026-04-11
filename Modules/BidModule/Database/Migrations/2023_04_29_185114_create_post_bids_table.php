@@ -13,6 +13,9 @@ class CreatePostBidsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('post_bids')) {
+            return;
+        }
         Schema::create('post_bids', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->decimal('offered_price',24,2)->default(0);

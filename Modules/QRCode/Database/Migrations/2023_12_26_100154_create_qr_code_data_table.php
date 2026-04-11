@@ -12,6 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('qr_code_data')) {
+            return;
+        }
         Schema::create('qr_code_data', function (Blueprint $table) {
             $table->id();
             $table->integer('company_id')->unsigned()->nullable();

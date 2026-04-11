@@ -16,6 +16,9 @@ return new class extends Migration
     {
         \App\Models\Module::validateVersion(BookingModuleSetting::MODULE_NAME);
 
+        if (Schema::hasTable('subscription_subscriber_bookings')) {
+            return;
+        }
         Schema::create('subscription_subscriber_bookings', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();

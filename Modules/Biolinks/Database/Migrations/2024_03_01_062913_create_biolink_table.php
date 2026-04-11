@@ -18,6 +18,9 @@ return new class extends Migration {
      */
     public function up(): void
     {
+        if (Schema::hasTable('biolinks')) {
+            return;
+        }
         Schema::create('biolinks', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('company_id')->unsigned()->nullable();

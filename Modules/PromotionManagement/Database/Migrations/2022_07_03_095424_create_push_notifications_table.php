@@ -13,6 +13,9 @@ class CreatePushNotificationsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('push_notifications')) {
+            return;
+        }
         Schema::create('push_notifications', function (Blueprint $table) {
             $table->uuid('id')->index()->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();

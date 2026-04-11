@@ -1,0 +1,22 @@
+{
+  "name": "FSMStageAction",
+  "alias": "fsmstageaction",
+  "description": "Field Service \u2013 Automated actions triggered on stage transitions",
+  "keywords": [
+    "fsm",
+    "field-service",
+    "cleansmartOS"
+  ],
+  "active": 1,
+  "order": 0,
+  "providers": [
+    "Modules\\\\FSMStageAction\\\\Providers\\\\FSMStageActionServiceProvider",
+    "Modules\\\\FSMStageAction\\\\Providers\\\\RouteServiceProvider"
+  ],
+  "aliases": {},
+  "files": [],
+  "requires": [
+    "FSMCore"
+  ],
+  "version": "1.0.0"
+}

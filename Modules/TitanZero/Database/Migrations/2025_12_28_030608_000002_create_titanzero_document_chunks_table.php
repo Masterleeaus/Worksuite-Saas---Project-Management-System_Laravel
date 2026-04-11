@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('titanzero_document_chunks')) {
+            return;
+        }
         Schema::create('titanzero_document_chunks', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('document_id')->index();

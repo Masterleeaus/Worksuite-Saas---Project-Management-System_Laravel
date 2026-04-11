@@ -11,6 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('biometric_commands')) {
+            return;
+        }
         Schema::create('biometric_commands', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('company_id');

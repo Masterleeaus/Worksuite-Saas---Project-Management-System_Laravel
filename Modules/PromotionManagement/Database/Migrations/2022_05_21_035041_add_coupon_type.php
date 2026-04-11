@@ -13,6 +13,9 @@ class AddCouponType extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('coupons')) {
+            return;
+        }
         Schema::table('coupons', function($table) {
             $table->string('coupon_type',191)->after('id')->nullable();
         });

@@ -13,6 +13,9 @@ class CreateCouponsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('coupons')) {
+            return;
+        }
         Schema::create('coupons', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();

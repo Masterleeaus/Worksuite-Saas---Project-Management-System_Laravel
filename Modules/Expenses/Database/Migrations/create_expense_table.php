@@ -22,6 +22,9 @@ class CreateExpenseTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('expense')) {
+            return;
+        }
         Schema::create('expense', function (Blueprint $table) {
             $table->bigIncrements('id');
 

@@ -13,6 +13,9 @@ class CreateIgnoredPostsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('ignored_posts')) {
+            return;
+        }
         Schema::create('ignored_posts', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('post_id');

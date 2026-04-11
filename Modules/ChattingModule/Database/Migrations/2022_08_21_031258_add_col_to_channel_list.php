@@ -13,6 +13,9 @@ class AddColToChannelList extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('channel_lists')) {
+            return;
+        }
         Schema::table('channel_lists', function (Blueprint $table) {
             $table->boolean('is_read')->default(0);
         });

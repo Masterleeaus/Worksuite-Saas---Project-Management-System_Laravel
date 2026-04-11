@@ -13,6 +13,9 @@ class CreateAdvertisementNotesTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('advertisement_notes')) {
+            return;
+        }
         Schema::create('advertisement_notes', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();
