@@ -62,23 +62,41 @@
 
 @push('scripts')
 <script>
+    const scorecardIndexUrl = '{{ route("report.fsm.cleaner-scorecard") }}';
+
+    // HTML-escape helper to prevent XSS when injecting server data into the DOM.
+    const esc = (v) => String(v ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+
     const renderRow = (row) => {
-        const rating = row.avg_rating ? `<span class="text-warning">${row.avg_rating} ★</span>` : '—';
-        const punc   = row.punctuality_pct !== null ? row.punctuality_pct + '%' : '—';
-        const badge  = row.complaints > 0
-            ? `<span class="badge badge-danger">${row.complaints}</span>`
+        const rating = row.avg_rating
+            ? `<span class="text-warning">${esc(row.avg_rating)} ★</span>`
+            : '—';
+        const punc  = row.punctuality_pct !== null ? esc(row.punctuality_pct) + '%' : '—';
+        const badge = row.complaints > 0
+            ? `<span class="badge badge-danger">${esc(row.complaints)}</span>`
             : '<span class="badge badge-success">0</span>';
 
+        // Use a numeric cleaner_id as the route parameter (safe integer cast).
+        const cleanerId = parseInt(row.cleaner_id, 10);
+        const showUrl   = Number.isInteger(cleanerId)
+            ? scorecardIndexUrl.replace(/\/?$/, '/') + cleanerId
+            : '#';
+
         return `<tr>
-            <td>${row.cleaner_name}</td>
-            <td class="text-center">${row.completed}</td>
-            <td class="text-center">${row.cancelled}</td>
-            <td class="text-center">${row.recleans}</td>
+            <td>${esc(row.cleaner_name)}</td>
+            <td class="text-center">${esc(row.completed)}</td>
+            <td class="text-center">${esc(row.cancelled)}</td>
+            <td class="text-center">${esc(row.recleans)}</td>
             <td class="text-center">${rating}</td>
             <td class="text-center">${punc}</td>
             <td class="text-center">${badge}</td>
             <td>
-                <a href="/account/reports/fsm/cleaner-scorecard/${row.cleaner_id}" class="btn btn-sm btn-outline-primary">View</a>
+                <a href="${showUrl}" class="btn btn-sm btn-outline-primary">View</a>
             </td>
         </tr>`;
     };
@@ -89,7 +107,7 @@
     };
 
     const loadScorecards = () => {
-        $.get('/account/reports/fsm/cleaner-scorecard', buildParams(), function(data) {
+        $.get(scorecardIndexUrl, buildParams(), function(data) {
             if (!Array.isArray(data) || data.length === 0) {
                 $('#scorecard-body').html('<tr><td colspan="8" class="text-center text-muted py-4">No data for selected period.</td></tr>');
                 return;

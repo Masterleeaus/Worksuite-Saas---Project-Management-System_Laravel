@@ -110,12 +110,19 @@
                 $('#zone-table-body').html('<tr><td colspan="5" class="text-center text-muted py-4">No data for selected period.</td></tr>');
                 return;
             }
+            // Escape helper to prevent XSS when inserting server data into the DOM.
+            const esc = (v) => String(v ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
             const rows = data.rows.map(r => `<tr>
-                <td>${r.zone_name}</td>
-                <td class="text-right">${r.job_count}</td>
-                <td class="text-right">${r.total_revenue}</td>
-                <td class="text-right">${r.avg_revenue}</td>
-                <td class="text-right">${r.cost_per_job}</td>
+                <td>${esc(r.zone_name)}</td>
+                <td class="text-right">${esc(r.job_count)}</td>
+                <td class="text-right">${esc(r.total_revenue)}</td>
+                <td class="text-right">${esc(r.avg_revenue)}</td>
+                <td class="text-right">${esc(r.cost_per_job)}</td>
             </tr>`);
             $('#zone-table-body').html(rows.join(''));
         }, 'json');

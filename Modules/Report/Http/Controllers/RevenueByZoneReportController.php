@@ -110,10 +110,11 @@ class RevenueByZoneReportController extends FinanceReportController
     {
         // Strategy 1 — FSM locations + territories table available
         if (Schema::hasTable('fsm_orders') && Schema::hasTable('fsm_locations')) {
+            // Join invoices directly on project_id to avoid per-row correlated subqueries.
             $query = DB::table('fsm_orders')
                 ->join('fsm_locations', 'fsm_locations.id', '=', 'fsm_orders.location_id')
-                ->join('invoices', 'invoices.id', '=', DB::raw('(SELECT id FROM invoices WHERE project_id = fsm_orders.id ORDER BY id DESC LIMIT 1)'))
-                ->join('payments', function ($j) {
+                ->leftJoin('invoices', 'invoices.project_id', '=', 'fsm_orders.id')
+                ->leftJoin('payments', function ($j) {
                     $j->on('payments.invoice_id', '=', 'invoices.id')
                       ->where('payments.status', 'complete');
                 })

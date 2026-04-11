@@ -172,11 +172,16 @@ class BookingReportController extends TaskReportController
             if (\Illuminate\Support\Facades\Schema::hasTable('fsm_locations')) {
                 $locationCities = \Illuminate\Support\Facades\DB::table('fsm_locations')
                     ->where('territory_id', $request->territory_id)
-                    ->pluck('city');
+                    ->pluck('city')
+                    ->filter()
+                    ->map(fn ($city) => addcslashes((string) $city, '%_\\'))
+                    ->values();
                 if ($locationCities->isNotEmpty()) {
                     $query->where(function ($q) use ($locationCities) {
                         foreach ($locationCities as $city) {
-                            $q->orWhere('service_address', 'like', "%{$city}%");
+                            // The value is passed as a PDO bound parameter by Laravel's query builder,
+                            // preventing SQL injection. addcslashes escapes LIKE pattern wildcards.
+                            $q->orWhere('service_address', 'like', '%' . $city . '%');
                         }
                     });
                 }
