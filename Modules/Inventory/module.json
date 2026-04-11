@@ -1,16 +1,32 @@
 {
   "name": "Inventory",
   "alias": "inventory",
-  "description": "Stock, items, warehouses, and movements for Worksuite SaaS.",
+  "description": "Warehouse & stock management — locations, stock levels, movements, transfers and purchase orders",
   "keywords": [
     "inventory",
     "stock",
-    "warehouse"
+    "warehouse",
+    "movements",
+    "transfers",
+    "purchase orders"
   ],
   "priority": 10,
   "providers": [
     "Modules\\Inventory\\Providers\\InventoryServiceProvider",
     "Modules\\Inventory\\Providers\\RouteServiceProvider"
   ],
-  "files": []
+  "files": [],
+  "version": "1.0.0",
+  "active": 1,
+  "aliases": {},
+  "requires": [],
+  "permissions": [
+    "view_inventory",
+    "manage_stock",
+    "create_transfer",
+    "manage_warehouses",
+    "manage_purchase_orders",
+    "receive_goods"
+  ],
+  "sidebar_menu": true
 }

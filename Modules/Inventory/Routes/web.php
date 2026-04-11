@@ -64,6 +64,8 @@ Route::middleware('permission:inventory.manage')->group(function () {
     Route::middleware('permission:inventory.transfer.manage')->group(function(){
         Route::get('/transfers/create', [TransferController::class, 'create'])->name('transfers.create');
         Route::post('/transfers', [TransferController::class, 'store'])->name('transfers.store');
+        Route::post('/transfers/{transfer}/dispatch', [TransferController::class, 'dispatch'])->name('transfers.dispatch');
+        Route::post('/transfers/{transfer}/receive', [TransferController::class, 'receive'])->name('transfers.receive');
         Route::post('/transfers/{transfer}/approve', [TransferController::class, 'approve'])->name('transfers.approve');
         Route::delete('/transfers/{transfer}', [TransferController::class, 'destroy'])->name('transfers.destroy');
     });

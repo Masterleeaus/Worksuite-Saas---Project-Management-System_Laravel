@@ -17,15 +17,15 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function mapWebRoutes(): void
     {
-        Route::middleware(['web','auth'])
-            ->prefix('inventory')
+        Route::middleware(['web', 'auth'])
+            ->prefix('account/inventory')
             ->name('inventory.')
             ->group(module_path('Inventory', '/Routes/web.php'));
     }
 
     protected function mapApiRoutes(): void
     {
-        Route::middleware(['api','auth:sanctum'])
+        Route::middleware(['api', 'auth:sanctum'])
             ->prefix('api/inventory')
             ->name('inventory.api.')
             ->group(module_path('Inventory', '/Routes/api.php'));
