@@ -1,4 +1,5 @@
 {
     "Accountings": true,
-    "Purchase": true
+    "Purchase": true,
+    "PromotionManagement": true
 }
