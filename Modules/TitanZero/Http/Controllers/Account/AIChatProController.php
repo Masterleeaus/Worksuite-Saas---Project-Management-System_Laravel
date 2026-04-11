@@ -325,10 +325,14 @@ class AIChatProController extends Controller
         $name = $category->human_name ?? $category->name;
 
         if ($category->role === 'default') {
-            return __('Hi! I am') . ' ' . $name . __(', and I\'m here to answer all your questions');
+            return __("Hi! I am :name, and I'm here to answer all your questions", ['name' => $name]);
         }
 
-        return __('Hi! I am') . ' ' . $name . __(', and I\'m') . ' ' . $category->role . '. ' . ($category->helps_with ?? '');
+        return __("Hi! I am :name, and I'm :role. :helps", [
+            'name'  => $name,
+            'role'  => $category->role,
+            'helps' => $category->helps_with ?? '',
+        ]);
     }
 
     protected function kbKeyFromCategory(?AiChatCategory $category): string
