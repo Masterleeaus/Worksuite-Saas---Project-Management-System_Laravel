@@ -25,8 +25,6 @@ class PromotionService
 {
     /** @var bool|null Cached result of `Schema::hasTable('bookings')` */
     private ?bool $bookingsTableExists = null;
-
-    /** @var bool|null Cached result of `Schema::hasColumn('bookings', 'discount_id')` — unused here but kept for symmetry */
     /**
      * Validate and apply a coupon code to a booking/invoice.
      *

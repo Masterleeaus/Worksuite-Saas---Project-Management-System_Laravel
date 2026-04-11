@@ -123,11 +123,14 @@ return new class extends Migration {
     private function indexExists(string $table, string $indexName): bool
     {
         try {
-            $indexes = \Illuminate\Support\Facades\DB::select(
-                "SHOW INDEX FROM `{$table}` WHERE Key_name = ?",
-                [$indexName]
-            );
-            return count($indexes) > 0;
+            // Use Schema::getIndexes() for safe, driver-agnostic index lookup
+            $indexes = \Illuminate\Support\Facades\Schema::getIndexes($table);
+            foreach ($indexes as $index) {
+                if (($index['name'] ?? '') === $indexName) {
+                    return true;
+                }
+            }
+            return false;
         } catch (\Throwable) {
             return false;
         }
