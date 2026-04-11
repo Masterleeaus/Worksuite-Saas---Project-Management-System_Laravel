@@ -4,6 +4,9 @@ $editAttendancePermission = user()->permission('edit_attendance');
 $deleteAttendancePermission = user()->permission('delete_attendance');
 @endphp
 
+{{-- Include biometric GPS/method tab (pushes into @stack('biometric-data-tab') below) --}}
+@includeIf('biometric::attendance.biometric_tab')
+
 <div class="modal-header">
     <h5 class="modal-title" id="modelHeading">@lang('app.attendanceDetails')</h5>
     <button type="button"  class="close" data-dismiss="modal" aria-label="Close"><span
@@ -209,6 +212,9 @@ $deleteAttendancePermission = user()->permission('delete_attendance');
             </x-cards.data>
         </div>
     </div>
+
+    {{-- Biometric module pushes GPS map + method badge here --}}
+    @stack('biometric-data-tab')
 
 </div>
 <script>
