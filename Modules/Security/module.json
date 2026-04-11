@@ -1,12 +1,71 @@
 {
     "name": "Security",
     "alias": "security",
-    "description": "Unified Security & Access Control Module - Consolidated from 7 modules (AccessCard, InOutPermit, WorkPermits, Package, Parking, Notes, Security)",
+    "description": "Physical access control — visitor permits, access cards, work permits, parking and package delivery tracking",
     "keywords": ["security", "access", "permissions", "approvals", "audit"],
     "priority": 0,
     "providers": [
         "Modules\\Security\\Providers\\SecurityServiceProvider",
         "Modules\\Security\\Providers\\EventServiceProvider"
     ],
-    "files": []
+    "aliases": {},
+    "files": [],
+    "requires": [],
+    "active": 1,
+    "order": 84,
+    "permissions": [
+        "manage_access_cards",
+        "manage_permits",
+        "manage_work_permits",
+        "manage_parking",
+        "manage_packages",
+        "view_security_log",
+        "approve_permits"
+    ],
+    "roles_permissions": {
+        "admin": [
+            "manage_access_cards",
+            "manage_permits",
+            "manage_work_permits",
+            "manage_parking",
+            "manage_packages",
+            "view_security_log",
+            "approve_permits"
+        ],
+        "manager": [
+            "manage_access_cards",
+            "manage_permits",
+            "manage_work_permits",
+            "manage_parking",
+            "manage_packages",
+            "view_security_log",
+            "approve_permits"
+        ],
+        "security_guard": [
+            "manage_access_cards",
+            "view_security_log",
+            "approve_permits"
+        ]
+    },
+    "menus": [
+        {
+            "panel": "user",
+            "label": "Security",
+            "route": "security.dashboard",
+            "sort_order": 84
+        },
+        {
+            "panel": "user",
+            "label": "Access Cards",
+            "route": "security.access-cards.index",
+            "sort_order": 85
+        },
+        {
+            "panel": "user",
+            "label": "Visitor Permits",
+            "route": "security.inout-permits.index",
+            "sort_order": 86
+        }
+    ],
+    "sidebar_menu": true
 }
