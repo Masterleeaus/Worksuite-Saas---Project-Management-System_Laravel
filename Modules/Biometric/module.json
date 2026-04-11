@@ -4,6 +4,7 @@
     "description": "",
     "keywords": [],
     "priority": 0,
+    "active": 1,
     "providers": [
         "Modules\\Biometric\\Providers\\BiometricServiceProvider",
         "Modules\\Biometric\\Providers\\EventServiceProvider"

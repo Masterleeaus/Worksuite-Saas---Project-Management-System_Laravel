@@ -148,4 +148,15 @@ return [
     'biometricIdOnly' => 'Biometric ID Only',
     'copyToBiometricId' => 'Copy to Biometric ID',
     'fingerprintRegistered' => 'Fingerprint Registered',
+
+    // Biometric data tab on attendance show view
+    'biometricData'    => 'Biometric Data',
+    'method'           => 'Clock-in Method',
+    'methodOut'        => 'Clock-out Method',
+    'geofence'         => 'Geofence',
+    'gpsIn'            => 'GPS (Clock-in)',
+    'gpsOut'           => 'GPS (Clock-out)',
+    'passed'           => 'Passed',
+    'failed'           => 'Failed',
+    'noBiometricData'  => 'No biometric clock-ins recorded for this day.',
 ];
