@@ -25,7 +25,7 @@ class TitanZeroController extends AccountBaseController
 
     public function chat()
     {
-        return view('titanzero::pages.chat');
+        return redirect()->route('titan.zero.ai-chat.index');
     }
 
     public function generators()
