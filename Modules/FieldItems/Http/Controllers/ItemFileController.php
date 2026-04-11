@@ -97,6 +97,20 @@ class ItemFileController extends AccountBaseController
     }
 
     /**
+     * Delete an item file/image by id (used via POST route).
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function deleteImage($id)
+    {
+        $file = ItemFiles::findOrFail($id);
+        Files::deleteFile($file->hashname, ItemFiles::FILE_PATH);
+        $file->delete();
+
+        return Reply::success(__('messages.deleteSuccess'));
+    }
+
+    /**
      * Remove the specified resource from storage.
      * @param int $id
      * @return Renderable

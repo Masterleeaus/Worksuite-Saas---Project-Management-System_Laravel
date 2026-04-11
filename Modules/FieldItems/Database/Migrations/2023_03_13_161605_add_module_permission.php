@@ -50,6 +50,10 @@ return new class extends Migration
             [
                 'name' => 'manage_item_sub_category',
                 'display_name' => 'Manage Item Sub Category'
+            ],
+            [
+                'name' => 'manage_item_categories',
+                'display_name' => 'Manage Item Categories'
             ]
         ];
 
@@ -72,7 +76,7 @@ return new class extends Migration
             $module->permissions()->createMany($permissions);
         }
 
-        $all = ['add_item', 'view_item', 'edit_item', 'delete_item','manage_item_category','manage_item_sub_category'];
+        $all = ['add_item', 'view_item', 'edit_item', 'delete_item', 'manage_item_category', 'manage_item_sub_category', 'manage_item_categories'];
         Permission::whereIn('name', $all)->update(['allowed_permissions' => Permission::ALL_NONE]);
 
         $companies = Company::all();
