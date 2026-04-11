@@ -16,4 +16,5 @@ return [
     'redo'          => 'Redo',
     'layer_up'      => 'Bring Forward',
     'layer_down'    => 'Send Backward',
+    'save_failed'   => 'Save failed — please try again.',
 ];

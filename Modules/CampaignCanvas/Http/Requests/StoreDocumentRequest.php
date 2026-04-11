@@ -12,7 +12,8 @@ class StoreDocumentRequest extends FormRequest
         return [
             'name'    => ['sometimes', 'string', 'max:255'],
             'payload' => ['nullable', 'array'],
-            'preview' => ['nullable', 'string'],
+            // preview is a base64-encoded data URI thumbnail; limit to 512KB
+            'preview' => ['nullable', 'string', 'max:524288'],
         ];
     }
 }

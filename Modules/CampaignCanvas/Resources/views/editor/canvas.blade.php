@@ -41,7 +41,7 @@ const SAVE_URL    = DOC_UUID
     ? `/account/campaign-canvas/documents/${DOC_UUID}`
     : `/account/campaign-canvas/documents`;
 const UPLOAD_URL  = '/account/campaign-canvas/upload-image';
-const CSRF        = document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] ?? '{{ csrf_token() }}';
+const CSRF        = '{{ csrf_token() }}';
 
 let elements   = @json($document?->payload ?? []);
 let history    = [JSON.stringify(elements)];
@@ -267,7 +267,18 @@ document.getElementById('cc-file-input').addEventListener('change', async e => {
     const data = await res.json();
     const img  = new Image();
     img.onload = () => {
-        const el = { id: uid(), type: 'image', x: 50, y: 50, w: Math.min(img.naturalWidth, 400), h: Math.min(img.naturalHeight, 400), opacity: 1, z: elements.length, src: data.url, _img: img };
+        const el = {
+            id:      uid(),
+            type:    'image',
+            x:       50,
+            y:       50,
+            w:       Math.min(img.naturalWidth,  400),
+            h:       Math.min(img.naturalHeight, 400),
+            opacity: 1,
+            z:       elements.length,
+            src:     data.url,
+            _img:    img,
+        };
         addElement(el);
     };
     img.src = data.url;
@@ -307,7 +318,7 @@ async function doSave() {
         }
         setStatus('{{ __('campaigncanvas::campaigncanvas.saved') }}');
     } catch (err) {
-        setStatus('Save failed');
+        setStatus('{{ __('campaigncanvas::campaigncanvas.save_failed') }}');
     }
 }
 

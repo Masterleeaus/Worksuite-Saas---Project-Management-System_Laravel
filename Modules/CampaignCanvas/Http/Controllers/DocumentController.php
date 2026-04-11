@@ -26,6 +26,12 @@ class DocumentController extends AccountBaseController
 
     public function update(Request $request, string $uuid): JsonResponse
     {
+        $request->validate([
+            'name'    => ['sometimes', 'string', 'max:255'],
+            'payload' => ['nullable', 'array'],
+            'preview' => ['nullable', 'string', 'max:524288'],
+        ]);
+
         $doc = $this->findOwned($uuid);
 
         $doc->update(array_filter([

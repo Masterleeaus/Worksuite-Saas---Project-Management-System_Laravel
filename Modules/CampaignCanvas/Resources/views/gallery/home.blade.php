@@ -71,8 +71,12 @@ function ccDuplicate(uuid) {
         method: 'POST',
         headers: {'X-CSRF-TOKEN': CC_CSRF, 'Accept': 'application/json'},
     })
-    .then(r => r.json())
-    .then(data => { window.location = CC_ROUTES.gallery; });
+    .then(res => {
+        if (!res.ok) throw new Error('Duplicate failed');
+        return res.json();
+    })
+    .then(() => { window.location = CC_ROUTES.gallery; })
+    .catch(() => { alert('Could not duplicate design. Please try again.'); });
 }
 
 function ccDelete(uuid) {
