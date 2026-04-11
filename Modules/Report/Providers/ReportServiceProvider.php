@@ -3,21 +3,88 @@
 namespace Modules\Report\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Modules\Report\Console\DailyCleanerScheduleCommand;
+use Modules\Report\Console\MonthlyFinancialSummaryCommand;
+use Modules\Report\Console\WeeklyBookingSummaryCommand;
 
 class ReportServiceProvider extends ServiceProvider
 {
     protected $moduleName = 'Report';
     protected $moduleNameLower = 'report';
 
-    public function boot()
+    public function boot(): void
     {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                WeeklyBookingSummaryCommand::class,
+                MonthlyFinancialSummaryCommand::class,
+                DailyCleanerScheduleCommand::class,
+            ]);
+        }
+
+        $this->registerTranslations();
+        $this->registerConfig();
+        $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
-        $this->loadViewsFrom(module_path($this->moduleName, 'Resources/views'), $this->moduleNameLower);
-        $this->loadTranslationsFrom(module_path($this->moduleName, 'Resources/lang'), $this->moduleNameLower);
     }
 
-    public function register()
+    public function register(): void
     {
         $this->app->register(RouteServiceProvider::class);
+        $this->mergeConfigFrom(
+            module_path($this->moduleName, 'Config/config.php'), $this->moduleNameLower
+        );
+    }
+
+    protected function registerConfig(): void
+    {
+        $this->publishes([
+            module_path($this->moduleName, 'Config/config.php') => config_path($this->moduleNameLower . '.php'),
+        ], 'config');
+        $this->mergeConfigFrom(
+            module_path($this->moduleName, 'Config/config.php'), $this->moduleNameLower
+        );
+    }
+
+    public function registerViews(): void
+    {
+        $viewPath   = resource_path('views/modules/' . $this->moduleNameLower);
+        $sourcePath = module_path($this->moduleName, 'Resources/views');
+
+        $this->publishes([
+            $sourcePath => $viewPath,
+        ], ['views', $this->moduleNameLower . '-module-views']);
+
+        $this->loadViewsFrom(
+            array_merge($this->getPublishableViewPaths(), [$sourcePath]),
+            $this->moduleNameLower
+        );
+    }
+
+    protected function registerTranslations(): void
+    {
+        $langPath = resource_path('lang/modules/' . $this->moduleNameLower);
+
+        if (is_dir($langPath)) {
+            $this->loadTranslationsFrom($langPath, $this->moduleNameLower);
+        } else {
+            $this->loadTranslationsFrom(module_path($this->moduleName, 'Resources/lang'), $this->moduleNameLower);
+        }
+    }
+
+    public function provides(): array
+    {
+        return [];
+    }
+
+    private function getPublishableViewPaths(): array
+    {
+        $paths = [];
+        foreach (\Config::get('view.paths') as $path) {
+            if (is_dir($path . '/modules/' . $this->moduleNameLower)) {
+                $paths[] = $path . '/modules/' . $this->moduleNameLower;
+            }
+        }
+        return $paths;
     }
 }
