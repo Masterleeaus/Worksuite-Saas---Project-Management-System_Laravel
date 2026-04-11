@@ -4,6 +4,7 @@
     "description": "",
     "keywords": [],
     "priority": 0,
+    "active": true,
     "providers": [
         "Modules\\Performance\\Providers\\PerformanceServiceProvider",
         "Modules\\Performance\\Providers\\EventServiceProvider"
