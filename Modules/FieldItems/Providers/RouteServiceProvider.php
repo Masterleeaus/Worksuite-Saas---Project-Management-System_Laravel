@@ -24,7 +24,10 @@ class RouteServiceProvider extends ServiceProvider
     public function boot()
     {
         parent::boot();
-            if (is_dir($modulePath.'/Resources/lang')) { $this->loadTranslationsFrom($modulePath.'/Resources/lang', 'fielditems'); }
+        $modulePath = dirname(__DIR__);
+        if (is_dir($modulePath . '/Resources/lang')) {
+            $this->loadTranslationsFrom($modulePath . '/Resources/lang', 'fielditems');
+        }
     }
 
     /**

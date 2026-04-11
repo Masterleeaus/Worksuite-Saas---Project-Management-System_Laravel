@@ -1,8 +1,8 @@
 {
   "name": "FieldItems",
   "alias": "items",
-  "description": "Manage items, categories, subcategories, suppliers and attachments for field service use.",
-  "keywords": [],
+  "description": "FSM field items — materials, chemicals and equipment catalogue with job consumption tracking",
+  "keywords": ["field items", "materials", "chemicals", "equipment", "fsm", "catalogue", "job consumption"],
   "priority": 0,
   "providers": [
     "Modules\\FieldItems\\Providers\\FieldItemsServiceProvider",
@@ -10,5 +10,15 @@
   ],
   "files": [],
   "version": "1.0.1",
-  "active": 1
+  "active": 1,
+  "aliases": {},
+  "requires": [],
+  "permissions": [
+    "view_item",
+    "add_item",
+    "edit_item",
+    "delete_item",
+    "manage_item_categories"
+  ],
+  "sidebar_menu": true
 }

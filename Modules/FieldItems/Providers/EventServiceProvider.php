@@ -25,5 +25,4 @@ class EventServiceProvider extends ServiceProvider
         ItemFiles::class => [ItemFileObserver::class],
         Item::class => [ItemObserver::class],
     ];
-        if (is_dir($modulePath.'/Resources/lang')) { $this->loadTranslationsFrom($modulePath.'/Resources/lang', 'fielditems'); }
-    }
+}

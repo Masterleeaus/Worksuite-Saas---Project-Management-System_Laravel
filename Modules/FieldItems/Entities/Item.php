@@ -23,7 +23,22 @@ class Item extends BaseModel
 
     const FILE_PATH = 'items';
 
-    protected $fillable = ['name', 'price', 'description', 'taxes'];
+    protected $fillable = [
+        'name',
+        'price',
+        'description',
+        'taxes',
+        'sku',
+        'base_price',
+        'stock_qty',
+        'is_active',
+        'item_type',
+        'barcode',
+        'low_stock_threshold',
+        'is_hazardous',
+        'is_eco_friendly',
+        'sds_file_path',
+    ];
 
     protected $appends = ['total_amount', 'image_url', 'download_file_url'];
 
@@ -102,6 +117,11 @@ class Item extends BaseModel
     public function files(): HasMany
     {
         return $this->hasMany(ItemFiles::class, 'item_id')->orderBy('id', 'desc');
+    }
+
+    public function taskItems(): HasMany
+    {
+        return $this->hasMany(TaskItem::class, 'item_id');
     }
 
     public function getTaxListAttribute()

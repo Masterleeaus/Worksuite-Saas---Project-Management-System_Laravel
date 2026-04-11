@@ -9,6 +9,9 @@ return [
         'item_subcategories'=> 'Item Sub-categories',
         'suppliers'        => 'Suppliers',
         'settings'         => 'Settings',
+        'categories'       => 'Categories',
+        'jobConsumption'   => 'Job Consumption',
+        'stockLevels'      => 'Stock Levels',
     ],
 
     // Common UI
