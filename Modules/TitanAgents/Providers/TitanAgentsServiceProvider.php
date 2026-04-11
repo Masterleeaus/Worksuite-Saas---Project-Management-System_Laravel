@@ -33,6 +33,13 @@ class TitanAgentsServiceProvider extends ServiceProvider
     {
         $this->app->register(EventServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
+
+        // Bind EmbeddingCapableInterface to OpenAIGenerator so EmbeddingService
+        // receives the correct implementation via the service container.
+        $this->app->bind(
+            \Modules\TitanAgents\Services\Generators\EmbeddingCapableInterface::class,
+            \Modules\TitanAgents\Services\Generators\OpenAIGenerator::class,
+        );
     }
 
     /**

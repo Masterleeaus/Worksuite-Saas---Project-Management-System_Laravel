@@ -4,16 +4,16 @@ namespace Modules\TitanAgents\Services\Chatbot;
 
 use Modules\TitanAgents\Models\ChatbotEmbedding;
 use Modules\TitanAgents\Models\ChatbotKnowledgeBaseArticle;
-use Modules\TitanAgents\Services\Generators\OpenAIGenerator;
+use Modules\TitanAgents\Services\Generators\EmbeddingCapableInterface;
 
 class EmbeddingService
 {
-    public function __construct(protected OpenAIGenerator $openAIGenerator) {}
+    public function __construct(protected EmbeddingCapableInterface $embeddingProvider) {}
 
     public function generateForArticle(ChatbotKnowledgeBaseArticle $article): ChatbotEmbedding
     {
         $text     = $article->title . "\n\n" . $article->content;
-        $vector   = $this->openAIGenerator->generateEmbedding($text);
+        $vector   = $this->embeddingProvider->generateEmbedding($text);
         $checksum = md5($text);
 
         $embedding = ChatbotEmbedding::updateOrCreate(
@@ -50,7 +50,7 @@ class EmbeddingService
 
     public function findSimilarArticles(int $chatbotId, string $query, int $topK = 3): array
     {
-        $queryVector = $this->openAIGenerator->generateEmbedding($query);
+        $queryVector = $this->embeddingProvider->generateEmbedding($query);
 
         $embeddings = ChatbotEmbedding::where('chatbot_id', $chatbotId)
             ->where('source_type', 'article')

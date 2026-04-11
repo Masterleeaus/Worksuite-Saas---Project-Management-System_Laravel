@@ -55,7 +55,6 @@ class ChatbotController extends AccountBaseController
 
     public function update(Request $request, Chatbot $chatbot)
     {
-
         $data = $request->validate([
             'name'             => 'required|string|max:255',
             'description'      => 'nullable|string',
@@ -78,7 +77,6 @@ class ChatbotController extends AccountBaseController
 
     public function destroy(Chatbot $chatbot)
     {
-
         $chatbot->delete();
 
         return redirect()->route('titanagents.chatbot.index')

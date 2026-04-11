@@ -4,7 +4,7 @@ namespace Modules\TitanAgents\Services\Generators;
 
 use Illuminate\Support\Facades\Http;
 
-class OpenAIGenerator implements GeneratorInterface
+class OpenAIGenerator implements GeneratorInterface, EmbeddingCapableInterface
 {
     public function generate(array $messages, array $options = []): array
     {

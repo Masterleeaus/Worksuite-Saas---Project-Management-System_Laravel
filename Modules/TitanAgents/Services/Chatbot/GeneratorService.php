@@ -9,14 +9,22 @@ use Modules\TitanAgents\Services\Generators\OpenAIGenerator;
 
 class GeneratorService
 {
+    /** @var GeneratorInterface[] */
     protected array $generators = [];
 
-    public function __construct()
-    {
+    /**
+     * Generators are resolved from the container to allow
+     * easy overriding in tests or application service providers.
+     */
+    public function __construct(
+        OpenAIGenerator    $openai,
+        AnthropicGenerator $anthropic,
+        GeminiGenerator    $gemini,
+    ) {
         $this->generators = [
-            'openai'    => new OpenAIGenerator(),
-            'anthropic' => new AnthropicGenerator(),
-            'gemini'    => new GeminiGenerator(),
+            'openai'    => $openai,
+            'anthropic' => $anthropic,
+            'gemini'    => $gemini,
         ];
     }
 
