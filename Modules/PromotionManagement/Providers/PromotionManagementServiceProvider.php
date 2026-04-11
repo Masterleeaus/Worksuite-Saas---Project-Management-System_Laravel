@@ -3,6 +3,8 @@
 namespace Modules\PromotionManagement\Providers;
 
 use Modules\PromotionManagement\Console\ActivateModuleCommand;
+use Modules\PromotionManagement\Observers\BookingObserver;
+use Modules\PromotionManagement\Services\PromotionService;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
 
@@ -35,6 +37,11 @@ class PromotionManagementServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
+
+        // Register booking observer (guarded — BookingModule may not be installed)
+        if (class_exists(\Modules\BookingModule\Entities\Booking::class)) {
+            \Modules\BookingModule\Entities\Booking::observe(BookingObserver::class);
+        }
     }
 
     /**
@@ -47,6 +54,8 @@ class PromotionManagementServiceProvider extends ServiceProvider
         // Load module helper functions (global functions used across the module)
         $helpers = module_path($this->moduleName, 'Lib/Promotion.php');
         if (file_exists($helpers)) { require_once $helpers; }
+
+        $this->app->singleton(PromotionService::class);
 
         $this->app->register(RouteServiceProvider::class);
     }
