@@ -1,11 +1,37 @@
 {
     "name": "Report",
     "alias": "report",
-    "description": "Report module for payment and provider reports",
-    "keywords": ["report", "payment"],
+    "description": "FSM Report module — booking performance, cleaner scorecards, zone revenue, chemical usage and route efficiency.",
+    "keywords": ["report", "fsm", "booking", "cleaner", "zone", "revenue"],
     "priority": 0,
     "providers": [
-        "Modules\\Report\\Providers\\ReportServiceProvider"
+        "Modules\\Report\\Providers\\ReportServiceProvider",
+        "Modules\\Report\\Providers\\RouteServiceProvider"
     ],
-    "files": []
+    "aliases": {},
+    "files": [],
+    "requires": [],
+    "active": 1,
+    "order": 0,
+    "permissions": [
+        "view_reports",
+        "export_reports",
+        "view_financial_reports",
+        "view_hr_reports"
+    ],
+    "roles_permissions": {
+        "admin": [
+            "view_reports",
+            "export_reports",
+            "view_financial_reports",
+            "view_hr_reports"
+        ],
+        "manager": [
+            "view_reports",
+            "export_reports"
+        ],
+        "employee": [
+            "view_reports"
+        ]
+    }
 }

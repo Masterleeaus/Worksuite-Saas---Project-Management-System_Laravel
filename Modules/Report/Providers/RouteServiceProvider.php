@@ -9,15 +9,15 @@ class RouteServiceProvider extends ServiceProvider
 {
     protected $moduleNamespace = 'Modules\Report\Http\Controllers';
 
-    public function map()
+    public function map(): void
     {
         $this->mapWebRoutes();
     }
 
-    protected function mapWebRoutes()
+    protected function mapWebRoutes(): void
     {
         Route::middleware('web')
             ->namespace($this->moduleNamespace)
-            ->group(__DIR__.'/../Routes/web.php');
+            ->group(module_path('Report', 'Routes/web.php'));
     }
 }

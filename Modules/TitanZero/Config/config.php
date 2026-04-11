@@ -27,5 +27,11 @@ return [
         'anomaly_detection',
         'automation_rules',
     ],
+
+    // AIChatPro integration settings
+    'aichatpro' => [
+        // Default screen when opening the chat: 'new', 'last', 'pinned'
+        'default_screen' => env('TITANZERO_AICHAT_DEFAULT_SCREEN', 'new'),
+    ],
 ];
 

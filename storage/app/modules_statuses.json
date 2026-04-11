@@ -3,4 +3,5 @@
     "Purchase": true,
     "PromotionManagement": true,
     "Inventory": true
+    "Report": true
 }

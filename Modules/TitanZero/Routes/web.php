@@ -4,6 +4,7 @@
 use Illuminate\Support\Facades\Route;
 use Modules\TitanZero\Http\Controllers\TitanZeroController;
 use Modules\TitanZero\Http\Controllers\CleaningSuggestionsController;
+use Modules\TitanZero\Http\Controllers\Account\AIChatProController;
 use Modules\TitanZero\Http\Controllers\SuperAdmin\SettingsController as SuperAdminSettingsController;
 use Modules\TitanZero\Http\Controllers\SuperAdmin\DashboardController;
 use Modules\TitanZero\Http\Controllers\SuperAdmin\DiagnosticsController;
@@ -45,6 +46,11 @@ Route::middleware(['web', 'auth'])
         Route::post('/suggestions/complaint-triage', [CleaningSuggestionsController::class, 'complaintTriage'])->name('suggestions.complaint-triage');
         Route::post('/suggestions/anomaly-detect', [CleaningSuggestionsController::class, 'anomalyDetect'])->name('suggestions.anomaly-detect');
         Route::post('/suggestions/automation-rules', [CleaningSuggestionsController::class, 'automationRules'])->name('suggestions.automation-rules');
+
+        // ── AIChatPro ─────────────────────────────────────────────────────────
+        Route::get('/ai-chat/{slug?}', [AIChatProController::class, 'index'])->name('ai-chat.index');
+        Route::post('/ai-chat/message', [AIChatProController::class, 'sendMessage'])->name('ai-chat.send');
+        Route::post('/ai-chat/session/new', [AIChatProController::class, 'startNewSession'])->name('ai-chat.session.new');
 
         // Legacy aliases kept for backwards compatibility
         Route::get('/business', fn () => redirect()->route('titan.zero.chat'))->name('business');
