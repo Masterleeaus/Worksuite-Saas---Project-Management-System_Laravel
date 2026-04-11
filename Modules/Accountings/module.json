@@ -1,13 +1,15 @@
 {
     "name": "Accountings",
     "alias": "accountings",
-    "description": "",
-    "keywords": [],
+    "description": "Accounting, GST, Chart of Accounts, Xero/MYOB integration, bank reconciliation",
+    "keywords": ["accounting", "gst", "xero", "myob", "invoices", "expenses"],
     "priority": 0,
+    "active": 1,
     "providers": [
         "Modules\\Accountings\\Providers\\AccountingsServiceProvider",
         "Modules\\Accountings\\Providers\\EventServiceProvider"
     ],
+    "aliases": {},
     "files": [],
-    "version": "1.0.1"
+    "version": "1.0.2"
 }
