@@ -8,7 +8,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('dispatch_teams', function (Blueprint $table) {
-            $table->increments('id');
+            $table->bigIncrements('id');
             $table->string('code', 64)->unique();
             $table->string('name');
             $table->text('description')->nullable();

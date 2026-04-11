@@ -143,7 +143,10 @@
         });
 
         // Team filter — refetch
-        document.getElementById('team-filter').addEventListener('change', () => calendar.refetchEvents() && calendar.refetchResources());
+        document.getElementById('team-filter').addEventListener('change', () => {
+            calendar.refetchEvents();
+            calendar.refetchResources();
+        });
     });
 })();
 </script>

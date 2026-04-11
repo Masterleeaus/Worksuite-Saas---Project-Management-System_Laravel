@@ -3,9 +3,11 @@
 @section('synapse_content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>⚡ SynapseDispatch Dashboard</h2>
-    <div class="d-flex gap-2">
+    <div class="d-flex gap-2 flex-wrap">
         <a href="{{ route('synapsedispatch.planner.gantt') }}" class="btn btn-primary">📅 Gantt Planner</a>
         <a href="{{ route('synapsedispatch.jobs.create') }}" class="btn btn-success">+ New Job</a>
+        <a href="{{ route('synapsedispatch.locations.index') }}" class="btn btn-outline-secondary">📍 Locations</a>
+        <a href="{{ route('synapsedispatch.my_jobs.index') }}" class="btn btn-outline-info">👷 My Jobs</a>
     </div>
 </div>
 

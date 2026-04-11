@@ -4,7 +4,9 @@ use Illuminate\Support\Facades\Route;
 use Modules\SynapseDispatch\Http\Controllers\DispatchJobController;
 use Modules\SynapseDispatch\Http\Controllers\DispatchWorkerController;
 use Modules\SynapseDispatch\Http\Controllers\DispatchTeamController;
+use Modules\SynapseDispatch\Http\Controllers\DispatchLocationController;
 use Modules\SynapseDispatch\Http\Controllers\PlannerController;
+use Modules\SynapseDispatch\Http\Controllers\MyJobsController;
 
 Route::middleware(['web', 'auth'])
     ->prefix('account/synapse-dispatch')
@@ -18,6 +20,9 @@ Route::middleware(['web', 'auth'])
         Route::get('workers/fc-resources', [DispatchWorkerController::class, 'fcResources'])->name('workers.fc_resources');
         Route::resource('workers', DispatchWorkerController::class)->names('workers');
 
+        // Locations
+        Route::resource('locations', DispatchLocationController::class)->names('locations');
+
         // Jobs — custom actions before resource to avoid route conflict with {job}
         Route::get('jobs/fc-events',               [DispatchJobController::class, 'fcEvents'])->name('jobs.fc_events');
         Route::patch('jobs/{job}/reschedule',       [DispatchJobController::class, 'reschedule'])->name('jobs.reschedule');
@@ -26,7 +31,10 @@ Route::middleware(['web', 'auth'])
         Route::resource('jobs', DispatchJobController::class)->names('jobs');
 
         // Planner
-        Route::get('planner',           [PlannerController::class, 'index'])->name('planner.index');
-        Route::get('planner/gantt',     [PlannerController::class, 'gantt'])->name('planner.gantt');
+        Route::get('planner',               [PlannerController::class, 'index'])->name('planner.index');
+        Route::get('planner/gantt',         [PlannerController::class, 'gantt'])->name('planner.gantt');
         Route::get('planner/suggest/{job}', [PlannerController::class, 'suggest'])->name('planner.suggest');
+
+        // My Jobs — for field workers logged in as Worksuite users
+        Route::get('my-jobs', [MyJobsController::class, 'index'])->name('my_jobs.index');
     });

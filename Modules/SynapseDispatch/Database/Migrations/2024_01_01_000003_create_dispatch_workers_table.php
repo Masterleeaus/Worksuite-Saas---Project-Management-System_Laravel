@@ -12,7 +12,7 @@ return new class extends Migration {
             $table->string('code', 64)->unique();
             $table->string('name');
             $table->boolean('is_active')->default(true);
-            $table->unsignedInteger('team_id')->nullable()->index();
+            $table->unsignedBigInteger('team_id')->nullable()->index();
             $table->unsignedBigInteger('location_id')->nullable()->index();
             $table->json('skills')->nullable();
             $table->json('business_hour')->nullable();

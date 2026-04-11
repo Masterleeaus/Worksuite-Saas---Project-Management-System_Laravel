@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->string('planning_status', 1)->default('U'); // PlanningStatus enum value
             $table->string('life_cycle_status', 16)->default('created'); // LifeCycleStatus enum value
             $table->boolean('auto_planning')->default(true);
-            $table->unsignedInteger('team_id')->nullable()->index();
+            $table->unsignedBigInteger('team_id')->nullable()->index();
             $table->datetime('requested_start_datetime')->nullable();
             $table->float('requested_duration_minutes')->default(60);
             $table->datetime('scheduled_start_datetime')->nullable();
