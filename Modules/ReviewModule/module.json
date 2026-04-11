@@ -1,8 +1,8 @@
 {
     "name": "ReviewModule",
     "alias": "reviewmodule",
-    "description": "",
-    "keywords": [],
+    "description": "Customer review collection, moderation and public display",
+    "keywords": ["review", "rating", "moderation", "feedback"],
     "priority": 0,
     "providers": [
         "Modules\\ReviewModule\\Providers\\ReviewModuleServiceProvider",
@@ -15,9 +15,31 @@
     "requires": [],
     "active": 1,
     "order": 0,
-    "permissions": [],
+    "permissions": [
+        "view_reviews",
+        "moderate_reviews",
+        "respond_to_reviews",
+        "publish_review"
+    ],
     "roles_permissions": {
-        "admin": [],
-        "manager": []
-    }
+        "admin": [
+            "view_reviews",
+            "moderate_reviews",
+            "respond_to_reviews",
+            "publish_review"
+        ],
+        "manager": [
+            "view_reviews",
+            "respond_to_reviews"
+        ]
+    },
+    "menus": [
+        {
+            "panel": "user",
+            "label": "Reviews",
+            "route": "reviews.index",
+            "sort_order": 92
+        }
+    ],
+    "sidebar_menu": true
 }
