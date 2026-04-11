@@ -1,0 +1,77 @@
+<?php
+
+return [
+    'module_name'        => 'TitanTheme',
+    'live_customizer'    => 'Live Customizer',
+    'mega_menu'          => 'Mega Menu',
+    'navigation'         => 'Navigation',
+    'white_label'        => 'White-Label',
+    'theme_presets'      => 'Theme Presets',
+
+    // Preset actions
+    'preset_created'     => 'Theme preset created successfully.',
+    'preset_updated'     => 'Theme preset updated successfully.',
+    'preset_deleted'     => 'Theme preset deleted.',
+    'preset_activated'   => 'Theme preset activated.',
+    'presets_deactivated'=> 'All theme presets deactivated (showing defaults).',
+    'theme_saved'        => 'Theme saved and activated successfully.',
+
+    // Mega menu actions
+    'mega_menu_created'  => 'Mega menu created successfully.',
+    'mega_menu_updated'  => 'Mega menu updated successfully.',
+    'mega_menu_deleted'  => 'Mega menu deleted.',
+    'menu_item_created'  => 'Menu item added successfully.',
+    'menu_item_updated'  => 'Menu item updated successfully.',
+    'menu_item_deleted'  => 'Menu item deleted.',
+
+    // Navigation actions
+    'nav_item_created'   => 'Navigation item added successfully.',
+    'nav_item_updated'   => 'Navigation item updated successfully.',
+    'nav_item_deleted'   => 'Navigation item deleted.',
+
+    // Shared
+    'order_saved'        => 'Sort order saved.',
+    'white_label_saved'  => 'White-label settings saved successfully.',
+
+    // Field labels
+    'name'               => 'Name',
+    'description'        => 'Description',
+    'primary_color'      => 'Primary Colour',
+    'secondary_color'    => 'Secondary Colour',
+    'accent_color'       => 'Accent Colour',
+    'background_color'   => 'Background Colour',
+    'text_color'         => 'Text Colour',
+    'heading_font'       => 'Heading Font',
+    'body_font'          => 'Body Font',
+    'sidebar_width'      => 'Sidebar Width (px)',
+    'header_height'      => 'Header Height (px)',
+    'border_radius'      => 'Border Radius (px)',
+    'custom_css'         => 'Custom CSS',
+    'is_active'          => 'Active',
+    'sort_order'         => 'Sort Order',
+    'icon'               => 'Icon',
+    'label'              => 'Label',
+    'url'                => 'URL',
+    'route_name'         => 'Route Name',
+    'panel'              => 'Panel',
+    'item_type'          => 'Item Type',
+    'open_in_new_tab'    => 'Open in New Tab',
+    'visible_to_roles'   => 'Visible to Roles',
+    'required_module'    => 'Required Module',
+    'logo'               => 'Logo',
+    'favicon'            => 'Favicon',
+    'login_bg'           => 'Login Background',
+    'email_header'       => 'Email Header Image',
+    'app_name'           => 'Application Name',
+    'support_email'      => 'Support Email',
+    'custom_domain'      => 'Custom Domain',
+    'activate'           => 'Activate',
+    'deactivate'         => 'Reset to Defaults',
+    'save_theme'         => 'Save Theme',
+    'preview'            => 'Preview',
+    'add_item'           => 'Add Item',
+    'edit_item'          => 'Edit Item',
+    'delete_item'        => 'Delete Item',
+    'create_preset'      => 'Create Preset',
+    'edit_preset'        => 'Edit Preset',
+];
