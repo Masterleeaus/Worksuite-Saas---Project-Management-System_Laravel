@@ -40,15 +40,22 @@
                     <table class="table table-sm table-bordered">
                         <thead><tr><th>Date</th><th>Desc</th><th>Amt</th><th></th></tr></thead>
                         <tbody>
+                        @php
+                            $reconciliationLinesByTransactionId = collect();
+
+                            try {
+                                $reconciliationLinesByTransactionId = \Modules\Accountings\Entities\BankReconciliationLine::where('reconciliation_id', $rec->id)
+                                    ->whereIn('bank_transaction_id', $selected->pluck('id'))
+                                    ->get()
+                                    ->keyBy('bank_transaction_id');
+                            } catch (\Illuminate\Database\QueryException $e) {
+                                // Table may not exist yet
+                            }
+                        @endphp
                         @forelse($selected as $t)
                             @php
-    $line = null;
-    try {
-                                $line = \Modules\Accountings\Entities\BankReconciliationLine::where('reconciliation_id',$rec->id)->where('bank_transaction_id',$t->id)->first();
-    } catch (\Illuminate\Database\QueryException $e) {
-        // Table may not exist yet
-    }
-@endphp
+                                $line = $reconciliationLinesByTransactionId->get($t->id);
+                            @endphp
                             <tr>
                                 <td>{{ $t->txn_date->format('Y-m-d') }}</td>
                                 <td>{{ $t->description }}</td>
