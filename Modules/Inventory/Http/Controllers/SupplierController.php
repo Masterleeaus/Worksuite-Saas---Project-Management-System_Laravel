@@ -70,7 +70,11 @@ class SupplierController extends Controller
 
     private function suppliersModuleActive(): bool
     {
-        return class_exists(\Modules\Suppliers\Entities\Supplier::class)
-            && \Illuminate\Support\Facades\Schema::hasTable('suppliers');
+        static $result = null;
+        if ($result === null) {
+            $result = class_exists(\Modules\Suppliers\Entities\Supplier::class)
+                && \Illuminate\Support\Facades\Schema::hasTable('suppliers');
+        }
+        return $result;
     }
 }

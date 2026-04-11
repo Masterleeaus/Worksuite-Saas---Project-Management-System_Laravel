@@ -48,6 +48,49 @@ class TransferController extends Controller
             return back()->with('error', 'Transfer can only be dispatched from pending status');
         }
 
+        $this->processDispatch($transfer);
+
+        return back()->with('status', 'Transfer dispatched (in transit)');
+    }
+
+    /**
+     * Receive a transfer — stock arrives at destination warehouse.
+     */
+    public function receive(Transfer $transfer)
+    {
+        if ($transfer->status !== 'in_transit') {
+            return back()->with('error', 'Transfer must be in_transit to receive');
+        }
+
+        $this->processReceive($transfer);
+
+        return back()->with('status', 'Transfer received');
+    }
+
+    /**
+     * Legacy approve endpoint — kept for backward compat; maps to dispatch then receive.
+     */
+    public function approve(Transfer $transfer)
+    {
+        if ($transfer->status === 'received') {
+            return back()->with('status', 'Already received');
+        }
+
+        if ($transfer->status === 'pending') {
+            $this->processDispatch($transfer);
+            $transfer->refresh();
+        }
+
+        if ($transfer->status === 'in_transit') {
+            $this->processReceive($transfer);
+        }
+
+        return back()->with('status', 'Transfer approved');
+    }
+
+    /** Business logic: dispatch a pending transfer to in_transit. */
+    private function processDispatch(Transfer $transfer): void
+    {
         DB::transaction(function () use ($transfer) {
             $from = StockLevel::firstOrCreate(
                 ['item_id' => $transfer->item_id, 'warehouse_id' => $transfer->from_warehouse_id],
@@ -71,19 +114,11 @@ class TransferController extends Controller
             $transfer->status = 'in_transit';
             $transfer->save();
         });
-
-        return back()->with('status', 'Transfer dispatched (in transit)');
     }
 
-    /**
-     * Receive a transfer — stock arrives at destination warehouse.
-     */
-    public function receive(Transfer $transfer)
+    /** Business logic: receive an in_transit transfer. */
+    private function processReceive(Transfer $transfer): void
     {
-        if ($transfer->status !== 'in_transit') {
-            return back()->with('error', 'Transfer must be in_transit to receive');
-        }
-
         DB::transaction(function () use ($transfer) {
             $to = StockLevel::firstOrCreate(
                 ['item_id' => $transfer->item_id, 'warehouse_id' => $transfer->to_warehouse_id],
@@ -107,29 +142,6 @@ class TransferController extends Controller
             $transfer->status = 'received';
             $transfer->save();
         });
-
-        return back()->with('status', 'Transfer received');
-    }
-
-    /**
-     * Legacy approve endpoint — kept for backward compat; maps to dispatch then receive.
-     */
-    public function approve(Transfer $transfer)
-    {
-        if ($transfer->status === 'received') {
-            return back()->with('status', 'Already received');
-        }
-
-        if ($transfer->status === 'pending') {
-            $this->dispatch($transfer);
-            $transfer->refresh();
-        }
-
-        if ($transfer->status === 'in_transit') {
-            return $this->receive($transfer);
-        }
-
-        return back()->with('status', 'Transfer approved');
     }
 
     public function destroy(Transfer $transfer)

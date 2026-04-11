@@ -135,8 +135,8 @@ class PurchaseController extends Controller
         if (class_exists(\Modules\Suppliers\Entities\Supplier::class) && \Illuminate\Support\Facades\Schema::hasTable('suppliers')) {
             try {
                 return \Modules\Suppliers\Entities\Supplier::orderBy('name')->get(['id', 'name']);
-            } catch (\Throwable $e) {
-                // fall through to local
+            } catch (\Illuminate\Database\QueryException $e) {
+                \Illuminate\Support\Facades\Log::warning('Inventory: could not load Suppliers module suppliers', ['error' => $e->getMessage()]);
             }
         }
         return Supplier::orderBy('name')->get(['id', 'name']);

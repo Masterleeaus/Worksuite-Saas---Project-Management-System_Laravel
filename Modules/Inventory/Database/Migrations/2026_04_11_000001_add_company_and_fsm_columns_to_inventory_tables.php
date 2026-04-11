@@ -165,13 +165,18 @@ return new class extends Migration
     /** Check whether a named foreign key already exists (avoids duplicates). */
     private function foreignExists(string $table, string $keyName): bool
     {
-        $fks = \Illuminate\Support\Facades\DB::select(
-            "SELECT CONSTRAINT_NAME FROM information_schema.KEY_COLUMN_USAGE
-             WHERE TABLE_SCHEMA = DATABASE()
-               AND TABLE_NAME = ?
-               AND CONSTRAINT_NAME = ?",
-            [$table, $keyName]
-        );
-        return count($fks) > 0;
+        try {
+            $fks = \Illuminate\Support\Facades\Schema::getConnection()
+                ->getDoctrineSchemaManager()
+                ->listTableForeignKeys($table);
+            foreach ($fks as $fk) {
+                if ($fk->getName() === $keyName) {
+                    return true;
+                }
+            }
+        } catch (\Throwable $e) {
+            // If Doctrine is not available or the table doesn't exist, fall back to false
+        }
+        return false;
     }
 };

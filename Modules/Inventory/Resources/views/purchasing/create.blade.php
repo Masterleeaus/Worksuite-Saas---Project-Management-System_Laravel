@@ -73,6 +73,10 @@
                             <i class="fa fa-plus"></i> Add Item
                         </button>
 
+                        <script id="po-items-data" type="application/json">
+                            {!! json_encode($items->map(fn($i) => ['id' => $i->id, 'name' => $i->name])) !!}
+                        </script>
+
                         <div class="d-flex justify-content-between mt-2">
                             <a href="{{ route('inventory.purchasing.index') }}" class="btn btn-secondary">Cancel</a>
                             <button type="submit" class="btn btn-primary">Create Purchase Order</button>
@@ -87,18 +91,49 @@
 <script>
 (function() {
     var idx = 1;
-    var items = @json($items->map(fn($i) => ['id' => $i->id, 'name' => $i->name]));
+    var itemsData = document.getElementById('po-items-data');
+    var items = JSON.parse(itemsData.textContent || itemsData.innerText);
     document.getElementById('add-item').addEventListener('click', function() {
-        var opts = items.map(function(i){ return '<option value="'+i.id+'">'+i.name+'</option>'; }).join('');
-        var html = '<div class="row po-item-row mb-2">'
-            + '<div class="col-md-5"><select name="items['+idx+'][item_id]" class="form-control" required><option value="">— Item —</option>'+opts+'</select></div>'
-            + '<div class="col-md-3"><input type="number" name="items['+idx+'][qty_ordered]" step="0.0001" min="0.0001" class="form-control" placeholder="Qty" required></div>'
-            + '<div class="col-md-3"><input type="number" name="items['+idx+'][unit_cost]" step="0.01" min="0" class="form-control" placeholder="Unit Cost" required></div>'
-            + '<div class="col-md-1"><button type="button" class="btn btn-sm btn-outline-danger remove-row"><i class="fa fa-times"></i></button></div>'
-            + '</div>';
-        var container = document.getElementById('po-items');
-        container.insertAdjacentHTML('beforeend', html);
-        container.lastElementChild.querySelector('.remove-row').addEventListener('click', function(){ this.closest('.po-item-row').remove(); });
+        var select = document.createElement('select');
+        select.name = 'items[' + idx + '][item_id]';
+        select.className = 'form-control';
+        select.required = true;
+        var defaultOpt = document.createElement('option');
+        defaultOpt.value = '';
+        defaultOpt.textContent = '— Item —';
+        select.appendChild(defaultOpt);
+        items.forEach(function(item) {
+            var opt = document.createElement('option');
+            opt.value = item.id;
+            opt.textContent = item.name;
+            select.appendChild(opt);
+        });
+
+        var row = document.createElement('div');
+        row.className = 'row po-item-row mb-2';
+
+        var col1 = document.createElement('div'); col1.className = 'col-md-5'; col1.appendChild(select);
+        var col2 = document.createElement('div'); col2.className = 'col-md-3';
+        var qtyInput = document.createElement('input');
+        qtyInput.type = 'number'; qtyInput.name = 'items[' + idx + '][qty_ordered]';
+        qtyInput.step = '0.0001'; qtyInput.min = '0.0001'; qtyInput.className = 'form-control';
+        qtyInput.placeholder = 'Qty'; qtyInput.required = true;
+        col2.appendChild(qtyInput);
+        var col3 = document.createElement('div'); col3.className = 'col-md-3';
+        var costInput = document.createElement('input');
+        costInput.type = 'number'; costInput.name = 'items[' + idx + '][unit_cost]';
+        costInput.step = '0.01'; costInput.min = '0'; costInput.className = 'form-control';
+        costInput.placeholder = 'Unit Cost'; costInput.required = true;
+        col3.appendChild(costInput);
+        var col4 = document.createElement('div'); col4.className = 'col-md-1';
+        var rmBtn = document.createElement('button');
+        rmBtn.type = 'button'; rmBtn.className = 'btn btn-sm btn-outline-danger remove-row';
+        rmBtn.innerHTML = '<i class="fa fa-times"></i>';
+        rmBtn.addEventListener('click', function() { row.remove(); });
+        col4.appendChild(rmBtn);
+
+        row.appendChild(col1); row.appendChild(col2); row.appendChild(col3); row.appendChild(col4);
+        document.getElementById('po-items').appendChild(row);
         idx++;
     });
 })();

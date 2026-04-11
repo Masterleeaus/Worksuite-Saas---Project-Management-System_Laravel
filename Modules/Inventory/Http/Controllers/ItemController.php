@@ -21,8 +21,8 @@ class ItemController extends Controller
         if (class_exists(\Modules\FieldItems\Entities\Item::class) && \Illuminate\Support\Facades\Schema::hasTable('items')) {
             try {
                 $fieldItems = \Modules\FieldItems\Entities\Item::orderBy('name')->get(['id', 'name', 'sku']);
-            } catch (\Throwable $e) {
-                // Silently ignore — FieldItems may not be ready
+            } catch (\Illuminate\Database\QueryException $e) {
+                \Illuminate\Support\Facades\Log::warning('Inventory: could not load FieldItems catalogue', ['error' => $e->getMessage()]);
             }
         }
         return view('inventory::items.create', compact('fieldItems'));
@@ -47,8 +47,8 @@ class ItemController extends Controller
         if (class_exists(\Modules\FieldItems\Entities\Item::class) && \Illuminate\Support\Facades\Schema::hasTable('items')) {
             try {
                 $fieldItems = \Modules\FieldItems\Entities\Item::orderBy('name')->get(['id', 'name', 'sku']);
-            } catch (\Throwable $e) {
-                // Silently ignore
+            } catch (\Illuminate\Database\QueryException $e) {
+                \Illuminate\Support\Facades\Log::warning('Inventory: could not load FieldItems catalogue', ['error' => $e->getMessage()]);
             }
         }
         return view('inventory::items.edit', compact('item', 'fieldItems'));

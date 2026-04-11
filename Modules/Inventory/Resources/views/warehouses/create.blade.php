@@ -37,7 +37,7 @@
                         <div class="form-group">
                             <div class="custom-control custom-switch">
                                 <input type="checkbox" class="custom-control-input" id="is_active" name="is_active" value="1"
-                                       {{ old('is_active', '1') ? 'checked' : '' }}>
+                                       {{ old('is_active', true) ? 'checked' : '' }}>
                                 <label class="custom-control-label" for="is_active">Active</label>
                             </div>
                         </div>
