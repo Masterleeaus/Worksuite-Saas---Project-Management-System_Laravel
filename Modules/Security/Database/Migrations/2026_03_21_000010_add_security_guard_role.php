@@ -13,7 +13,7 @@ return new class extends Migration
         }
 
         DB::table('roles')->insertOrIgnore([
-            ['name' => 'security_guard', 'display_name' => 'Security Guard', 'is_admin' => 0],
+            ['name' => 'security_guard', 'display_name' => 'Security Guard'],
         ]);
     }
 

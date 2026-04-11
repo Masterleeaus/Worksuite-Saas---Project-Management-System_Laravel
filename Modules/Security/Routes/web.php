@@ -61,10 +61,10 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     // ACCESS LOGS
     Route::get('security/access-logs', [AccessLogController::class, 'index'])->name('security.access_logs.index');
     Route::get('security/access-logs/data', [AccessLogController::class, 'data'])->name('security.access_logs.data');
-    Route::get('security/access-logs/{id}', [AccessLogController::class, 'show'])->name('security.access_logs.show');
     Route::get('security/access-logs/denied/attempts', [AccessLogController::class, 'deniedAttempts'])->name('security.access_logs.denied_attempts');
     Route::post('security/access-logs/trail', [AccessLogController::class, 'trail'])->name('security.access_logs.trail');
     Route::get('security/access-logs/summary', [AccessLogController::class, 'summary'])->name('security.access_logs.summary');
     Route::get('security/access-logs/export', [AccessLogController::class, 'export'])->name('security.access_logs.export');
     Route::post('security/access-logs/cleanup', [AccessLogController::class, 'cleanup'])->name('security.access_logs.cleanup');
+    Route::get('security/access-logs/{id}', [AccessLogController::class, 'show'])->name('security.access_logs.show')->whereNumber('id');
 });

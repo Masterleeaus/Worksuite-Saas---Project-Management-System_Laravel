@@ -42,6 +42,13 @@ return new class extends Migration
                 $table->foreign('rejected_by')->references('id')->on('users')->nullOnDelete();
             }
         });
+
+        // Add task_id FK after table creation so we can safely guard on tasks table existence
+        if (Schema::hasTable('tasks') && Schema::hasColumn('tr_workpermits', 'task_id')) {
+            Schema::table('tr_workpermits', function (Blueprint $table) {
+                $table->foreign('task_id')->references('id')->on('tasks')->nullOnDelete();
+            });
+        }
     }
 
     public function down(): void
