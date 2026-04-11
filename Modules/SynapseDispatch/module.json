@@ -1,0 +1,19 @@
+{
+  "name": "SynapseDispatch",
+  "alias": "synapsedispatch",
+  "description": "SynapseDispatch \u2013 Real-Time Field Service Dispatch Engine: Jobs, Workers, Teams, Locations, Events with Heuristic Auto-Planning and FullCalendar Gantt.",
+  "keywords": ["dispatch","field-service","gantt","scheduling","planner"],
+  "active": 1,
+  "order": 2,
+  "providers": [
+    "Modules\\SynapseDispatch\\Providers\\SynapseDispatchServiceProvider",
+    "Modules\\SynapseDispatch\\Providers\\RouteServiceProvider",
+    "Modules\\SynapseDispatch\\Providers\\EventServiceProvider",
+    "Modules\\SynapseDispatch\\Providers\\ConfigServiceProvider",
+    "Modules\\SynapseDispatch\\Providers\\ViewServiceProvider"
+  ],
+  "aliases": {},
+  "files": [],
+  "requires": [],
+  "version": "1.0.0"
+}
