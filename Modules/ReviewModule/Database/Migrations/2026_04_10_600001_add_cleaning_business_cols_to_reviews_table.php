@@ -53,12 +53,11 @@ return new class extends Migration {
                 'rating_value', 'rating_communication', 'review_token',
                 'request_sent_at', 'submitted_at', 'complaint_created',
             ];
-            foreach ($cols as $col) {
-                if (Schema::hasColumn('reviews', $col)) {
-                    Schema::table('reviews', function (Blueprint $table) use ($col) {
-                        $table->dropColumn($col);
-                    });
-                }
+            $existingCols = array_filter($cols, fn ($col) => Schema::hasColumn('reviews', $col));
+            if ($existingCols) {
+                Schema::table('reviews', function (Blueprint $table) use ($existingCols) {
+                    $table->dropColumn(array_values($existingCols));
+                });
             }
         }
     }

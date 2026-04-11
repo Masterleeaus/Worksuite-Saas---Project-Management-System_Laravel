@@ -180,17 +180,17 @@
                                 @if(user()->permission('moderate_reviews') != 'none')
                                     @if(($review->moderation_status ?? 'pending') === 'pending')
                                         <button class="btn btn-sm btn-outline-success review-approve"
-                                                data-id="{{ $review->id }}">
+                                                data-url="{{ route('reviews.approve', $review->id) }}">
                                             <i class="fa fa-check"></i>
                                         </button>
                                         <button class="btn btn-sm btn-outline-danger review-reject"
-                                                data-id="{{ $review->id }}">
+                                                data-url="{{ route('reviews.reject', $review->id) }}">
                                             <i class="fa fa-times"></i>
                                         </button>
                                     @endif
                                     @if(($review->moderation_status ?? 'pending') === 'approved' && user()->permission('publish_review') != 'none')
                                         <button class="btn btn-sm btn-outline-primary review-publish"
-                                                data-id="{{ $review->id }}">
+                                                data-url="{{ route('reviews.publish', $review->id) }}">
                                             <i class="fa fa-globe"></i>
                                         </button>
                                     @endif
@@ -221,48 +221,43 @@
 @push('scripts')
     <script>
         $(document).on('click', '.review-approve', function () {
-            const id = $(this).data('id');
-            $.post("{{ url('account/reviews') }}/" + id + "/approve", {_token: '{{ csrf_token() }}'})
+            $.post($(this).data('url'), {_token: '{{ csrf_token() }}'})
                 .done(function () { location.reload(); });
         });
 
         $(document).on('click', '.review-reject', function () {
-            const id = $(this).data('id');
-            $.post("{{ url('account/reviews') }}/" + id + "/reject", {_token: '{{ csrf_token() }}'})
+            $.post($(this).data('url'), {_token: '{{ csrf_token() }}'})
                 .done(function () { location.reload(); });
         });
 
         $(document).on('click', '.review-publish', function () {
-            const id = $(this).data('id');
-            $.post("{{ url('account/reviews') }}/" + id + "/publish", {_token: '{{ csrf_token() }}'})
+            $.post($(this).data('url'), {_token: '{{ csrf_token() }}'})
                 .done(function () { location.reload(); });
         });
 
         $('#review-status, #review-rating').on('change', function () {
+            const params = new URLSearchParams();
             const status = $('#review-status').val();
             const rating = $('#review-rating').val();
-            let url = "{{ route('reviews.index') }}?";
-            if (status && status !== 'all') url += 'status=' + status + '&';
-            if (rating) url += 'rating=' + rating;
-            window.location.href = url;
+            if (status && status !== 'all') params.set('status', status);
+            if (rating) params.set('rating', rating);
+            const qs = params.toString();
+            window.location.href = "{{ route('reviews.index') }}" + (qs ? '?' + qs : '');
         });
 
         let searchTimer;
         $('#search-text-field').on('keyup', function () {
             clearTimeout(searchTimer);
             const q = $(this).val();
+            if (q.length > 0) $('#reset-filters').removeClass('d-none');
+            else $('#reset-filters').addClass('d-none');
             searchTimer = setTimeout(function () {
-                window.location.href = "{{ route('reviews.index') }}?search=" + encodeURIComponent(q);
+                window.location.href = "{{ route('reviews.index') }}" + (q ? '?search=' + encodeURIComponent(q) : '');
             }, 500);
         });
 
         $('#reset-filters').on('click', function () {
             window.location.href = "{{ route('reviews.index') }}";
-        });
-
-        $('#search-text-field').on('keyup', function () {
-            if ($(this).val().length > 0) $('#reset-filters').removeClass('d-none');
-            else $('#reset-filters').addClass('d-none');
         });
     </script>
 @endpush

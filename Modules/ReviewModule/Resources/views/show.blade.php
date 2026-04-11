@@ -12,15 +12,15 @@
             @if(user()->permission('moderate_reviews') != 'none')
                 <div class="d-flex">
                     @if(($review->moderation_status ?? 'pending') === 'pending')
-                        <button class="btn btn-success btn-sm mr-2 review-approve" data-id="{{ $review->id }}">
+                        <button class="btn btn-success btn-sm mr-2 review-approve" data-url="{{ route('reviews.approve', $review->id) }}">
                             <i class="fa fa-check mr-1"></i>@lang('reviewmodule::modules.approve')
                         </button>
-                        <button class="btn btn-danger btn-sm mr-2 review-reject" data-id="{{ $review->id }}">
+                        <button class="btn btn-danger btn-sm mr-2 review-reject" data-url="{{ route('reviews.reject', $review->id) }}">
                             <i class="fa fa-times mr-1"></i>@lang('reviewmodule::modules.reject')
                         </button>
                     @endif
                     @if(($review->moderation_status ?? 'pending') === 'approved' && user()->permission('publish_review') != 'none')
-                        <button class="btn btn-primary btn-sm review-publish" data-id="{{ $review->id }}">
+                        <button class="btn btn-primary btn-sm review-publish" data-url="{{ route('reviews.publish', $review->id) }}">
                             <i class="fa fa-globe mr-1"></i>@lang('reviewmodule::modules.publish')
                         </button>
                     @endif
@@ -222,9 +222,8 @@
     <script>
         $('#respond-form').on('submit', function (e) {
             e.preventDefault();
-            const id = '{{ $review->id }}';
             $.ajax({
-                url: "{{ url('account/reviews') }}/" + id + "/respond",
+                url: "{{ route('reviews.respond', $review->id) }}",
                 method: 'POST',
                 data: {
                     _token: '{{ csrf_token() }}',
@@ -245,20 +244,17 @@
         });
 
         $('.review-approve').on('click', function () {
-            const id = $(this).data('id');
-            $.post("{{ url('account/reviews') }}/" + id + "/approve", {_token: '{{ csrf_token() }}'})
+            $.post($(this).data('url'), {_token: '{{ csrf_token() }}'})
                 .done(function () { location.reload(); });
         });
 
         $('.review-reject').on('click', function () {
-            const id = $(this).data('id');
-            $.post("{{ url('account/reviews') }}/" + id + "/reject", {_token: '{{ csrf_token() }}'})
+            $.post($(this).data('url'), {_token: '{{ csrf_token() }}'})
                 .done(function () { location.reload(); });
         });
 
         $('.review-publish').on('click', function () {
-            const id = $(this).data('id');
-            $.post("{{ url('account/reviews') }}/" + id + "/publish", {_token: '{{ csrf_token() }}'})
+            $.post($(this).data('url'), {_token: '{{ csrf_token() }}'})
                 .done(function () { location.reload(); });
         });
     </script>

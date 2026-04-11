@@ -25,7 +25,7 @@ class ReviewController extends Controller
      */
     public function index(Request $request)
     {
-        abort_if(!in_array('reviewmodule', user_modules()) && user()->permission('view_reviews') == 'none', 403);
+        abort_if(!in_array('reviewmodule', user_modules()) || user()->permission('view_reviews') == 'none', 403);
 
         $query = $this->review->with(['customer', 'service', 'provider', 'reviewReply']);
 
@@ -184,7 +184,7 @@ class ReviewController extends Controller
     public function publicForm($token)
     {
         $review = $this->review->where('review_token', $token)
-            ->whereNull('review_comment')
+            ->whereNull('submitted_at')
             ->firstOrFail();
 
         return view('reviewmodule::public.form', compact('review', 'token'));
