@@ -42,11 +42,10 @@
                         <tbody>
                         @forelse($selected as $t)
                             @php
+    $line = null;
     try {
-
                                 $line = \Modules\Accountings\Entities\BankReconciliationLine::where('reconciliation_id',$rec->id)->where('bank_transaction_id',$t->id)->first();
-                            
-    } catch (\Exception $e) {
+    } catch (\Illuminate\Database\QueryException $e) {
         // Table may not exist yet
     }
 @endphp

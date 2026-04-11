@@ -181,12 +181,11 @@
                                 <div class="card rounded-0">
                                     <h4 class="p-2 lang_title">{{ __('available_translations') }}</h4>
                                     @php
+    $language = null;
     try {
-
                                         $langCode = \App::getLocale();
                                         $language = \Modules\GlobalSetting\app\Models\Language::where('code', $langCode)->first();
-                                    
-    } catch (\Exception $e) {
+    } catch (\Illuminate\Database\QueryException $e) {
         // Table may not exist yet
     }
 @endphp

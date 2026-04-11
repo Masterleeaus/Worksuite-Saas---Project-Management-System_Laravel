@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Modules\Affiliate\Enums\PaymentStatus;
 
 return new class extends Migration
 {
@@ -26,7 +25,7 @@ return new class extends Migration
 
             $table->string('status')
                 ->nullable()
-                ->default(PaymentStatus::Pending->value);
+                ->default('pending');
 
             $table->string('payment_method');
             $table->string('other_payment_method')->nullable();
