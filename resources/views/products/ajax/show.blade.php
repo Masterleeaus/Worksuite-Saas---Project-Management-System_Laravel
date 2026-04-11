@@ -138,3 +138,6 @@ $deletePermission = user()->permission('delete_product');
     });
 
 </script>
+
+{{-- Purchase module: PO history for this product (injected by Modules/Purchase) --}}
+@stack('product-purchase-history')
