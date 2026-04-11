@@ -37,24 +37,29 @@ return [
         'FSMStock'             => ['FSMCore'],
         'FSMCRM'               => ['FSMCore'],         // references fsm_locations, fsm_orders
         // FSM extension modules
-        'FSMAccount'        => ['FSMCore'],
-        'FSMKanban'         => ['FSMCore'],
-        'FSMProject'        => ['FSMCore'],
-        'FSMRepair'         => ['FSMCore'],
-        'FSMRepairTemplate' => ['FSMCore', 'FSMRepair'],
-        'FSMSize'           => ['FSMCore'],
-        'FSMStageAction'    => ['FSMCore'],
-
+        'FSMAccount'           => ['FSMCore'],
+        'FSMKanban'            => ['FSMCore'],
+        'FSMProject'           => ['FSMCore'],
+        'FSMRepair'            => ['FSMCore'],
+        'FSMRepairTemplate'    => ['FSMCore', 'FSMRepair'],
+        'FSMSize'              => ['FSMCore'],
+        'FSMStageAction'       => ['FSMCore'],
         'FSMCalendar'          => ['FSMCore'],
+        // FSM client & billing modules
+        'FSMPortal'            => ['FSMCore'],
+        'FSMSales'             => ['FSMCore'],
 
-        // Accounting stack
-        'Accountings'          => ['Accounting'],
+        // Accounting stack (Accountings is the single accounting module — no sub-dependency)
+        // 'Accountings' has no Laravel module dependency; it is standalone.
 
         // Titan stack
         'TitanAgents'          => ['TitanCore'],
         'TitanDocs'            => ['TitanCore'],
         'TitanHello'           => ['TitanCore'],
         'TitanZero'            => ['TitanCore'],
+        'TitanPWA'             => ['TitanCore'],
+        'TitanReach'           => ['TitanCore'],
+        'TitanVault'           => ['TitanCore'],
 
         // Business modules that need GlobalSetting seeded first
         'Payroll'              => ['GlobalSetting'],
@@ -83,7 +88,7 @@ return [
 
     'order' => [
         'GlobalSetting',
-        'Accounting',
+        'Accountings',          // was incorrectly 'Accounting' — only Accountings module exists
         'Inspection',
         'FSMCore',
         'FSMRecurring',
@@ -105,11 +110,16 @@ return [
         'FSMRepairTemplate',
         'FSMSize',
         'FSMStageAction',
+        'FSMPortal',
+        'FSMSales',
         'TitanCore',
         'TitanAgents',
         'TitanDocs',
         'TitanHello',
         'TitanZero',
+        'TitanPWA',
+        'TitanReach',
+        'TitanVault',
         'QualityControl',
         'Payroll',
         'Zoom',
