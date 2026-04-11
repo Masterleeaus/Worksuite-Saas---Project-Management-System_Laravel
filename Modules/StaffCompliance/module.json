@@ -1,0 +1,45 @@
+{
+    "name": "StaffCompliance",
+    "alias": "staffcompliance",
+    "description": "Tracks mandatory compliance documents for field workers: police checks, working with children checks, insurance, trade licences and certifications",
+    "keywords": ["compliance", "certifications", "police-check", "licence", "field-worker"],
+    "active": 1,
+    "order": 0,
+    "providers": [
+        "Modules\\StaffCompliance\\Providers\\StaffComplianceServiceProvider",
+        "Modules\\StaffCompliance\\Providers\\EventServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": [],
+    "permissions": [
+        "view_compliance",
+        "manage_compliance",
+        "verify_compliance_documents",
+        "manage_compliance_document_types"
+    ],
+    "roles_permissions": {
+        "admin": [
+            "view_compliance",
+            "manage_compliance",
+            "verify_compliance_documents",
+            "manage_compliance_document_types"
+        ],
+        "manager": [
+            "view_compliance",
+            "verify_compliance_documents"
+        ],
+        "employee": [
+            "view_compliance"
+        ]
+    },
+    "menus": [
+        {
+            "panel": "user",
+            "label": "Staff Compliance",
+            "route": "compliance.dashboard",
+            "sort_order": 95
+        }
+    ],
+    "sidebar_menu": true
+}
