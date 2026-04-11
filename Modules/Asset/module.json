@@ -1,8 +1,8 @@
 {
     "name": "Asset",
     "alias": "asset",
-    "description": "",
-    "keywords": [],
+    "description": "Equipment and asset tracking — vacuums, chemicals, vehicles and consumables",
+    "keywords": ["asset", "equipment", "maintenance", "inventory", "consumables", "vehicle", "cleaning"],
     "active": 1,
     "order": 2,
     "providers": [
@@ -12,5 +12,40 @@
     "aliases": {},
     "files": [
         "start.php"
-    ]
+    ],
+    "requires": [],
+    "permissions": [
+        "view_assets",
+        "add_asset",
+        "edit_asset",
+        "delete_asset",
+        "manage_maintenance"
+    ],
+    "roles_permissions": {
+        "admin": [
+            "view_assets",
+            "add_asset",
+            "edit_asset",
+            "delete_asset",
+            "manage_maintenance"
+        ],
+        "manager": [
+            "view_assets",
+            "add_asset",
+            "edit_asset",
+            "manage_maintenance"
+        ],
+        "employee": [
+            "view_assets"
+        ]
+    },
+    "menus": [
+        {
+            "panel": "user",
+            "label": "Assets",
+            "route": "assets.index",
+            "sort_order": 47
+        }
+    ],
+    "sidebar_menu": true
 }
