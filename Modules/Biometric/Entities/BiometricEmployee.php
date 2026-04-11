@@ -115,8 +115,7 @@ class BiometricEmployee extends BaseModel
         Log::info('Fingerprint data received', [
             'device_serial_number' => $device->serial_number,
             'employee_id'          => $employeeId,
-            'fingerprint_id'       => $fingerprintId,
-            // Never log the raw template value — it is sensitive biometric data.
+            // fingerprint_id and template are never logged — sensitive biometric data.
         ]);
 
         if ($employeeId && $fingerprintId) {
@@ -146,6 +145,7 @@ class BiometricEmployee extends BaseModel
 
         Log::info('User data received', [
             'employee_id' => $employeeId,
+            // card_number intentionally omitted — treat as sensitive credential.
         ]);
 
         if ($employeeId && $cardNumber) {
@@ -314,7 +314,9 @@ class BiometricEmployee extends BaseModel
                 $biometricEmployee->user,
                 $timestamp,
                 $device->serial_number,
-                $status === 0 ? 'fingerprint' : 'fingerprint',
+                // parts[3] is the ZKTeco verify type:
+                // 0 = password, 1 = fingerprint, 15 = face, other = card/NFC
+                self::resolveClockMethod($parts[3] ?? null),
             );
         }
     }
@@ -433,6 +435,26 @@ class BiometricEmployee extends BaseModel
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
+
+    /**
+     * Map a ZKTeco verify-type integer to a human-readable clock method string.
+     *
+     * ZKTeco verify types:
+     *  0  = password / PIN
+     *  1  = fingerprint
+     *  3  = card / NFC
+     *  15 = face recognition
+     */
+    private static function resolveClockMethod(mixed $verifyType): string
+    {
+        return match ((int) ($verifyType ?? 1)) {
+            0       => 'pin',
+            1       => 'fingerprint',
+            3       => 'nfc',
+            15      => 'face',
+            default => 'fingerprint',
+        };
+    }
 
     private static function validateAndFormatInteger(mixed $value): ?int
     {

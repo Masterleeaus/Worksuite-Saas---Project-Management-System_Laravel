@@ -2,17 +2,13 @@
     Biometric Data Tab
     Pushed into @stack('biometric-data-tab') on the core attendance show view.
     Shows GPS coordinates, method badge and geofence pass/fail for each clock-in.
+    $attendanceActivity is available from the parent AttendanceController::show context.
 --}}
 @if(in_array('biometric', user_modules()))
 @push('biometric-data-tab')
     <div class="row mt-3">
         <div class="col-md-12">
             <x-cards.data :title="__('biometric::app.biometricData')">
-
-                @php
-                    /** @var \App\Models\Attendance $attendance */
-                    $bioRows = $attendanceActivity ?? collect();
-                @endphp
 
                 <div class="table-responsive">
                     <table class="table table-sm">
@@ -29,8 +25,12 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($bioRows as $row)
-                                @if($row->clock_in_method && $row->clock_in_method !== 'manual')
+                            @php
+                                $biometricRows = isset($attendanceActivity)
+                                    ? $attendanceActivity->filter(fn($r) => isset($r->clock_in_method) && $r->clock_in_method !== 'manual')
+                                    : collect();
+                            @endphp
+                            @forelse($biometricRows as $row)
                                 <tr>
                                     <td>{{ $row->clock_in_time?->translatedFormat(company()->time_format) }}</td>
                                     <td>
@@ -63,7 +63,7 @@
                                     </td>
                                     <td>{{ $row->clock_out_time?->translatedFormat(company()->time_format) ?? '—' }}</td>
                                     <td>
-                                        @if($row->clock_out_method && $row->clock_out_method !== 'manual')
+                                        @if(isset($row->clock_out_method) && $row->clock_out_method !== 'manual')
                                             <span class="badge badge-secondary">
                                                 {{ ucfirst($row->clock_out_method) }}
                                             </span>
@@ -88,7 +88,6 @@
                                         </span>
                                     </td>
                                 </tr>
-                                @endif
                             @empty
                                 <tr>
                                     <td colspan="8" class="text-center text-muted">
