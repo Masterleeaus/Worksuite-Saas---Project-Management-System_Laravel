@@ -22,11 +22,16 @@ class WarehouseController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name' => 'required|string|max:190',
-            'code' => 'nullable|string|max:50|unique:warehouses,code',
+            'name'      => 'required|string|max:190',
+            'code'      => 'nullable|string|max:50|unique:warehouses,code',
+            'address'   => 'nullable|string|max:500',
+            'type'      => 'nullable|in:depot,van,office',
+            'is_active' => 'sometimes|boolean',
         ]);
+        $data['company_id'] = company()->id ?? null;
+        $data['is_active']  = $request->boolean('is_active', true);
         Warehouse::create($data);
-        return redirect()->route('inventory.warehouses.index')->with('status','Warehouse created');
+        return redirect()->route('inventory.warehouses.index')->with('status', 'Warehouse created');
     }
 
     public function edit(Warehouse $warehouse)
@@ -37,16 +42,20 @@ class WarehouseController extends Controller
     public function update(Request $request, Warehouse $warehouse)
     {
         $data = $request->validate([
-            'name' => 'required|string|max:190',
-            'code' => 'nullable|string|max:50|unique:warehouses,code,' . $warehouse->id,
+            'name'      => 'required|string|max:190',
+            'code'      => 'nullable|string|max:50|unique:warehouses,code,' . $warehouse->id,
+            'address'   => 'nullable|string|max:500',
+            'type'      => 'nullable|in:depot,van,office',
+            'is_active' => 'sometimes|boolean',
         ]);
+        $data['is_active'] = $request->boolean('is_active', true);
         $warehouse->update($data);
-        return redirect()->route('inventory.warehouses.index')->with('status','Warehouse updated');
+        return redirect()->route('inventory.warehouses.index')->with('status', 'Warehouse updated');
     }
 
     public function destroy(Warehouse $warehouse)
     {
         $warehouse->delete();
-        return back()->with('status','Warehouse deleted');
+        return back()->with('status', 'Warehouse deleted');
     }
 }

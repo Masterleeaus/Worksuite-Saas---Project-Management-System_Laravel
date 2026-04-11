@@ -2,13 +2,42 @@
 
 namespace Modules\Inventory\Models;
 
+use App\Traits\HasCompany;
 use Illuminate\Database\Eloquent\Model;
 
 class GoodsReceipt extends Model
 {
-    protected $fillable = ['purchase_order_id','warehouse_id','received_at','reference'];
-    protected $casts = ['received_at'=>'datetime'];
+    use HasCompany;
 
-    public function order(){ return $this->belongsTo(PurchaseOrder::class,'purchase_order_id'); }
-    public function items(){ return $this->hasMany(GoodsReceiptItem::class); }
+    protected $fillable = [
+        'company_id',
+        'purchase_order_id',
+        'warehouse_id',
+        'received_by',
+        'received_at',
+        'reference',
+        'notes',
+    ];
+
+    protected $casts = ['received_at' => 'datetime'];
+
+    public function order()
+    {
+        return $this->belongsTo(PurchaseOrder::class, 'purchase_order_id');
+    }
+
+    public function warehouse()
+    {
+        return $this->belongsTo(Warehouse::class);
+    }
+
+    public function receivedBy()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'received_by');
+    }
+
+    public function items()
+    {
+        return $this->hasMany(GoodsReceiptItem::class);
+    }
 }
