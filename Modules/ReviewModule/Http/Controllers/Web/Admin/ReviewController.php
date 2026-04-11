@@ -358,7 +358,7 @@ class ReviewController extends Controller
                 'subject'         => $subject,
                 'status'          => 'open',
                 'priority'        => $review->review_rating == 1 ? 'urgent' : 'high',
-                'complaint_number' => rand(100000, 999999),
+                'complaint_number' => DB::table('complaint')->max('complaint_number') + 1,
                 'no_hp'           => '',
                 'added_by'        => $review->customer_id ?? null,
             ]);

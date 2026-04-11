@@ -30,9 +30,15 @@ class SendReviewRequestsCommand extends Command
         $windowStart = Carbon::now()->subHours($delayHours + 1);
         $windowEnd   = Carbon::now()->subHours($delayHours);
 
+        // We look for bookings whose service_schedule falls within the completion
+        // window (or whose updated_at is within the window as a fallback). We rely
+        // on the already-sent-token check (whereDoesntHave) to avoid duplicates.
         $bookings = \Modules\BookingModule\Entities\Booking::query()
             ->where('booking_status', 'completed')
-            ->whereBetween('updated_at', [$windowStart, $windowEnd])
+            ->where(function ($q) use ($windowStart, $windowEnd) {
+                $q->whereBetween('service_schedule', [$windowStart, $windowEnd])
+                  ->orWhereBetween('updated_at', [$windowStart, $windowEnd]);
+            })
             ->whereDoesntHave('reviews', function ($q) {
                 $q->whereNotNull('review_token');
             })

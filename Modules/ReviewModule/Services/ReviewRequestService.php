@@ -2,7 +2,6 @@
 
 namespace Modules\ReviewModule\Services;
 
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Modules\ReviewModule\Entities\Review;
 
@@ -40,7 +39,7 @@ class ReviewRequestService
                 return $existing;
             }
 
-            $token = Str::random(48);
+            $token = bin2hex(random_bytes(24)); // 48-char cryptographically secure hex token
 
             $review = new Review();
             $review->booking_id       = $booking->id;
