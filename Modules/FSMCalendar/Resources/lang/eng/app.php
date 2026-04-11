@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'name'                => 'FSM Calendar',
+    'calendar'            => 'Calendar',
+    'schedule'            => 'Schedule',
+    'day_view'            => 'Day',
+    'week_view'           => 'Week',
+    'month_view'          => 'Month',
+    'list_view'           => 'List',
+    'resource_view'       => 'Workers',
+    'filter_worker'       => 'Filter by Worker',
+    'filter_team'         => 'Filter by Team',
+    'filter_stage'        => 'Filter by Stage',
+    'reschedule_success'  => 'Order rescheduled successfully.',
+    'reschedule_failed'   => 'Could not reschedule the order.',
+    'quick_create'        => 'New Order',
+    'settings'            => 'Calendar Settings',
+    'default_view'        => 'Default View',
+    'slot_duration'       => 'Slot Duration',
+    'business_hours'      => 'Business Hours',
+    'show_weekends'       => 'Show Weekends',
+    'show_resource_view'  => 'Enable Worker Resource View',
+    'default_event_color' => 'Default Event Colour',
+];
