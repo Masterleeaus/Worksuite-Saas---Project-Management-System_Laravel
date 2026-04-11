@@ -43,6 +43,12 @@ class PurchaseServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->register(RouteServiceProvider::class);
+
+        // Bind PurchaseReorderService as a singleton so it can be resolved
+        // from the container across the application.
+        $this->app->singleton(
+            \Modules\Purchase\Services\PurchaseReorderService::class
+        );
     }
 
     /**

@@ -82,6 +82,48 @@ class Order extends BaseModel
 
     const CUSTOM_FIELD_MODEL = 'App\Models\Order';
 
+    /**
+     * Procurement columns added by the Purchase module are mass-assignable.
+     * Core columns remain unguarded (BaseModel behaviour).
+     */
+    protected $fillable = [
+        'company_id', 'client_id', 'order_date', 'sub_total', 'discount',
+        'discount_type', 'total', 'due_amount', 'status', 'currency_id',
+        'show_shipping_address', 'note', 'added_by', 'last_updated_by',
+        'company_address_id',
+        // procurement columns
+        'order_type', 'supplier_id', 'po_number', 'purchase_status',
+        'expected_delivery_date', 'actual_delivery_date',
+        'delivery_address', 'delivery_notes',
+        'gst_applicable', 'gst_amount',
+        'payment_terms', 'invoice_reference',
+        'invoice_matched', 'expense_created', 'created_expense_id',
+    ];
+
+    protected $casts = [
+        'invoice_matched'   => 'boolean',
+        'expense_created'   => 'boolean',
+        'gst_applicable'    => 'boolean',
+        'expected_delivery_date' => 'date',
+        'actual_delivery_date'   => 'date',
+    ];
+
+    /**
+     * Resolve the supplier (from the Suppliers module) for a purchase order.
+     * Guard with class_exists so the Order model works even if Suppliers
+     * module is disabled.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo|null
+     */
+    public function supplier()
+    {
+        if (class_exists(\Modules\Suppliers\Models\Supplier::class)) {
+            return $this->belongsTo(\Modules\Suppliers\Models\Supplier::class, 'supplier_id');
+        }
+
+        return null;
+    }
+
     public function client(): BelongsTo
     {
         return $this->belongsTo(User::class, 'client_id')->withoutGlobalScope(ActiveScope::class);
