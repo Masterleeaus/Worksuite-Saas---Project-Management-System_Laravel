@@ -25,9 +25,9 @@ Route::middleware('auth:api')->prefix('v1')->group(function () {
         return response()->json($items);
     });
 
-    // Barcode / SKU lookup — cleaner scans item on van
-    Route::get('/items/barcode/{sku}', function ($sku) {
-        $item = Item::where('sku', $sku)->firstOrFail();
+    // Barcode / QR code scan lookup — cleaner scans item on van
+    Route::get('/items/barcode/{barcode}', function ($barcode) {
+        $item = Item::where('barcode', $barcode)->orWhere('sku', $barcode)->firstOrFail();
 
         return response()->json(['item' => $item]);
     });
@@ -36,7 +36,7 @@ Route::middleware('auth:api')->prefix('v1')->group(function () {
     Route::post('/task-items', function (Request $request) {
         $request->validate([
             'task_id'    => 'required|integer',
-            'item_id'    => 'required|integer',
+            'item_id'    => 'required|integer|exists:items,id',
             'quantity'   => 'required|numeric|min:0.01',
             'unit_price' => 'nullable|numeric|min:0',
         ]);

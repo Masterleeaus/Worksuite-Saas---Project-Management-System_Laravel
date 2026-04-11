@@ -24,6 +24,10 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     Route::post('items/apply-quick-action', [ProductController::class, 'applyQuickAction'])
         ->name('fielditems.apply_quick_action');
 
+    // Item pricing preview — must be declared before the resource route to avoid route conflicts
+    Route::get('items/pricing/preview', [ItemPricingController::class, 'preview'])
+        ->name('fielditems.pricing.preview');
+
     Route::resource('items', ItemsController::class);
     Route::resource('itemCategory', ItemCategoryController::class);
     Route::get('getItemSubCategories/{id}', [ItemSubCategoryController::class, 'getSubCategories'])
@@ -47,8 +51,4 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
         ->name('task-items.update');
     Route::delete('task-items/{id}', [TaskItemController::class, 'destroy'])
         ->name('task-items.destroy');
-
-    // Item pricing preview
-    Route::get('items/preview-price', [ItemPricingController::class, 'preview'])
-        ->name('fielditems.pricing.preview');
 });

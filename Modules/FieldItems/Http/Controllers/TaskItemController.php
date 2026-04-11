@@ -63,7 +63,7 @@ class TaskItemController extends AccountBaseController
         $taskItem = TaskItem::create([
             'task_id'    => $request->task_id,
             'item_id'    => $request->item_id,
-            'quantity'   => $request->quantity ?? 1,
+            'quantity'   => $request->quantity,
             'unit_price' => $request->unit_price ?? $item->price,
             'company_id' => company()->id,
         ]);

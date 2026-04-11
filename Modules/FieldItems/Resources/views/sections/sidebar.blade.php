@@ -18,7 +18,7 @@
                 </a>
             </li>
             <li class="{{ request()->routeIs('task-items.*') ? 'active' : '' }}">
-                <a href="{{ request()->route('task_id') ? route('task-items.index', request()->route('task_id')) : route('items.index') }}">
+                <a href="{{ route('items.index') }}#job-consumption">
                     <i class="fa fa-clipboard-list mr-1"></i>
                     @lang('fielditems::app.menu.jobConsumption')
                 </a>

@@ -23,7 +23,22 @@ class Item extends BaseModel
 
     const FILE_PATH = 'items';
 
-    protected $fillable = ['name', 'price', 'description', 'taxes', 'sku', 'base_price', 'stock_qty', 'is_active', 'item_type', 'barcode', 'low_stock_threshold', 'is_hazardous', 'is_eco_friendly', 'sds_file_path'];
+    protected $fillable = [
+        'name',
+        'price',
+        'description',
+        'taxes',
+        'sku',
+        'base_price',
+        'stock_qty',
+        'is_active',
+        'item_type',
+        'barcode',
+        'low_stock_threshold',
+        'is_hazardous',
+        'is_eco_friendly',
+        'sds_file_path',
+    ];
 
     protected $appends = ['total_amount', 'image_url', 'download_file_url'];
 
