@@ -28,7 +28,7 @@ return new class extends Migration {
                 $table->decimal('kpi_punctuality_rate', 5, 2)->default(0.00);
             }
             if (!Schema::hasColumn('employee_details', 'kpi_quality_score')) {
-                $table->decimal('kpi_quality_score', 3, 2)->default(0.00);
+                $table->decimal('kpi_quality_score', 5, 2)->default(0.00);
             }
             if (!Schema::hasColumn('employee_details', 'kpi_complaints_count')) {
                 $table->integer('kpi_complaints_count')->default(0);
