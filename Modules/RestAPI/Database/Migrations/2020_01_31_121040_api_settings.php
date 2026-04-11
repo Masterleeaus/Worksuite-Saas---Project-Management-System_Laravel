@@ -16,6 +16,9 @@ return new class extends Migration
     {
         \App\Models\Module::validateVersion(RestAPISetting::MODULE_NAME);
 
+        if (Schema::hasTable('rest_api_settings')) {
+            return;
+        }
         Schema::create('rest_api_settings', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();

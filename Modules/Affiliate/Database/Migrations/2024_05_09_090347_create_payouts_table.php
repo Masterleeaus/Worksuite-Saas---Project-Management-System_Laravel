@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Modules\Affiliate\Enums\PaymentStatus;
 
 return new class extends Migration
 {
@@ -24,10 +23,9 @@ return new class extends Migration
             $table->decimal('balance', 30, 2)->default(0);
             $table->decimal('amount_requested', 30, 2)->default(0);
 
-            // Use enum default if available, otherwise fallback to 'pending'
             $table->string('status')
                 ->nullable()
-                ->default(PaymentStatus::PENDING->value ?? 'pending');
+                ->default('pending');
 
             $table->string('payment_method');
             $table->string('other_payment_method')->nullable();

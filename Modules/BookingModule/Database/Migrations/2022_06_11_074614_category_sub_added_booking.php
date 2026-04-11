@@ -16,6 +16,9 @@ return new class extends Migration
     {
         \App\Models\Module::validateVersion(BookingModuleSetting::MODULE_NAME);
 
+        if (! Schema::hasTable('bookings')) {
+            return;
+        }
         Schema::table('bookings', function($table) {
             $table->foreignUuid('category_id')->nullable();
             $table->foreignUuid('sub_category_id')->nullable();

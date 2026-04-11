@@ -16,6 +16,9 @@ return new class extends Migration
     {
         \App\Models\Module::validateVersion(BookingModuleSetting::MODULE_NAME);
 
+        if (! Schema::hasTable('booking_repeats')) {
+            return;
+        }
         Schema::table('booking_repeats', function (Blueprint $table) {
             $table->string('service_location')->default('customer')->comment('customer,provider')->after('booking_otp');
             $table->text('service_address_location')->nullable()->after('booking_otp');

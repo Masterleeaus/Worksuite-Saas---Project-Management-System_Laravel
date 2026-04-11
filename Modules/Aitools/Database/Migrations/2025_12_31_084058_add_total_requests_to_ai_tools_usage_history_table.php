@@ -11,6 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('ai_tools_usage_history')) {
+            return;
+        }
         Schema::table('ai_tools_usage_history', function (Blueprint $table) {
             $table->bigInteger('total_requests')->default(1)->after('total_tokens');
         });

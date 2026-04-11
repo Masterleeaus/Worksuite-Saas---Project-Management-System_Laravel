@@ -22,6 +22,9 @@ class CreateLedgerTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('ledger')) {
+            return;
+        }
         Schema::create('ledger', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('transaction_id');

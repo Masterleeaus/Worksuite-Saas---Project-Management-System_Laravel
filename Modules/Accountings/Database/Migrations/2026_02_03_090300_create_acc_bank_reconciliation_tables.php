@@ -8,6 +8,9 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('acc_bank_reconciliations')) {
+            return;
+        }
         Schema::create('acc_bank_reconciliations', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->index();

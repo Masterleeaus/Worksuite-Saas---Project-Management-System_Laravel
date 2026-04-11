@@ -13,6 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('salary_slips')) {
+            return;
+        }
         Schema::table('salary_slips', function (Blueprint $table) {
             $table->double('fixed_allowance')->default(0);
         });

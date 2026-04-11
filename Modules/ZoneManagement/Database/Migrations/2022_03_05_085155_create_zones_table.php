@@ -13,6 +13,9 @@ class CreateZonesTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('zones')) {
+            return;
+        }
         Schema::create('zones', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();

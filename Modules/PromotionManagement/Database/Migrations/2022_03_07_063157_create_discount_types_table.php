@@ -13,6 +13,9 @@ class CreateDiscountTypesTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('discount_types')) {
+            return;
+        }
         Schema::create('discount_types', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();

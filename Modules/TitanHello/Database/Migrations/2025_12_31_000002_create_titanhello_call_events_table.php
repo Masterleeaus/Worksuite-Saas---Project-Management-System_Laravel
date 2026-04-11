@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('titanhello_call_events')) {
+            return;
+        }
         Schema::create('titanhello_call_events', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('call_id')->index();

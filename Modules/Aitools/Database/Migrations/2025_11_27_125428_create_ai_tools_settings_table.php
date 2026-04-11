@@ -13,6 +13,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('ai_tools_settings')) {
+            return;
+        }
         Schema::create('ai_tools_settings', function (Blueprint $table) {
             $table->id();
             $table->integer('company_id')->unsigned()->nullable();

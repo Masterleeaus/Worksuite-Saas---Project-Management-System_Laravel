@@ -14,6 +14,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('zoom_setting')) {
+            return;
+        }
         Schema::create('zoom_setting', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();

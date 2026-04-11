@@ -13,6 +13,9 @@ class AddToColPackageSubscriberTable extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('package_subscribers')) {
+            return;
+        }
         Schema::table('package_subscribers', function (Blueprint $table) {
             $table->tinyInteger('is_canceled')->default(0);
         });

@@ -13,6 +13,9 @@ class ColChangeToBusinessSettingsTable extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('business_settings')) {
+            return;
+        }
         Schema::table('business_settings', function (Blueprint $table) {
             $table->uuid('id')->index()->change();
         });

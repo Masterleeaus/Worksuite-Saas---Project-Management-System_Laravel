@@ -13,6 +13,9 @@ class RenameFileNameColToConversationFilesTable extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('conversation_files')) {
+            return;
+        }
         Schema::table('conversation_files', function(Blueprint $table) {
             $table->renameColumn('file_name', 'stored_file_name');
         });

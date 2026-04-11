@@ -10,6 +10,9 @@ return new class extends Migration
     {
         // TODO: define tables for webhooks
         // Example:
+        if (Schema::hasTable('webhooks_items')) {
+            return;
+        }
         // Schema::create('webhooks_items', function (Blueprint $table) {
         //     $table->id();
         //     $table->string('name');

@@ -13,6 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('employee_monthly_salaries')) {
+            return;
+        }
         Schema::table('employee_monthly_salaries', function (Blueprint $table) {
             $table->string('annual_salary')->after('user_id')->nullable();
             $table->string('basic_salary')->after('amount')->nullable();

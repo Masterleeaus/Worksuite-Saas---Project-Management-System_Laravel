@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('titanhello_inbound_numbers')) {
+            return;
+        }
         Schema::create('titanhello_inbound_numbers', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->index();

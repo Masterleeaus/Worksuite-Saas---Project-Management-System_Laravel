@@ -14,6 +14,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('login_expiries')) {
+            return;
+        }
         Schema::create('login_expiries', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('user_id')->index('user_id');

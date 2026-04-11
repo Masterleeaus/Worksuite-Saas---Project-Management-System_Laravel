@@ -1,7 +1,13 @@
 @php
+    try {
+
     $notificationUser = App\Models\User::where('id', $notification->data['user_id'])
     ->orderByDesc('id')
     ->first();
+
+    } catch (\Exception $e) {
+        // Table may not exist yet
+    }
 @endphp
 <x-cards.notification :notification="$notification"
                       :link="route('interview-schedule.show', $notification->data['job_id'])"

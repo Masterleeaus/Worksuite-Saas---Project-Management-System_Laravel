@@ -13,6 +13,9 @@ class AddColToChannelUserTable extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('channel_users')) {
+            return;
+        }
         Schema::table('channel_users', function (Blueprint $table) {
             $table->boolean('is_read')->default(0);
         });

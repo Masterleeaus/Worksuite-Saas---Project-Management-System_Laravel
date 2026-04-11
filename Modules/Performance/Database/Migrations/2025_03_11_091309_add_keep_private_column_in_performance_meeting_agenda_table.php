@@ -12,6 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('performance_meeting_agenda')) {
+            return;
+        }
         Schema::table('performance_meeting_agenda', function (Blueprint $table) {
             $table->enum('keep_private', ['yes', 'no'])->default('no')->after('is_discussed');
         });

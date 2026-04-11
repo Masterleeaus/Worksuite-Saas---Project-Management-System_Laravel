@@ -13,6 +13,9 @@ class CreatePackageSubscriberLogsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('package_subscriber_logs')) {
+            return;
+        }
         Schema::create('package_subscriber_logs', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();

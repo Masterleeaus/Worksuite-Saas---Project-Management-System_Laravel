@@ -13,6 +13,9 @@ class CreatePostAdditionalInstructionsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('post_additional_instructions')) {
+            return;
+        }
         Schema::create('post_additional_instructions', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->text('details')->nullable();

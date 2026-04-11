@@ -13,6 +13,9 @@ class CreateOfflinePaymentsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('offline_payments')) {
+            return;
+        }
         Schema::create('offline_payments', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();

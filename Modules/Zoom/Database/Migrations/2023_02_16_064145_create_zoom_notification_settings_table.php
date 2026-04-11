@@ -13,6 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('zoom_notification_settings')) {
+            return;
+        }
         Schema::create('zoom_notification_settings', function (Blueprint $table) {
             $table->id();
             $table->integer('company_id')->unsigned()->nullable();

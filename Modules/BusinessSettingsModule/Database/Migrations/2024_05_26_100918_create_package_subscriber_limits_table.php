@@ -13,6 +13,9 @@ class CreatePackageSubscriberLimitsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('package_subscriber_limits')) {
+            return;
+        }
         Schema::create('package_subscriber_limits', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();

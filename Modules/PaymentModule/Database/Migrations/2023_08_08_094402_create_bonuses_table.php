@@ -13,6 +13,9 @@ class CreateBonusesTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('bonuses')) {
+            return;
+        }
         Schema::create('bonuses', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();

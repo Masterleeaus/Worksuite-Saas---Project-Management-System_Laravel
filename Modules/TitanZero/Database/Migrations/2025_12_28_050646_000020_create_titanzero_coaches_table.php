@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('titanzero_coaches')) {
+            return;
+        }
         Schema::create('titanzero_coaches', function (Blueprint $table) {
             $table->id();
             $table->string('key', 64)->unique();

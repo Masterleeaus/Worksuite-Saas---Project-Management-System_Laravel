@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('titanhello_ivr_menus')) {
+            return;
+        }
         Schema::create('titanhello_ivr_menus', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->index();

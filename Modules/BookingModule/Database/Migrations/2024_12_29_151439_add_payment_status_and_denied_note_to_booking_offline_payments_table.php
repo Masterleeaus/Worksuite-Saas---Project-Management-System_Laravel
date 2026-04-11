@@ -16,6 +16,9 @@ return new class extends Migration
     {
         \App\Models\Module::validateVersion(BookingModuleSetting::MODULE_NAME);
 
+        if (! Schema::hasTable('booking_offline_payments')) {
+            return;
+        }
         Schema::table('booking_offline_payments', function (Blueprint $table) {
             $table->foreignUuid('offline_payment_id')->nullable()->after('booking_id');
             $table->enum('payment_status', ['pending', 'denied', 'approved'])->default('approved')->after('customer_information');

@@ -13,6 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('salary_slips')) {
+            return;
+        }
         Schema::table('salary_slips', function (Blueprint $table) {
             $table->double('gross_salary', 16, 2);
             $table->double('total_deductions', 16, 2);

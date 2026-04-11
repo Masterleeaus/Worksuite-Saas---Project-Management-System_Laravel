@@ -12,6 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('affiliate_referrals')) {
+            return;
+        }
         Schema::create('affiliate_referrals', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('company_id');

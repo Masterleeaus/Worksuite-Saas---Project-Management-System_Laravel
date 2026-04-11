@@ -13,6 +13,9 @@ class CreateLoyaltyPointTransactionsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('loyalty_point_transactions')) {
+            return;
+        }
         Schema::create('loyalty_point_transactions', function (Blueprint $table) {
             $table->uuid('id')->primary()->index();
             $table->unsignedBigInteger('company_id')->nullable()->index();

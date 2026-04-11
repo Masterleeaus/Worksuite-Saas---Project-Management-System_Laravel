@@ -13,6 +13,9 @@ class CreateCampaignsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('campaigns')) {
+            return;
+        }
         Schema::create('campaigns', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();

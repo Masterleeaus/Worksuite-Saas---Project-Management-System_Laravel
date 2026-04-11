@@ -15,6 +15,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('performance_settings')) {
+            return;
+        }
         Schema::table('performance_settings', function (Blueprint $table) {
             $table->boolean('create_meeting_participant')->default(false)->after('create_meeting_manager');
         });

@@ -86,6 +86,8 @@
                                         <div class="table-custom-wrap">
                                             @foreach($notifications as $index => $notification)
                                                 @php
+    try {
+
                                                     $admin = json_decode($notification->value);
                                                     $provider = optional($notification->providerNotifications->first());
                                                     $providerValue = $provider ? json_decode($provider->value) : null;
@@ -93,7 +95,11 @@
                                                     $email = $providerValue->email ?? $admin->email;
                                                     $push = $providerValue->notification ?? $admin->notification;
                                                     $sms = $providerValue->sms ?? $admin->sms;
-                                                @endphp
+                                                
+    } catch (\Exception $e) {
+        // Table may not exist yet
+    }
+@endphp
                                                 <div class="table-custom-td gap-2 d-flex align-items-center justify-content-between border-bottom p-20 py-2">
                                                     <div class="d-flex sl-topics">
                                                         <span class="text-dark">{{ $index + 1 }}</span>

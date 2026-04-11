@@ -13,6 +13,9 @@ class CreateVariationsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('variations')) {
+            return;
+        }
         Schema::create('variations', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();

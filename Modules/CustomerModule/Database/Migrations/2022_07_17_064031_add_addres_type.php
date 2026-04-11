@@ -13,6 +13,9 @@ class AddAddresType extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('user_addresses')) {
+            return;
+        }
         Schema::table('user_addresses', function (Blueprint $table) {
             $table->string('address_type')->nullable();
             $table->string('contact_person_name')->nullable();

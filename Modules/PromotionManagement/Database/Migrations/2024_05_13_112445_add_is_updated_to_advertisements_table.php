@@ -13,6 +13,9 @@ class AddIsUpdatedToAdvertisementsTable extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('advertisements')) {
+            return;
+        }
         Schema::table('advertisements', function (Blueprint $table) {
             $table->boolean('is_updated')->default(0);
         });

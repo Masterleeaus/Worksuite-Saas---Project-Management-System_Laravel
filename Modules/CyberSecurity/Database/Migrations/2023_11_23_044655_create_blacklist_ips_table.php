@@ -14,6 +14,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('blacklist_ips')) {
+            return;
+        }
         Schema::create('blacklist_ips', function (Blueprint $table) {
             $table->id();
             $table->string('ip_address');

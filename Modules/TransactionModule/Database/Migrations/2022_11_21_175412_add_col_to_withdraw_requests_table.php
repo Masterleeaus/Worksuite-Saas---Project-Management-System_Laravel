@@ -13,6 +13,9 @@ class AddColToWithdrawRequestsTable extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('withdraw_requests')) {
+            return;
+        }
         Schema::table('withdraw_requests', function (Blueprint $table) {
             $table->foreignUuid('withdrawal_method_id')->nullable();
             $table->text('withdrawal_method_fields')->nullable();

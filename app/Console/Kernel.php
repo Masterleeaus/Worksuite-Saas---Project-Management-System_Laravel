@@ -38,6 +38,8 @@ use App\Console\Commands\UpdateProjectProgressByDeadline;
 use DateTimeZone;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use App\Console\Commands\ModuleHealthCheck;
+use App\Console\Commands\ModuleMigrateOrdered;
 use App\Console\Commands\SuperAdmin\FreeLicenceRenew;
 use App\Console\Commands\SuperAdmin\TrialExpire;
 
@@ -52,6 +54,8 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
+        ModuleHealthCheck::class,
+        ModuleMigrateOrdered::class,
         AutoClockOut::class,
         UpdateExchangeRates::class,
         AutoStopTimer::class,

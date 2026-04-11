@@ -16,6 +16,9 @@ return new class extends Migration
     {
         \App\Models\Module::validateVersion(BookingModuleSetting::MODULE_NAME);
 
+        if (! Schema::hasTable('booking_details')) {
+            return;
+        }
         Schema::table('booking_details', function (Blueprint $table) {
             $table->string('service_name')->nullable()->after('service_id');
         });

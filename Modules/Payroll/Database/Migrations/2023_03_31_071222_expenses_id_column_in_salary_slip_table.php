@@ -12,6 +12,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('salary_slips')) {
+            return;
+        }
         Schema::table('salary_slips', function (Blueprint $table) {
             $table->boolean('expenses_created')->default(0);
         });

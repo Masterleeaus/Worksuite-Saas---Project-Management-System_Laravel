@@ -16,6 +16,9 @@ return new class extends Migration
     {
         \App\Models\Module::validateVersion(BookingModuleSetting::MODULE_NAME);
 
+        if (! Schema::hasTable('booking_details_amounts')) {
+            return;
+        }
         Schema::table('booking_details_amounts', function (Blueprint $table) {
             $table->integer('service_quantity')->default(0)->after('service_unit_cost');
             $table->decimal('service_tax',24,2)->default(0)->after('service_quantity');

@@ -15,6 +15,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('salary_slips')) {
+            return;
+        }
         Schema::table('salary_slips', function (Blueprint $table) {
             $table->unsignedInteger('currency_id')->nullable()->after('company_id');
             $table->foreign('currency_id')->references('id')->on('currencies')->onUpdate('cascade')->onDelete('cascade');

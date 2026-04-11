@@ -16,6 +16,9 @@ return new class extends Migration
     {
         \App\Models\Module::validateVersion(BookingModuleSetting::MODULE_NAME);
 
+        if (! Schema::hasTable('bookings')) {
+            return;
+        }
         Schema::table('bookings', function (Blueprint $table) {
             $table->decimal('total_campaign_discount_amount',24,3)->default(0);
             $table->decimal('total_coupon_discount_amount',24,3)->default(0);

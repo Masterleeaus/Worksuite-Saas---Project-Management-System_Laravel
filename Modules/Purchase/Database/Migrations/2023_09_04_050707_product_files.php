@@ -14,6 +14,9 @@ return new class extends Migration
 
     public function up()
     {
+        if (! Schema::hasTable('product_files')) {
+            return;
+        }
         Schema::table('product_files', function(Blueprint $table){
             $table->boolean('default_status')->default(false);
         });

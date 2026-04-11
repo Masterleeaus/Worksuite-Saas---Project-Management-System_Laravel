@@ -13,6 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('salary_tds')) {
+            return;
+        }
         Schema::create('salary_tds', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->double('salary_from', 16, 2);

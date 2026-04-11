@@ -13,6 +13,9 @@ class AddColToCategoriesTable extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('categories')) {
+            return;
+        }
         Schema::table('categories', function (Blueprint $table) {
             $table->boolean('is_featured')->after('is_active')->default(0);
         });

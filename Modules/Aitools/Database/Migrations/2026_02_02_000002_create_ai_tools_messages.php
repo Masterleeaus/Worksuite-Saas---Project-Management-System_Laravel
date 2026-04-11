@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
     public function up() {
+        if (Schema::hasTable('ai_tools_messages')) {
+            return;
+        }
         Schema::create('ai_tools_messages', function(Blueprint $t){
             $t->id();
             $t->unsignedBigInteger('conversation_id');

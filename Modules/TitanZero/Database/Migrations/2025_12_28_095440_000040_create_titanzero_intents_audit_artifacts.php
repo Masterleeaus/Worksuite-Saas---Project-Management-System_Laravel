@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('titanzero_intent_runs')) {
+            return;
+        }
         Schema::create('titanzero_intent_runs', function (Blueprint $table) {
             $table->id();
             $table->string('intent', 80)->index();
