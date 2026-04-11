@@ -8,17 +8,24 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // TODO: define tables for suppliers
-        // Example:
-        // Schema::create('suppliers_items', function (Blueprint $table) {
-        //     $table->id();
-        //     $table->string('name');
-        //     $table->timestamps();
-        // });
+        if (!Schema::hasTable('supplier_ratings')) {
+            Schema::create('supplier_ratings', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedInteger('supplier_id');
+                $table->foreign('supplier_id')->references('id')->on('suppliers')->onDelete('cascade');
+                $table->unsignedBigInteger('rated_by')->nullable();
+                $table->foreign('rated_by')->references('id')->on('users')->onDelete('set null');
+                $table->tinyInteger('rating')->unsigned()->comment('1-5 star rating');
+                $table->string('category')->nullable()->comment('quality, reliability, price');
+                $table->text('comment')->nullable();
+                $table->timestamp('rated_at')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     public function down(): void
     {
-        // Schema::dropIfExists('suppliers_items');
+        Schema::dropIfExists('supplier_ratings');
     }
 };

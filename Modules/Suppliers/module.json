@@ -1,16 +1,33 @@
 {
   "name": "Suppliers",
   "alias": "suppliers",
-  "description": "",
-  "keywords": [],
+  "description": "Supplier directory — vendor management, purchase history, ratings and FSM supply chain",
+  "keywords": ["suppliers", "vendors", "purchase", "ratings", "fsm"],
   "priority": 0,
   "providers": [
     "Modules\\Suppliers\\Providers\\SuppliersServiceProvider",
-    "Modules\\Suppliers\\Providers\\RouteServiceProvider"
+    "Modules\\Suppliers\\Providers\\RouteServiceProvider",
+    "Modules\\Suppliers\\Providers\\EventServiceProvider"
   ],
   "files": [],
   "version": "1.1.0",
   "active": 1,
   "aliases": {},
-  "requires": []
+  "requires": [],
+  "permissions": [
+    "view_suppliers",
+    "add_supplier",
+    "edit_supplier",
+    "delete_supplier",
+    "manage_supplier_ratings"
+  ],
+  "menus": [
+    {
+      "panel": "user",
+      "label": "Suppliers",
+      "route": "suppliers.index",
+      "sort_order": 90
+    }
+  ],
+  "sidebar_menu": true
 }
