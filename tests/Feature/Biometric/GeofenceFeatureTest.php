@@ -9,6 +9,10 @@ use PHPUnit\Framework\TestCase;
  * Feature-level tests for the GeofenceService that can run without a
  * database connection.  These verify the end-to-end geofence logic including
  * the "passes" method and the radius boundary conditions.
+ *
+ * Intentionally extends PHPUnit\Framework\TestCase (not Laravel's TestCase)
+ * because all assertions exercise the pure Haversine maths with no database
+ * or container dependencies — consistent with ExampleTest.php in this repo.
  */
 class GeofenceFeatureTest extends TestCase
 {

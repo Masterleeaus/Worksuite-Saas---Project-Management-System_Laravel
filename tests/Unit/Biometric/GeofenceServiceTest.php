@@ -7,6 +7,11 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Unit tests for the GeofenceService Haversine distance calculation.
+ *
+ * Intentionally extends PHPUnit\Framework\TestCase (not Laravel's TestCase)
+ * because all tests exercise the pure Haversine math in
+ * GeofenceService::haversineDistanceMetres(), which has no database or
+ * container dependencies.
  */
 class GeofenceServiceTest extends TestCase
 {
