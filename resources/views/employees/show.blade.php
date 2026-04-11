@@ -168,6 +168,7 @@ if ($viewPermission == 'all'
         @include($view)
     </div>
     @stack('employee-rating')
+    @stack('employee-performance-tab')
 @endsection
 
 @push('scripts')
