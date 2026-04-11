@@ -23,6 +23,10 @@ use Modules\PromotionManagement\Entities\Discount;
  */
 class PromotionService
 {
+    /** @var bool|null Cached result of `Schema::hasTable('bookings')` */
+    private ?bool $bookingsTableExists = null;
+
+    /** @var bool|null Cached result of `Schema::hasColumn('bookings', 'discount_id')` — unused here but kept for symmetry */
     /**
      * Validate and apply a coupon code to a booking/invoice.
      *
@@ -69,6 +73,10 @@ class PromotionService
      * Find and apply the first matching auto-apply promotion for the given context.
      *
      * Called on BookingCreated events.
+     * Note: `promotion_type` is the existing column on the `discounts` table that
+     * distinguishes discount rows ('discount') from coupon rows ('coupon').
+     * The new `promo_type` column (added by migration) holds the calculation type
+     * (percentage | fixed | free_service | bundle) and is separate.
      *
      * @return array|null  Null when no auto-apply promo matched.
      */
@@ -80,7 +88,6 @@ class PromotionService
     ): ?array {
         $discount = Discount::where('auto_apply', true)
             ->where('is_active', true)
-            ->where('promotion_type', 'coupon')
             ->where('start_date', '<=', Carbon::today())
             ->where('end_date', '>=', Carbon::today())
             ->orderBy('created_at', 'desc')
@@ -240,11 +247,16 @@ class PromotionService
     /**
      * Count prior bookings for a customer.
      * Guards against missing BookingModule gracefully.
+     * Caches the table-existence check in a property to avoid repeated queries.
      */
     private function countPriorBookings(int $customerId): int
     {
         try {
-            if (!\Illuminate\Support\Facades\Schema::hasTable('bookings')) {
+            if ($this->bookingsTableExists === null) {
+                $this->bookingsTableExists = \Illuminate\Support\Facades\Schema::hasTable('bookings');
+            }
+
+            if (!$this->bookingsTableExists) {
                 return 0;
             }
 

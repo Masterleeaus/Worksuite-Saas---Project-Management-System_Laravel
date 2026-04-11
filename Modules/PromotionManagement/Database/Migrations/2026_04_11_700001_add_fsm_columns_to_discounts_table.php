@@ -82,9 +82,10 @@ return new class extends Migration {
             }
         });
 
-        // Unique index: one referral_code per company (only on rows where it is not null)
-        // MySQL partial-unique indices require a workaround; we add a plain unique index
-        // and rely on application-level validation to allow multiple nulls.
+        // Unique index: one referral_code per company.
+        // In MySQL (and most RDBMS), a composite UNIQUE index treats NULL values as
+        // distinct from one another, so multiple rows with NULL referral_code for the
+        // same company_id are permitted without violating this constraint.
         if (!$this->indexExists('discounts', 'discounts_referral_code_company_id_unique')) {
             Schema::table('discounts', function (Blueprint $table) {
                 $table->unique(['referral_code', 'company_id'], 'discounts_referral_code_company_id_unique');

@@ -3,6 +3,7 @@
 namespace Modules\PromotionManagement\Observers;
 
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Modules\PromotionManagement\Services\PromotionService;
 
 /**
@@ -17,6 +18,12 @@ use Modules\PromotionManagement\Services\PromotionService;
  */
 class BookingObserver
 {
+    /**
+     * Cached result of Schema::hasColumn('bookings', 'discount_id').
+     * Evaluated once per request rather than on every booking creation.
+     */
+    private static ?bool $bookingsHasDiscountId = null;
+
     public function created($booking): void
     {
         try {
@@ -36,9 +43,12 @@ class BookingObserver
             );
 
             if ($result !== null && isset($result['discount_id'])) {
-                // Persist the auto-applied discount on the booking row when the
-                // column exists (non-destructive — schema may not always have it).
-                if (isset($booking->discount_id) || \Illuminate\Support\Facades\Schema::hasColumn('bookings', 'discount_id')) {
+                // Cache the column-existence check so it only hits the DB once per request
+                if (self::$bookingsHasDiscountId === null) {
+                    self::$bookingsHasDiscountId = Schema::hasColumn('bookings', 'discount_id');
+                }
+
+                if (self::$bookingsHasDiscountId) {
                     $booking->discount_id     = $result['discount_id'];
                     $booking->discount_amount = $result['discount_amount'];
                     $booking->saveQuietly();
