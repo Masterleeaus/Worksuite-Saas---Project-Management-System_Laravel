@@ -1,12 +1,43 @@
 {
     "name": "ProjectRoadmap",
     "alias": "projectroadmap",
-    "description": "",
-    "keywords": [],
+    "description": "Feature roadmap — track platform development, milestones and client feature requests",
+    "keywords": ["roadmap", "milestones", "features", "voting", "changelog"],
     "priority": 0,
     "providers": [
         "Modules\\ProjectRoadmap\\Providers\\ProjectRoadmapServiceProvider"
     ],
     "files": [],
-    "version": "1.0.1"
+    "version": "1.1.0",
+    "active": 1,
+    "order": 0,
+    "permissions": [
+        "view_roadmap",
+        "manage_roadmap",
+        "vote_on_feature"
+    ],
+    "roles_permissions": {
+        "admin": [
+            "view_roadmap",
+            "manage_roadmap",
+            "vote_on_feature"
+        ],
+        "manager": [
+            "view_roadmap",
+            "vote_on_feature"
+        ],
+        "client": [
+            "view_roadmap",
+            "vote_on_feature"
+        ]
+    },
+    "menus": [
+        {
+            "panel": "user",
+            "label": "Roadmap",
+            "route": "roadmap.index",
+            "sort_order": 100
+        }
+    ],
+    "sidebar_menu": true
 }
