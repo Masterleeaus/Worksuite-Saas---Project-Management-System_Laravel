@@ -28,12 +28,26 @@ class AccountingsServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
-    
+
+        $this->registerObservers();
+
         // Titan Zero + Titan Go integration (capabilities registry)
         if (class_exists(\Modules\TitanZero\Services\CapabilityRegistry::class)) {
             \Modules\TitanZero\Services\CapabilityRegistry::registerModuleFromConfig('Accountings');
         }
-}
+    }
+
+    /**
+     * Register model observers.
+     */
+    protected function registerObservers(): void
+    {
+        if (class_exists(\App\Models\Invoice::class)) {
+            \App\Models\Invoice::observe(
+                \Modules\Accountings\Observers\InvoiceAccountingObserver::class
+            );
+        }
+    }
 
     /**
      * Register the service provider.
@@ -43,6 +57,10 @@ class AccountingsServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->register(RouteServiceProvider::class);
+        $this->app->singleton(
+            \Modules\Accountings\Services\FinancialYearService::class,
+            \Modules\Accountings\Services\FinancialYearService::class
+        );
     }
 
     /**

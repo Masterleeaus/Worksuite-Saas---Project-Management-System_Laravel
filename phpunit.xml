@@ -8,10 +8,12 @@
         <testsuite name="Unit">
             <directory suffix="Test.php">./tests/Unit</directory>
             <directory suffix="Test.php">./Modules/TitanCore/Tests/Unit</directory>
+            <directory suffix="Test.php">./Modules/Accountings/Tests/Unit</directory>
         </testsuite>
         <testsuite name="Feature">
             <directory suffix="Test.php">./tests/Feature</directory>
             <directory suffix="Test.php">./Modules/TitanCore/Tests/Feature</directory>
+            <directory suffix="Test.php">./Modules/Accountings/Tests/Feature</directory>
         </testsuite>
     </testsuites>
     <coverage>

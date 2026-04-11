@@ -6,8 +6,12 @@ use Illuminate\Support\Facades\DB;
 
 class GstReportService
 {
+    private const SCALE = 4; // bcmath decimal scale for intermediate calculations
+
     /**
      * GST summary with accrual vs cash basis.
+     *
+     * Uses bcmath for all monetary arithmetic (precision required for tax).
      *
      * - accrual: bills by bill_date, invoices by issue_date/created_at
      * - cash: bills by payment date (acc_bill_payments), invoices by paid_at/payment_date when available
@@ -23,7 +27,7 @@ class GstReportService
         $schema = DB::getSchemaBuilder();
 
         // ---------- GST PAID (INPUTS) ----------
-        $gstPaidBills = 0.0;
+        $gstPaidBills = '0.0000';
 
         if ($basis === 'cash' && $schema->hasTable('acc_bill_payments')) {
             // allocate bill tax proportionally to payments: (bill.tax_total / bill.total) * payment.amount
@@ -37,12 +41,13 @@ class GstReportService
             if ($to) $pay->whereDate('p.paid_at', '<=', $to);
 
             $rows = $pay->select('p.amount', 'b.tax_total', 'b.total')->get();
-            $calc = 0.0;
+            $calc = '0.0000';
             foreach ($rows as $r) {
-                $total = (float)($r->total ?? 0);
-                $tax = (float)($r->tax_total ?? 0);
-                if ($total <= 0 || $tax <= 0) continue;
-                $calc += ((float)$r->amount) * ($tax / $total);
+                $total = (string) ($r->total ?? 0);
+                $tax = (string) ($r->tax_total ?? 0);
+                if (bccomp($total, '0', self::SCALE) <= 0 || bccomp($tax, '0', self::SCALE) <= 0) continue;
+                $ratio = bcdiv($tax, $total, self::SCALE);
+                $calc = bcadd($calc, bcmul((string)$r->amount, $ratio, self::SCALE), self::SCALE);
             }
             $gstPaidBills = $calc;
         } else {
@@ -56,7 +61,7 @@ class GstReportService
             if ($from) $billLines->whereDate($dateCol, '>=', $from);
             if ($to) $billLines->whereDate($dateCol, '<=', $to);
 
-            $gstPaidBills = (float) ($billLines->sum('l.line_tax') ?? 0);
+            $gstPaidBills = (string) ($billLines->sum('l.line_tax') ?? 0);
         }
 
         $expenses = DB::table('acc_expenses')
@@ -66,11 +71,11 @@ class GstReportService
         if ($from) $expenses->whereDate('expense_date', '>=', $from);
         if ($to) $expenses->whereDate('expense_date', '<=', $to);
 
-        $gstPaidExpenses = (float) ($expenses->sum('tax_amount') ?? 0);
-        $gstPaidTotal = round($gstPaidBills + $gstPaidExpenses, 2);
+        $gstPaidExpenses = (string) ($expenses->sum('tax_amount') ?? 0);
+        $gstPaidTotal = bcadd($gstPaidBills, $gstPaidExpenses, self::SCALE);
 
         // ---------- GST COLLECTED (OUTPUTS) ----------
-        $gstCollectedTotal = 0.0;
+        $gstCollectedTotal = '0.0000';
         if ($schema->hasTable('invoices')) {
             $inv = DB::table('invoices')
                 ->when($companyId, fn($q) => $schema->hasColumn('invoices','company_id') ? $q->where('company_id', $companyId) : $q)
@@ -102,37 +107,63 @@ class GstReportService
 
             foreach (['tax', 'tax_total', 'total_tax', 'gst'] as $col) {
                 if ($schema->hasColumn('invoices', $col)) {
-                    $gstCollectedTotal = (float) ($inv->sum($col) ?? 0);
+                    $gstCollectedTotal = (string) ($inv->sum($col) ?? 0);
                     break;
                 }
             }
 
-            if ($gstCollectedTotal == 0.0) {
+            if (bccomp($gstCollectedTotal, '0', self::SCALE) === 0) {
                 if ($schema->hasColumn('invoices', 'total') && $schema->hasColumn('invoices', 'sub_total')) {
                     $rows = $inv->select('total', 'sub_total')->get();
-                    $calc = 0.0;
+                    $calc = '0.0000';
                     foreach ($rows as $r) {
-                        $calc += max(0, ((float)$r->total - (float)$r->sub_total));
+                        $diff = bcsub((string)$r->total, (string)$r->sub_total, self::SCALE);
+                        if (bccomp($diff, '0', self::SCALE) > 0) {
+                            $calc = bcadd($calc, $diff, self::SCALE);
+                        }
                     }
                     $gstCollectedTotal = $calc;
                 }
             }
         }
 
-        $gstCollectedTotal = round((float)$gstCollectedTotal, 2);
-        $gstPaidBills = round((float)$gstPaidBills, 2);
-        $gstPaidExpenses = round((float)$gstPaidExpenses, 2);
-        $net = round($gstCollectedTotal - $gstPaidTotal, 2);
+        $gstCollectedTotal = bcadd($gstCollectedTotal, '0', 2); // round to 2dp
+        $gstPaidBillsFinal = bcadd($gstPaidBills, '0', 2);
+        $gstPaidExpensesFinal = bcadd($gstPaidExpenses, '0', 2);
+        $gstPaidTotalFinal = bcadd($gstPaidTotal, '0', 2);
+        $net = bcsub($gstCollectedTotal, $gstPaidTotalFinal, 2);
 
         return [
             'from' => $from,
             'to' => $to,
             'basis' => $basis,
-            'gst_collected' => $gstCollectedTotal,
-            'gst_paid' => $gstPaidTotal,
-            'gst_paid_bills' => $gstPaidBills,
-            'gst_paid_expenses' => $gstPaidExpenses,
-            'net_gst' => $net,
+            'gst_collected' => (float) $gstCollectedTotal,
+            'gst_paid' => (float) $gstPaidTotalFinal,
+            'gst_paid_bills' => (float) $gstPaidBillsFinal,
+            'gst_paid_expenses' => (float) $gstPaidExpensesFinal,
+            'net_gst' => (float) $net,
         ];
+    }
+
+    /**
+     * Calculate GST amount from a price using bcmath.
+     *
+     * @param  string  $price      Monetary value as string (avoids float imprecision)
+     * @param  string  $treatment  'inclusive'|'exclusive'
+     * @param  string  $rate       GST rate as decimal string, e.g. '0.10' for 10%
+     * @return string  GST amount rounded to 2 decimal places
+     */
+    public static function calculateGst(string $price, string $treatment = 'inclusive', string $rate = '0.10'): string
+    {
+        if ($treatment === 'inclusive') {
+            // GST = price * rate / (1 + rate)
+            $divisor = bcadd('1', $rate, self::SCALE);
+            $gst = bcdiv(bcmul($price, $rate, self::SCALE), $divisor, self::SCALE);
+        } else {
+            // exclusive: GST = price * rate
+            $gst = bcmul($price, $rate, self::SCALE);
+        }
+
+        return bcadd($gst, '0', 2); // round to 2dp
     }
 }
