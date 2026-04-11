@@ -9,12 +9,22 @@
     "tutorialUrl": "https://czappstudio.com/",
     "keywords": [],
     "priority": 0,
+    "active": 1,
     "providers": [
-        "Modules\\TitanAgents\\Providers\\TitanAgentsServiceProvider"
+        "Modules\\TitanAgents\\Providers\\TitanAgentsServiceProvider",
+        "Modules\\TitanAgents\\Providers\\AiChatServiceProvider"
     ],
     "files": [],
     "category": "Communication & Collaboration",
     "dependencies": [
         "AICore"
+    ],
+    "permissions": [
+        "chatbot_manage",
+        "chatbot_view",
+        "chatbot_create",
+        "chatbot_edit",
+        "chatbot_delete",
+        "chatbot_analytics"
     ]
 }

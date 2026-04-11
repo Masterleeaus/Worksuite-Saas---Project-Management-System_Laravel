@@ -22,6 +22,7 @@ class TitanAgentsServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'database/migrations'));
+        $this->loadRoutesFrom(module_path($this->moduleName, 'Routes/chatbot.php'));
         $this->registerMenu();
     }
 
