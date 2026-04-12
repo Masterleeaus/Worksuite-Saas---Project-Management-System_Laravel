@@ -102,4 +102,32 @@ class ThemeService
     {
         return config('titantheme.fonts', []);
     }
+
+    /**
+     * Server-side CSS block builder from stored settings.
+     *
+     * Builds a full CSS custom-property block from the saved LiveCustomizer
+     * setting() values (the raw CSS saved by LiveCustomizerController::apply())
+     * merged with the active ThemePreset variables.  Suitable for SSR/caching.
+     *
+     * @return string  Ready-to-embed CSS string (no wrapping <style> tags).
+     */
+    public function generateCss(): string
+    {
+        $canUseSetting = function_exists('setting');
+        $dashTheme     = $canUseSetting ? (setting('dash_theme') ?? 'default') : 'default';
+
+        // Raw CSS block saved by the real-time LiveCustomizer panel.
+        $rawCss = $canUseSetting ? setting($dashTheme . '_live_customizer', '') : '';
+
+        // Structured CSS vars from the active ThemePreset model.
+        $structuredCss = $this->generateCssVariables();
+
+        if (!empty($rawCss)) {
+            // Raw CSS takes precedence (last-write-wins in cascade).
+            return $structuredCss . "\n\n" . $rawCss;
+        }
+
+        return $structuredCss;
+    }
 }
