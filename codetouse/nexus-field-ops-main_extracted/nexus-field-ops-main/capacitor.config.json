@@ -1,8 +1,0 @@
-{
-  "appId": "com.nexusops.fieldtech",
-  "appName": "Nexus Field Ops",
-  "webDir": "dist",
-  "server": {
-    "androidScheme": "https"
-  }
-}
