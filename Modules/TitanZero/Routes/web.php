@@ -14,6 +14,7 @@ use Modules\TitanZero\Http\Controllers\SuperAdmin\PersonasController;
 use Modules\TitanZero\Http\Controllers\SuperAdmin\PolicyController;
 use Modules\TitanZero\Http\Controllers\SuperAdmin\ToolsController;
 use Modules\TitanZero\Http\Controllers\SuperAdmin\WorkflowsController;
+use Modules\TitanZero\Canvas\Http\Controllers\CanvasController;
 
 // ── User-facing Titan Zero routes ──────────────────────────────────────────
 Route::middleware(['web', 'auth'])
@@ -51,6 +52,10 @@ Route::middleware(['web', 'auth'])
         Route::get('/ai-chat/{slug?}', [AIChatProController::class, 'index'])->name('ai-chat.index');
         Route::post('/ai-chat/message', [AIChatProController::class, 'sendMessage'])->name('ai-chat.send');
         Route::post('/ai-chat/session/new', [AIChatProController::class, 'startNewSession'])->name('ai-chat.session.new');
+
+        // ── Canvas (AI Chat Pro TipTap Editor) ────────────────────────────────
+        Route::post('/canvas/store', [CanvasController::class, 'storeContent'])->name('canvas.store');
+        Route::post('/canvas/title', [CanvasController::class, 'saveTitle'])->name('canvas.title');
 
         // Legacy aliases kept for backwards compatibility
         Route::get('/business', fn () => redirect()->route('titan.zero.chat'))->name('business');

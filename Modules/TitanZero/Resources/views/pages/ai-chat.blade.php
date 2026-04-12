@@ -48,6 +48,36 @@
 .tz-chat-input-bar textarea { flex: 1; resize: none; border-radius: .5rem; min-height: 42px; max-height: 140px; }
 .tz-chat-input-bar button   { align-self: flex-end; }
 .tz-empty-hint         { text-align: center; color: #aaa; margin-top: 3rem; font-size: .92rem; }
+
+/* ── Canvas Panel ─────────────────────────────────────── */
+.tz-canvas-panel       { display: none; flex-direction: column; width: 420px; min-width: 320px;
+                         border-left: 1px solid var(--bs-border-color, #dee2e6); overflow: hidden; }
+.tz-canvas-panel.open  { display: flex; }
+.tz-canvas-header      { padding: .6rem 1rem; border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+                         display: flex; align-items: center; justify-content: space-between; gap: .5rem;
+                         background: var(--bs-light, #f8f9fa); }
+.tz-canvas-title-wrap  { display: flex; align-items: center; gap: .4rem; flex: 1; min-width: 0; }
+.tz-canvas-icon        { flex-shrink: 0; color: var(--bs-primary, #0d6efd); }
+.tz-canvas-title-input { border: none; background: transparent; flex: 1; font-weight: 600;
+                         font-size: .9rem; min-width: 0; outline: none;
+                         color: var(--bs-body-color, #212529); }
+.tz-canvas-title-input::placeholder { color: #aaa; font-weight: 400; }
+.tz-canvas-toolbar     { padding: .4rem .75rem; border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+                         background: var(--bs-white, #fff); display: flex; flex-wrap: wrap; gap: .2rem; }
+.tz-canvas-editor-wrap { flex: 1; overflow-y: auto; }
+.tz-canvas-editor      { min-height: 300px; padding: 1rem 1.25rem; outline: none;
+                         font-size: .88rem; line-height: 1.6; }
+.tz-canvas-editor p    { margin-bottom: .6rem; }
+.tz-canvas-editor h1,.tz-canvas-editor h2,.tz-canvas-editor h3 { margin: .8rem 0 .4rem; font-weight: 600; }
+.tz-canvas-editor ul,.tz-canvas-editor ol { padding-left: 1.5rem; margin-bottom: .6rem; }
+.tz-canvas-editor blockquote { border-left: 3px solid var(--bs-primary, #0d6efd);
+                                padding: .25rem .75rem; color: var(--bs-secondary, #6c757d); margin: .5rem 0; }
+.tz-canvas-editor pre  { background: var(--bs-light, #f8f9fa); padding: .75rem 1rem;
+                         border-radius: .375rem; overflow-x: auto; font-size: .82rem; margin-bottom: .6rem; }
+.tz-tb-btn.is-active   { background: var(--bs-primary, #0d6efd) !important; color: #fff !important; }
+/* ── "Open in Canvas" button on messages ────────────────── */
+.tz-canvas-open-btn    { display: inline-flex; align-items: center; gap: .25rem; margin-top: .35rem;
+                         font-size: .75rem; opacity: .7; padding: 2px 6px; border-radius: .25rem; }
 </style>
 @endpush
 
@@ -136,8 +166,19 @@
                                     <div class="tz-bubble">{{ $msg->input }}</div>
                                 </div>
                                 @if($msg->output)
-                                    <div class="tz-msg assistant">
+                                    <div class="tz-msg assistant" data-message-id="{{ $msg->id }}">
                                         <div class="tz-bubble">{!! nl2br(e($msg->output)) !!}</div>
+                                        <button
+                                            class="btn btn-outline-secondary btn-sm tz-canvas-open-btn"
+                                            data-canvas-open="{{ $msg->id }}"
+                                            data-canvas-text="{{ e($msg->output) }}"
+                                            title="{{ __('Open in Canvas') }}"
+                                        >
+                                            <svg width="14" height="12" viewBox="0 0 22 20" fill="none" stroke="currentColor" stroke-width="1.85">
+                                                <path d="M4.875 14.125H11.875M15.75 15V5M4.875 10.0625H11.875M4.875 6.0625H11.875M2.875 19C2.325 19 1.85417 18.8042 1.4625 18.4125C1.07083 18.0208 0.875 17.55 0.875 17V3C0.875 2.45 1.07083 1.97917 1.4625 1.5875C1.85417 1.19583 2.325 1 2.875 1H18.875C19.425 1 19.8958 1.19583 20.2875 1.5875C20.6792 1.97917 20.875 2.45 20.875 3V17C20.875 17.55 20.6792 18.0208 20.2875 18.4125C19.8958 18.8042 19.425 19 18.875 19H2.875Z"/>
+                                            </svg>
+                                            {{ __('Open in Canvas') }}
+                                        </button>
                                     </div>
                                 @endif
                             @endif
@@ -162,12 +203,19 @@
                 </div>
             </div>
 
+            {{-- Canvas Panel (TipTap Editor) --}}
+            @include('titanzero::canvas.panel')
+
         </div>
     </div>
 </div>
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/@tiptap/core@2.11.5/dist/tiptap-core.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tiptap/pm@2.11.5/dist/tiptap-pm.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tiptap/starter-kit@2.11.5/dist/tiptap-starter-kit.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-underline@2.11.5/dist/tiptap-extension-underline.umd.min.js"></script>
 <script>
 (function () {
     'use strict';
@@ -175,6 +223,8 @@
     const SEND_URL       = @json(route('titan.zero.ai-chat.send'));
     const NEW_SESS_URL   = @json(route('titan.zero.ai-chat.session.new'));
     const CHAT_BASE_URL  = @json(rtrim(route('titan.zero.ai-chat.index'), '/'));
+    const CANVAS_STORE   = @json(route('titan.zero.canvas.store'));
+    const CANVAS_TITLE   = @json(route('titan.zero.canvas.title'));
     const CSRF           = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
     let currentSessionId = {{ $chat?->id ?? 'null' }};
 
@@ -209,7 +259,7 @@
         const msg = (input?.value ?? '').trim();
         if (!msg || !currentSessionId) return;
 
-        appendBubble('user', msg);
+        appendBubble('user', msg, null, null);
         input.value = '';
         input.style.height = 'auto';
         setInputEnabled(false);
@@ -229,21 +279,23 @@
             const data = await res.json();
             typing.classList.remove('show');
             if (data.ok) {
-                appendBubble('assistant', data.reply ?? '', data.citations ?? []);
+                appendBubble('assistant', data.reply ?? '', data.citations ?? [], data.message_id ?? null);
             } else {
-                appendBubble('assistant', data.message ?? '{{ __("An error occurred.") }}');
+                appendBubble('assistant', data.message ?? '{{ __("An error occurred.") }}', [], null);
             }
         } catch (err) {
             typing.classList.remove('show');
-            appendBubble('assistant', '{{ __("Connection error. Please try again.") }}');
+            appendBubble('assistant', '{{ __("Connection error. Please try again.") }}', [], null);
         }
         setInputEnabled(true);
         scrollDown();
     }
 
-    function appendBubble(role, text, citations) {
+    function appendBubble(role, text, citations, messageId) {
         const wrap = document.createElement('div');
         wrap.className = 'tz-msg ' + role;
+        if (messageId) wrap.dataset.messageId = messageId;
+
         const bubble = document.createElement('div');
         bubble.className = 'tz-bubble';
         bubble.textContent = text;
@@ -255,6 +307,19 @@
             citeEl.textContent = '{{ __("Sources:") }} ' +
                 citations.map(c => c.document_title || c.document_id).filter(Boolean).join(', ');
             wrap.appendChild(citeEl);
+        }
+
+        if (role === 'assistant' && messageId) {
+            const canvasBtn = document.createElement('button');
+            canvasBtn.className = 'btn btn-outline-secondary btn-sm tz-canvas-open-btn';
+            canvasBtn.dataset.canvasOpen = messageId;
+            canvasBtn.dataset.canvasText = text;
+            canvasBtn.title = '{{ __("Open in Canvas") }}';
+            canvasBtn.innerHTML =
+                '<svg width="14" height="12" viewBox="0 0 22 20" fill="none" stroke="currentColor" stroke-width="1.85">' +
+                '<path d="M4.875 14.125H11.875M15.75 15V5M4.875 10.0625H11.875M4.875 6.0625H11.875M2.875 19C2.325 19 1.85417 18.8042 1.4625 18.4125C1.07083 18.0208 0.875 17.55 0.875 17V3C0.875 2.45 1.07083 1.97917 1.4625 1.5875C1.85417 1.19583 2.325 1 2.875 1H18.875C19.425 1 19.8958 1.19583 20.2875 1.5875C20.6792 1.97917 20.875 2.45 20.875 3V17C20.875 17.55 20.6792 18.0208 20.2875 18.4125C19.8958 18.8042 19.425 19 18.875 19H2.875Z"/>' +
+                '</svg> {{ __("Open in Canvas") }}';
+            wrap.appendChild(canvasBtn);
         }
 
         msgBox.appendChild(wrap);
@@ -305,6 +370,195 @@
     if (catSel) {
         catSel.addEventListener('change', () => {
             window.location.href = CHAT_BASE_URL + '/' + catSel.value;
+        });
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       Canvas — TipTap Editor
+    ═══════════════════════════════════════════════════════ */
+    let tiptapEditor   = null;
+    let canvasMessageId = null;
+
+    const canvasPanel  = document.getElementById('tzCanvasPanel');
+    const canvasTitle  = document.getElementById('tzCanvasTitle');
+    const canvasSave   = document.getElementById('tzCanvasSaveBtn');
+    const canvasClose  = document.getElementById('tzCanvasCloseBtn');
+    const editorEl     = document.getElementById('tzTiptapEditor');
+
+    function initTiptap() {
+        if (!window.StarterKit || !editorEl) return;
+
+        if (tiptapEditor) {
+            tiptapEditor.destroy();
+            tiptapEditor = null;
+        }
+
+        const extensions = [window.StarterKit];
+        const underlineExt = window.TiptapUnderline || window.Underline || window.TiptapExtensionUnderline;
+        if (underlineExt) extensions.push(underlineExt);
+
+        tiptapEditor = new window.tiptapCore.Editor({
+            element: editorEl,
+            extensions,
+            content: '',
+            editorProps: {
+                attributes: { class: 'tz-canvas-editor', style: 'outline:none;' },
+            },
+        });
+
+        // Sync toolbar active-state on selection change
+        tiptapEditor.on('selectionUpdate', syncToolbarState);
+        tiptapEditor.on('transaction',     syncToolbarState);
+    }
+
+    function syncToolbarState() {
+        if (!tiptapEditor) return;
+        document.querySelectorAll('.tz-tb-btn').forEach(btn => {
+            const action = btn.dataset.action;
+            let active = false;
+            if (action === 'bold')      active = tiptapEditor.isActive('bold');
+            if (action === 'italic')    active = tiptapEditor.isActive('italic');
+            if (action === 'underline') active = tiptapEditor.isActive('underline');
+            if (action === 'h1')        active = tiptapEditor.isActive('heading', { level: 1 });
+            if (action === 'h2')        active = tiptapEditor.isActive('heading', { level: 2 });
+            if (action === 'h3')        active = tiptapEditor.isActive('heading', { level: 3 });
+            if (action === 'bullet')    active = tiptapEditor.isActive('bulletList');
+            if (action === 'ordered')   active = tiptapEditor.isActive('orderedList');
+            if (action === 'blockquote')active = tiptapEditor.isActive('blockquote');
+            if (action === 'code')      active = tiptapEditor.isActive('codeBlock');
+            btn.classList.toggle('is-active', active);
+        });
+    }
+
+    /* Toolbar actions */
+    document.querySelectorAll('.tz-tb-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (!tiptapEditor) return;
+            const action = btn.dataset.action;
+            const chain = tiptapEditor.chain().focus();
+            if (action === 'bold')       chain.toggleBold().run();
+            if (action === 'italic')     chain.toggleItalic().run();
+            if (action === 'underline')  chain.toggleUnderline().run();
+            if (action === 'h1')         chain.toggleHeading({ level: 1 }).run();
+            if (action === 'h2')         chain.toggleHeading({ level: 2 }).run();
+            if (action === 'h3')         chain.toggleHeading({ level: 3 }).run();
+            if (action === 'bullet')     chain.toggleBulletList().run();
+            if (action === 'ordered')    chain.toggleOrderedList().run();
+            if (action === 'blockquote') chain.toggleBlockquote().run();
+            if (action === 'code')       chain.toggleCodeBlock().run();
+        });
+    });
+
+    /* Open canvas with message content */
+    function openCanvas(messageId, text) {
+        canvasMessageId = messageId;
+
+        if (!tiptapEditor) {
+            initTiptap();
+        }
+
+        // Set editor content — use plain text to avoid XSS
+        if (tiptapEditor) {
+            tiptapEditor.commands.clearContent();
+            tiptapEditor.commands.setContent({
+                type: 'doc',
+                content: (text || '').split('\n').filter(Boolean).map(line => ({
+                    type: 'paragraph',
+                    content: [{ type: 'text', text: line }],
+                })),
+            });
+        }
+
+        canvasTitle.value = '';
+        canvasPanel.classList.add('open');
+    }
+
+    /* Close canvas */
+    if (canvasClose) {
+        canvasClose.addEventListener('click', () => {
+            canvasPanel.classList.remove('open');
+        });
+    }
+
+    /* Auto-save title on blur/enter */
+    if (canvasTitle) {
+        const saveTitle = async () => {
+            if (!canvasMessageId) return;
+            await fetch(CANVAS_TITLE, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': CSRF,
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: JSON.stringify({ message_id: canvasMessageId, title: canvasTitle.value }),
+            });
+        };
+        canvasTitle.addEventListener('blur',    saveTitle);
+        canvasTitle.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); saveTitle(); } });
+    }
+
+    /* Save canvas content */
+    if (canvasSave) {
+        canvasSave.addEventListener('click', async () => {
+            if (!canvasMessageId || !tiptapEditor) return;
+
+            canvasSave.disabled = true;
+            canvasSave.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>{{ __("Saving…") }}';
+
+            try {
+                const output = JSON.stringify(tiptapEditor.getJSON());
+
+                const [storeRes, titleRes] = await Promise.all([
+                    fetch(CANVAS_STORE, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': CSRF,
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                        body: JSON.stringify({ message_id: canvasMessageId, type: 'output', content: output }),
+                    }),
+                    fetch(CANVAS_TITLE, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': CSRF,
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                        body: JSON.stringify({ message_id: canvasMessageId, title: canvasTitle.value }),
+                    }),
+                ]);
+
+                const storeData = await storeRes.json();
+
+                if (storeData.status === 'success') {
+                    if (typeof toastr !== 'undefined') {
+                        toastr.success('{{ __("Saved successfully") }}');
+                    }
+                } else {
+                    if (typeof toastr !== 'undefined') {
+                        toastr.error(storeData.message || '{{ __("Save failed") }}');
+                    }
+                }
+            } catch (err) {
+                if (typeof toastr !== 'undefined') {
+                    toastr.error('{{ __("Connection error. Please try again.") }}');
+                }
+            } finally {
+                canvasSave.disabled = false;
+                canvasSave.innerHTML = '<i class="ti ti-device-floppy me-1"></i>{{ __("Save") }}';
+            }
+        });
+    }
+
+    /* Delegate "Open in Canvas" button clicks (covers both server-rendered and dynamic bubbles) */
+    if (msgBox) {
+        msgBox.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-canvas-open]');
+            if (!btn) return;
+            e.preventDefault();
+            openCanvas(btn.dataset.canvasOpen, btn.dataset.canvasText);
         });
     }
 
