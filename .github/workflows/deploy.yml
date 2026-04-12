@@ -29,8 +29,8 @@ jobs:
       pull-requests: write
 
     outputs:
-      should_deploy: ${{ steps.result.outputs.should_deploy }}
-      drift_branch: ${{ steps.result.outputs.drift_branch }}
+      should_deploy: ${{ steps.drift.outputs.should_deploy }}
+      drift_branch: ${{ steps.drift.outputs.drift_branch }}
 
     env:
       DEPLOY_PATH: ${{ vars.DEPLOY_PATH || '/home/saassmar/domains/cleansm.art/public_html' }}
@@ -39,6 +39,7 @@ jobs:
 
     steps:
       - name: Verify runner context
+        shell: bash
         run: |
           echo "==> Runner host   : $(hostname)"
           echo "==> Running as    : $(whoami)"
@@ -46,7 +47,9 @@ jobs:
           echo "==> Deploy branch : $DEPLOY_BRANCH"
 
       - name: Verify deployment directory
+        shell: bash
         run: |
+          set -e
           if [ ! -d "$DEPLOY_PATH" ]; then
             echo "::error::Deploy path does not exist: $DEPLOY_PATH"
             exit 1
@@ -62,47 +65,71 @@ jobs:
             exit 1
           fi
 
-      - name: Fetch latest refs
+      - name: Prepare git working tree
+        shell: bash
         run: |
+          set -e
+          cd "$DEPLOY_PATH"
+
+          git config --global --add safe.directory "$DEPLOY_PATH" || true
+
+          if [ -f .git/index.lock ]; then
+            echo "==> Found stale .git/index.lock"
+            rm -f .git/index.lock
+          fi
+
+      - name: Fetch latest refs
+        shell: bash
+        run: |
+          set -e
           cd "$DEPLOY_PATH"
           git fetch --all --prune
 
       - name: Detect drift and capture if needed
-        id: result
+        id: drift
         shell: bash
         run: |
-          set +e
-          cd "$DEPLOY_PATH" || {
-            echo "::error::Cannot cd to deploy path."
-            echo "should_deploy=false" >> "$GITHUB_OUTPUT"
-            echo "drift_branch=" >> "$GITHUB_OUTPUT"
-            exit 1
-          }
+          set -e
+          cd "$DEPLOY_PATH"
 
           TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
           DRIFT_BRANCH="server-drift/$TIMESTAMP"
 
-          # Compare tracked code against origin branch.
           TRACKED_DRIFT="$(git diff --name-only "origin/$DEPLOY_BRANCH" -- \
             app \
-            routes \
-            resources \
+            bootstrap \
             config \
+            database \
+            public \
+            resources \
+            routes \
             Modules \
-            public/index.php \
-            public/.htaccess \
-            public/build 2>/dev/null)"
+            artisan \
+            composer.json \
+            composer.lock \
+            package.json \
+            package-lock.json \
+            vite.config.js \
+            .htaccess \
+            .env.example || true)"
 
-          # Find untracked code files in important paths.
           UNTRACKED_DRIFT="$(git ls-files --others --exclude-standard -- \
             app \
-            routes \
-            resources \
+            bootstrap \
             config \
+            database \
+            public \
+            resources \
+            routes \
             Modules \
-            public/index.php \
-            public/.htaccess \
-            public/build 2>/dev/null)"
+            artisan \
+            composer.json \
+            composer.lock \
+            package.json \
+            package-lock.json \
+            vite.config.js \
+            .htaccess \
+            .env.example || true)"
 
           echo "==> Tracked drift:"
           echo "$TRACKED_DRIFT"
@@ -116,33 +143,38 @@ jobs:
             exit 0
           fi
 
-          echo "==> Drift detected. Capturing into review branch."
+          echo "==> Drift detected. Capturing review branch and stopping deploy."
 
-          # Preserve server .env across branch operations
           cp .env /tmp/.deploy_env_backup
 
-          CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
+          CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "$DEPLOY_BRANCH")"
           if [ -z "$CURRENT_BRANCH" ] || [ "$CURRENT_BRANCH" = "HEAD" ]; then
             CURRENT_BRANCH="$DEPLOY_BRANCH"
           fi
 
-          # Clean up any prior local branch collision
           git branch -D "$DRIFT_BRANCH" 2>/dev/null || true
-
           git checkout -b "$DRIFT_BRANCH"
 
           git add \
             app \
-            routes \
-            resources \
+            bootstrap \
             config \
+            database \
+            public \
+            resources \
+            routes \
             Modules \
-            public/index.php \
-            public/.htaccess \
-            public/build
+            artisan \
+            composer.json \
+            composer.lock \
+            package.json \
+            package-lock.json \
+            vite.config.js \
+            .htaccess \
+            .env.example
 
           if git diff --cached --quiet; then
-            echo "==> Drift was reported but nothing staged after filtering."
+            echo "==> Nothing staged after filtering."
             git checkout "$CURRENT_BRANCH" || git checkout "$DEPLOY_BRANCH" || true
             mv /tmp/.deploy_env_backup .env
             echo "should_deploy=true" >> "$GITHUB_OUTPUT"
@@ -163,7 +195,6 @@ jobs:
             --body "This draft PR captures code differences found on the live server before deployment." \
             --draft
 
-          # Restore working tree to deploy branch and preserve .env
           git fetch origin "$DEPLOY_BRANCH"
           git checkout "$DEPLOY_BRANCH" || git checkout -B "$DEPLOY_BRANCH" "origin/$DEPLOY_BRANCH"
           mv /tmp/.deploy_env_backup .env
@@ -172,7 +203,6 @@ jobs:
           echo "drift_branch=$DRIFT_BRANCH" >> "$GITHUB_OUTPUT"
 
           echo "::warning::Server drift found. Draft PR created. Deployment stopped for review."
-          exit 0
 
   deploy:
     name: Deploy to production
@@ -190,6 +220,7 @@ jobs:
 
     steps:
       - name: Verify runner context
+        shell: bash
         run: |
           echo "==> Runner host   : $(hostname)"
           echo "==> Running as    : $(whoami)"
@@ -197,7 +228,9 @@ jobs:
           echo "==> Deploy branch : $DEPLOY_BRANCH"
 
       - name: Verify deployment directory and .env
+        shell: bash
         run: |
+          set -e
           if [ ! -d "$DEPLOY_PATH" ]; then
             echo "::error::Deploy path does not exist: $DEPLOY_PATH"
             exit 1
@@ -213,25 +246,37 @@ jobs:
             exit 1
           fi
 
+      - name: Prepare git working tree
+        shell: bash
+        run: |
+          set -e
+          cd "$DEPLOY_PATH"
+
+          git config --global --add safe.directory "$DEPLOY_PATH" || true
+
+          if [ -f .git/index.lock ]; then
+            echo "==> Found stale .git/index.lock"
+            rm -f .git/index.lock
+          fi
+
       - name: Reset server to canonical branch
         shell: bash
         run: |
           set -e
           cd "$DEPLOY_PATH"
 
-          if [ -f .env ]; then
-            cp .env /tmp/.deploy_env_backup
-          fi
+          cp .env /tmp/.deploy_env_backup
 
           git fetch origin "$DEPLOY_BRANCH"
           git reset --hard "origin/$DEPLOY_BRANCH"
+          git clean -fd
 
-          if [ -f /tmp/.deploy_env_backup ]; then
-            mv /tmp/.deploy_env_backup .env
-          fi
+          mv /tmp/.deploy_env_backup .env
 
       - name: Install Composer dependencies
+        shell: bash
         run: |
+          set -e
           cd "$DEPLOY_PATH"
           php -v
           composer --version
@@ -239,12 +284,16 @@ jobs:
 
       - name: Run database migrations
         if: github.event_name != 'workflow_dispatch' || github.event.inputs.skip_migrations != 'true'
+        shell: bash
         run: |
+          set -e
           cd "$DEPLOY_PATH"
           php artisan migrate --force --no-interaction
 
       - name: Rebuild application caches
+        shell: bash
         run: |
+          set -e
           cd "$DEPLOY_PATH"
           php artisan optimize:clear
           php artisan config:cache
@@ -252,6 +301,7 @@ jobs:
           php artisan view:cache || echo "::warning::view:cache failed."
 
       - name: Restart queue workers
+        shell: bash
         run: |
           cd "$DEPLOY_PATH"
           php artisan queue:restart || true
@@ -259,13 +309,14 @@ jobs:
       - name: Post-deploy health check
         env:
           APP_URL: ${{ secrets.APP_URL }}
+        shell: bash
         run: |
           if [ -z "$APP_URL" ]; then
             echo "APP_URL secret not set — skipping health check."
             exit 0
           fi
 
-          HTTP_CODE=$(curl --silent --output /dev/null --write-out "%{http_code}" --max-time 30 "$APP_URL")
+          HTTP_CODE="$(curl --silent --output /dev/null --write-out "%{http_code}" --max-time 30 "$APP_URL")"
           echo "HTTP response: $HTTP_CODE"
 
           if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 400 ]; then
