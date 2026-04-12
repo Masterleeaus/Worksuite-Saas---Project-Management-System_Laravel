@@ -5,6 +5,7 @@ namespace Modules\TitanTheme\Http\Controllers;
 use App\Helper\Reply;
 use App\Http\Controllers\AccountBaseController;
 use Illuminate\Http\Request;
+use Modules\TitanTheme\Http\Requests\MegaMenuRequest;
 use Modules\TitanTheme\Models\MegaMenu;
 
 class MegaMenuController extends AccountBaseController
@@ -22,7 +23,7 @@ class MegaMenuController extends AccountBaseController
     {
         abort_403(!$this->user->permission('view_mega_menu'));
 
-        $this->menus = MegaMenu::with('items')->orderBy('sort_order')->get();
+        $this->menus = MegaMenu::with('items')->orderBy('sort_order')->paginate(10);
 
         return view('titantheme::mega-menu.index', $this->data);
     }
@@ -40,18 +41,11 @@ class MegaMenuController extends AccountBaseController
     /**
      * Store a new mega menu.
      */
-    public function store(Request $request)
+    public function store(MegaMenuRequest $request)
     {
         abort_403(!$this->user->permission('manage_mega_menu'));
 
-        $data = $request->validate([
-            'title'           => 'required|string|max:255',
-            'slug'            => 'nullable|string|max:100',
-            'icon'            => 'nullable|string|max:100',
-            'sort_order'      => 'nullable|integer|min:0',
-            'is_active'       => 'nullable|boolean',
-            'required_module' => 'nullable|string|max:100',
-        ]);
+        $data = $request->validated();
 
         $data['created_by'] = $this->user->id;
         $data['is_active']  = $request->boolean('is_active', true);
@@ -79,21 +73,13 @@ class MegaMenuController extends AccountBaseController
     /**
      * Update an existing mega menu.
      */
-    public function update(Request $request, int $id)
+    public function update(MegaMenuRequest $request, int $id)
     {
         abort_403(!$this->user->permission('manage_mega_menu'));
 
         $menu = MegaMenu::findOrFail($id);
 
-        $data = $request->validate([
-            'title'           => 'required|string|max:255',
-            'slug'            => 'nullable|string|max:100',
-            'icon'            => 'nullable|string|max:100',
-            'sort_order'      => 'nullable|integer|min:0',
-            'is_active'       => 'nullable|boolean',
-            'required_module' => 'nullable|string|max:100',
-        ]);
-
+        $data = $request->validated();
         $data['is_active'] = $request->boolean('is_active', true);
 
         $menu->update($data);

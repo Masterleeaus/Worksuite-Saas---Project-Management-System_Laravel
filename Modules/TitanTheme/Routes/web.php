@@ -6,6 +6,7 @@ use Modules\TitanTheme\Http\Controllers\LiveCustomizerController;
 use Modules\TitanTheme\Http\Controllers\LiveCustomizerSettingController;
 use Modules\TitanTheme\Http\Controllers\MegaMenuController;
 use Modules\TitanTheme\Http\Controllers\MegaMenuItemController;
+use Modules\TitanTheme\Http\Controllers\MenuController;
 use Modules\TitanTheme\Http\Controllers\NavigationController;
 use Modules\TitanTheme\Http\Controllers\WhiteLabelController;
 
@@ -81,5 +82,28 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account', 'as' => 'titantheme
     Route::prefix('admin/theme/white-label')->name('white-label.')->group(function () {
         Route::get('/',  [WhiteLabelController::class, 'index'])->name('index');
         Route::post('/', [WhiteLabelController::class, 'update'])->name('update');
+    });
+
+    // ── Sidebar Menu Builder (Menu v2.2.0) ────────────────────────────────
+    Route::prefix('admin/menu')->name('menu.')->group(function () {
+        Route::get('/',         [MenuController::class, 'index'])->name('index');
+        Route::delete('/{menu}', [MenuController::class, 'delete'])->name('delete');
+    });
+
+    // ── Admin Mega Menu (MegaMenu v1.1.0) ─────────────────────────────────
+    Route::prefix('admin/mega-menu')->name('admin.mega-menu.')->group(function () {
+        Route::get('/',          [MegaMenuController::class, 'index'])->name('index');
+        Route::get('/create',    [MegaMenuController::class, 'create'])->name('create');
+        Route::post('/',         [MegaMenuController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [MegaMenuController::class, 'edit'])->name('edit');
+        Route::put('/{id}',      [MegaMenuController::class, 'update'])->name('update');
+
+        // Mega menu items (nested under a menu)
+        Route::prefix('/{menuId}/items')->name('items.')->group(function () {
+            Route::post('/',           [MegaMenuItemController::class, 'store'])->name('store');
+            Route::put('/{itemId}',    [MegaMenuItemController::class, 'update'])->name('update');
+            Route::delete('/{itemId}', [MegaMenuItemController::class, 'destroy'])->name('destroy');
+            Route::post('/reorder',    [MegaMenuItemController::class, 'reorder'])->name('reorder');
+        });
     });
 });

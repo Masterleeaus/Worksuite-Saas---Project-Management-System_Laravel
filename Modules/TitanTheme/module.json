@@ -51,6 +51,18 @@
             "label": "Theme & Branding",
             "route": "titantheme.customizer.index",
             "sort_order": 95
+        },
+        {
+            "panel": "admin",
+            "label": "Menu Builder",
+            "route": "titantheme.menu.index",
+            "sort_order": 96
+        },
+        {
+            "panel": "admin",
+            "label": "Mega Menu",
+            "route": "titantheme.admin.mega-menu.index",
+            "sort_order": 97
         }
     ],
     "sidebar_menu": true
