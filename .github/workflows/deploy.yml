@@ -1,4 +1,4 @@
-name: Drift Check + Deploy
+name: Deploy with Drift Guard
 
 on:
   push:
@@ -38,6 +38,13 @@ jobs:
       GH_TOKEN: ${{ github.token }}
 
     steps:
+      - name: Verify runner context
+        run: |
+          echo "==> Runner host   : $(hostname)"
+          echo "==> Running as    : $(whoami)"
+          echo "==> Deploy path   : $DEPLOY_PATH"
+          echo "==> Deploy branch : $DEPLOY_BRANCH"
+
       - name: Verify deployment directory
         run: |
           if [ ! -d "$DEPLOY_PATH" ]; then
@@ -62,39 +69,81 @@ jobs:
 
       - name: Detect drift and capture if needed
         id: result
+        shell: bash
         run: |
-          cd "$DEPLOY_PATH"
+          set +e
+          cd "$DEPLOY_PATH" || {
+            echo "::error::Cannot cd to deploy path."
+            echo "should_deploy=false" >> "$GITHUB_OUTPUT"
+            echo "drift_branch=" >> "$GITHUB_OUTPUT"
+            exit 1
+          }
 
           TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
           DRIFT_BRANCH="server-drift/$TIMESTAMP"
 
-          # Make sure runtime/server-only paths are not part of the review branch.
-          TRACKED_DRIFT="$(git diff --name-only -- app routes resources config Modules public || true)"
-          UNTRACKED_DRIFT="$(git ls-files --others --exclude-standard -- app routes resources config Modules public || true)"
+          # Compare tracked code against origin branch.
+          TRACKED_DRIFT="$(git diff --name-only "origin/$DEPLOY_BRANCH" -- \
+            app \
+            routes \
+            resources \
+            config \
+            Modules \
+            public/index.php \
+            public/.htaccess \
+            public/build 2>/dev/null)"
+
+          # Find untracked code files in important paths.
+          UNTRACKED_DRIFT="$(git ls-files --others --exclude-standard -- \
+            app \
+            routes \
+            resources \
+            config \
+            Modules \
+            public/index.php \
+            public/.htaccess \
+            public/build 2>/dev/null)"
+
+          echo "==> Tracked drift:"
+          echo "$TRACKED_DRIFT"
+          echo "==> Untracked drift:"
+          echo "$UNTRACKED_DRIFT"
 
           if [ -z "$TRACKED_DRIFT" ] && [ -z "$UNTRACKED_DRIFT" ]; then
-            echo "No drift found."
+            echo "==> No drift found."
             echo "should_deploy=true" >> "$GITHUB_OUTPUT"
             echo "drift_branch=" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          echo "Drift detected:"
-          echo "$TRACKED_DRIFT"
-          echo "$UNTRACKED_DRIFT"
+          echo "==> Drift detected. Capturing into review branch."
 
-          # Preserve .env before branch work
+          # Preserve server .env across branch operations
           cp .env /tmp/.deploy_env_backup
 
-          CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD || echo "$DEPLOY_BRANCH")"
+          CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
+          if [ -z "$CURRENT_BRANCH" ] || [ "$CURRENT_BRANCH" = "HEAD" ]; then
+            CURRENT_BRANCH="$DEPLOY_BRANCH"
+          fi
+
+          # Clean up any prior local branch collision
+          git branch -D "$DRIFT_BRANCH" 2>/dev/null || true
 
           git checkout -b "$DRIFT_BRANCH"
 
-          git add app routes resources config Modules public
+          git add \
+            app \
+            routes \
+            resources \
+            config \
+            Modules \
+            public/index.php \
+            public/.htaccess \
+            public/build
 
           if git diff --cached --quiet; then
-            echo "Nothing staged after filtering."
-            git checkout "$CURRENT_BRANCH" || true
+            echo "==> Drift was reported but nothing staged after filtering."
+            git checkout "$CURRENT_BRANCH" || git checkout "$DEPLOY_BRANCH" || true
             mv /tmp/.deploy_env_backup .env
             echo "should_deploy=true" >> "$GITHUB_OUTPUT"
             echo "drift_branch=" >> "$GITHUB_OUTPUT"
@@ -114,13 +163,16 @@ jobs:
             --body "This draft PR captures code differences found on the live server before deployment." \
             --draft
 
-          # Return working tree to deploy branch, but stop the workflow before deploy.
+          # Restore working tree to deploy branch and preserve .env
           git fetch origin "$DEPLOY_BRANCH"
           git checkout "$DEPLOY_BRANCH" || git checkout -B "$DEPLOY_BRANCH" "origin/$DEPLOY_BRANCH"
           mv /tmp/.deploy_env_backup .env
 
           echo "should_deploy=false" >> "$GITHUB_OUTPUT"
           echo "drift_branch=$DRIFT_BRANCH" >> "$GITHUB_OUTPUT"
+
+          echo "::warning::Server drift found. Draft PR created. Deployment stopped for review."
+          exit 0
 
   deploy:
     name: Deploy to production
@@ -139,10 +191,10 @@ jobs:
     steps:
       - name: Verify runner context
         run: |
-          echo "==> Runner host : $(hostname)"
-          echo "==> Running as  : $(whoami)"
-          echo "==> Deploy path : $DEPLOY_PATH"
-          echo "==> Deploy branch: $DEPLOY_BRANCH"
+          echo "==> Runner host   : $(hostname)"
+          echo "==> Running as    : $(whoami)"
+          echo "==> Deploy path   : $DEPLOY_PATH"
+          echo "==> Deploy branch : $DEPLOY_BRANCH"
 
       - name: Verify deployment directory and .env
         run: |
@@ -162,7 +214,9 @@ jobs:
           fi
 
       - name: Reset server to canonical branch
+        shell: bash
         run: |
+          set -e
           cd "$DEPLOY_PATH"
 
           if [ -f .env ]; then
@@ -179,10 +233,12 @@ jobs:
       - name: Install Composer dependencies
         run: |
           cd "$DEPLOY_PATH"
+          php -v
+          composer --version
           composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
 
       - name: Run database migrations
-        if: github.event.inputs.skip_migrations != 'true'
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.skip_migrations != 'true'
         run: |
           cd "$DEPLOY_PATH"
           php artisan migrate --force --no-interaction
@@ -214,5 +270,7 @@ jobs:
 
           if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 400 ]; then
             echo "::warning::Health check returned HTTP $HTTP_CODE"
+          else
+            echo "==> Health check passed."
           fi
         continue-on-error: true
