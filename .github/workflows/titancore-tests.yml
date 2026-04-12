@@ -52,7 +52,11 @@ jobs:
         run: mkdir -p bootstrap/cache && chmod -R 775 storage bootstrap/cache
 
       - name: Install dependencies
-        run: composer install --no-interaction --no-progress --prefer-dist
+        run: |
+          if ! composer install --no-interaction --no-progress --prefer-dist; then
+            composer update laravel/mcp laravel/reverb --no-interaction --prefer-dist --no-scripts
+            composer install --no-interaction --no-progress --prefer-dist
+          fi
 
       - name: Prepare .env
         run: |
