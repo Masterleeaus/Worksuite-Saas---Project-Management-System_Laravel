@@ -97,6 +97,10 @@ class EmployeeDetails extends BaseModel
         'date_of_birth' => 'datetime',
         'calendar_view	' => 'array',
         'marital_status' => MaritalStatus::class,
+        // Compliance fields (Recruit module — Cleaning Business Upgrade)
+        'is_subcontractor'   => 'boolean',
+        'bank_account_number' => 'encrypted',
+        'tax_file_number'    => 'encrypted',
     ];
 
     protected $with = ['company:id'];
