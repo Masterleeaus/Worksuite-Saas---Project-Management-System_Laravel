@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Modules\TitanTheme\Services\ThemeService;
 use Modules\TitanTheme\Services\NavigationService;
 use Modules\TitanTheme\Services\WhiteLabelService;
+use App\Services\Common\MenuService;
 
 class TitanThemeServiceProvider extends ServiceProvider
 {
@@ -19,6 +20,7 @@ class TitanThemeServiceProvider extends ServiceProvider
         $this->app->singleton(ThemeService::class);
         $this->app->singleton(NavigationService::class);
         $this->app->singleton(WhiteLabelService::class);
+        $this->app->singleton(MenuService::class);
     }
 
     public function boot(): void
@@ -59,6 +61,12 @@ class TitanThemeServiceProvider extends ServiceProvider
         $this->loadViewsFrom(
             module_path($this->moduleName, 'Resources/views'),
             $this->moduleNameLower
+        );
+
+        // Register 'menu::' as an alias pointing to the menu sub-directory.
+        $this->loadViewsFrom(
+            module_path($this->moduleName, 'Resources/views/menu'),
+            'menu'
         );
 
         $this->publishes([

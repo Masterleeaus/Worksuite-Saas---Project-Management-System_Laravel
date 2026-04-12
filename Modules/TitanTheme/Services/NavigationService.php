@@ -5,6 +5,7 @@ namespace Modules\TitanTheme\Services;
 use Illuminate\Support\Collection;
 use Modules\TitanTheme\Models\MegaMenu;
 use Modules\TitanTheme\Models\NavItem;
+use App\Services\Common\MenuService;
 
 class NavigationService
 {
@@ -97,6 +98,17 @@ class NavigationService
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
+
+    /**
+     * Return the core WorkSuite sidebar menu tree via MenuService.
+     * Used by TitanTheme to render the main sidebar navigation.
+     *
+     * @return Collection<\App\Models\Menu>
+     */
+    public function coreMenuTree(bool $includeSettingMenus = false): Collection
+    {
+        return app(MenuService::class)->generate($includeSettingMenus);
+    }
 
     protected function moduleIsLoaded(?string $moduleName): bool
     {

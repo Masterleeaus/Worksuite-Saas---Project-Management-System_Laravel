@@ -74,4 +74,12 @@ return [
     'delete_item'        => 'Delete Item',
     'create_preset'      => 'Create Preset',
     'edit_preset'        => 'Edit Preset',
+
+    // Menu builder (Menu v2.2.0)
+    'menu_builder'              => 'Menu Builder',
+    'no_menu_items'             => 'No sidebar menu items found.',
+    'confirm_delete_menu'       => 'Remove sidebar menu item',
+    'module'                    => 'Module',
+    'mega_menu_title_required'  => 'The mega menu title is required.',
+    'mega_menu_title_max'       => 'The mega menu title may not be greater than 255 characters.',
 ];
