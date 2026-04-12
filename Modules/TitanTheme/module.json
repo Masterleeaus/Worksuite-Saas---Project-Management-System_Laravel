@@ -1,0 +1,57 @@
+{
+    "name": "TitanTheme",
+    "alias": "titantheme",
+    "description": "TitanTheme — Complete visual theming, navigation management, and white-label customisation system. Unifies LiveCustomizer, MegaMenu, and Menu extensions.",
+    "keywords": ["theme", "customizer", "white-label", "mega-menu", "navigation", "branding"],
+    "active": 1,
+    "order": 0,
+    "version": "1.0.0",
+    "providers": [
+        "Modules\\TitanTheme\\Providers\\TitanThemeServiceProvider",
+        "Modules\\TitanTheme\\Providers\\EventServiceProvider",
+        "Modules\\TitanTheme\\Providers\\RouteServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": [],
+    "permissions": [
+        "view_theme_settings",
+        "manage_theme_settings",
+        "view_mega_menu",
+        "manage_mega_menu",
+        "view_navigation",
+        "manage_navigation",
+        "manage_white_label"
+    ],
+    "roles_permissions": {
+        "admin": [
+            "view_theme_settings",
+            "manage_theme_settings",
+            "view_mega_menu",
+            "manage_mega_menu",
+            "view_navigation",
+            "manage_navigation",
+            "manage_white_label"
+        ],
+        "manager": [
+            "view_theme_settings",
+            "view_mega_menu",
+            "view_navigation"
+        ],
+        "employee": [
+            "view_theme_settings",
+            "view_mega_menu",
+            "view_navigation"
+        ],
+        "client": []
+    },
+    "menus": [
+        {
+            "panel": "admin",
+            "label": "Theme & Branding",
+            "route": "titantheme.customizer.index",
+            "sort_order": 95
+        }
+    ],
+    "sidebar_menu": true
+}
