@@ -74,4 +74,13 @@ return [
     'delete_item'        => 'Delete Item',
     'create_preset'      => 'Create Preset',
     'edit_preset'        => 'Edit Preset',
+
+    // Live Customizer v1.3.0 — settings & apply
+    'customizer_settings'         => 'Customizer Settings',
+    'customizer_settings_updated' => 'Customizer settings updated successfully.',
+    'customizer_settings_info'    => 'If you close the editor, the theme customisation process will be cancelled.',
+    'show_live_customizer'        => 'Live Customizer Editor',
+    'show_live_customizer_help'   => 'Enable the floating real-time customiser panel for administrators.',
+    'theme_updated'               => 'Theme updated successfully.',
+    'changes_discarded'           => 'Changes discarded successfully.',
 ];

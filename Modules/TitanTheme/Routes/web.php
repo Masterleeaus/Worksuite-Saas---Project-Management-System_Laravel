@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Modules\TitanTheme\Http\Controllers\ThemeController;
 use Modules\TitanTheme\Http\Controllers\LiveCustomizerController;
+use Modules\TitanTheme\Http\Controllers\LiveCustomizerSettingController;
 use Modules\TitanTheme\Http\Controllers\MegaMenuController;
 use Modules\TitanTheme\Http\Controllers\MegaMenuItemController;
 use Modules\TitanTheme\Http\Controllers\NavigationController;
@@ -21,6 +22,14 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account', 'as' => 'titantheme
         Route::get('/',         [LiveCustomizerController::class, 'index'])->name('index');
         Route::post('/preview', [LiveCustomizerController::class, 'preview'])->name('preview');
         Route::post('/save',    [LiveCustomizerController::class, 'save'])->name('save');
+
+        // Real-time CSS-variable apply endpoint (LiveCustomizer v1.3.0 protocol).
+        // Called by the lqdCustomizer Alpine component on "Save & Close".
+        Route::post('/apply',   [LiveCustomizerController::class, 'apply'])->name('apply');
+
+        // Admin settings: enable / disable the Live Customizer feature.
+        Route::get('/setting',  [LiveCustomizerSettingController::class, 'index'])->name('setting.index');
+        Route::post('/setting', [LiveCustomizerSettingController::class, 'update'])->name('setting.update');
     });
 
     // CSS variables endpoint (included in <head> via blade directive)

@@ -3,6 +3,7 @@
 namespace Modules\TitanTheme\Http\Controllers;
 
 use App\Helper\Reply;
+use App\Helpers\Classes\Helper;
 use App\Http\Controllers\AccountBaseController;
 use Illuminate\Http\Request;
 use Modules\TitanTheme\Models\ThemePreset;
@@ -82,5 +83,48 @@ class LiveCustomizerController extends AccountBaseController
             __('titantheme::titantheme.theme_saved'),
             ['presetId' => $preset->id]
         );
+    }
+
+    /**
+     * Real-time CSS variable application endpoint (LiveCustomizer v1.3.0 protocol).
+     *
+     * Saves the raw CSS-variable string and font configuration via the WorkSuite
+     * setting() helper so that lqd-customizer-style-head injects them immediately
+     * on the next page load.  Setting keys are intentionally backward-compatible
+     * with the original LiveCustomizer extension.
+     *
+     * POST account/titan-theme/customiser/apply
+     * Body params:
+     *   style  — full CSS custom-property block (string)
+     *   fonts  — font configuration object {fontBody, fontHeading}
+     *   clear  — (optional) truthy to discard and revert to defaults
+     */
+    public function apply(Request $request)
+    {
+        abort_403(!$this->user->permission('manage_theme_settings'));
+
+        if (Helper::appIsNotDemo()) {
+            $dashTheme = setting('dash_theme') ?? 'default';
+
+            setting([
+                $dashTheme . '_live_customizer'       => $request->get('style'),
+                $dashTheme . '_live_customizer_fonts' => $request->get('fonts'),
+                'show_live_customizer'                => 0,
+            ])->save();
+
+            $message = $request->get('clear')
+                ? __('titantheme::titantheme.changes_discarded')
+                : __('titantheme::titantheme.theme_updated');
+
+            return response()->json([
+                'message' => $message,
+                'status'  => 'success',
+            ]);
+        }
+
+        return response()->json([
+            'message' => __('messages.demoRestrictedAction'),
+            'status'  => 'error',
+        ], 422);
     }
 }
