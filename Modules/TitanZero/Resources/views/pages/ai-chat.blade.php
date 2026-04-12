@@ -49,6 +49,16 @@
 .tz-chat-input-bar button   { align-self: flex-end; }
 .tz-empty-hint         { text-align: center; color: #aaa; margin-top: 3rem; font-size: .92rem; }
 
+/* ── File Chat (AiChatProFileChat v1.1.0) ────────────────── */
+.tz-file-badge         { display: flex; align-items: center; gap: .35rem; padding: .25rem .6rem;
+                         background: rgba(13,110,253,.08); border: 1px solid rgba(13,110,253,.2);
+                         border-radius: .4rem; font-size: .78rem; color: var(--bs-primary, #0d6efd);
+                         max-width: 220px; overflow: hidden; }
+.tz-file-badge span    { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+.tz-file-input-wrap    { position: relative; }
+.tz-file-input-wrap input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+.tz-upload-btn         { align-self: flex-end; position: relative; overflow: hidden; }
+
 /* ── Canvas Panel ─────────────────────────────────────── */
 .tz-canvas-panel       { display: none; flex-direction: column; width: 420px; min-width: 320px;
                          border-left: 1px solid var(--bs-border-color, #dee2e6); overflow: hidden; }
@@ -191,7 +201,33 @@
                     <span>{{ __('Titan is thinking…') }}</span>
                 </div>
 
+                {{-- Document badge: shown when a file is attached to the session --}}
+                @if(isset($chat) && $chat->doc_name)
+                <div class="tz-file-badge ms-3 mb-1" id="tzFileBadge">
+                    <i class="ti ti-file-text" style="flex-shrink:0;"></i>
+                    <span title="{{ $chat->doc_name }}">{{ $chat->doc_name }}</span>
+                </div>
+                @else
+                <div class="tz-file-badge ms-3 mb-1 d-none" id="tzFileBadge">
+                    <i class="ti ti-file-text" style="flex-shrink:0;"></i>
+                    <span id="tzFileDocName"></span>
+                </div>
+                @endif
+
                 <div class="tz-chat-input-bar">
+                    @if(config('titanzero.file_chat.allowed', true) && isset($chat))
+                    <div class="tz-upload-btn" title="{{ __('Upload a document (PDF, DOCX, TXT)') }}">
+                        <button class="btn btn-outline-secondary" id="tzUploadBtn"
+                                {{ !isset($chat) ? 'disabled' : '' }}
+                                type="button">
+                            <i class="ti ti-paperclip" id="tzUploadIcon"></i>
+                        </button>
+                        <input type="file"
+                               id="tzFileInput"
+                               accept=".pdf,.docx,.doc,.txt,.csv,.xlsx"
+                               {{ !isset($chat) ? 'disabled' : '' }}>
+                    </div>
+                    @endif
                     <textarea id="tzInput" class="form-control"
                               placeholder="{{ __('Type a message…') }}"
                               rows="1"
@@ -225,6 +261,7 @@
     const CHAT_BASE_URL  = @json(rtrim(route('titan.zero.ai-chat.index'), '/'));
     const CANVAS_STORE   = @json(route('titan.zero.canvas.store'));
     const CANVAS_TITLE   = @json(route('titan.zero.canvas.title'));
+    const FILE_UPLOAD_URL= @json(route('titan.zero.ai-chat.file-upload'));
     const CSRF           = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
     let currentSessionId = {{ $chat?->id ?? 'null' }};
 
@@ -559,6 +596,61 @@
             if (!btn) return;
             e.preventDefault();
             openCanvas(btn.dataset.canvasOpen, btn.dataset.canvasText);
+        });
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       File upload — AiChatProFileChat v1.1.0
+    ═══════════════════════════════════════════════════════ */
+    const fileInput  = document.getElementById('tzFileInput');
+    const uploadIcon = document.getElementById('tzUploadIcon');
+    const fileBadge  = document.getElementById('tzFileBadge');
+    const fileDocName= document.getElementById('tzFileDocName');
+
+    if (fileInput) {
+        fileInput.addEventListener('change', async () => {
+            const file = fileInput.files?.[0];
+            if (!file || !currentSessionId) return;
+
+            if (uploadIcon) {
+                uploadIcon.className = 'spinner-border spinner-border-sm';
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('session_id', currentSessionId);
+            formData.append('_token', CSRF);
+
+            try {
+                const res  = await fetch(FILE_UPLOAD_URL, {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': CSRF, 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData,
+                });
+                const data = await res.json();
+
+                if (data.ok) {
+                    if (fileBadge)  { fileBadge.classList.remove('d-none'); }
+                    if (fileDocName){ fileDocName.textContent = data.doc_name || file.name; }
+                    if (typeof toastr !== 'undefined') {
+                        toastr.success('{{ __("Document uploaded and indexed successfully.") }}');
+                    }
+                } else {
+                    if (typeof toastr !== 'undefined') {
+                        toastr.error(data.message || '{{ __("File upload failed.") }}');
+                    }
+                }
+            } catch (err) {
+                if (typeof toastr !== 'undefined') {
+                    toastr.error('{{ __("Connection error during file upload.") }}');
+                }
+            } finally {
+                if (uploadIcon) {
+                    uploadIcon.className = 'ti ti-paperclip';
+                }
+                // Reset input so the same file can be re-uploaded if needed
+                fileInput.value = '';
+            }
         });
     }
 
