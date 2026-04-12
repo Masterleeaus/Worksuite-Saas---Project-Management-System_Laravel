@@ -271,10 +271,7 @@ class PayslipService
             $unpaidLeaveHours = Leave::where('user_id', $userId)
                 ->where('status', 'approved')
                 ->where('leave_type', 'unpaid')
-                ->where(function ($q) use ($run) {
-                    $q->whereBetween('leave_date', [$run->period_start, $run->period_end])
-                      ->orWhereBetween('leave_date', [$run->period_start, $run->period_end]);
-                })
+                ->whereBetween('leave_date', [$run->period_start, $run->period_end])
                 ->sum('no_of_days');
         } catch (\Exception $e) {
             // Leave model may not have this column structure; return 0 safely

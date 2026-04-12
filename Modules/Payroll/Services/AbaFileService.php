@@ -130,6 +130,8 @@ class AbaFileService
         $line .= $this->pad($h['user_name'] ?? 'PAYROLL', 26);               //  31-56 (26)
         $line .= $this->padLeft($h['user_number'] ?? '999999', 6, '0');      //  57-62 (6)
         $line .= $this->pad($h['description'] ?? 'PAYROLL', 12);             //  63-74 (12)
+        // ABA spec requires DDMMYY (6 chars). PHP 'd'=2-digit day, 'm'=2-digit numeric
+        // month (01-12), 'y'=2-digit year — 'dmy' produces the correct 6-char format.
         $line .= $this->pad($h['processing_date'] ?? now()->format('dmy'), 6); // 75-80 (6)
         $line .= str_repeat(' ', 4);                                          //  81-84 (4)
         $line .= str_repeat(' ', 36);                                         //  85-120 (36)
