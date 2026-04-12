@@ -26,7 +26,9 @@ class TitanPayServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(CryptomusPaymentService::class, fn() => new CryptomusPaymentService());
-        $this->app->singleton(QrPaymentService::class, fn() => new QrPaymentService());
+        $this->app->singleton(QrPaymentService::class, fn($app) => new QrPaymentService(
+            $app->make(PaymentLinkService::class)
+        ));
         $this->app->singleton(PaymentLinkService::class, fn() => new PaymentLinkService());
         $this->app->singleton(PaymentDispatcher::class, fn($app) => new PaymentDispatcher(
             $app->make(CryptomusPaymentService::class)

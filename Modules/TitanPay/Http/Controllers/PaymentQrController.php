@@ -64,19 +64,29 @@ class PaymentQrController extends AccountBaseController
     }
 
     /**
-     * Record a QR scan (called when the payment page is opened via QR link).
+     * Record a QR scan — called when the payment page is opened via a QR-encoded link.
+     * The token belongs to a PaymentLink record whose ID is stored on the QR code
+     * via the payment_url, but the cleanest approach is to look up the PaymentLink
+     * by token and then find its associated QR code.
+     *
      * Public endpoint — no auth required.
      */
     public function recordScan(string $token)
     {
-        $qr = PaymentQrCode::whereHas('invoice', fn($q) => $q)
-            ->where('status', 'active')
-            ->whereRaw('payment_url LIKE ?', ['%' . $token . '%'])
-            ->first();
+        // Look up the payment link by token first (properly indexed)
+        $link = \Modules\TitanPay\Models\PaymentLink::where('token', $token)->first();
 
-        $qr?->recordScan();
+        if ($link) {
+            // Find the QR code that belongs to the same invoice and is still active
+            $qr = PaymentQrCode::where('invoice_id', $link->invoice_id)
+                ->where('status', 'active')
+                ->latest()
+                ->first();
+
+            $qr?->recordScan();
+        }
 
         // Continue to payment page
-        return redirect($qr ? $qr->payment_url : '/');
+        return redirect('/pay/' . $token);
     }
 }

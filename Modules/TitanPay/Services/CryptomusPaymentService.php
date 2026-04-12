@@ -85,7 +85,8 @@ class CryptomusPaymentService
     {
         $webhookSecret = (string) config('titanpay.cryptomus.webhook_secret');
 
-        // Cryptomus signs: md5( base64_encode(json_encode($data_without_sign)) + api_key )
+        // NOTE: MD5 is mandated by the Cryptomus v1 API signature scheme (their protocol constraint).
+        // Signature: md5( base64_encode(json_encode($data_without_sign)) + api_key )
         $dataWithoutSign = $payload;
         unset($dataWithoutSign['sign']);
 

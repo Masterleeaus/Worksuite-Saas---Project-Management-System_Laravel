@@ -75,7 +75,14 @@ class CryptoPaymentController extends AccountBaseController
 
         // order_id format: "inv_{invoiceId}_{timestamp}"
         if (str_starts_with($orderId, 'inv_')) {
-            $invoiceId = (int) explode('_', $orderId)[1];
+            $parts = explode('_', $orderId);
+
+            // Guard: expect at least 3 segments (inv, id, timestamp)
+            if (count($parts) < 2 || !is_numeric($parts[1])) {
+                return response()->json(['result' => 'ok']);
+            }
+
+            $invoiceId = (int) $parts[1];
             $invoice   = Invoice::find($invoiceId);
 
             if ($invoice && in_array($status, ['paid', 'paid_over', 'wrong_amount_waiting', 'check'], true)) {

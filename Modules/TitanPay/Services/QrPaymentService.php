@@ -14,7 +14,7 @@ use Modules\TitanPay\Models\PaymentQrCode;
 class QrPaymentService
 {
     public function __construct(
-        private readonly PaymentLinkService $linkService = new PaymentLinkService()
+        private readonly PaymentLinkService $linkService
     ) {}
 
     /**
