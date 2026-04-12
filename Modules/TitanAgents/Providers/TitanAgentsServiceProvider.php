@@ -23,6 +23,8 @@ class TitanAgentsServiceProvider extends ServiceProvider
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'database/migrations'));
         $this->loadRoutesFrom(module_path($this->moduleName, 'Routes/chatbot.php'));
+        $this->loadRoutesFrom(module_path($this->moduleName, 'Routes/voice.php'));
+        $this->publishVoiceAssets();
         $this->registerMenu();
     }
 
@@ -100,6 +102,18 @@ class TitanAgentsServiceProvider extends ServiceProvider
 
         $componentNamespace = str_replace('/', '\\', config('modules.namespace').'\\'.$this->moduleName.'\\'.ltrim(config('modules.paths.generator.component-class.path'), config('modules.paths.app_folder', '')));
         Blade::componentNamespace($componentNamespace, $this->moduleNameLower);
+    }
+
+    /**
+     * Publish voice chatbot front-end assets (JS widget, images, default avatars).
+     */
+    protected function publishVoiceAssets(): void
+    {
+        $this->publishes([
+            module_path($this->moduleName, 'Resources/assets/voice/js')      => public_path('vendor/titanagents-voice/js'),
+            module_path($this->moduleName, 'Resources/assets/voice/images')   => public_path('vendor/titanagents-voice/images'),
+            module_path($this->moduleName, 'Resources/assets/voice/avatars')  => public_path('vendor/titanagents-voice/avatars'),
+        ], 'titanagents-voice');
     }
 
     /**
