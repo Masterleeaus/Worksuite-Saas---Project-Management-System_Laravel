@@ -33,5 +33,11 @@ return [
         // Default screen when opening the chat: 'new', 'last', 'pinned'
         'default_screen' => env('TITANZERO_AICHAT_DEFAULT_SCREEN', 'new'),
     ],
+
+    // AiChatProFileChat v1.1.0 — file-grounded chat feature gate
+    'file_chat' => [
+        // Set to false to globally disable document upload in AI Chat Pro.
+        'allowed' => (bool) env('TITANZERO_FILE_CHAT_ALLOWED', true),
+    ],
 ];
 

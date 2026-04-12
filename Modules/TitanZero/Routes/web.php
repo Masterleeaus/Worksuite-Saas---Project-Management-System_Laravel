@@ -53,6 +53,9 @@ Route::middleware(['web', 'auth'])
         Route::post('/ai-chat/message', [AIChatProController::class, 'sendMessage'])->name('ai-chat.send');
         Route::post('/ai-chat/session/new', [AIChatProController::class, 'startNewSession'])->name('ai-chat.session.new');
 
+        // ── AiChatProFileChat v1.1.0 — document upload ────────────────────────
+        Route::post('/ai-chat/file-upload', [AIChatProController::class, 'uploadFile'])->name('ai-chat.file-upload');
+
         // ── Canvas (AI Chat Pro TipTap Editor) ────────────────────────────────
         Route::post('/canvas/store', [CanvasController::class, 'storeContent'])->name('canvas.store');
         Route::post('/canvas/title', [CanvasController::class, 'saveTitle'])->name('canvas.title');

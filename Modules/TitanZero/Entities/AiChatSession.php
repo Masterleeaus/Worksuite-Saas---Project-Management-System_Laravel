@@ -21,6 +21,11 @@ class AiChatSession extends Model
         'is_pinned',
         'is_chatbot',
         'team_id',
+        // AiChatProFileChat v1.1.0 — OpenAI FileSearch / vector store columns
+        'openai_vector_id',
+        'openai_file_id',
+        'doc_name',
+        'reference_url',
     ];
 
     protected $casts = [
