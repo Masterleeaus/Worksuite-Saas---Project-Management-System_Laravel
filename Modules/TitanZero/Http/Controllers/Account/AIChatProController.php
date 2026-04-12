@@ -12,6 +12,7 @@ use Modules\TitanZero\Entities\AiChatCategory;
 use Modules\TitanZero\Entities\AiChatMessage;
 use Modules\TitanZero\Entities\AiChatSession;
 use Modules\TitanZero\Services\AiChatProService;
+use Modules\TitanZero\Services\AIFileChatService;
 use Modules\TitanZero\Services\ZeroGateway;
 
 /**
@@ -144,6 +145,10 @@ class AIChatProController extends Controller
             'kb_collection_key'  => $kbKey,
             'history'            => $history,
             'category_slug'      => $category?->slug ?? 'tz-general-assistant',
+            // AiChatProFileChat v1.1.0 — pass vector store context when available
+            'vector_store_id'    => $session->openai_vector_id ?: null,
+            'openai_file_id'     => $session->openai_file_id   ?: null,
+            'doc_name'           => $session->doc_name         ?: null,
         ];
 
         $result = $this->gateway->proposeDocument($envelope, $this->tenantId());
@@ -192,6 +197,56 @@ class AIChatProController extends Controller
             'ok'         => true,
             'session_id' => $session->id,
             'title'      => $session->title,
+        ]);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    //  File upload (POST) — AiChatProFileChat v1.1.0
+    // ─────────────────────────────────────────────────────────────────────────
+
+    public function uploadFile(Request $request): JsonResponse
+    {
+        if (! config('titanzero.file_chat.allowed', true)) {
+            return response()->json(['ok' => false, 'message' => __('File chat is not enabled.')], 403);
+        }
+
+        $request->validate([
+            'session_id' => ['required', 'integer'],
+            'file'       => ['required', 'file', 'mimes:pdf,docx,txt,doc,csv,xlsx', 'max:20480'],
+        ]);
+
+        $session = AiChatSession::findOrFail((int) $request->input('session_id'));
+
+        if (! $session->is_guest && $session->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $uploadedFile = $request->file('file');
+        $fileName     = $uploadedFile->getClientOriginalName();
+        $relativePath = $uploadedFile->store('ai-chat-files', 'public');
+
+        $service = new AIFileChatService(
+            filePaths: storage_path('app/public/' . $relativePath),
+            sessionId: (string) $session->id
+        );
+
+        $ok = $service->validateAndAnalyzeFile();
+
+        if (! $ok) {
+            return response()->json([
+                'ok'      => false,
+                'message' => __('File could not be processed. Please check your OpenAI API key configuration.'),
+            ], 422);
+        }
+
+        $session->refresh();
+
+        return response()->json([
+            'ok'               => true,
+            'doc_name'         => $session->doc_name ?? $fileName,
+            'reference_url'    => $session->reference_url,
+            'openai_file_id'   => $session->openai_file_id,
+            'openai_vector_id' => $session->openai_vector_id,
         ]);
     }
 
