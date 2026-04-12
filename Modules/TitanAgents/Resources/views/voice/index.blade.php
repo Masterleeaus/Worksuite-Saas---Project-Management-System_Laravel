@@ -214,7 +214,7 @@
                         const id = form.elements['id'].value;
                         const chatbotIndex = this.chatbots.data.findIndex(c => c.id == id);
 
-                        this.submittinData = true;
+                        this.submittingData = true;
 
                         const res = await fetch(form.action, {
                             method: 'DELETE',

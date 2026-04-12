@@ -51,7 +51,7 @@
                 id="train-file"
                 name="file"
                 type="file"
-				accept="file/*"
+				accept="application/pdf,.pdf,.xlsx,.xls,.csv,.docx,.doc"
                 @change="if ($event.target?.files[0]) $refs.fileName.innerText = $event.target.files[0].name"
             />
         </label>
