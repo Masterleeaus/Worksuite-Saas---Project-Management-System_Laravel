@@ -36,16 +36,16 @@ class LiveCustomizer
 
         $fontBody = data_get($fonts, 'fontBody');
 
-        if ($fontBody && $fontBody !== null) {
+        if ($fontBody) {
             $fontArray[$fontBody] = ['400', '500', '600'];
         }
 
         $fontHeading = data_get($fonts, 'fontHeading');
 
-        if ($fontHeading && $fontHeading !== null) {
+        if ($fontHeading) {
             $fontArray[$fontHeading] = ['500', '600', '700'];
         }
 
-        return $fontArray ?? [];
+        return $fontArray;
     }
 }

@@ -78,7 +78,7 @@ return [
     // Live Customizer v1.3.0 — settings & apply
     'customizer_settings'         => 'Customizer Settings',
     'customizer_settings_updated' => 'Customizer settings updated successfully.',
-    'customizer_settings_info'    => 'If you close the editor, the theme customisation process will be cancelled.',
+    'customizer_settings_info'    => 'If you close the editor, the theme customization process will be cancelled.',
     'show_live_customizer'        => 'Live Customizer Editor',
     'show_live_customizer_help'   => 'Enable the floating real-time customiser panel for administrators.',
     'theme_updated'               => 'Theme updated successfully.',

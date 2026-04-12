@@ -14,7 +14,7 @@
     $ttCss        = $themeService->generateCssVariables();
 
     // Backward-compat: raw CSS string saved by LiveCustomizerController::apply()
-    $lqdRawCss    = setting(setting('dash_theme') . '_live_customizer');
+    $lqdRawCss    = setting((setting('dash_theme') ?? 'default') . '_live_customizer');
 @endphp
 <style id="titan-theme-vars">
 {!! $ttCss !!}

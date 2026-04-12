@@ -114,10 +114,11 @@ class ThemeService
      */
     public function generateCss(): string
     {
-        $dashTheme = function_exists('setting') ? (setting('dash_theme') ?? 'default') : 'default';
+        $canUseSetting = function_exists('setting');
+        $dashTheme     = $canUseSetting ? (setting('dash_theme') ?? 'default') : 'default';
 
         // Raw CSS block saved by the real-time LiveCustomizer panel.
-        $rawCss = function_exists('setting') ? setting($dashTheme . '_live_customizer', '') : '';
+        $rawCss = $canUseSetting ? setting($dashTheme . '_live_customizer', '') : '';
 
         // Structured CSS vars from the active ThemePreset model.
         $structuredCss = $this->generateCssVariables();
