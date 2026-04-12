@@ -11,6 +11,9 @@
                             :text="__('Team Salaries')"
                             :permission="user()->permission('manage_employee_salary') == 'all'"
             />
+            @if (in_array('admin', user_roles()) || in_array(user()->permission('run_payroll'), ['all']))
+                <x-sub-menu-item :link="route('payroll-runs.index')" :text="__('payroll::app.menu.payrollRuns')"/>
+            @endif
             <x-sub-menu-item :link="route('payroll-expenses.index')" :text="__('payroll::app.payrollExpenses')"/>
             <x-sub-menu-item :link="route('overtime-requests.index')" :text="__('payroll::modules.payroll.overtimeRequest')"/>
             @if (in_array('admin', user_roles()))

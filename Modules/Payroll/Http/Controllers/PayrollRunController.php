@@ -50,9 +50,12 @@ class PayrollRunController extends AccountBaseController
 
     /**
      * Create a new draft payroll run.
+     * Requires run_payroll permission.
      */
     public function store(Request $request)
     {
+        abort_403(!in_array(user()->permission('run_payroll'), ['all']));
+
         $request->validate([
             'period_start' => 'required|date',
             'period_end'   => 'required|date|after_or_equal:period_start',
@@ -144,12 +147,15 @@ class PayrollRunController extends AccountBaseController
 
     /**
      * Approve the payroll run.
+     * Requires approve_payroll permission and admin role.
      */
     public function approve($id)
     {
+        abort_403(!in_array(user()->permission('approve_payroll'), ['all']));
+        abort_403(!in_array('admin', user_roles()));
+
         $run = PayrollRun::where('company_id', company()->id)->findOrFail($id);
         abort_403($run->isApproved());
-        abort_403(!in_array('admin', user_roles()));
 
         $run->update([
             'status'      => 'approved',
@@ -182,9 +188,12 @@ class PayrollRunController extends AccountBaseController
 
     /**
      * Export payroll run to CSV.
+     * Requires export_payroll permission.
      */
     public function exportCsv($id)
     {
+        abort_403(!in_array(user()->permission('export_payroll'), ['all']));
+
         $run = PayrollRun::where('company_id', company()->id)
             ->with(['lineItems.user', 'lineItems.overrides'])
             ->findOrFail($id);
@@ -252,9 +261,11 @@ class PayrollRunController extends AccountBaseController
 
     /**
      * Export payroll run to PDF.
+     * Requires export_payroll permission.
      */
     public function exportPdf($id)
     {
+        abort_403(!in_array(user()->permission('export_payroll'), ['all']));
         $run = PayrollRun::where('company_id', company()->id)
             ->with(['lineItems.user', 'lineItems.overrides.overriddenBy', 'creator', 'approver'])
             ->findOrFail($id);
@@ -285,6 +296,76 @@ class PayrollRunController extends AccountBaseController
         abort_403($run->isApproved());
         $run->delete();
         return Reply::success(__('messages.deleteSuccess'));
+    }
+
+    /**
+     * Export ABA bank file for bulk payment of this payroll run.
+     * Requires export_payroll permission and an approved run.
+     */
+    public function exportAba($id)
+    {
+        abort_403(!in_array(user()->permission('export_payroll'), ['all']));
+
+        $run = PayrollRun::where('company_id', company()->id)
+            ->with('payslips.employee.employeeDetail')
+            ->findOrFail($id);
+
+        abort_403(!$run->isApproved());
+
+        $abaService = app(\Modules\Payroll\Services\AbaFileService::class);
+        $payrollSetting = \Modules\Payroll\Entities\PayrollSetting::where('company_id', company()->id)->firstOrFail();
+
+        // Build header from company/payroll settings
+        $companyBsb    = $payrollSetting->bank_bsb     ?? '000-000';
+        $companyAccount = $payrollSetting->bank_account ?? '000000000';
+        $companyName   = company()->company_name ?? 'Company';
+
+        $header = [
+            'bsb'             => $companyBsb,
+            'account_number'  => $companyAccount,
+            'bank_name'       => $payrollSetting->bank_code ?? 'NAB',
+            'user_name'       => mb_substr($companyName, 0, 26),
+            'user_number'     => $payrollSetting->apca_user_number ?? '000000',
+            'description'     => 'PAYROLL',
+            'processing_date' => now()->format('dmY'),
+        ];
+
+        $records = [];
+        foreach ($run->payslips as $payslip) {
+            $emp = optional($payslip->employee);
+            $detail = optional($emp->employeeDetail);
+
+            $bsb     = $detail->bank_bsb ?? null;
+            $account = $detail->bank_account_number ?? null;
+
+            if (empty($bsb) || empty($account)) {
+                continue; // skip employees without bank details
+            }
+
+            $records[] = [
+                'bsb'            => $bsb,
+                'account_number' => $account,
+                'account_name'   => mb_substr($detail->bank_account_name ?? $emp->name ?? '', 0, 32),
+                'amount_cents'   => (int) round((float) $payslip->net_pay * 100),
+                'lodgement_ref'  => mb_substr('PAY ' . $run->period_end, 0, 18),
+                'trace_bsb'      => $companyBsb,
+                'trace_account'  => $companyAccount,
+                'remitter_name'  => mb_substr($companyName, 0, 16),
+                'tax_amount'     => (int) round((float) $payslip->tax_withheld * 100),
+            ];
+        }
+
+        if (empty($records)) {
+            return Reply::error(__('payroll::app.noPayslipsForAba'));
+        }
+
+        $abaContent = $abaService->generate($header, $records);
+        $filename   = 'payroll_run_' . $run->id . '_' . $run->period_end . '.aba';
+
+        return response($abaContent, 200, [
+            'Content-Type'        => 'text/plain',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
     }
 
     /**

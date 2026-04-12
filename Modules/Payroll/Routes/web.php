@@ -110,6 +110,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     Route::post('payroll-runs/{run}/line-items/{item}/override', [\Modules\Payroll\Http\Controllers\PayrollRunController::class, 'overrideLineItem'])->name('payroll-runs.override-line-item');
     Route::get('payroll-runs/{id}/export-csv', [\Modules\Payroll\Http\Controllers\PayrollRunController::class, 'exportCsv'])->name('payroll-runs.export-csv');
     Route::get('payroll-runs/{id}/export-pdf', [\Modules\Payroll\Http\Controllers\PayrollRunController::class, 'exportPdf'])->name('payroll-runs.export-pdf');
+    Route::get('payroll-runs/{id}/export-aba', [\Modules\Payroll\Http\Controllers\PayrollRunController::class, 'exportAba'])->name('payroll-runs.export-aba');
     Route::resource('payroll-runs', \Modules\Payroll\Http\Controllers\PayrollRunController::class);
 
 });
