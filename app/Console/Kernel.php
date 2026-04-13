@@ -42,6 +42,7 @@ use App\Console\Commands\ModuleHealthCheck;
 use App\Console\Commands\ModuleMigrateOrdered;
 use App\Console\Commands\SuperAdmin\FreeLicenceRenew;
 use App\Console\Commands\SuperAdmin\TrialExpire;
+use App\Console\Commands\TitanFilamentCheckCommand;
 
 class Kernel extends ConsoleKernel
 {
@@ -94,6 +95,9 @@ class Kernel extends ConsoleKernel
         AssignEmployeeShiftRotation::class,
         RecalculateLeavesQuotas::class,
         UpdateProjectProgressByDeadline::class,
+
+        // Titan Filament
+        TitanFilamentCheckCommand::class,
     ];
 
     /**

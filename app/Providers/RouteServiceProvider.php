@@ -37,6 +37,7 @@ class RouteServiceProvider extends ServiceProvider
             $this->mapSettingRoutes();
             $this->mapApiRoutes();
             $this->mapWebRoutes();
+            $this->mapTitanRoutes();
 
             // WORKSUITESAAS
             if (isWorksuiteSaas()) {
@@ -134,6 +135,35 @@ class RouteServiceProvider extends ServiceProvider
     {
         Route::namespace($this->namespace)
             ->group(base_path('routes/SuperAdmin/web-public.php'));
+    }
+
+    /**
+     * Register Titan panel routes (Filament parallel UI layer).
+     *
+     * Route files live in routes/Titan/ and are loaded recursively so that
+     * future sub-directories (e.g. routes/Titan/Api/) are automatically picked
+     * up without changes to this provider.  routes/web.php is NOT modified.
+     */
+    protected function mapTitanRoutes(): void
+    {
+        $titanRoutesPath = base_path('routes/Titan');
+
+        if (!is_dir($titanRoutesPath)) {
+            return;
+        }
+
+        /** @var \RecursiveIteratorIterator<\RecursiveDirectoryIterator> $iterator */
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($titanRoutesPath, \RecursiveDirectoryIterator::SKIP_DOTS)
+        );
+
+        foreach ($iterator as $file) {
+            if ($file->isFile() && $file->getExtension() === 'php') {
+                Route::middleware('web')
+                    ->namespace($this->namespace)
+                    ->group($file->getRealPath());
+            }
+        }
     }
 
 }
