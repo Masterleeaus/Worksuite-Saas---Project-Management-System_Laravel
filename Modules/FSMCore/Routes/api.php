@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Modules\FSMCore\Http\Controllers\Api\WorkerAuthController;
 use Modules\FSMCore\Http\Controllers\Api\WorkerOrderController;
 use Modules\FSMCore\Http\Controllers\Api\WorkerPhotoController;
+use Modules\FSMCore\Http\Controllers\Api\WorkerTimesheetController;
 
 /*
 |--------------------------------------------------------------------------
@@ -71,5 +72,11 @@ Route::prefix('api/fsm/v1')
                 ->name('fsm.api.photos.store');
             Route::delete('orders/{order_id}/photos/{photo_id}', [WorkerPhotoController::class, 'destroy'])
                 ->name('fsm.api.photos.destroy');
+
+            // Timesheets (delegates to FSMTimesheet module when active)
+            Route::get('timesheets',  [WorkerTimesheetController::class, 'index'])
+                ->name('fsm.api.timesheets.index');
+            Route::post('timesheets', [WorkerTimesheetController::class, 'store'])
+                ->name('fsm.api.timesheets.store');
         });
     });

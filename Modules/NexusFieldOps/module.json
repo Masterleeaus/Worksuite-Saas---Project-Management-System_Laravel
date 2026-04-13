@@ -1,0 +1,16 @@
+{
+  "name": "NexusFieldOps",
+  "alias": "nexusfieldops",
+  "description": "Titan Go — Nexus Field Ops mobile bridge. Provides the API surface for the Titan Go worker execution app: dashboard, job notes, issue escalation, worker quick-actions, offline sync, GPS pings, and FCM token management.",
+  "keywords": ["nexus", "titan-go", "field-ops", "worker", "mobile", "cleansmartOS"],
+  "active": 1,
+  "order": 10,
+  "providers": [
+    "Modules\\NexusFieldOps\\Providers\\NexusFieldOpsServiceProvider",
+    "Modules\\NexusFieldOps\\Providers\\RouteServiceProvider"
+  ],
+  "aliases": {},
+  "files": [],
+  "requires": ["FSMCore"],
+  "version": "1.0.0"
+}
