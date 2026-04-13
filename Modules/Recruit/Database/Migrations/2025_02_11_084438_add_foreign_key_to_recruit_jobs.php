@@ -15,7 +15,7 @@ return new class extends Migration
             return;
         }
         Schema::table('recruit_jobs', function (Blueprint $table) {
-            if (! Schema::hasColumn('recruit_jobs', 'recruiter_id')) {
+            if (Schema::hasColumn('recruit_jobs', 'recruiter_id')) {
                 $table->unsignedInteger('recruiter_id')->nullable()->change();
             }
             $table->foreign('recruiter_id')
@@ -36,7 +36,7 @@ return new class extends Migration
             $table->dropForeign(['recruiter_id']);
 
             // Change the column back to NOT NULL (if needed)
-            if (! Schema::hasColumn('recruit_jobs', 'recruiter_id')) {
+            if (Schema::hasColumn('recruit_jobs', 'recruiter_id')) {
                 $table->unsignedInteger('recruiter_id')->nullable(false)->change()->nullable();
             }
         });

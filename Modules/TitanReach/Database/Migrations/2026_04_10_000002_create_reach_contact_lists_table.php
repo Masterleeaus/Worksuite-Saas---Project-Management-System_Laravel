@@ -7,30 +7,26 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        if (Schema::hasTable('reach_contact_lists')) {
-            return;
+        if (! Schema::hasTable('reach_contact_lists')) {
+            Schema::create('reach_contact_lists', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('company_id')->nullable()->index();
+                $table->string('name');
+                $table->text('description')->nullable();
+                $table->json('meta')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
         }
-        
-        Schema::create('reach_contact_lists', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('company_id')->nullable()->index();
-            $table->string('name');
-            $table->text('description')->nullable();
-            $table->json('meta')->nullable();
-            $table->timestamps();
-            $table->softDeletes();
-        });
 
-        if (Schema::hasTable('reach_contact_list_contact')) {
-            return;
+        if (! Schema::hasTable('reach_contact_list_contact')) {
+            Schema::create('reach_contact_list_contact', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('contact_list_id')->index();
+                $table->unsignedBigInteger('contact_id')->index();
+                $table->timestamps();
+            });
         }
-        
-        Schema::create('reach_contact_list_contact', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('contact_list_id')->index();
-            $table->unsignedBigInteger('contact_id')->index();
-            $table->timestamps();
-        });
     }
 
     public function down(): void

@@ -8,40 +8,36 @@ return new class extends Migration {
     public function up(): void
     {
         // Skill requirements attached to FSM Orders
-        if (Schema::hasTable('fsm_order_skill_requirements')) {
-            return;
-        }
-        
-        Schema::create('fsm_order_skill_requirements', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->unsignedBigInteger('fsm_order_id')->index();
-            $table->unsignedBigInteger('skill_id')->index();
-            $table->unsignedBigInteger('skill_level_id')->nullable()->index(); // minimum required level
-            $table->timestamps();
+        if (! Schema::hasTable('fsm_order_skill_requirements')) {
+            Schema::create('fsm_order_skill_requirements', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->unsignedBigInteger('fsm_order_id')->index();
+                $table->unsignedBigInteger('skill_id')->index();
+                $table->unsignedBigInteger('skill_level_id')->nullable()->index(); // minimum required level
+                $table->timestamps();
 
-            $table->foreign('fsm_order_id')->references('id')->on('fsm_orders')->cascadeOnDelete();
-            $table->foreign('skill_id')->references('id')->on('fsm_skills')->cascadeOnDelete();
-            $table->foreign('skill_level_id')->references('id')->on('fsm_skill_levels')->nullOnDelete();
-            $table->unique(['fsm_order_id', 'skill_id'], 'fsm_order_skill_req_unique');
-        });
+                $table->foreign('fsm_order_id')->references('id')->on('fsm_orders')->cascadeOnDelete();
+                $table->foreign('skill_id')->references('id')->on('fsm_skills')->cascadeOnDelete();
+                $table->foreign('skill_level_id')->references('id')->on('fsm_skill_levels')->nullOnDelete();
+                $table->unique(['fsm_order_id', 'skill_id'], 'fsm_order_skill_req_unique');
+            });
+        }
 
         // Skill requirements attached to FSM Templates
-        if (Schema::hasTable('fsm_template_skill_requirements')) {
-            return;
-        }
-        
-        Schema::create('fsm_template_skill_requirements', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->unsignedBigInteger('fsm_template_id')->index();
-            $table->unsignedBigInteger('skill_id')->index();
-            $table->unsignedBigInteger('skill_level_id')->nullable()->index();
-            $table->timestamps();
+        if (! Schema::hasTable('fsm_template_skill_requirements')) {
+            Schema::create('fsm_template_skill_requirements', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->unsignedBigInteger('fsm_template_id')->index();
+                $table->unsignedBigInteger('skill_id')->index();
+                $table->unsignedBigInteger('skill_level_id')->nullable()->index();
+                $table->timestamps();
 
-            $table->foreign('fsm_template_id')->references('id')->on('fsm_templates')->cascadeOnDelete();
-            $table->foreign('skill_id')->references('id')->on('fsm_skills')->cascadeOnDelete();
-            $table->foreign('skill_level_id')->references('id')->on('fsm_skill_levels')->nullOnDelete();
-            $table->unique(['fsm_template_id', 'skill_id'], 'fsm_template_skill_req_unique');
-        });
+                $table->foreign('fsm_template_id')->references('id')->on('fsm_templates')->cascadeOnDelete();
+                $table->foreign('skill_id')->references('id')->on('fsm_skills')->cascadeOnDelete();
+                $table->foreign('skill_level_id')->references('id')->on('fsm_skill_levels')->nullOnDelete();
+                $table->unique(['fsm_template_id', 'skill_id'], 'fsm_template_skill_req_unique');
+            });
+        }
     }
 
     public function down(): void

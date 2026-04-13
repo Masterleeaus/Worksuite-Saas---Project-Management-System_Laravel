@@ -19,10 +19,10 @@ return new class extends Migration
             return;
         }
         Schema::table('key_results', function (Blueprint $table) {
-            if (! Schema::hasColumn('key_results', 'target_value')) {
+            if (Schema::hasColumn('key_results', 'target_value')) {
                 $table->decimal('target_value', 16, 2)->nullable()->change();
             }
-            if (! Schema::hasColumn('key_results', 'current_value')) {
+            if (Schema::hasColumn('key_results', 'current_value')) {
                 $table->decimal('current_value', 16, 2)->nullable()->change();
             }
         });

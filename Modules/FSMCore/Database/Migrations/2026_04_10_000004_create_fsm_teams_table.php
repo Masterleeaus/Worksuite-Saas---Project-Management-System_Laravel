@@ -7,30 +7,26 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        if (Schema::hasTable('fsm_teams')) {
-            return;
+        if (! Schema::hasTable('fsm_teams')) {
+            Schema::create('fsm_teams', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->unsignedBigInteger('company_id')->nullable()->index();
+                $table->string('name', 128);
+                $table->text('description')->nullable();
+                $table->boolean('active')->default(true);
+                $table->timestamps();
+            });
         }
-        
-        Schema::create('fsm_teams', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->unsignedBigInteger('company_id')->nullable()->index();
-            $table->string('name', 128);
-            $table->text('description')->nullable();
-            $table->boolean('active')->default(true);
-            $table->timestamps();
-        });
 
-        if (Schema::hasTable('fsm_team_user')) {
-            return;
+        if (! Schema::hasTable('fsm_team_user')) {
+            Schema::create('fsm_team_user', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->unsignedBigInteger('fsm_team_id');
+                $table->unsignedBigInteger('user_id');
+
+                $table->foreign('fsm_team_id')->references('id')->on('fsm_teams')->cascadeOnDelete();
+            });
         }
-        
-        Schema::create('fsm_team_user', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->unsignedBigInteger('fsm_team_id');
-            $table->unsignedBigInteger('user_id');
-
-            $table->foreign('fsm_team_id')->references('id')->on('fsm_teams')->cascadeOnDelete();
-        });
     }
 
     public function down(): void

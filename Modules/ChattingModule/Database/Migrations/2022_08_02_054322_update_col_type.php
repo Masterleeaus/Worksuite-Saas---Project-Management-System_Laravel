@@ -17,7 +17,7 @@ class UpdateColType extends Migration
             return;
         }
         Schema::table('channel_lists', function (Blueprint $table) {
-            if (! Schema::hasColumn('channel_lists', 'reference_id')) {
+            if (Schema::hasColumn('channel_lists', 'reference_id')) {
                 $table->uuid('reference_id')->nullable()->change();
             }
         });

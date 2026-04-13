@@ -499,30 +499,28 @@ return new class extends Migration {
                 $table->timestamps();
             });
 
-            if (Schema::hasTable('purchase_payment_histories')) {
-                return;
+            if (! Schema::hasTable('purchase_payment_histories')) {
+                Schema::create('purchase_payment_histories', function (Blueprint $table) {
+                    $table->increments('id');
+                    $table->integer('company_id')->unsigned()->nullable();
+                    $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade')->onUpdate('cascade');
+                    $table->integer('purchase_vendor_id')->unsigned()->nullable();
+                    $table->foreign('purchase_vendor_id')->references('id')->on('purchase_vendors')->onDelete('cascade')->onUpdate('cascade');
+                    $table->integer('purchase_payment_id')->unsigned()->nullable();
+                    $table->foreign('purchase_payment_id')->references('id')->on('purchase_vendor_payments')->onDelete('cascade')->onUpdate('cascade');
+                    $table->integer('purchase_order_id')->unsigned()->nullable();
+                    $table->foreign('purchase_order_id')->references('id')->on('purchase_orders')->onDelete('cascade')->onUpdate('cascade');
+                    $table->string('purchase_order')->nullable();
+                    $table->integer('purchase_bill_id')->unsigned()->nullable();
+                    $table->foreign('purchase_bill_id')->references('id')->on('purchase_bills')->onDelete('cascade')->onUpdate('cascade');
+                    $table->double('amount', 16, 2)->default(0)->nullable();
+                    $table->integer('user_id')->unsigned()->nullable();
+                    $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
+                    $table->text('details')->nullable();
+                    $table->text('label')->nullable();
+                    $table->timestamps();
+                });
             }
-            
-            Schema::create('purchase_payment_histories', function (Blueprint $table) {
-                $table->increments('id');
-                $table->integer('company_id')->unsigned()->nullable();
-                $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade')->onUpdate('cascade');
-                $table->integer('purchase_vendor_id')->unsigned()->nullable();
-                $table->foreign('purchase_vendor_id')->references('id')->on('purchase_vendors')->onDelete('cascade')->onUpdate('cascade');
-                $table->integer('purchase_payment_id')->unsigned()->nullable();
-                $table->foreign('purchase_payment_id')->references('id')->on('purchase_vendor_payments')->onDelete('cascade')->onUpdate('cascade');
-                $table->integer('purchase_order_id')->unsigned()->nullable();
-                $table->foreign('purchase_order_id')->references('id')->on('purchase_orders')->onDelete('cascade')->onUpdate('cascade');
-                $table->string('purchase_order')->nullable();
-                $table->integer('purchase_bill_id')->unsigned()->nullable();
-                $table->foreign('purchase_bill_id')->references('id')->on('purchase_bills')->onDelete('cascade')->onUpdate('cascade');
-                $table->double('amount', 16, 2)->default(0)->nullable();
-                $table->integer('user_id')->unsigned()->nullable();
-                $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
-                $table->text('details')->nullable();
-                $table->text('label')->nullable();
-                $table->timestamps();
-            });
         }
 
         if (!Schema::hasTable('purchase_vendor_credit_histories')) {

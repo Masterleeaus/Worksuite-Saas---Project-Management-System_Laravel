@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        if (! Schema::hasColumn('recruit_jobs', 'currency_id')) {
+        if (Schema::hasColumn('recruit_jobs', 'currency_id')) {
             if (! Schema::hasTable('recruit_jobs')) {
                 return;
             }

@@ -18,49 +18,46 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        if (Schema::hasTable('biolinks')) {
-            return;
+        if (! Schema::hasTable('biolinks')) {
+            Schema::create('biolinks', function (Blueprint $table) {
+                $table->increments('id');
+                $table->integer('company_id')->unsigned()->nullable();
+                $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade')->onUpdate('cascade');
+                $table->string('page_link')->nullable();
+                $table->integer('total_page_views')->default(0);
+                $table->string('status')->default(Status::Active);
+                $table->timestamps();
+            });
         }
-        Schema::create('biolinks', function (Blueprint $table) {
-            $table->increments('id');
-            $table->integer('company_id')->unsigned()->nullable();
-            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade')->onUpdate('cascade');
-            $table->string('page_link')->nullable();
-            $table->integer('total_page_views')->default(0);
-            $table->string('status')->default(Status::Active);
-            $table->timestamps();
-        });
 
-        if (Schema::hasTable('biolink_settings')) {
-            return;
+        if (! Schema::hasTable('biolink_settings')) {
+            Schema::create('biolink_settings', function (Blueprint $table) {
+                $table->increments('id');
+                $table->integer('biolink_id')->unsigned()->nullable();
+                $table->foreign('biolink_id')->references('id')->on('biolinks')->onDelete('cascade')->onUpdate('cascade');
+                $table->string('theme')->default(Theme::GRADIENTA);
+                $table->string('theme_color')->nullable();
+                $table->string('custom_color_one')->nullable();
+                $table->string('custom_color_two')->nullable();
+                $table->string('favicon')->nullable();
+                $table->string('font')->default(Font::ARIAL);
+                $table->string('block_space')->default(BlockSpacing::MEDIUM);
+                $table->string('block_hover_animation')->default(BlockHoverAnimation::NONE);
+                $table->string('verified_badge')->default(VerifiedBadge::NONE);
+                $table->string('display_branding')->default(YesNo::No);
+                $table->string('branding_name')->nullable();
+                $table->string('branding_url')->nullable();
+                $table->string('branding_text_color');
+                $table->string('protection_password');
+                $table->string('is_sensitive')->default(YesNo::No);
+                $table->string('page_title');
+                $table->string('meta_description');
+                $table->string('meta_keywords');
+                $table->longText('custom_css');
+                $table->longText('custom_js');
+                $table->timestamps();
+            });
         }
-        
-        Schema::create('biolink_settings', function (Blueprint $table) {
-            $table->increments('id');
-            $table->integer('biolink_id')->unsigned()->nullable();
-            $table->foreign('biolink_id')->references('id')->on('biolinks')->onDelete('cascade')->onUpdate('cascade');
-            $table->string('theme')->default(Theme::GRADIENTA);
-            $table->string('theme_color')->nullable();
-            $table->string('custom_color_one')->nullable();
-            $table->string('custom_color_two')->nullable();
-            $table->string('favicon')->nullable();
-            $table->string('font')->default(Font::ARIAL);
-            $table->string('block_space')->default(BlockSpacing::MEDIUM);
-            $table->string('block_hover_animation')->default(BlockHoverAnimation::NONE);
-            $table->string('verified_badge')->default(VerifiedBadge::NONE);
-            $table->string('display_branding')->default(YesNo::No);
-            $table->string('branding_name')->nullable();
-            $table->string('branding_url')->nullable();
-            $table->string('branding_text_color');
-            $table->string('protection_password');
-            $table->string('is_sensitive')->default(YesNo::No);
-            $table->string('page_title');
-            $table->string('meta_description');
-            $table->string('meta_keywords');
-            $table->longText('custom_css');
-            $table->longText('custom_js');
-            $table->timestamps();
-        });
     }
 
     /**
