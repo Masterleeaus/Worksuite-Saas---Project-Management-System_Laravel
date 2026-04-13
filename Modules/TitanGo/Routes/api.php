@@ -9,6 +9,7 @@ use Modules\TitanGo\Http\Controllers\Api\LocationPingController;
 use Modules\TitanGo\Http\Controllers\Api\IssueController;
 use Modules\TitanGo\Http\Controllers\Api\SiteMemoryController;
 use Modules\TitanGo\Http\Controllers\Api\WorkerStatusController;
+use Modules\TitanGo\Http\Controllers\Api\ChecklistController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,6 +38,8 @@ use Modules\TitanGo\Http\Controllers\Api\WorkerStatusController;
 |   POST   /api/nexus/v1/jobs/{id}/site-memory         — add site note
 |   GET    /api/nexus/v1/jobs/{id}/status              — worker status history
 |   POST   /api/nexus/v1/jobs/{id}/status              — quick-action signal
+|   GET    /api/nexus/v1/jobs/{id}/checklist            — checklist steps + completion state
+|   POST   /api/nexus/v1/jobs/{id}/checklist/step       — mark step complete
 |   GET    /api/nexus/v1/worker/profile                — current worker
 |   PUT    /api/nexus/v1/worker/fcm-token              — register FCM token
 |
@@ -83,6 +86,12 @@ Route::prefix('api/nexus/v1')
             ->name('titango.api.status.index');
         Route::post('jobs/{id}/status',           [WorkerStatusController::class, 'store'])
             ->name('titango.api.status.store');
+
+        // Checklist steps + per-step completion
+        Route::get('jobs/{id}/checklist',         [ChecklistController::class, 'index'])
+            ->name('titango.api.checklist.index');
+        Route::post('jobs/{id}/checklist/step',   [ChecklistController::class, 'completeStep'])
+            ->name('titango.api.checklist.step');
 
         // Worker profile + FCM token
         Route::get('worker/profile',              [WorkerController::class, 'profile'])

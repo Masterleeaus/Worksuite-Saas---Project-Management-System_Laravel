@@ -10,6 +10,7 @@ use Modules\FSMCore\Models\FSMOrder;
 use Modules\TitanGo\Models\NexusJobNote;
 use Modules\TitanGo\Models\TitanGoIssue;
 use Modules\TitanGo\Models\TitanGoWorkerStatus;
+use Modules\TitanGo\Models\TitanGoChecklistCompletion;
 
 /**
  * SyncController
@@ -59,13 +60,14 @@ class SyncController extends Controller
                 DB::beginTransaction();
 
                 match ($type) {
-                    'note' => $this->replayNote($companyId, $workerId, (int) $visitId, $payload),
-                    'status' => $this->replayStatus($companyId, $workerId, (int) $visitId, $payload),
-                    'issue' => $this->replayIssue($companyId, $workerId, (int) $visitId, $payload),
-                    'checkin' => $this->replayCheckin((int) $visitId, $workerId),
-                    'checkout' => $this->replayCheckout((int) $visitId, $workerId),
-                    'complete' => $this->replayComplete((int) $visitId, $workerId),
-                    default => null,
+                    'note'           => $this->replayNote($companyId, $workerId, (int) $visitId, $payload),
+                    'status'         => $this->replayStatus($companyId, $workerId, (int) $visitId, $payload),
+                    'issue'          => $this->replayIssue($companyId, $workerId, (int) $visitId, $payload),
+                    'checkin'        => $this->replayCheckin((int) $visitId, $workerId),
+                    'checkout'       => $this->replayCheckout((int) $visitId, $workerId),
+                    'complete'       => $this->replayComplete((int) $visitId, $workerId),
+                    'checklist_step' => $this->replayChecklistStep($companyId, $workerId, (int) $visitId, $payload),
+                    default          => null,
                 };
 
                 DB::commit();
@@ -141,6 +143,38 @@ class SyncController extends Controller
         if (is_null($order->date_end)) {
             $order->date_end = now();
             $order->save();
+        }
+    }
+
+    private function replayChecklistStep(int $companyId, int $workerId, int $visitId, array $payload): void
+    {
+        $idx = isset($payload['step_index']) ? (int) $payload['step_index'] : null;
+        if ($idx === null) {
+            return;
+        }
+
+        $existing = TitanGoChecklistCompletion::where('company_id', $companyId)
+            ->where('visit_id', $visitId)
+            ->where('worker_id', $workerId)
+            ->where('step_index', $idx)
+            ->first();
+
+        $attributes = [
+            'company_id'     => $companyId,
+            'visit_id'       => $visitId,
+            'worker_id'      => $workerId,
+            'step_index'     => $idx,
+            'instruction'    => $payload['instruction'] ?? null,
+            'notes'          => $payload['notes'] ?? null,
+            'photo_data'     => $payload['photo_data'] ?? null,
+            'signature_data' => $payload['signature_data'] ?? null,
+            'completed_at'   => now(),
+        ];
+
+        if ($existing) {
+            $existing->update($attributes);
+        } else {
+            TitanGoChecklistCompletion::create($attributes);
         }
     }
 }

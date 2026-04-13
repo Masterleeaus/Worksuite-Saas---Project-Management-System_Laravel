@@ -1,21 +1,26 @@
 // Titan Go — ChecklistView
 // Renders checklist steps with photo-required and signature-required indicators.
+// Signature-required steps open the canvas-based SignaturePad.
 
-import React, { useRef } from 'react';
-import { CheckCircle2, Camera, PenLine, FileText } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { CheckCircle2, Camera, PenLine } from 'lucide-react';
 import { ChecklistStep } from '../types';
+import { SignaturePad } from './SignaturePad';
 
 interface Props {
   steps: ChecklistStep[];
-  onComplete: (stepId: string, photo?: string, notes?: string) => void;
+  onComplete: (stepId: string, photo?: string, signature?: string, notes?: string) => void;
 }
 
 export function ChecklistView({ steps, onComplete }: Props) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [activeStep, setActiveStep] = React.useState<string | null>(null);
-  const [noteText,   setNoteText]   = React.useState('');
+  const fileInputRef  = useRef<HTMLInputElement>(null);
+  const [activeStep,        setActiveStep]        = useState<string | null>(null);
+  const [sigStep,           setSigStep]           = useState<string | null>(null);
+  const [noteText,          setNoteText]          = useState('');
 
-  const handleCapture = (stepId: string) => {
+  // --- Photo capture ---
+
+  const handleCapturePhoto = (stepId: string) => {
     setActiveStep(stepId);
     fileInputRef.current?.click();
   };
@@ -27,7 +32,7 @@ export function ChecklistView({ steps, onComplete }: Props) {
     const reader = new FileReader();
     reader.onload = ev => {
       const data = ev.target?.result as string;
-      onComplete(activeStep, data, noteText || undefined);
+      onComplete(activeStep, data, undefined, noteText || undefined);
       setActiveStep(null);
       setNoteText('');
     };
@@ -35,6 +40,16 @@ export function ChecklistView({ steps, onComplete }: Props) {
     e.target.value = '';
   };
 
+  // --- Signature capture ---
+
+  const handleSignatureCapture = (dataUrl: string) => {
+    if (!sigStep) return;
+    onComplete(sigStep, undefined, dataUrl, noteText || undefined);
+    setSigStep(null);
+    setNoteText('');
+  };
+
+  // --- Completed count ---
   const completedCount = steps.filter(s => s.completed).length;
 
   return (
@@ -57,6 +72,15 @@ export function ChecklistView({ steps, onComplete }: Props) {
         className="hidden"
         onChange={handleFileChange}
       />
+
+      {/* Signature pad overlay */}
+      {sigStep !== null && (
+        <SignaturePad
+          label={steps.find(s => s.id === sigStep)?.instruction}
+          onCapture={handleSignatureCapture}
+          onCancel={() => setSigStep(null)}
+        />
+      )}
 
       {steps.map((step, idx) => (
         <div
@@ -116,20 +140,45 @@ export function ChecklistView({ steps, onComplete }: Props) {
                   className="mt-2 w-20 h-20 object-cover rounded-lg border border-zinc-700"
                 />
               )}
+
+              {/* Signature preview */}
+              {step.signatureCaptured && (
+                <img
+                  src={step.signatureCaptured}
+                  alt="Signature"
+                  className="mt-2 h-10 rounded border border-zinc-700 bg-zinc-900"
+                />
+              )}
             </div>
 
             {/* Action button */}
             {!step.completed && (
-              <button
-                onClick={() =>
-                  step.photoRequired
-                    ? handleCapture(step.id)
-                    : onComplete(step.id)
-                }
-                className="shrink-0 px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 text-[10px] font-black uppercase rounded-lg transition-all"
-              >
-                {step.photoRequired ? <Camera size={14} /> : <CheckCircle2 size={14} />}
-              </button>
+              <div className="shrink-0 flex flex-col gap-1">
+                {step.photoRequired && (
+                  <button
+                    onClick={() => handleCapturePhoto(step.id)}
+                    className="px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 text-[10px] font-black uppercase rounded-lg transition-all flex items-center gap-1"
+                  >
+                    <Camera size={12} /> Photo
+                  </button>
+                )}
+                {step.signatureRequired && (
+                  <button
+                    onClick={() => setSigStep(step.id)}
+                    className="px-3 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 text-[10px] font-black uppercase rounded-lg transition-all flex items-center gap-1"
+                  >
+                    <PenLine size={12} /> Sign
+                  </button>
+                )}
+                {!step.photoRequired && !step.signatureRequired && (
+                  <button
+                    onClick={() => onComplete(step.id)}
+                    className="px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-[10px] font-black uppercase rounded-lg transition-all"
+                  >
+                    <CheckCircle2 size={14} />
+                  </button>
+                )}
+              </div>
             )}
           </div>
         </div>
@@ -137,3 +186,4 @@ export function ChecklistView({ steps, onComplete }: Props) {
     </div>
   );
 }
+

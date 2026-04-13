@@ -14,5 +14,8 @@ class TitanGoServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->loadMigrationsFrom(__DIR__ . '/../Database/Migrations');
+
+        // Register Blade view namespace: titango::
+        $this->loadViewsFrom(__DIR__ . '/../Resources/views', 'titango');
     }
 }

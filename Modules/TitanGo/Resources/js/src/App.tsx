@@ -63,7 +63,7 @@ function App() {
             onCheckIn={checkIn}
             onCheckOut={checkOut}
             onComplete={complete}
-            onStepComplete={completeStep}
+            onStepComplete={(visitId, stepId, photo, _sig, notes) => completeStep(visitId, stepId, photo, notes)}
           />
         </div>
 

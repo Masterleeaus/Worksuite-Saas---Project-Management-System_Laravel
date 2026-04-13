@@ -34,13 +34,13 @@ function normaliseVisit(raw: any): Visit {
     dateEnd:        raw.date_end,
     priority:       raw.priority ?? 'medium',
     description:    raw.description,
-    steps:          (raw.template?.steps ?? []).map((s: any, i: number): ChecklistStep => ({
-      id:                String(s.id ?? i),
-      instruction:       s.instruction ?? s.name ?? '',
+    steps:          (raw.template?.checklist ?? []).map((instruction: string, i: number): ChecklistStep => ({
+      id:                String(i),
+      instruction,
       completed:         false,
-      photoRequired:     s.photo_required ?? false,
-      signatureRequired: s.signature_required ?? false,
-      isRequired:        s.is_required ?? true,
+      photoRequired:     false,
+      signatureRequired: false,
+      isRequired:        true,
     })),
   };
 }

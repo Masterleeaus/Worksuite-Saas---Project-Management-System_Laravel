@@ -168,15 +168,26 @@ Tenant scoping is enforced server-side via `HasCompany` trait on all models.
 
 ---
 
+## Pass History
+
+### Pass 1 (2026-04-13) — Initial build
+Full module scaffold: 8 API controllers, 5 models, 6 migrations, React/TS/Capacitor frontend
+(services, hooks, components, routes, providers).
+
+### Pass 2 (2026-04-13) — Tailwind · Checklist API · SignaturePad · Admin panel
+
+1. **Tailwind CSS** ✅ — `@tailwindcss/vite` v4 plugin wired into `vite.config.ts`; `tailwind.config.ts` created; `index.css` updated to `@import "tailwindcss"`.
+2. **Checklist API integration** ✅ — Migration `titan_go_checklist_completions`, `TitanGoChecklistCompletion` model, `ChecklistController` (GET steps + completion state, POST step), `useChecklist` hook with optimistic update + offline queue.  `normaliseVisit` fixed to map `template.checklist` (array of strings).  `checklist_step` replay added to `SyncController`.
+3. **Signature capture** ✅ — `SignaturePad.tsx` canvas component (touch + mouse, amber stroke on zinc-900 background, Clear/Confirm actions).  `ChecklistView` updated to use `SignaturePad` for signature-required steps and show captured signature previews.
+4. **Admin panel** ✅ — `IssueAdminController`, `WorkerStatusAdminController`, `LocationTrackAdminController` + Blade views extending `fsmcore::layouts.master`.  Routes under `/account/titan-go/` (issues, statuses, tracking).  `TitanGoServiceProvider` now loads the `titango::` view namespace.
+
+---
+
 ## Passes Remaining Before MVP-Ready Titan Go
 
-1. **Tailwind CSS** — Add tailwind to `vite.config.ts` (currently CSS references `@tailwind` directives; install `tailwindcss` npm package and configure)
-2. **Checklist API integration** — Connect FSMCore template steps to real API via `GET /api/fsm/v1/orders/{id}` template data
-3. **Signature capture** — Add canvas-based signature component (replace file input workaround in ChecklistView)
-4. **Android build** — Run `npx cap sync android` after `npm run build` in `Resources/js/`
-5. **FCM setup** — Configure Firebase project credentials in production env and wire `firebaseFcmToken` into `useAuth`
-6. **GPS background mode** — Add Capacitor Background Geolocation plugin for true background tracking on Android/iOS
-7. **Proof-of-service sign-off** — Add signature-required step completion in ChecklistView (stub is in place)
-8. **Admin panel integration** — Surface `titan_go_issues`, `titan_go_worker_statuses`, and `titan_go_location_pings` in the Worksuite admin UI
-9. **Inspection module hook-up** — Wire `FSMCore template.steps` to the Inspection module for checklist template management
-10. **E2E testing** — Add integration tests for SyncController replay scenarios (offline → online transitions)
+1. **Android build** — Run `npx cap sync android` after `npm run build` in `Resources/js/`
+2. **FCM setup** — Configure Firebase project credentials in production env and wire `firebaseFcmToken` into `useAuth`
+3. **GPS background mode** — Add Capacitor Background Geolocation plugin for true background tracking on Android/iOS
+4. **Inspection module hook-up** — Extend `FSMTemplate.checklist` to store rich step objects (`{instruction, photo_required, signature_required}`) so step-level requirements are API-driven rather than always defaulting to false
+5. **E2E testing** — Add integration tests for SyncController replay scenarios (offline → online transitions)
+6. **Admin navigation** — Add Titan Go admin links to the FSMCore sidebar (Issues / Statuses / Tracking)

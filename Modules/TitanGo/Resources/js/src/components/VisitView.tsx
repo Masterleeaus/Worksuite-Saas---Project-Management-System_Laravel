@@ -13,6 +13,7 @@ import { SiteMemoryPanel } from './SiteMemoryPanel';
 import { IssueForm } from './IssueForm';
 import { gpsService } from '../services/gps.service';
 import { mediaUploadService } from '../services/media.service';
+import { useChecklist } from '../hooks/useChecklist';
 
 type Tab = 'overview' | 'checklist' | 'site' | 'notes';
 
@@ -23,7 +24,7 @@ interface Props {
   onCheckIn:   (id: string | number) => void;
   onCheckOut:  (id: string | number) => void;
   onComplete:  (id: string | number) => void;
-  onStepComplete: (visitId: string | number, stepId: string, photo?: string, notes?: string) => void;
+  onStepComplete: (visitId: string | number, stepId: string, photo?: string, signature?: string, notes?: string) => void;
 }
 
 export function VisitView({
@@ -37,9 +38,16 @@ export function VisitView({
   const photoRef = useRef<HTMLInputElement>(null);
   const [photoType, setPhotoType] = useState<'before' | 'after'>('before');
 
+  // Use live checklist from API, fall back to cached steps from visit
+  const { steps, completedCount, totalCount, completeStep } = useChecklist(
+    visit.id,
+    isOnline,
+    visit.steps,
+  );
+
   const hasCheckedIn  = !!visit.dateStart;
   const hasCheckedOut = !!visit.dateEnd;
-  const allStepsDone  = visit.steps.length === 0 || visit.steps.every(s => s.completed);
+  const allStepsDone  = totalCount === 0 || completedCount === totalCount;
 
   const handleCheckIn = () => {
     gpsService.start('foreground', visit.id);
@@ -229,10 +237,14 @@ export function VisitView({
         )}
 
         {activeTab === 'checklist' && (
-          visit.steps.length > 0 ? (
+          steps.length > 0 ? (
             <ChecklistView
-              steps={visit.steps}
-              onComplete={(stepId, photo, notes) => onStepComplete(visit.id, stepId, photo, notes)}
+              steps={steps}
+              onComplete={(stepId, photo, signature, notes) => {
+                const idx = parseInt(stepId, 10);
+                completeStep(idx, { photo, signature, notes });
+                onStepComplete(visit.id, stepId, photo, signature, notes);
+              }}
             />
           ) : (
             <p className="text-zinc-600 text-xs text-center py-8">No checklist for this visit.</p>
