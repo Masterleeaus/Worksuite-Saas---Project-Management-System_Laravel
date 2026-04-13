@@ -8,6 +8,7 @@ use Modules\Recruit\Console\ActivateModuleCommand;
 use Modules\Recruit\Console\CandidateFollowupReminderCommand;
 use Modules\Recruit\Console\JobEndDateCheck;
 use Modules\Recruit\Console\OfferLetterReminder;
+use Modules\Recruit\Console\RecruitComplianceExpiryReminderCommand;
 use Modules\Recruit\Console\SendInterviewReminder;
 
 class RecruitServiceProvider extends ServiceProvider
@@ -146,6 +147,7 @@ class RecruitServiceProvider extends ServiceProvider
                 OfferLetterReminder::class,
                 ActivateModuleCommand::class,
                 CandidateFollowupReminderCommand::class,
+                RecruitComplianceExpiryReminderCommand::class,
             ]
         );
     }
@@ -164,6 +166,7 @@ class RecruitServiceProvider extends ServiceProvider
 
         $schedule->command('job-end-date-check')->daily();
         $schedule->command('offer-letter-reminder')->daily();
+        $schedule->command('recruit:compliance-expiry-reminder')->daily();
     }
 
 }
