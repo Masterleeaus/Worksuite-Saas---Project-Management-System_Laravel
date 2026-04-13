@@ -248,7 +248,7 @@ POST  /api/v1/provider/post/bid
 
 ### 2.2 Gap Summary
 
-- **3 features native:** login, job list/detail, check-in/out, photos/signatures, checklists, notes, push notifications (7 native total)
+- **7 features native:** login, job list/detail, check-in/out, photos/signatures, checklists, notes, push notifications
 - **4 features need extension:** issue reporting, continuous GPS, full offline sync, routing
 - **2 features need adapter:** token refresh, dispatcher messaging
 - **0 features missing entirely** (all exist in some form in the backend ecosystem)
@@ -415,7 +415,7 @@ Backend modules assessed: `FSMCore`, `ServicemanModule`, `Inspection`, `FSMTimes
 | `SyncController` (queued note sync pattern) | Service | Titan Go | Extend to full job cache |
 | `NexusJobNote` model | Data | Titan Go | Worker note submission |
 | Sanctum token auth with `nexus_fcm_token` | Auth | Titan Go | Already aligned with Worksuite auth |
-| Job lifecycle handler (check-in → photos → checkin→ checkout → complete) | Logic | Titan Go | Backbone of Titan Go workflow |
+| Job lifecycle handler (check-in → photos → checkout → complete) | Logic | Titan Go | Backbone of Titan Go workflow |
 
 ### 7.3 From TitanPWA (Backend Module)
 
