@@ -561,7 +561,7 @@
 
         section('Rooms',    data.rooms,    r => '/account/titan-talk/room/' + r.id);
         section('Messages', data.messages, m => '/account/titan-talk/room/' + m.room_id);
-        section('Users',    data.users,    u => '/account/titan-talk?dm_user_id=' + u.id);
+        section('Users',    data.users,    u => '/account/titan-talk?dm_user_id=' + encodeURIComponent(u.id));
 
         dropdown.style.display = 'block';
     }

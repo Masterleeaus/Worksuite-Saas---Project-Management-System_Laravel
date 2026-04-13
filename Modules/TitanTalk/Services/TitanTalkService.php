@@ -139,6 +139,9 @@ class TitanTalkService
 
         $slugs = collect($matches[1])->unique()->values();
 
+        // Heuristic: match @token against user names with a substring search.
+        // This is the same best-effort approach used by NewChatObserver for DM mentions.
+        // For a stricter match, store a separate username/slug field on users and query it.
         return User::where('company_id', $companyId)
             ->where(function ($q) use ($slugs) {
                 foreach ($slugs as $slug) {
@@ -267,6 +270,10 @@ class TitanTalkService
                 'type'         => 'chat',
                 'from_user_id' => $fromUserId,
                 'to_user_id'   => $toUserId,
+                // 'booking_id' is a VARCHAR(36) used here as a generic reference ID.
+                // The Communication schema predates TitanTalk; we store the room ID here as
+                // a string reference. A migration to add a dedicated room_id column is a
+                // recommended follow-up.
                 'booking_id'   => $roomId !== null ? (string) $roomId : null,
                 'subject'      => $subject,
                 'body'         => $body,
