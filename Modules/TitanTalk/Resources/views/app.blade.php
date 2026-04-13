@@ -436,7 +436,7 @@
 
     // ---- Pinned messages modal ----
     document.getElementById('pinnedMessagesModal')?.addEventListener('show.bs.modal', async function () {
-        const roomId = {{ $activeRoom->id ?? 'null' }};
+        const roomId = @json($activeRoom->id ?? null);
         if (!roomId) return;
         const list = document.getElementById('tt-pinned-list');
         const data = await apiGet(`/account/titan-talk/rooms/${roomId}/pinned`);
@@ -454,14 +454,25 @@
     const searchInput = document.getElementById('tt-search-input');
     if (searchInput) {
         let timer;
+        let searchController = null;
         searchInput.addEventListener('input', function () {
             clearTimeout(timer);
+            if (searchController) { searchController.abort(); }
             timer = setTimeout(async () => {
                 const q = this.value.trim();
                 if (q.length < 2) return;
-                const data = await apiGet(`/account/titan-talk/search?q=${encodeURIComponent(q)}`);
-                console.log('TitanTalk search:', data);
-                // TODO: render results in a dropdown
+                searchController = new AbortController();
+                try {
+                    const res = await fetch(
+                        `/account/titan-talk/search?q=${encodeURIComponent(q)}`,
+                        { headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }, signal: searchController.signal }
+                    );
+                    const data = await res.json();
+                    console.log('TitanTalk search:', data);
+                    // TODO: render results in a dropdown
+                } catch (err) {
+                    if (err.name !== 'AbortError') console.error('Search error:', err);
+                }
             }, 300);
         });
     }
@@ -487,7 +498,9 @@
 
     // ---- Helpers ----
     function escHtml(str) {
-        return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        const div = document.createElement('div');
+        div.textContent = String(str ?? '');
+        return div.innerHTML;
     }
 
     function formatTime(iso) {

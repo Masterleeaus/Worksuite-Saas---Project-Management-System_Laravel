@@ -61,9 +61,9 @@ class TitanTalkRoom extends BaseModel
         return $this->hasMany(TitanTalkMessage::class, 'room_id');
     }
 
-    public function latestMessage(): HasMany
+    public function latestMessage(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
-        return $this->hasMany(TitanTalkMessage::class, 'room_id')->latest()->limit(1);
+        return $this->hasOne(TitanTalkMessage::class, 'room_id')->latest();
     }
 
     public function pins(): HasMany

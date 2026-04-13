@@ -20,13 +20,15 @@ class SearchController extends AccountBaseController
     {
         $request->validate(['q' => 'required|string|min:2|max:200']);
 
-        $q         = $request->q;
         $companyId = company()->id;
         $userId    = user()->id;
 
+        // Escape LIKE wildcards to prevent SQL injection via wildcard abuse
+        $safeQ = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $request->q);
+
         // Search accessible rooms
         $rooms = TitanTalkRoom::accessibleByUser($userId, $companyId)
-            ->where('name', 'like', '%' . $q . '%')
+            ->where('name', 'like', '%' . $safeQ . '%')
             ->limit(10)
             ->get(['id', 'name', 'type']);
 
@@ -35,7 +37,7 @@ class SearchController extends AccountBaseController
 
         $messages = TitanTalkMessage::whereIn('room_id', $accessibleRoomIds)
             ->where('company_id', $companyId)
-            ->where('body', 'like', '%' . $q . '%')
+            ->where('body', 'like', '%' . $safeQ . '%')
             ->whereNull('thread_parent_id')
             ->with(['author', 'room'])
             ->limit(20)
@@ -43,7 +45,7 @@ class SearchController extends AccountBaseController
 
         // Search users (company-scoped)
         $users = User::where('company_id', $companyId)
-            ->where('name', 'like', '%' . $q . '%')
+            ->where('name', 'like', '%' . $safeQ . '%')
             ->limit(10)
             ->get(['id', 'name', 'image', 'email']);
 
