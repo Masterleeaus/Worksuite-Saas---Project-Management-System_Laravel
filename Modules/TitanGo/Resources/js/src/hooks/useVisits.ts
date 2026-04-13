@@ -34,14 +34,27 @@ function normaliseVisit(raw: any): Visit {
     dateEnd:        raw.date_end,
     priority:       raw.priority ?? 'medium',
     description:    raw.description,
-    steps:          (raw.template?.checklist ?? []).map((instruction: string, i: number): ChecklistStep => ({
-      id:                String(i),
-      instruction,
-      completed:         false,
-      photoRequired:     false,
-      signatureRequired: false,
-      isRequired:        true,
-    })),
+    steps:          (raw.template?.checklist ?? []).map((step: any, i: number): ChecklistStep => {
+      // Support both rich objects and plain strings (backward-compat)
+      if (typeof step === 'object' && step !== null) {
+        return {
+          id:                String(i),
+          instruction:       step.instruction ?? '',
+          completed:         false,
+          photoRequired:     step.photo_required     ?? false,
+          signatureRequired: step.signature_required ?? false,
+          isRequired:        step.is_required        ?? true,
+        };
+      }
+      return {
+        id:                String(i),
+        instruction:       String(step),
+        completed:         false,
+        photoRequired:     false,
+        signatureRequired: false,
+        isRequired:        true,
+      };
+    }),
   };
 }
 

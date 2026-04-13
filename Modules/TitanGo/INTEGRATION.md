@@ -181,13 +181,22 @@ Full module scaffold: 8 API controllers, 5 models, 6 migrations, React/TS/Capaci
 3. **Signature capture** ✅ — `SignaturePad.tsx` canvas component (touch + mouse, amber stroke on zinc-900 background, Clear/Confirm actions).  `ChecklistView` updated to use `SignaturePad` for signature-required steps and show captured signature previews.
 4. **Admin panel** ✅ — `IssueAdminController`, `WorkerStatusAdminController`, `LocationTrackAdminController` + Blade views extending `fsmcore::layouts.master`.  Routes under `/account/titan-go/` (issues, statuses, tracking).  `TitanGoServiceProvider` now loads the `titango::` view namespace.
 
+### Pass 3 (2026-04-13) — Rich checklist steps · FCM · GPS background · Admin nav · Type fix
+
+1. **Rich checklist step schema** ✅ — Migration `2026_04_13_000008_upgrade_fsm_template_checklist_to_rich_steps` converts existing plain-string arrays in-place.  `TemplateController` now parses both the new dynamic step-builder JSON _and_ plain-line textarea (backward-compat).  `ChecklistController` emits `photo_required`, `signature_required`, `is_required` per step; `completeStep` resolves instruction from rich or plain form.  `useVisits.ts` `normaliseVisit` reads rich step objects.  `FSMCore templates/_form.blade.php` upgraded from a textarea to a dynamic JavaScript step builder with per-step photo/signature/required toggles.
+
+2. **FCM / Capacitor Push Notifications** ✅ — `notification.service.ts` rewritten: lazy-loads `@capacitor/push-notifications` plugin; requests OS permissions; registers with FCM/APNs; listens for `registration`, `registrationError`, `pushNotificationReceived`, and `pushNotificationActionPerformed` events; falls back to browser Notification API on web.  `useAuth.ts` calls `notificationService.init()` after successful login (fire-and-forget, errors swallowed with warning).  `package.json` adds `@capacitor/push-notifications ^7.0.0`.
+
+3. **GPS background mode** ✅ — `gps.service.ts` rewritten: lazy-loads `@capacitor-community/background-geolocation` plugin; uses `addWatcher()` for native position delivery (enables Android foreground-service + iOS background mode via `backgroundMessage`); falls back to `navigator.geolocation` interval on web.  `start()` is now `async`.  `VisitView` updated to `.catch(console.warn)` on check-in/out.  `package.json` adds `@capacitor-community/background-geolocation ^1.2.3`.
+
+4. **Admin navigation** ✅ — Titan Go section added to `resources/views/sections/menu.blade.php`, guarded by `in_array('admin', user_roles()) && class_exists(TitanGoServiceProvider)`.  Links: FSM Dashboard, Orders, Checklist Templates (FSMCore-guarded), TG Issues, TG Worker Signals, TG GPS Tracking.
+
+5. **Type correctness** ✅ — `QueueItemType` union in `types/index.ts` now includes `'checklist_step'`.
+
 ---
 
 ## Passes Remaining Before MVP-Ready Titan Go
 
-1. **Android build** — Run `npx cap sync android` after `npm run build` in `Resources/js/`
-2. **FCM setup** — Configure Firebase project credentials in production env and wire `firebaseFcmToken` into `useAuth`
-3. **GPS background mode** — Add Capacitor Background Geolocation plugin for true background tracking on Android/iOS
-4. **Inspection module hook-up** — Extend `FSMTemplate.checklist` to store rich step objects (`{instruction, photo_required, signature_required}`) so step-level requirements are API-driven rather than always defaulting to false
-5. **E2E testing** — Add integration tests for SyncController replay scenarios (offline → online transitions)
-6. **Admin navigation** — Add Titan Go admin links to the FSMCore sidebar (Issues / Statuses / Tracking)
+1. **Android build** — Run `npx cap sync android` after `npm run build` in `Resources/js/`; add `google-services.json` for FCM; enable `INTERNET` and `ACCESS_FINE_LOCATION` permissions in `AndroidManifest.xml`
+2. **E2E testing** — Add integration tests for `SyncController` replay scenarios (offline → online transitions)
+3. **Proof-of-delivery report** — PDF/email summary of completed checklist with photo evidence and signature for a given visit (admin + customer copy)

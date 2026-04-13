@@ -427,5 +427,25 @@
         @endif
     @endif
 
+    {{-- ── Titan Go / FSM Admin ──────────────────────────────────────────────── --}}
+    @if(in_array('admin', user_roles())
+        && class_exists(\Modules\TitanGo\Providers\TitanGoServiceProvider::class))
+        <x-menu-item icon="phone" text="Field Ops (Titan Go)">
+            <x-slot name="iconPath">
+                <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1h-3zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5zm1.886 6.914L15 7.151V12.5a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5V7.15l6.614 1.764a1.5 1.5 0 0 0 .772 0zM1.5 4h13a.5.5 0 0 1 .5.5v1.616L8.222 7.771a.5.5 0 0 1-.444 0L1 6.116V4.5a.5.5 0 0 1 .5-.5z"/>
+            </x-slot>
+            <div class="accordionItemContent">
+                @if(class_exists(\Modules\FSMCore\Models\FSMOrder::class))
+                    <x-sub-menu-item :link="route('fsmcore.dashboard')"   text="FSM Dashboard" />
+                    <x-sub-menu-item :link="route('fsmcore.orders.index')" text="Orders" />
+                    <x-sub-menu-item :link="route('fsmcore.templates.index')" text="Checklist Templates" />
+                @endif
+                <x-sub-menu-item :link="route('titango.admin.issues.index')"   text="TG Issues" />
+                <x-sub-menu-item :link="route('titango.admin.statuses.index')"  text="TG Worker Signals" />
+                <x-sub-menu-item :link="route('titango.admin.tracking.index')"  text="TG GPS Tracking" />
+            </div>
+        </x-menu-item>
+    @endif
+
 
 </ul>

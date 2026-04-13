@@ -50,12 +50,12 @@ export function VisitView({
   const allStepsDone  = totalCount === 0 || completedCount === totalCount;
 
   const handleCheckIn = () => {
-    gpsService.start('foreground', visit.id);
+    gpsService.start('foreground', visit.id).catch(console.warn);
     onCheckIn(visit.id);
   };
 
   const handleCheckOut = () => {
-    gpsService.stop();
+    gpsService.stop().catch(console.warn);
     onCheckOut(visit.id);
   };
 

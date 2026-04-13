@@ -18,11 +18,13 @@ export function useAuth() {
       const s = await authService.login({ email, password });
       setSession(s);
 
-      // Request notification permission and try to register token
-      const granted = await notificationService.requestPermission();
-      if (granted && (window as any).firebaseFcmToken) {
-        await notificationService.registerToken((window as any).firebaseFcmToken);
-      }
+      // Initialise push notifications after successful login.
+      // init() handles both the Capacitor native plugin (Android/iOS)
+      // and the web browser Notification API fallback — no FCM credentials
+      // needed in JS; they live in the native Google Services JSON.
+      notificationService.init().catch((e) =>
+        console.warn('[useAuth] push notification init failed:', e),
+      );
     } catch (e: any) {
       setError(e?.message ?? 'Login failed');
     } finally {

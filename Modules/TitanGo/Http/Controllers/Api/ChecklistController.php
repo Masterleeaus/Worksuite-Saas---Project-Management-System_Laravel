@@ -65,16 +65,32 @@ class ChecklistController extends Controller
             ->get()
             ->keyBy('step_index');
 
-        $steps = collect($rawSteps)->values()->map(function ($instruction, int $idx) use ($completions) {
+        $steps = collect($rawSteps)->values()->map(function ($step, int $idx) use ($completions) {
+            // Support both rich objects and plain strings (backward-compat)
+            if (is_array($step)) {
+                $instruction      = $step['instruction'] ?? '';
+                $photoRequired    = (bool) ($step['photo_required'] ?? false);
+                $sigRequired      = (bool) ($step['signature_required'] ?? false);
+                $isRequired       = (bool) ($step['is_required'] ?? true);
+            } else {
+                $instruction      = (string) $step;
+                $photoRequired    = false;
+                $sigRequired      = false;
+                $isRequired       = true;
+            }
+
             $c = $completions->get($idx);
             return [
-                'index'       => $idx,
-                'instruction' => $instruction,
-                'completed'   => (bool) $c,
-                'completed_at'=> $c?->completed_at,
-                'has_photo'   => $c && !empty($c->getRawOriginal('photo_data')),
-                'has_signature' => $c && !empty($c->getRawOriginal('signature_data')),
-                'notes'       => $c?->notes,
+                'index'              => $idx,
+                'instruction'        => $instruction,
+                'photo_required'     => $photoRequired,
+                'signature_required' => $sigRequired,
+                'is_required'        => $isRequired,
+                'completed'          => (bool) $c,
+                'completed_at'       => $c?->completed_at,
+                'has_photo'          => $c && !empty($c->getRawOriginal('photo_data')),
+                'has_signature'      => $c && !empty($c->getRawOriginal('signature_data')),
+                'notes'              => $c?->notes,
             ];
         });
 
@@ -125,6 +141,10 @@ class ChecklistController extends Controller
 
         $idx = (int) $request->step_index;
 
+        // Extract instruction from rich or plain step
+        $rawStep     = $rawSteps[$idx] ?? null;
+        $instruction = is_array($rawStep) ? ($rawStep['instruction'] ?? null) : $rawStep;
+
         $completion = TitanGoChecklistCompletion::where('company_id', $companyId)
             ->where('visit_id', $id)
             ->where('worker_id', $workerId)
@@ -136,7 +156,7 @@ class ChecklistController extends Controller
             'visit_id'       => $id,
             'worker_id'      => $workerId,
             'step_index'     => $idx,
-            'instruction'    => $rawSteps[$idx] ?? null,
+            'instruction'    => $instruction,
             'notes'          => $request->notes,
             'photo_data'     => $request->photo_data,
             'signature_data' => $request->signature_data,

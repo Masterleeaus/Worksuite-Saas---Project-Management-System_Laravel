@@ -151,7 +151,8 @@ export type QueueItemType =
   | 'location_ping'
   | 'checkin'
   | 'checkout'
-  | 'complete';
+  | 'complete'
+  | 'checklist_step';
 
 export interface SyncQueueItem {
   id: string;
