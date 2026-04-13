@@ -21,6 +21,10 @@ return new class extends Migration
 
     public function up()
     {
+        if (Schema::hasTable('custom_link_settings')) {
+            return;
+        }
+
         Schema::create('custom_link_settings', function (Blueprint $table) {
             $table->id();
             $table->integer('company_id')->unsigned()->nullable();

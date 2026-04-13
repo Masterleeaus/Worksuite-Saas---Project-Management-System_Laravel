@@ -23,6 +23,10 @@ return new class extends Migration {
 
     public function up()
     {
+        if (Schema::hasTable('bank_accounts')) {
+            return;
+        }
+
         Schema::create('bank_accounts', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('company_id')->unsigned()->nullable();

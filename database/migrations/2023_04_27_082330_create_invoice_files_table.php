@@ -12,6 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('invoice_files')) {
+            return;
+        }
+
         Schema::create('invoice_files', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('invoice_id')->index('invoice_files_invoice_id_foreign');

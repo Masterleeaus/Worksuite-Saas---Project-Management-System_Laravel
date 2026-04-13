@@ -16,6 +16,10 @@ return new class extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('quick_books_settings')) {
+            return;
+        }
+
         Schema::create('quick_books_settings', function (Blueprint $table) {
             $table->id();
             $table->integer('company_id')->unsigned()->nullable();

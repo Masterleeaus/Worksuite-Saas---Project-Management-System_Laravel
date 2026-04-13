@@ -12,6 +12,10 @@ return new class extends Migration {
 
     public function up(): void
     {
+        if (Schema::hasTable('gantt_links')) {
+            return;
+        }
+
         Schema::create('gantt_links', function (Blueprint $table) {
             $table->id();
             $table->string('type');

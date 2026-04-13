@@ -18,6 +18,10 @@ return new class extends Migration {
 
     public function up()
     {
+        if (Schema::hasTable('estimate_templates')) {
+            return;
+        }
+
         Schema::create('estimate_templates', function (Blueprint $table) {
             $table->id();
             $table->integer('company_id')->unsigned()->nullable();

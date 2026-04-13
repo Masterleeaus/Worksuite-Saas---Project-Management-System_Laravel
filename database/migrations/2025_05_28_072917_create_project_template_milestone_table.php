@@ -11,6 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('project_template_milestone')) {
+            return;
+        }
 
         Schema::create('project_template_milestone', function (Blueprint $table) {
                 $table->increments('id');

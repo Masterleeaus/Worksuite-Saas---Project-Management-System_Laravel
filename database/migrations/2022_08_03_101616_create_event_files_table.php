@@ -14,6 +14,10 @@ return new class extends Migration {
 
     public function up()
     {
+        if (Schema::hasTable('event_files')) {
+            return;
+        }
+
         Schema::create('event_files', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('company_id')->unsigned()->nullable();

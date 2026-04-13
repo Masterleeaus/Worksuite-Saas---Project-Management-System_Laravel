@@ -21,6 +21,10 @@ return new class extends Migration {
         $deviceTableName = config('laravel-device-tracking.device_table');
         $fieldName = config('laravel-device-tracking.model_relation_id');
 
+        if (Schema::hasTable($deviceTableName)) {
+            return;
+        }
+
         Schema::create($deviceTableName, function (Blueprint $table) {
             $table->id();
             $table->string('device_uuid')->unique();

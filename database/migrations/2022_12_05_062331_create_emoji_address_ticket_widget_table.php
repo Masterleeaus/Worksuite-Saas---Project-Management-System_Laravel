@@ -17,6 +17,10 @@ return new class extends Migration {
 
     public function up()
     {
+        if (Schema::hasTable('task_comment_emoji')) {
+            return;
+        }
+
         Schema::create('task_comment_emoji', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id')->unsigned()->nullable();

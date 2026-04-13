@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('project_label_list')) {
+            return;
+        }
+
         Schema::create('project_label_list', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('company_id')->unsigned()->nullable();

@@ -11,6 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('project_sub_categories')) {
+            return;
+        }
 
          Schema::create('project_sub_categories', function (Blueprint $table) {
                 $table->bigIncrements('id');
