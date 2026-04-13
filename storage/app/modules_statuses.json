@@ -5,6 +5,7 @@
     "Inventory": true,
     "Report": true,
     "ProShots": true,
-    "Recruit": true
-    "Payroll": true
+    "Recruit": true,
+    "Payroll": true,
+    "TitanIntegrations": true
 }

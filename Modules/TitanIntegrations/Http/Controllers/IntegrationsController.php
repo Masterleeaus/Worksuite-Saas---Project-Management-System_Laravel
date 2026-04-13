@@ -178,12 +178,19 @@ class IntegrationsController extends AccountBaseController
     private function resolveService(string $provider): ?object
     {
         return match ($provider) {
-            'google_calendar' => app(\Modules\TitanIntegrations\Services\Integrations\GoogleCalendarIntegration::class),
-            'xero'            => app(\Modules\TitanIntegrations\Services\Integrations\XeroIntegration::class),
-            'hubspot'         => app(\Modules\TitanIntegrations\Services\Integrations\HubSpotIntegration::class),
-            'mailchimp'       => app(\Modules\TitanIntegrations\Services\Integrations\MailchimpIntegration::class),
-            'slack'           => app(\Modules\TitanIntegrations\Services\Integrations\SlackIntegration::class),
-            default           => null,
+            'google_calendar'  => app(\Modules\TitanIntegrations\Services\Integrations\GoogleCalendarIntegration::class),
+            'outlook_calendar' => app(\Modules\TitanIntegrations\Services\Integrations\OutlookCalendarIntegration::class),
+            'xero'             => app(\Modules\TitanIntegrations\Services\Integrations\XeroIntegration::class),
+            'quickbooks'       => app(\Modules\TitanIntegrations\Services\Integrations\QuickBooksIntegration::class),
+            'myob'             => app(\Modules\TitanIntegrations\Services\Integrations\MYOBIntegration::class),
+            'google_sheets'    => app(\Modules\TitanIntegrations\Services\Integrations\GoogleSheetsIntegration::class),
+            'hubspot'          => app(\Modules\TitanIntegrations\Services\Integrations\HubSpotIntegration::class),
+            'mailchimp'        => app(\Modules\TitanIntegrations\Services\Integrations\MailchimpIntegration::class),
+            'slack'            => app(\Modules\TitanIntegrations\Services\Integrations\SlackIntegration::class),
+            // Zapier, Make (Integromat) and n8n all use the same outbound webhook-trigger pattern
+            'zapier', 'make'   => app(\Modules\TitanIntegrations\Services\Integrations\ZapierIntegration::class),
+            'wordpress'        => app(\Modules\TitanIntegrations\Services\Integrations\WordPressIntegration::class),
+            default            => null,
         };
     }
 }
