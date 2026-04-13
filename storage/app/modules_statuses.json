@@ -4,5 +4,6 @@
     "PromotionManagement": true,
     "Inventory": true,
     "Report": true,
-    "ProShots": true
+    "ProShots": true,
+    "Payroll": true
 }
