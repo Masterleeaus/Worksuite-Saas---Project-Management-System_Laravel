@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('project_time_logs', function (Blueprint $table) {
-            $table->boolean('rejected')->default(false);
-            $table->unsignedInteger('rejected_by')->nullable()->index('project_time_logs_rejected_by_foreign');
-            $table->foreign(['rejected_by'])->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('SET NULL');
-            $table->dateTime('rejected_at')->nullable();
-            $table->text('reject_reason')->nullable();
-        });
+        if (!Schema::hasColumn('project_time_logs', 'rejected')) {
+            Schema::table('project_time_logs', function (Blueprint $table) {
+                $table->boolean('rejected')->default(false);
+                $table->unsignedInteger('rejected_by')->nullable()->index('project_time_logs_rejected_by_foreign');
+                $table->foreign(['rejected_by'])->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('SET NULL');
+                $table->dateTime('rejected_at')->nullable();
+                $table->text('reject_reason')->nullable();
+            });
+        }
     }
 
     /**

@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('project_template_tasks', function (Blueprint $table) {
-            $table->text('task_labels')->nullable()->after('priority');
-        });
+        if (!Schema::hasColumn('project_template_tasks', 'task_labels')) {
+            Schema::table('project_template_tasks', function (Blueprint $table) {
+                $table->text('task_labels')->nullable()->after('priority');
+            });
+        }
     }
 
     /**

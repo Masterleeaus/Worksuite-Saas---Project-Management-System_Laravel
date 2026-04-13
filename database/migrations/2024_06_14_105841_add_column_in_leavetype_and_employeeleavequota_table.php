@@ -11,13 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('leave_types', function (Blueprint $table) {
-            $table->enum('leavetype', ['monthly', 'yearly'])->nullable();
-        });
+        if (!Schema::hasColumn('leave_types', 'leavetype')) {
+            Schema::table('leave_types', function (Blueprint $table) {
+                $table->enum('leavetype', ['monthly', 'yearly'])->nullable();
+            });
+        }
 
-        Schema::table('employee_leave_quotas', function (Blueprint $table) {
-            $table->text('carry_forward_status')->nullable();
-        });
+        if (!Schema::hasColumn('employee_leave_quotas', 'carry_forward_status')) {
+            Schema::table('employee_leave_quotas', function (Blueprint $table) {
+                $table->text('carry_forward_status')->nullable();
+            });
+        }
     }
 
     /**

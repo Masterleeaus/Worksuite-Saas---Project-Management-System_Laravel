@@ -14,9 +14,11 @@ return new class extends Migration {
 
     public function up()
     {
-        Schema::table('project_templates', function (Blueprint $table) {
-            $table->integer('added_by')->default(1);
-        });
+        if (!Schema::hasColumn('project_templates', 'added_by')) {
+            Schema::table('project_templates', function (Blueprint $table) {
+                $table->integer('added_by')->default(1);
+            });
+        }
     }
 
     /**

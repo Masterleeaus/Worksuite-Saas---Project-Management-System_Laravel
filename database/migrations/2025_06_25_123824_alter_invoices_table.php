@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('invoices', function (Blueprint $table) {
-            $table->enum('is_timelog_invoice', [0,1])->default(0);
-        });
+        if (!Schema::hasColumn('invoices', 'is_timelog_invoice')) {
+            Schema::table('invoices', function (Blueprint $table) {
+                $table->enum('is_timelog_invoice', [0,1])->default(0);
+            });
+        }
     }
 
     /**

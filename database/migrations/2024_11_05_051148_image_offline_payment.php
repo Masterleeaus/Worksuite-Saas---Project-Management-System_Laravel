@@ -13,12 +13,17 @@ return new class extends Migration
     public function up(): void
     {
 
-        Schema::table('offline_payment_methods', function (Blueprint $table) {
-            $table->string('image')->nullable()->after('name');
-        });
-        Schema::table('invoice_payment_details', function (Blueprint $table) {
-            $table->string('image')->nullable()->after('title');
-        });
+        if (!Schema::hasColumn('offline_payment_methods', 'image')) {
+            Schema::table('offline_payment_methods', function (Blueprint $table) {
+                $table->string('image')->nullable()->after('name');
+            });
+        }
+
+        if (!Schema::hasColumn('invoice_payment_details', 'image')) {
+            Schema::table('invoice_payment_details', function (Blueprint $table) {
+                $table->string('image')->nullable()->after('title');
+            });
+        }
     }
 
     /**

@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('holidays', function (Blueprint $table) {
-            $table->enum('notification_sent', ['yes', 'no'])->default('no');
-        });
+        if (!Schema::hasColumn('holidays', 'notification_sent')) {
+            Schema::table('holidays', function (Blueprint $table) {
+                $table->enum('notification_sent', ['yes', 'no'])->default('no');
+            });
+        }
     }
 
     /**

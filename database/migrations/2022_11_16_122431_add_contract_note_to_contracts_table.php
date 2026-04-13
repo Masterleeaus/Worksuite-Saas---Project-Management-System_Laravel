@@ -14,9 +14,11 @@ return new class extends Migration
 
     public function up()
     {
-        Schema::table('contracts', function (Blueprint $table) {
-            $table->text('contract_note')->after('alternate_address')->nullable();
-        });
+        if (!Schema::hasColumn('contracts', 'contract_note')) {
+            Schema::table('contracts', function (Blueprint $table) {
+                $table->text('contract_note')->after('alternate_address')->nullable();
+            });
+        }
     }
 
     /**

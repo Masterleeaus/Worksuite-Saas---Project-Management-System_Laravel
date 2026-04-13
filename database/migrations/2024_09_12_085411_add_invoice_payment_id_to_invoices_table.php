@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('invoices', function (Blueprint $table) {
-            $table->unsignedBigInteger('invoice_payment_id')->nullable()->after('transaction_id');
-            $table->foreign('invoice_payment_id')->references('id')->on('invoice_payment_details')->onDelete('cascade')->onUpdate('cascade');
-        });
+        if (!Schema::hasColumn('invoices', 'invoice_payment_id')) {
+            Schema::table('invoices', function (Blueprint $table) {
+                $table->unsignedBigInteger('invoice_payment_id')->nullable()->after('transaction_id');
+                $table->foreign('invoice_payment_id')->references('id')->on('invoice_payment_details')->onDelete('cascade')->onUpdate('cascade');
+            });
+        }
     }
 
     /**

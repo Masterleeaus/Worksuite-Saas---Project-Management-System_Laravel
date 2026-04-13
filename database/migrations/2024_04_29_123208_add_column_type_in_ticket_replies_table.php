@@ -12,10 +12,12 @@ return new class extends Migration
 
     public function up(): void
     {
-        Schema::table('ticket_replies', function (Blueprint $table) {
-            $table->enum('type', ['reply', 'note'])->default('reply')->after('message');
+        if (!Schema::hasColumn('ticket_replies', 'type')) {
+            Schema::table('ticket_replies', function (Blueprint $table) {
+                $table->enum('type', ['reply', 'note'])->default('reply')->after('message');
 
-        });
+            });
+        }
     }
 
     /**

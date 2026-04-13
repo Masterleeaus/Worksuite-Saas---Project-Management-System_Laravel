@@ -16,9 +16,11 @@ return new class extends Migration
     public function up(): void
     {
 
-        Schema::table('packages', function (Blueprint $table) {
-            $table->string('package')->nullable()->after('annual_status');
-        });
+        if (!Schema::hasColumn('packages', 'package')) {
+            Schema::table('packages', function (Blueprint $table) {
+                $table->string('package')->nullable()->after('annual_status');
+            });
+        }
 
         DB::statement("ALTER TABLE `packages`
             MODIFY COLUMN `default`

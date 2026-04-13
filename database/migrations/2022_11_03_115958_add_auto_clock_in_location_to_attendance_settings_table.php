@@ -14,9 +14,11 @@ return new class extends Migration
 
     public function up()
     {
-        Schema::table('attendance_settings', function (Blueprint $table) {
-            $table->enum('auto_clock_in_location', ['office', 'home'])->default('office')->after('auto_clock_in');
-        });
+        if (!Schema::hasColumn('attendance_settings', 'auto_clock_in_location')) {
+            Schema::table('attendance_settings', function (Blueprint $table) {
+                $table->enum('auto_clock_in_location', ['office', 'home'])->default('office')->after('auto_clock_in');
+            });
+        }
     }
 
     /**

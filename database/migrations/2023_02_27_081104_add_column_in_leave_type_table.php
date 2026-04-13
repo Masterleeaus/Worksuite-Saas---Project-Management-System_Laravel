@@ -22,19 +22,21 @@ return new class extends Migration
 
     public function up()
     {
-        Schema::table('leave_types', function (Blueprint $table) {
-            $table->integer('effective_after')->nullable()->after('monthly_limit');
-            $table->string('effective_type')->nullable()->after('effective_after');
-            $table->string('unused_leave')->nullable()->after('effective_type');
-            $table->boolean('encashed')->after('unused_leave');
-            $table->boolean('allowed_probation')->after('encashed');
-            $table->boolean('allowed_notice')->after('allowed_probation');
-            $table->string('gender')->nullable()->after('allowed_notice');
-            $table->string('marital_status')->nullable()->after('gender');
-            $table->string('department')->nullable()->after('marital_status');
-            $table->string('designation')->nullable()->after('department');
-            $table->string('role')->nullable()->after('designation');
-        });
+        if (!Schema::hasColumn('leave_types', 'effective_after')) {
+            Schema::table('leave_types', function (Blueprint $table) {
+                $table->integer('effective_after')->nullable()->after('monthly_limit');
+                $table->string('effective_type')->nullable()->after('effective_after');
+                $table->string('unused_leave')->nullable()->after('effective_type');
+                $table->boolean('encashed')->after('unused_leave');
+                $table->boolean('allowed_probation')->after('encashed');
+                $table->boolean('allowed_notice')->after('allowed_probation');
+                $table->string('gender')->nullable()->after('allowed_notice');
+                $table->string('marital_status')->nullable()->after('gender');
+                $table->string('department')->nullable()->after('marital_status');
+                $table->string('designation')->nullable()->after('department');
+                $table->string('role')->nullable()->after('designation');
+            });
+        }
 
         $companies = Company::all();
 

@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('project_templates', function (Blueprint $table) {
-            $table->unsignedBigInteger('sub_category_id')->nullable()->after('category_id');
-            $table->foreign(['sub_category_id'])->references(['id'])->on('project_sub_categories')->onUpdate('CASCADE')->onDelete('SET NULL');
-        });
-
+        if (!Schema::hasColumn('project_templates', 'sub_category_id')) {
+            Schema::table('project_templates', function (Blueprint $table) {
+                $table->unsignedBigInteger('sub_category_id')->nullable()->after('category_id');
+                $table->foreign(['sub_category_id'])->references(['id'])->on('project_sub_categories')->onUpdate('CASCADE')->onDelete('SET NULL');
+            });
+        }
     }
 
     /**

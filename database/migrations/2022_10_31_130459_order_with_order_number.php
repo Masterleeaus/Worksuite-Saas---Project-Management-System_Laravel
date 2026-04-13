@@ -16,13 +16,17 @@ return new class extends Migration {
      */
     public function up()
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->bigInteger('order_number')->after('id')->nullable();
-        });
+        if (!Schema::hasColumn('orders', 'order_number')) {
+            Schema::table('orders', function (Blueprint $table) {
+                $table->bigInteger('order_number')->after('id')->nullable();
+            });
+        }
 
-        Schema::table('tickets', function (Blueprint $table) {
-            $table->bigInteger('ticket_number')->after('id')->nullable();
-        });
+        if (!Schema::hasColumn('tickets', 'ticket_number')) {
+            Schema::table('tickets', function (Blueprint $table) {
+                $table->bigInteger('ticket_number')->after('id')->nullable();
+            });
+        }
 
         $companies = Company::select('id')->get();
 

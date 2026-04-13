@@ -12,9 +12,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('lead_setting', function (Blueprint $table) {
-            $table->tinyInteger('ticket_round_robin_status')->default(0)->notNull();
-        });
+        if (!Schema::hasColumn('lead_setting', 'ticket_round_robin_status')) {
+            Schema::table('lead_setting', function (Blueprint $table) {
+                $table->tinyInteger('ticket_round_robin_status')->default(0)->notNull();
+            });
+        }
     }
 
     /**
