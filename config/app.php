@@ -261,6 +261,10 @@ return [
 
         // MCP (Model Context Protocol) server
         App\Providers\McpServiceProvider::class,
+
+        // Titan Filament panel – parallel UI layer (does NOT replace Worksuite UI)
+        App\Providers\TitanPanelProvider::class,
+        App\Providers\TitanFilamentServiceProvider::class,
     ],
 
     /*
