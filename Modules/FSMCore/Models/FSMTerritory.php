@@ -2,10 +2,13 @@
 
 namespace Modules\FSMCore\Models;
 
+use App\Traits\HasCompany;
 use Illuminate\Database\Eloquent\Model;
 
 class FSMTerritory extends Model
 {
+    use HasCompany;
+
     protected $table = 'fsm_territories';
 
     protected $fillable = [

@@ -2,10 +2,13 @@
 
 namespace Modules\FSMCore\Models;
 
+use App\Traits\HasCompany;
 use Illuminate\Database\Eloquent\Model;
 
 class FSMOrder extends Model
 {
+    use HasCompany;
+
     protected $table = 'fsm_orders';
 
     protected $fillable = [
@@ -127,6 +130,11 @@ class FSMOrder extends Model
     public function photos()
     {
         return $this->hasMany(FSMOrderPhoto::class, 'fsm_order_id');
+    }
+
+    public function attachments()
+    {
+        return $this->hasMany(FSMOrderAttachment::class, 'fsm_order_id')->latest();
     }
 
     public function size()

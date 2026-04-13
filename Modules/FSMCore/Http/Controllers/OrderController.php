@@ -177,7 +177,7 @@ class OrderController extends Controller
 
     public function show(int $id)
     {
-        $relations = ['location', 'person', 'team', 'stage', 'template', 'equipment', 'tags'];
+        $relations = ['location', 'person', 'team', 'stage', 'template', 'equipment', 'tags', 'attachments'];
 
         // Conditionally eager-load source lead if FSMCRM is installed
         if (class_exists(\Modules\FSMCRM\Models\FSMLead::class)

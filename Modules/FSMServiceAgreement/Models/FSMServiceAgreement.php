@@ -2,6 +2,7 @@
 
 namespace Modules\FSMServiceAgreement\Models;
 
+use App\Traits\HasCompany;
 use Illuminate\Database\Eloquent\Model;
 use Modules\FSMCore\Models\FSMLocation;
 use Modules\FSMCore\Models\FSMOrder;
@@ -9,6 +10,8 @@ use Modules\FSMCore\Models\FSMTemplate;
 
 class FSMServiceAgreement extends Model
 {
+    use HasCompany;
+
     protected $table = 'fsm_service_agreements';
 
     const STATE_DRAFT     = 'draft';

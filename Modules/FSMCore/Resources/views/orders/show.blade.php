@@ -508,4 +508,83 @@
 </div>
 @endif
 
+{{-- FSM Order Attachments (UploadAttachmentComponent pattern from FixitPro) --}}
+@if(\Illuminate\Support\Facades\Schema::hasTable('fsm_order_attachments'))
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+                <span>📎 Attachments</span>
+                <span class="badge bg-secondary">{{ $order->attachments->count() }}</span>
+            </div>
+            <div class="card-body">
+                {{-- Upload form --}}
+                <form method="POST"
+                      action="{{ route('fsmcore.orders.attachments.store', $order->id) }}"
+                      enctype="multipart/form-data"
+                      class="d-flex gap-2 flex-wrap align-items-end mb-3">
+                    @csrf
+                    <div>
+                        <label class="form-label small mb-1">File</label>
+                        <input type="file" name="file" class="form-control form-control-sm" required>
+                    </div>
+                    <div>
+                        <label class="form-label small mb-1">Description (optional)</label>
+                        <input type="text" name="description" class="form-control form-control-sm"
+                               maxlength="255" placeholder="e.g. Signed work order">
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-sm btn-outline-primary">Upload</button>
+                    </div>
+                </form>
+
+                {{-- Attachment list --}}
+                @if($order->attachments->isEmpty())
+                    <p class="text-muted small mb-0">No attachments yet.</p>
+                @else
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Filename</th>
+                                <th>Description</th>
+                                <th>Size</th>
+                                <th>Uploaded By</th>
+                                <th>Date</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($order->attachments as $attachment)
+                            <tr>
+                                <td>
+                                    <a href="{{ route('fsmcore.orders.attachments.download', [$order->id, $attachment->id]) }}"
+                                       title="Download {{ $attachment->filename }}">
+                                        {{ $attachment->filename }}
+                                    </a>
+                                </td>
+                                <td>{{ $attachment->description ?? '—' }}</td>
+                                <td>{{ $attachment->humanSize() }}</td>
+                                <td>{{ $attachment->uploader?->name ?? '—' }}</td>
+                                <td>{{ $attachment->created_at->format('d M Y H:i') }}</td>
+                                <td>
+                                    <form method="POST"
+                                          action="{{ route('fsmcore.orders.attachments.destroy', [$order->id, $attachment->id]) }}"
+                                          onsubmit="return confirm('Delete this attachment?')">
+                                        @csrf
+                                        <button class="btn btn-xs btn-sm btn-outline-danger py-0 px-1">✕</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
 @endsection
