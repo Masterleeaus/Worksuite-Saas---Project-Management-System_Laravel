@@ -1,0 +1,97 @@
+{
+  "name": "NexusFieldOps",
+  "alias": "nexusfieldops",
+  "description": "Nexus Field Ops integration layer — bridges the Nexus Field Ops Flutter mobile app to the CleanSmartOS backend. Provides worker dashboard, job notes, FCM push tokens, and offline batch sync. Compatibility: HIGH (7/11 core features covered natively by FSMCore; 4 extended by this module).",
+  "keywords": ["nexus", "field-ops", "mobile", "flutter", "fsm", "field-worker", "integration"],
+  "active": 1,
+  "order": 10,
+  "providers": [
+    "Modules\\NexusFieldOps\\Providers\\NexusFieldOpsServiceProvider",
+    "Modules\\NexusFieldOps\\Providers\\RouteServiceProvider"
+  ],
+  "aliases": {},
+  "files": [],
+  "requires": ["FSMCore"],
+  "version": "1.0.0",
+  "nexus_field_ops_analysis": {
+    "source": "codetouse/nexus-field-ops-main_extracted",
+    "scan_date": "2025-12-19",
+    "app_type": "Flutter mobile app (iOS + Android)",
+    "target_users": "Field service workers (cleaners, technicians, trades)",
+    "overall_compatibility": "HIGH",
+    "compatibility_score": "7/11 features natively available in FSMCore; 4 added by this module",
+    "features": {
+      "authentication": {
+        "description": "JWT / Bearer token login, logout, password reset",
+        "nexus_endpoint": "POST /v1/auth/login",
+        "backend_endpoint": "POST /api/fsm/v1/auth/login",
+        "status": "NATIVE — WorkerAuthController (FSMCore)"
+      },
+      "worker_profile": {
+        "description": "View and update own profile, change password",
+        "nexus_endpoint": "GET/PUT /v1/worker/me",
+        "backend_endpoint": "GET /api/fsm/v1/auth/me",
+        "status": "NATIVE — WorkerAuthController returns user profile"
+      },
+      "job_list": {
+        "description": "List assigned jobs with status filtering and pagination",
+        "nexus_endpoint": "GET /v1/jobs",
+        "backend_endpoint": "GET /api/fsm/v1/orders",
+        "status": "NATIVE — WorkerOrderController (FSMCore)"
+      },
+      "job_detail": {
+        "description": "Full job detail: location, equipment, checklist, photos",
+        "nexus_endpoint": "GET /v1/jobs/{id}",
+        "backend_endpoint": "GET /api/fsm/v1/orders/{id}",
+        "status": "NATIVE — WorkerOrderController with eager-loaded relations"
+      },
+      "gps_checkin_checkout": {
+        "description": "GPS-stamped arrival and departure recording",
+        "nexus_endpoint": "POST /v1/jobs/{id}/checkin  |  POST /v1/jobs/{id}/checkout",
+        "backend_endpoint": "POST /api/fsm/v1/orders/{id}/checkin  |  checkout",
+        "status": "NATIVE — WorkerOrderController accepts latitude/longitude"
+      },
+      "photo_capture": {
+        "description": "Before/after photos and customer signature uploaded to job",
+        "nexus_endpoint": "POST /v1/jobs/{id}/photos",
+        "backend_endpoint": "POST /api/fsm/v1/orders/{id}/photos",
+        "status": "NATIVE — WorkerPhotoController (FSMCore)"
+      },
+      "job_status_update": {
+        "description": "Move job through workflow stages (open → in-progress → done)",
+        "nexus_endpoint": "PATCH /v1/jobs/{id}/status",
+        "backend_endpoint": "POST /api/fsm/v1/orders/{id}/stage  |  /complete",
+        "status": "NATIVE — WorkerOrderController"
+      },
+      "dashboard_summary": {
+        "description": "Worker home screen: today's jobs, completion stats, earnings",
+        "nexus_endpoint": "GET /v1/dashboard",
+        "backend_endpoint": "GET /api/nexus/v1/dashboard",
+        "status": "EXTENDED — NexusDashboardController (this module)"
+      },
+      "job_notes": {
+        "description": "Worker adds text notes to a job (visible to dispatcher)",
+        "nexus_endpoint": "POST /v1/jobs/{id}/notes",
+        "backend_endpoint": "POST /api/nexus/v1/jobs/{id}/notes",
+        "status": "EXTENDED — NexusJobController + nexus_job_notes table (this module)"
+      },
+      "push_notifications": {
+        "description": "FCM device token registration for push notification delivery",
+        "nexus_endpoint": "PUT /v1/worker/fcm-token",
+        "backend_endpoint": "PUT /api/nexus/v1/worker/fcm-token",
+        "status": "EXTENDED — NexusWorkerController + users.nexus_fcm_token column (this module)"
+      },
+      "offline_sync": {
+        "description": "Queue job updates locally and sync when connectivity restored",
+        "nexus_endpoint": "POST /v1/sync",
+        "backend_endpoint": "POST /api/nexus/v1/sync",
+        "status": "EXTENDED — NexusSyncController (this module)"
+      }
+    },
+    "gaps_not_addressed": [
+      "Real-time dispatcher ↔ worker messaging (WebSocket/pusher) — requires separate channel setup",
+      "Turn-by-turn route navigation — handled client-side in Flutter via Google Maps SDK"
+    ],
+    "integration_recommendation": "INTEGRATE — the Nexus Field Ops Flutter app can target this backend with minimal adapter work. The existing /api/fsm/v1/* routes cover 7 of 11 features; this module adds the remaining 4 (dashboard, notes, FCM token, offline sync). No structural changes to FSMCore are needed."
+  }
+}
