@@ -17,7 +17,9 @@ return new class extends Migration {
             }
             
             Schema::table('salary_slips', function (Blueprint $table) {
-                $table->integer('expense_id')->unsigned()->nullable();
+                if (! Schema::hasColumn('salary_slips', 'expense_id')) {
+                    $table->integer('expense_id')->unsigned()->nullable();
+                }
                 $table->foreign('expense_id')->references('id')
                     ->on('expenses')->onDelete('cascade')->onUpdate('cascade');
             });

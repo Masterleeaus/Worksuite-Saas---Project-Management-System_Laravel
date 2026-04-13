@@ -20,7 +20,9 @@ class AddColToPostsTable extends Migration
             if (! Schema::hasColumn('posts', 'is_checked')) {
                 $table->boolean('is_checked')->default(0)->after('is_booked')->nullable();
             }
-            $table->foreignUuid('zone_id')->after('service_address_id')->nullable();
+            if (! Schema::hasColumn('posts', 'zone_id')) {
+                $table->foreignUuid('zone_id')->after('service_address_id')->nullable();
+            }
         });
     }
 

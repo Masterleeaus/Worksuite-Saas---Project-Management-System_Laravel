@@ -21,7 +21,9 @@ return new class extends Migration {
             }
             
             Schema::table('employee_monthly_salaries', function (Blueprint $table) {
-                $table->integer('company_id')->unsigned()->nullable()->after('id');
+                if (! Schema::hasColumn('employee_monthly_salaries', 'company_id')) {
+                    $table->integer('company_id')->unsigned()->nullable()->after('id');
+                }
                 $table->foreign('company_id')->references('id')
                     ->on('companies')->onDelete('cascade')->onUpdate('cascade');
 
@@ -36,8 +38,12 @@ return new class extends Migration {
             }
             
             Schema::table('employee_monthly_salaries', function (Blueprint $table) {
-                $table->string('effective_annual_salary')->nullable();
-                $table->string('effective_monthly_salary')->nullable();
+                if (! Schema::hasColumn('employee_monthly_salaries', 'effective_annual_salary')) {
+                    $table->string('effective_annual_salary')->nullable();
+                }
+                if (! Schema::hasColumn('employee_monthly_salaries', 'effective_monthly_salary')) {
+                    $table->string('effective_monthly_salary')->nullable();
+                }
             });
 
         }

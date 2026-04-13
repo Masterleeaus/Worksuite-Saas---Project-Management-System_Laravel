@@ -31,7 +31,9 @@ return new class extends Migration
             }
             
             Schema::table('recruit_job_offer_letter', function (Blueprint $table) {
-                $table->integer('add_structure')->default(0)->after('sign_require');
+                if (! Schema::hasColumn('recruit_job_offer_letter', 'add_structure')) {
+                    $table->integer('add_structure')->default(0)->after('sign_require')->nullable();
+                }
             });
         }
 
@@ -106,7 +108,9 @@ return new class extends Migration
             }
             
             Schema::table('recruit_settings', function (Blueprint $table) {
-                $table->enum('google_recaptcha_status', ['active', 'deactive'])->default('deactive');
+                if (! Schema::hasColumn('recruit_settings', 'google_recaptcha_status')) {
+                    $table->enum('google_recaptcha_status', ['active', 'deactive'])->default('deactive')->nullable();
+                }
             });
         }
 
@@ -116,7 +120,9 @@ return new class extends Migration
             }
             
             Schema::table('recruit_job_applications', function (Blueprint $table) {
-                $table->string('currenct_ctc_rate')->after('current_ctc')->nullable();
+                if (! Schema::hasColumn('recruit_job_applications', 'currenct_ctc_rate')) {
+                    $table->string('currenct_ctc_rate')->after('current_ctc')->nullable();
+                }
             });
         }
 
@@ -126,7 +132,9 @@ return new class extends Migration
             }
             
             Schema::table('recruit_job_applications', function (Blueprint $table) {
-                $table->string('expected_ctc_rate')->after('expected_ctc')->nullable();
+                if (! Schema::hasColumn('recruit_job_applications', 'expected_ctc_rate')) {
+                    $table->string('expected_ctc_rate')->after('expected_ctc')->nullable();
+                }
             });
         }
 
@@ -153,7 +161,9 @@ return new class extends Migration
             }
             
             Schema::table('recruit_job_applications', function (Blueprint $table) {
-                $table->string('rejection_remark')->after('remark')->nullable();
+                if (! Schema::hasColumn('recruit_job_applications', 'rejection_remark')) {
+                    $table->string('rejection_remark')->after('remark')->nullable();
+                }
             });
         }
 

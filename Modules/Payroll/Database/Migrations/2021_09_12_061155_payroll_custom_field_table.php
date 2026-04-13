@@ -23,7 +23,9 @@ return new class extends Migration
             }
             
             Schema::table('employee_monthly_salaries', function (Blueprint $table) {
-                $table->enum('allow_generate_payroll', ['yes', 'no'])->default('yes');
+                if (! Schema::hasColumn('employee_monthly_salaries', 'allow_generate_payroll')) {
+                    $table->enum('allow_generate_payroll', ['yes', 'no'])->default('yes')->nullable();
+                }
             });
         }
     }

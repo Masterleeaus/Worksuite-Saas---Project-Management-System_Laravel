@@ -48,9 +48,15 @@ return new class extends Migration
             }
             
             Schema::table('salary_slips', function (Blueprint $table) {
-                $table->dateTime('salary_from')->nullable();
-                $table->dateTime('salary_to')->nullable();
-                $table->unsignedBigInteger('payroll_cycle_id')->nullable();
+                if (! Schema::hasColumn('salary_slips', 'salary_from')) {
+                    $table->dateTime('salary_from')->nullable();
+                }
+                if (! Schema::hasColumn('salary_slips', 'salary_to')) {
+                    $table->dateTime('salary_to')->nullable();
+                }
+                if (! Schema::hasColumn('salary_slips', 'payroll_cycle_id')) {
+                    $table->unsignedBigInteger('payroll_cycle_id')->nullable();
+                }
                 $table->foreign('payroll_cycle_id')->references('id')->on('payroll_cycles')->onDelete('cascade')->onUpdate('cascade');
             });
 
@@ -59,8 +65,12 @@ return new class extends Migration
             }
             
             Schema::table('payroll_settings', function (Blueprint $table) {
-                $table->integer('semi_monthly_start')->nullable()->default(1);
-                $table->integer('semi_monthly_end')->nullable()->default(30);
+                if (! Schema::hasColumn('payroll_settings', 'semi_monthly_start')) {
+                    $table->integer('semi_monthly_start')->nullable()->default(1);
+                }
+                if (! Schema::hasColumn('payroll_settings', 'semi_monthly_end')) {
+                    $table->integer('semi_monthly_end')->nullable()->default(30);
+                }
             });
         }
 

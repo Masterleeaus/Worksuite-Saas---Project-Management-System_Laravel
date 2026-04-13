@@ -22,10 +22,14 @@ return new class extends Migration
             }
             
             Schema::table('rest_api_settings', function (Blueprint $table) {
-                $table->integer('added_by')->unsigned()->nullable();
+                if (! Schema::hasColumn('rest_api_settings', 'added_by')) {
+                    $table->integer('added_by')->unsigned()->nullable();
+                }
                 $table->foreign('added_by')->references('id')->on('users')->onDelete('SET NULL')->onUpdate('cascade');
 
-                $table->integer('last_updated_by')->unsigned()->nullable();
+                if (! Schema::hasColumn('rest_api_settings', 'last_updated_by')) {
+                    $table->integer('last_updated_by')->unsigned()->nullable();
+                }
                 $table->foreign('last_updated_by')->references('id')->on('users')->onDelete('SET NULL')->onUpdate('cascade');
             });
         }

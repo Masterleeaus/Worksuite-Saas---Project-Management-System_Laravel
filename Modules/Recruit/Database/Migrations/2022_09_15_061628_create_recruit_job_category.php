@@ -30,7 +30,9 @@ return new class extends Migration
             }
             
             Schema::table('recruit_job_applications', function (Blueprint $table) {
-                $table->bigInteger('job_id')->unsigned();
+                if (! Schema::hasColumn('recruit_job_applications', 'job_id')) {
+                    $table->bigInteger('job_id')->unsigned()->nullable();
+                }
                 $table->foreign('job_id')->references('id')->on('recruit_jobs')->onUpdate('cascade')->onDelete('cascade');
             });
         }
@@ -41,7 +43,9 @@ return new class extends Migration
             }
             
             Schema::table('recruit_job_applications', function (Blueprint $table) {
-                $table->integer('file_id')->unsigned()->nullable();
+                if (! Schema::hasColumn('recruit_job_applications', 'file_id')) {
+                    $table->integer('file_id')->unsigned()->nullable();
+                }
                 $table->foreign('file_id')->references('id')->on('recruit_job_files')->onDelete('cascade')->onUpdate('cascade');
             });
         }
@@ -52,7 +56,9 @@ return new class extends Migration
             }
             
             Schema::table('recruit_application_status', function (Blueprint $table) {
-                $table->bigInteger('category_id')->unsigned()->nullable()->default(null);
+                if (! Schema::hasColumn('recruit_application_status', 'category_id')) {
+                    $table->bigInteger('category_id')->unsigned()->nullable()->default(null);
+                }
                 $table->foreign('category_id')->references('id')->on('recruit_application_status_categories')->onUpdate('cascade')->onDelete('cascade');
             });
         }
@@ -63,8 +69,12 @@ return new class extends Migration
             }
             
             Schema::table('recruit_jobs', function (Blueprint $table) {
-                $table->enum('remote_job', ['yes', 'no'])->default('no')->nullable()->after('status');
-                $table->enum('disclose_salary', ['yes', 'no'])->default('no')->nullable()->after('remote_job');
+                if (! Schema::hasColumn('recruit_jobs', 'remote_job')) {
+                    $table->enum('remote_job', ['yes', 'no'])->default('no')->nullable()->after('status');
+                }
+                if (! Schema::hasColumn('recruit_jobs', 'disclose_salary')) {
+                    $table->enum('disclose_salary', ['yes', 'no'])->default('no')->nullable()->after('remote_job');
+                }
             });
 
             DB::statement('ALTER TABLE `recruit_job_applications` CHANGE `current_ctc` `current_ctc` DOUBLE NULL DEFAULT NULL');
@@ -100,11 +110,17 @@ return new class extends Migration
             }
             
             Schema::table('recruit_jobs', function (Blueprint $table) {
-                $table->integer('recruit_job_sub_category_id')->unsigned()->nullable()->after('status');
+                if (! Schema::hasColumn('recruit_jobs', 'recruit_job_sub_category_id')) {
+                    $table->integer('recruit_job_sub_category_id')->unsigned()->nullable()->after('status');
+                }
                 $table->foreign('recruit_job_sub_category_id')->references('id')->on('recruit_job_sub_categories')->onUpdate('cascade')->onDelete('cascade');
-                $table->integer('recruit_job_category_id')->unsigned()->nullable()->after('status');
+                if (! Schema::hasColumn('recruit_jobs', 'recruit_job_category_id')) {
+                    $table->integer('recruit_job_category_id')->unsigned()->nullable()->after('status');
+                }
                 $table->foreign('recruit_job_category_id')->references('id')->on('recruit_job_categories')->onUpdate('cascade')->onDelete('cascade');
-                $table->integer('currency_id')->unsigned()->nullable()->after('status');
+                if (! Schema::hasColumn('recruit_jobs', 'currency_id')) {
+                    $table->integer('currency_id')->unsigned()->nullable()->after('status');
+                }
                 $table->foreign('currency_id')->references('id')->on('currencies')->onDelete('cascade')->onUpdate('cascade');
             });
 

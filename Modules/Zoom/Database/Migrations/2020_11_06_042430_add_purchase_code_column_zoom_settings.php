@@ -16,7 +16,9 @@ return new class extends Migration
         if (! Schema::hasColumn('zoom_setting', 'purchase_code')) {
             Schema::table('zoom_setting', function (Blueprint $table) {
                 $table->string('purchase_code')->nullable();
-                $table->timestamp('supported_until')->nullable();
+                if (! Schema::hasColumn('zoom_setting', 'supported_until')) {
+                    $table->timestamp('supported_until')->nullable();
+                }
             });
         }
     }

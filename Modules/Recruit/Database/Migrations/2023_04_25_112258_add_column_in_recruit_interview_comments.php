@@ -20,7 +20,9 @@ return new class extends Migration
             }
             
             Schema::table('recruit_interview_comments', function (Blueprint $table) {
-                $table->string('candidate_comment')->after('comment')->nullable();
+                if (! Schema::hasColumn('recruit_interview_comments', 'candidate_comment')) {
+                    $table->string('candidate_comment')->after('comment')->nullable();
+                }
             });
         }
     }

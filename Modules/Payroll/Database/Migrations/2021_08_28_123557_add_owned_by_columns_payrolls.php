@@ -23,10 +23,14 @@ return new class extends Migration
             }
             
             Schema::table('salary_slips', function (Blueprint $table) {
-                $table->integer('added_by')->unsigned()->nullable();
+                if (! Schema::hasColumn('salary_slips', 'added_by')) {
+                    $table->integer('added_by')->unsigned()->nullable();
+                }
                 $table->foreign('added_by')->references('id')->on('users')->onDelete('SET NULL')->onUpdate('cascade');
 
-                $table->integer('last_updated_by')->unsigned()->nullable();
+                if (! Schema::hasColumn('salary_slips', 'last_updated_by')) {
+                    $table->integer('last_updated_by')->unsigned()->nullable();
+                }
                 $table->foreign('last_updated_by')->references('id')->on('users')->onDelete('SET NULL')->onUpdate('cascade');
             });
         }
@@ -37,7 +41,9 @@ return new class extends Migration
             }
             
             Schema::table('salary_slips', function (Blueprint $table) {
-                $table->integer('company_id')->unsigned()->nullable()->after('id');
+                if (! Schema::hasColumn('salary_slips', 'company_id')) {
+                    $table->integer('company_id')->unsigned()->nullable()->after('id');
+                }
                 $table->foreign('company_id')->references('id')
                     ->on('companies')->onDelete('cascade')->onUpdate('cascade');
             });

@@ -17,7 +17,9 @@ class AddColToWithdrawRequestsTable extends Migration
             return;
         }
         Schema::table('withdraw_requests', function (Blueprint $table) {
-            $table->foreignUuid('withdrawal_method_id')->nullable();
+            if (! Schema::hasColumn('withdraw_requests', 'withdrawal_method_id')) {
+                $table->foreignUuid('withdrawal_method_id')->nullable();
+            }
             if (! Schema::hasColumn('withdraw_requests', 'withdrawal_method_fields')) {
                 $table->text('withdrawal_method_fields')->nullable();
             }

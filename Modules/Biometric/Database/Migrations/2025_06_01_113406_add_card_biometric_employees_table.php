@@ -18,7 +18,9 @@ return new class extends Migration
             }
             
             Schema::table('biometric_employees', function (Blueprint $table) {
-                $table->string('card_number')->nullable()->after('user_id');
+                if (! Schema::hasColumn('biometric_employees', 'card_number')) {
+                    $table->string('card_number')->nullable()->after('user_id');
+                }
             });
         }
     }

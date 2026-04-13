@@ -21,7 +21,9 @@ return new class extends Migration
             }
             
             Schema::table('performance_settings', function (Blueprint $table) {
-                $table->integer('company_id')->unsigned()->nullable()->after('id');
+                if (! Schema::hasColumn('performance_settings', 'company_id')) {
+                    $table->integer('company_id')->unsigned()->nullable()->after('id');
+                }
                 $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade')->onUpdate('cascade');
             });
         }

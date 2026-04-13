@@ -17,7 +17,9 @@ return new class extends Migration {
             }
             
             Schema::table('salary_slips', function (Blueprint $table) {
-                $table->text('additional_earning_json')->nullable();
+                if (! Schema::hasColumn('salary_slips', 'additional_earning_json')) {
+                    $table->text('additional_earning_json')->nullable();
+                }
             });
         }
     }

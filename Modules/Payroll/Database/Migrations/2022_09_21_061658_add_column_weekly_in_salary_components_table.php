@@ -19,9 +19,15 @@ return new class extends Migration
             }
             
             Schema::table('salary_components', function (Blueprint $table) {
-                $table->double('weekly_value')->default(0);
-                $table->double('biweekly_value')->default(0);
-                $table->double('semimonthly_value')->default(0);
+                if (! Schema::hasColumn('salary_components', 'weekly_value')) {
+                    $table->double('weekly_value')->default(0)->nullable();
+                }
+                if (! Schema::hasColumn('salary_components', 'biweekly_value')) {
+                    $table->double('biweekly_value')->default(0)->nullable();
+                }
+                if (! Schema::hasColumn('salary_components', 'semimonthly_value')) {
+                    $table->double('semimonthly_value')->default(0)->nullable();
+                }
             });
         }
     }

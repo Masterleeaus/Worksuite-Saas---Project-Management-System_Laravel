@@ -16,7 +16,9 @@ return new class extends Migration {
             }
             
             Schema::table('employee_details', function (Blueprint $table) {
-                $table->double('overtime_hourly_rate', 16, 2)->nullable()->comment('This field is only for overtime calculation');
+                if (! Schema::hasColumn('employee_details', 'overtime_hourly_rate')) {
+                    $table->double('overtime_hourly_rate', 16, 2)->nullable()->comment('This field is only for overtime calculation');
+                }
             });
         }
 

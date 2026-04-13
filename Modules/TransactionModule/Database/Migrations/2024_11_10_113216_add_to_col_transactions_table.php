@@ -17,7 +17,9 @@ class AddToColTransactionsTable extends Migration
             return;
         }
         Schema::table('transactions', function (Blueprint $table) {
-            $table->foreignUuid('booking_repeat_id')->nullable();
+            if (! Schema::hasColumn('transactions', 'booking_repeat_id')) {
+                $table->foreignUuid('booking_repeat_id')->nullable();
+            }
         });
     }
 

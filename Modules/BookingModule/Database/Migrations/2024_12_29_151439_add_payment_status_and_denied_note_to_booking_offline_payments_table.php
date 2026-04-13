@@ -20,7 +20,9 @@ return new class extends Migration
             return;
         }
         Schema::table('booking_offline_payments', function (Blueprint $table) {
-            $table->foreignUuid('offline_payment_id')->nullable()->after('booking_id');
+            if (! Schema::hasColumn('booking_offline_payments', 'offline_payment_id')) {
+                $table->foreignUuid('offline_payment_id')->nullable()->after('booking_id');
+            }
             if (! Schema::hasColumn('booking_offline_payments', 'payment_status')) {
                 $table->enum('payment_status', ['pending', 'denied', 'approved'])->default('approved')->after('customer_information')->nullable();
             }

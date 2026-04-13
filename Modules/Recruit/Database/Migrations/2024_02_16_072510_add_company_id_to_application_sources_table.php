@@ -17,7 +17,9 @@ return new class extends Migration {
         if (!Schema::hasColumn('application_sources', 'is_predefined')) {
             Schema::table('application_sources', function (Blueprint $table) {
                 $table->boolean('is_predefined')->default(true);
-                $table->integer('company_id')->unsigned()->after('id')->nullable();
+                if (! Schema::hasColumn('application_sources', 'company_id')) {
+                    $table->integer('company_id')->unsigned()->after('id')->nullable();
+                }
                 $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade')->onUpdate('cascade');
             });
         }

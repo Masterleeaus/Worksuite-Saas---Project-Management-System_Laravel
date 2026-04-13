@@ -74,7 +74,9 @@ return new class extends Migration
                 if ($isBig) {
                     $table->unsignedBigInteger('fsm_default_supplier_id')->nullable()->after('fsm_unit');
                 } else {
-                    $table->unsignedInteger('fsm_default_supplier_id')->nullable()->after('fsm_unit');
+                    if (! Schema::hasColumn('items', 'fsm_default_supplier_id')) {
+                        $table->unsignedInteger('fsm_default_supplier_id')->nullable()->after('fsm_unit');
+                    }
                 }
             }
         });

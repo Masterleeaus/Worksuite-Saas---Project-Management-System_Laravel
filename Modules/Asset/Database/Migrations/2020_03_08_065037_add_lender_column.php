@@ -23,10 +23,14 @@ return new class extends Migration
             }
             
             Schema::table('asset_lending_history', function (Blueprint $table) {
-                $table->unsignedInteger('lender_id')->after('user_id');
+                if (! Schema::hasColumn('asset_lending_history', 'lender_id')) {
+                    $table->unsignedInteger('lender_id')->after('user_id')->nullable();
+                }
                 $table->foreign('lender_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
 
-                $table->unsignedInteger('returner_id')->after('lender_id')->nullable();
+                if (! Schema::hasColumn('asset_lending_history', 'returner_id')) {
+                    $table->unsignedInteger('returner_id')->after('lender_id')->nullable();
+                }
                 $table->foreign('returner_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
             });
 
