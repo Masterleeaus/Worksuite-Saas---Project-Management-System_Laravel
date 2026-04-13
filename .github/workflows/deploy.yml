@@ -109,7 +109,7 @@ jobs:
             composer.lock \
             package.json \
             package-lock.json \
-            vite.config.js \
+            webpack.mix.js \
             .htaccess \
             .env.example || true)"
 
@@ -127,7 +127,7 @@ jobs:
             composer.lock \
             package.json \
             package-lock.json \
-            vite.config.js \
+            webpack.mix.js \
             .htaccess \
             .env.example || true)"
 
@@ -169,7 +169,7 @@ jobs:
             composer.lock \
             package.json \
             package-lock.json \
-            vite.config.js \
+            webpack.mix.js \
             .htaccess \
             .env.example
 
