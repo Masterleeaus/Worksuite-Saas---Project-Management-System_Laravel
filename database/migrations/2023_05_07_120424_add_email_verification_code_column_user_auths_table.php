@@ -12,10 +12,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('user_auths', function (Blueprint $table) {
-            $table->string('email_verification_code')->nullable()->after('email_verified_at');
-            $table->dateTime('email_code_expires_at')->nullable()->after('email_verification_code');
-        });
+        if (!Schema::hasColumn('user_auths', 'email_verification_code')) {
+            Schema::table('user_auths', function (Blueprint $table) {
+                $table->string('email_verification_code')->nullable()->after('email_verified_at');
+                $table->dateTime('email_code_expires_at')->nullable()->after('email_verification_code');
+            });
+        }
     }
 
     /**

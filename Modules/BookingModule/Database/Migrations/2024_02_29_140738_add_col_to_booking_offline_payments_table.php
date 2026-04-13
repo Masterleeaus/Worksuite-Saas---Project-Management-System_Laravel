@@ -19,9 +19,11 @@ return new class extends Migration
         if (! Schema::hasTable('booking_offline_payments')) {
             return;
         }
-        Schema::table('booking_offline_payments', function (Blueprint $table) {
-            $table->text('method_name')->nullable()->after('booking_id');
-        });
+        if (!Schema::hasColumn('booking_offline_payments', 'method_name')) {
+            Schema::table('booking_offline_payments', function (Blueprint $table) {
+                $table->text('method_name')->nullable()->after('booking_id');
+            });
+        }
     }
 
     /**

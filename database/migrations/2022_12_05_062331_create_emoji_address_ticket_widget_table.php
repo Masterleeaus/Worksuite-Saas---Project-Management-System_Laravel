@@ -32,10 +32,12 @@ return new class extends Migration {
         });
 
 
-        Schema::table('company_addresses', function (Blueprint $table) {
-            $table->decimal('latitude', 10, 8)->default(null)->nullable();
-            $table->decimal('longitude', 11, 8)->default(null)->nullable();
-        });
+        if (!Schema::hasColumn('company_addresses', 'latitude')) {
+            Schema::table('company_addresses', function (Blueprint $table) {
+                $table->decimal('latitude', 10, 8)->default(null)->nullable();
+                $table->decimal('longitude', 11, 8)->default(null)->nullable();
+            });
+        }
 
 
         $companies = Company::get();

@@ -121,32 +121,38 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::table('payments', function (Blueprint $table) {
-            $table->integer('bank_account_id')->unsigned()->nullable();
-            $table->foreign('bank_account_id')
-                ->references('id')
-                ->on('bank_accounts')
-                ->onDelete('set null')
-                ->onUpdate('cascade');
-        });
+        if (!Schema::hasColumn('payments', 'bank_account_id')) {
+            Schema::table('payments', function (Blueprint $table) {
+                $table->integer('bank_account_id')->unsigned()->nullable();
+                $table->foreign('bank_account_id')
+                    ->references('id')
+                    ->on('bank_accounts')
+                    ->onDelete('set null')
+                    ->onUpdate('cascade');
+            });
+        }
 
-        Schema::table('expenses', function (Blueprint $table) {
-            $table->integer('bank_account_id')->unsigned()->nullable();
-            $table->foreign('bank_account_id')
-                ->references('id')
-                ->on('bank_accounts')
-                ->onDelete('set null')
-                ->onUpdate('cascade');
-        });
+        if (!Schema::hasColumn('expenses', 'bank_account_id')) {
+            Schema::table('expenses', function (Blueprint $table) {
+                $table->integer('bank_account_id')->unsigned()->nullable();
+                $table->foreign('bank_account_id')
+                    ->references('id')
+                    ->on('bank_accounts')
+                    ->onDelete('set null')
+                    ->onUpdate('cascade');
+            });
+        }
 
-        Schema::table('invoices', function (Blueprint $table) {
-            $table->integer('bank_account_id')->unsigned()->nullable();
-            $table->foreign('bank_account_id')
-                ->references('id')
-                ->on('bank_accounts')
-                ->onDelete('set null')
-                ->onUpdate('cascade');
-        });
+        if (!Schema::hasColumn('invoices', 'bank_account_id')) {
+            Schema::table('invoices', function (Blueprint $table) {
+                $table->integer('bank_account_id')->unsigned()->nullable();
+                $table->foreign('bank_account_id')
+                    ->references('id')
+                    ->on('bank_accounts')
+                    ->onDelete('set null')
+                    ->onUpdate('cascade');
+            });
+        }
 
 
         $count = Company::withoutGlobalScope(ActiveScope::class)->count();

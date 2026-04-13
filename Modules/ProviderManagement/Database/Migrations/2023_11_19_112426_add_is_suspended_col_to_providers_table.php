@@ -16,9 +16,11 @@ class AddIsSuspendedColToProvidersTable extends Migration
         if (! Schema::hasTable('providers')) {
             return;
         }
-        Schema::table('providers', function (Blueprint $table) {
-            $table->boolean('is_suspended')->default(0);
-        });
+        if (!Schema::hasColumn('providers', 'is_suspended')) {
+            Schema::table('providers', function (Blueprint $table) {
+                $table->boolean('is_suspended')->default(0);
+            });
+        }
     }
 
     /**

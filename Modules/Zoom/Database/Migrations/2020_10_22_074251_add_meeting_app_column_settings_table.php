@@ -16,13 +16,17 @@ return new class extends Migration
         if (! Schema::hasTable('zoom_setting')) {
             return;
         }
-        Schema::table('zoom_setting', function (Blueprint $table) {
-            $table->string('meeting_app')->default('in_app');
-        });
+        if (!Schema::hasColumn('zoom_setting', 'meeting_app')) {
+            Schema::table('zoom_setting', function (Blueprint $table) {
+                $table->string('meeting_app')->default('in_app');
+            });
+        }
 
-        Schema::table('zoom_meetings', function (Blueprint $table) {
-            $table->string('password')->nullable();
-        });
+        if (!Schema::hasColumn('zoom_meetings', 'password')) {
+            Schema::table('zoom_meetings', function (Blueprint $table) {
+                $table->string('password')->nullable();
+            });
+        }
     }
 
     /**

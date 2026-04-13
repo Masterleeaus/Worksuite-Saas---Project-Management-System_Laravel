@@ -16,9 +16,11 @@ class AddColToCategoriesTable extends Migration
         if (! Schema::hasTable('categories')) {
             return;
         }
-        Schema::table('categories', function (Blueprint $table) {
-            $table->boolean('is_featured')->after('is_active')->default(0);
-        });
+        if (!Schema::hasColumn('categories', 'is_featured')) {
+            Schema::table('categories', function (Blueprint $table) {
+                $table->boolean('is_featured')->after('is_active')->default(0);
+            });
+        }
     }
 
     /**

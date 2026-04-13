@@ -16,21 +16,22 @@ return new class extends Migration {
         if (! Schema::hasTable('biolink_blocks')) {
             return;
         }
-        Schema::table('biolink_blocks', function (Blueprint $table) {
-            $table->string('placeholder')->nullable();
-            $table->string('name_placeholder')->nullable();
-            $table->string('button_text')->nullable();
-            $table->string('thank_you_message')->nullable();
-            $table->string('thank_you_url')->nullable();
-            $table->boolean('show_agreement')->default(false)->nullable();
-            $table->string('agreement_text')->nullable();
-            $table->string('agreement_url')->nullable();
-            $table->string('api_key')->nullable();
-            $table->string('mailchimp_list')->nullable();
-            $table->string('webhook_url')->nullable();
-            $table->string('cancelled_payment_url')->nullable();
-
-        });
+        if (!Schema::hasColumn('biolink_blocks', 'placeholder')) {
+            Schema::table('biolink_blocks', function (Blueprint $table) {
+                $table->string('placeholder')->nullable();
+                $table->string('name_placeholder')->nullable();
+                $table->string('button_text')->nullable();
+                $table->string('thank_you_message')->nullable();
+                $table->string('thank_you_url')->nullable();
+                $table->boolean('show_agreement')->default(false)->nullable();
+                $table->string('agreement_text')->nullable();
+                $table->string('agreement_url')->nullable();
+                $table->string('api_key')->nullable();
+                $table->string('mailchimp_list')->nullable();
+                $table->string('webhook_url')->nullable();
+                $table->string('cancelled_payment_url')->nullable();
+            });
+        }
 
         Company::chunk(50, function ($companies) {
 

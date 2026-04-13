@@ -19,11 +19,13 @@ return new class extends Migration
         if (! Schema::hasTable('bookings')) {
             return;
         }
-        Schema::table('bookings', function (Blueprint $table) {
-            $table->decimal('total_campaign_discount_amount',24,3)->default(0);
-            $table->decimal('total_coupon_discount_amount',24,3)->default(0);
-            $table->string('coupon_code')->nullable();
-        });
+        if (!Schema::hasColumn('bookings', 'total_campaign_discount_amount')) {
+            Schema::table('bookings', function (Blueprint $table) {
+                $table->decimal('total_campaign_discount_amount',24,3)->default(0);
+                $table->decimal('total_coupon_discount_amount',24,3)->default(0);
+                $table->string('coupon_code')->nullable();
+            });
+        }
     }
 
     /**

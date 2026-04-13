@@ -13,9 +13,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('global_settings', function (Blueprint $table) {
-            $table->integer('allow_max_no_of_files')->after('allowed_file_size')->default(10);
-        });
+        if (!Schema::hasColumn('global_settings', 'allow_max_no_of_files')) {
+            Schema::table('global_settings', function (Blueprint $table) {
+                $table->integer('allow_max_no_of_files')->after('allowed_file_size')->default(10);
+            });
+        }
 
         cache()->forget('global_settings');
 
