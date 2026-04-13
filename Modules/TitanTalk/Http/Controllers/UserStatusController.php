@@ -40,6 +40,11 @@ class UserStatusController extends AccountBaseController
 
     public function show(User $user): JsonResponse
     {
+        // Tenant isolation: only allow fetching status of users in the same company
+        if ($user->company_id !== company()->id) {
+            abort(403);
+        }
+
         $status = TitanTalkUserStatus::firstOrNew(['user_id' => $user->id]);
 
         return response()->json([

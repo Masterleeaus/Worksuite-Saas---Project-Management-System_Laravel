@@ -558,19 +558,21 @@
         const result = await apiPost(`/account/titan-talk/messages/${parentId}/thread`, { body });
         if (result.status === 'success') {
             document.getElementById('tt-thread-reply-body').value = '';
-            // Reload thread by clicking reply button again
+            // Reload thread by clicking reply button again (will show accurate count)
             const btn = document.querySelector(`.tt-thread-btn[data-msg="${parentId}"]`);
             if (btn) btn.click();
-            // Update reply count badge
+            // Update reply count badge using server-returned count
+            const newCount = result.reply_count ?? 1;
             const msgDiv = document.querySelector(`.tt-message[data-msg-id="${parentId}"]`);
             if (msgDiv) {
                 let countEl = msgDiv.querySelector('.tt-thread-count');
                 if (!countEl) {
                     countEl = document.createElement('div');
                     countEl.className = 'mt-1 tt-thread-count';
-                    countEl.innerHTML = `<a href="#" class="text-primary small tt-thread-btn" data-msg="${parentId}"><i class="fa fa-comments"></i> 1 reply</a>`;
                     msgDiv.querySelector('.flex-grow-1').appendChild(countEl);
                 }
+                const plural = newCount === 1 ? 'reply' : 'replies';
+                countEl.innerHTML = `<a href="#" class="text-primary small tt-thread-btn" data-msg="${parentId}"><i class="fa fa-comments"></i> ${newCount} ${plural}</a>`;
             }
         }
     });
@@ -637,8 +639,8 @@
         const emoji = pick.dataset.emoji;
         emojiPicker.style.display = 'none';
         const result = await apiPost(`/account/titan-talk/messages/${msgId}/reactions`, { emoji });
-        if (result.summary) {
-            updateReactions(msgId, result.summary);
+        if (result.summary !== undefined) {
+            updateReactions(msgId, result.summary, result.user_reactions ?? []);
         }
     });
 
@@ -649,7 +651,7 @@
         e.preventDefault();
         const msgId = btn.dataset.msg;
         const emoji = btn.dataset.emoji;
-        // Toggle: if already reacted, DELETE; otherwise POST
+        // Toggle: if already reacted (tt-reacted class), DELETE; otherwise POST
         const isActive = btn.classList.contains('tt-reacted');
         let result;
         if (isActive) {
@@ -658,22 +660,25 @@
             result = await apiPost(`/account/titan-talk/messages/${msgId}/reactions`, { emoji });
         }
         if (result.summary !== undefined) {
-            updateReactions(msgId, result.summary);
+            updateReactions(msgId, result.summary, result.user_reactions ?? []);
         }
     });
 
-    function updateReactions(msgId, summary) {
+    function updateReactions(msgId, summary, userReactions) {
+        userReactions = userReactions ?? [];
         const msgDiv = document.querySelector(`.tt-message[data-msg-id="${msgId}"]`);
         if (!msgDiv) return;
         const container = msgDiv.querySelector('.tt-reactions');
         if (!container) return;
         container.innerHTML = '';
         Object.entries(summary).forEach(([emoji, count]) => {
+            const reacted = userReactions.includes(emoji);
             const btn = document.createElement('button');
-            btn.className = 'btn btn-sm btn-outline-secondary py-0 px-1 mr-1 tt-react-toggle';
+            btn.className = `btn btn-sm py-0 px-1 mr-1 tt-react-toggle ${reacted ? 'btn-secondary tt-reacted' : 'btn-outline-secondary'}`;
             btn.dataset.msg   = msgId;
             btn.dataset.emoji = emoji;
-            btn.innerHTML     = `${emoji} <span class="badge badge-secondary">${count}</span>`;
+            btn.title         = reacted ? 'Click to remove reaction' : 'Click to react';
+            btn.innerHTML     = `${emoji} <span class="badge ${reacted ? 'badge-light' : 'badge-secondary'}">${count}</span>`;
             container.appendChild(btn);
         });
     }

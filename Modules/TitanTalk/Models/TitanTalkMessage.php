@@ -47,6 +47,11 @@ class TitanTalkMessage extends BaseModel
         return $this->hasMany(TitanTalkMessageReaction::class, 'message_id');
     }
 
+    public function saves(): HasMany
+    {
+        return $this->hasMany(TitanTalkMessageSave::class, 'message_id');
+    }
+
     public function threadReplies(): HasMany
     {
         return $this->hasMany(static::class, 'thread_parent_id');

@@ -53,7 +53,12 @@ class RoomController extends AccountBaseController
 
         $this->activeRoom = $room->load(['members', 'pins.message.author']);
         $this->messages   = $room->messages()
-            ->with(['author', 'files', 'reactions'])
+            ->with([
+                'author',
+                'files',
+                'reactions',
+                'saves' => fn($q) => $q->where('user_id', $userId),
+            ])
             ->orderBy('created_at')
             ->paginate(50);
 
@@ -250,7 +255,7 @@ class RoomController extends AccountBaseController
             abort(403);
         }
 
-        if (in_array($room->type, ['private', 'dm']) && !$room->isMember(user()->id)) {
+        if (in_array($room->type, ['private', 'dm', 'private_group']) && !$room->isMember(user()->id)) {
             abort(403);
         }
     }

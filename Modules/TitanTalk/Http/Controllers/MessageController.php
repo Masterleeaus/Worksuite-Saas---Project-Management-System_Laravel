@@ -68,6 +68,16 @@ class MessageController extends AccountBaseController
         // Broadcast to room channel (reuses Pusher/Echo PrivateChannel stack)
         event(new TitanTalkMessageSent($message));
 
+        // For DM rooms, resolve the other participant BEFORE the mute-filtered query.
+        // Mirror and Communication logging must always use the real DM partner, even
+        // if they have muted the room (mute only suppresses in-app notifications).
+        $dmPartnerId = null;
+        if ($room->type === 'dm') {
+            $dmPartnerId = TitanTalkRoomMember::where('room_id', $room->id)
+                ->where('user_id', '!=', user()->id)
+                ->value('user_id');
+        }
+
         // Notify non-muted members (database + optional mail/push via TitanTalkNewMessage)
         $members = TitanTalkRoomMember::where('room_id', $room->id)
             ->where('user_id', '!=', user()->id)
@@ -89,12 +99,11 @@ class MessageController extends AccountBaseController
             }
         }
 
-        // For DM rooms: mirror to Worksuite UserChat inbox so /messages stays in sync
-        if ($room->type === 'dm' && config('titantalk.mirror_dm_to_userchat', true)) {
-            $otherMember = $members->first();
-            if ($otherMember?->user) {
-                $this->ttService->mirrorToUserChat($message, $otherMember->user->id);
-            }
+        // For DM rooms: mirror to Worksuite UserChat inbox so /messages stays in sync.
+        // Uses the real DM partner ID (not the mute-filtered list) to ensure the mirror
+        // always happens regardless of whether the partner has muted the room.
+        if ($room->type === 'dm' && $dmPartnerId && config('titantalk.mirror_dm_to_userchat', true)) {
+            $this->ttService->mirrorToUserChat($message, $dmPartnerId);
         }
 
         // Log to Communication module history (top-level messages only, not thread replies)
@@ -102,7 +111,7 @@ class MessageController extends AccountBaseController
             $this->ttService->logToCommunication(
                 companyId:  company()->id,
                 fromUserId: user()->id,
-                toUserId:   ($room->type === 'dm') ? ($members->first()?->user_id) : null,
+                toUserId:   $dmPartnerId,
                 subject:    'TitanTalk message in #' . $room->name,
                 body:       \Illuminate\Support\Str::limit($message->body, 500),
                 roomId:     $room->id,
@@ -174,6 +183,10 @@ class MessageController extends AccountBaseController
 
     public function save(TitanTalkMessage $message): JsonResponse
     {
+        if ($message->company_id !== company()->id) {
+            abort(403);
+        }
+
         TitanTalkMessageSave::firstOrCreate([
             'user_id'    => user()->id,
             'message_id' => $message->id,
@@ -184,6 +197,10 @@ class MessageController extends AccountBaseController
 
     public function unsave(TitanTalkMessage $message): JsonResponse
     {
+        if ($message->company_id !== company()->id) {
+            abort(403);
+        }
+
         TitanTalkMessageSave::where('user_id', user()->id)
             ->where('message_id', $message->id)
             ->delete();
@@ -203,6 +220,7 @@ class MessageController extends AccountBaseController
     public function saved(): JsonResponse
     {
         $saved = TitanTalkMessageSave::where('user_id', user()->id)
+            ->whereHas('message', fn($q) => $q->where('company_id', company()->id))
             ->with(['message.author', 'message.room'])
             ->latest()
             ->paginate(20);
@@ -216,7 +234,7 @@ class MessageController extends AccountBaseController
             abort(403);
         }
 
-        if (in_array($room->type, ['private', 'dm']) && !$room->isMember(user()->id)) {
+        if (in_array($room->type, ['private', 'dm', 'private_group']) && !$room->isMember(user()->id)) {
             abort(403);
         }
     }

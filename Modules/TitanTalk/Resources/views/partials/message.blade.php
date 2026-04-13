@@ -2,6 +2,12 @@
     $myRole = isset($activeRoom) ? $activeRoom->getMemberRole(user()->id) : null;
     $isRoomAdmin = in_array($myRole, ['owner', 'admin']);
     $canPin = $isRoomAdmin;
+    // Use the eager-loaded saves collection (no extra query); falls back to empty collection
+    $isSavedByMe = $message->relationLoaded('saves')
+        ? $message->saves->isNotEmpty()
+        : $message->isSavedBy(user()->id);
+    // Use the eager-loaded reactions collection to determine which emojis the current user has reacted to
+    $userReactedEmojis = $message->reactions->where('user_id', user()->id)->pluck('emoji')->toArray();
 @endphp
 <div class="tt-message d-flex mb-3" data-msg-id="{{ $message->id }}">
     <div class="flex-shrink-0 mr-3">
@@ -41,13 +47,14 @@
         </div>
         @endif
 
-        {{-- Reactions --}}
+        {{-- Reactions: mark which ones the current user has already reacted with (no extra query) --}}
         @if($message->reactions->count())
         <div class="tt-reactions mt-1">
             @foreach($message->reactionSummary() as $emoji => $count)
-                <button class="btn btn-sm btn-outline-secondary py-0 px-1 mr-1 tt-react-toggle"
-                        data-msg="{{ $message->id }}" data-emoji="{{ $emoji }}">
-                    {{ $emoji }} <span class="badge badge-secondary">{{ $count }}</span>
+                <button class="btn btn-sm py-0 px-1 mr-1 tt-react-toggle {{ in_array($emoji, $userReactedEmojis) ? 'btn-secondary tt-reacted' : 'btn-outline-secondary' }}"
+                        data-msg="{{ $message->id }}" data-emoji="{{ $emoji }}"
+                        title="{{ in_array($emoji, $userReactedEmojis) ? 'Click to remove reaction' : 'Click to react' }}">
+                    {{ $emoji }} <span class="badge {{ in_array($emoji, $userReactedEmojis) ? 'badge-light' : 'badge-secondary' }}">{{ $count }}</span>
                 </button>
             @endforeach
         </div>
@@ -69,8 +76,8 @@
         <div class="tt-msg-actions mt-1 d-none" style="font-size:0.78rem;">
             <a href="#" class="text-muted mr-2 tt-react-btn" data-msg="{{ $message->id }}">😊</a>
             <a href="#" class="text-muted mr-2 tt-thread-btn" data-msg="{{ $message->id }}">Reply</a>
-            <a href="#" class="text-muted mr-2 tt-save-btn" data-msg="{{ $message->id }}">
-                @if($message->isSavedBy(user()->id)) <span class="text-warning">★ Saved</span> @else Save @endif
+            <a href="#" class="text-muted mr-2 tt-save-btn {{ $isSavedByMe ? 'text-warning' : '' }}" data-msg="{{ $message->id }}">
+                @if($isSavedByMe) ★ Saved @else Save @endif
             </a>
             @if($canPin)
                 @if($message->isPinned())

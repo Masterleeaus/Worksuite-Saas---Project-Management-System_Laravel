@@ -51,6 +51,10 @@ class ThreadController extends AccountBaseController
 
         $reply->load(['author', 'files', 'reactions']);
 
-        return response()->json(['status' => 'success', 'reply' => $reply], 201);
+        return response()->json([
+            'status'      => 'success',
+            'reply'       => $reply,
+            'reply_count' => $message->fresh()->thread_reply_count,
+        ], 201);
     }
 }

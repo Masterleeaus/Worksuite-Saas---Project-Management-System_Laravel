@@ -30,8 +30,12 @@ class ReactionController extends AccountBaseController
         ]);
 
         return response()->json([
-            'status'  => 'success',
-            'summary' => $message->reactionSummary(),
+            'status'         => 'success',
+            'summary'        => $message->reactionSummary(),
+            'user_reactions' => $message->reactions()
+                ->where('user_id', user()->id)
+                ->pluck('emoji')
+                ->toArray(),
         ]);
     }
 
@@ -47,8 +51,12 @@ class ReactionController extends AccountBaseController
             ->delete();
 
         return response()->json([
-            'status'  => 'success',
-            'summary' => $message->reactionSummary(),
+            'status'         => 'success',
+            'summary'        => $message->reactionSummary(),
+            'user_reactions' => $message->reactions()
+                ->where('user_id', user()->id)
+                ->pluck('emoji')
+                ->toArray(),
         ]);
     }
 }

@@ -21,6 +21,11 @@ class MessageApiController extends Controller
             ->orderBy('created_at')
             ->paginate(50);
 
+        // Update last_read_at so the API client's unread count resets correctly
+        \Modules\TitanTalk\Models\TitanTalkRoomMember::where('room_id', $room->id)
+            ->where('user_id', auth()->id())
+            ->update(['last_read_at' => now()]);
+
         return response()->json($messages);
     }
 
