@@ -110,7 +110,6 @@ jobs:
             package.json \
             package-lock.json \
             webpack.mix.js \
-            .htaccess \
             .env.example || true)"
 
           UNTRACKED_DRIFT="$(git ls-files --others --exclude-standard -- \
@@ -128,7 +127,6 @@ jobs:
             package.json \
             package-lock.json \
             webpack.mix.js \
-            .htaccess \
             .env.example || true)"
 
           echo "==> Tracked drift:"
@@ -170,7 +168,6 @@ jobs:
             package.json \
             package-lock.json \
             webpack.mix.js \
-            .htaccess \
             .env.example
 
           if git diff --cached --quiet; then
@@ -269,7 +266,6 @@ jobs:
 
           git fetch origin "$DEPLOY_BRANCH"
           git reset --hard "origin/$DEPLOY_BRANCH"
-          git clean -fd
 
           mv /tmp/.deploy_env_backup .env
 
