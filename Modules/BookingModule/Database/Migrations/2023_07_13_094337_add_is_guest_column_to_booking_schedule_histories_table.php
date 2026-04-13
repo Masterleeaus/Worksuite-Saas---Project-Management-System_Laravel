@@ -19,9 +19,11 @@ return new class extends Migration
         if (! Schema::hasTable('booking_schedule_histories')) {
             return;
         }
-        Schema::table('booking_schedule_histories', function (Blueprint $table) {
-            $table->boolean('is_guest')->default(0);
-        });
+        if (!Schema::hasColumn('booking_schedule_histories', 'is_guest')) {
+            Schema::table('booking_schedule_histories', function (Blueprint $table) {
+                $table->boolean('is_guest')->default(0);
+            });
+        }
     }
 
     /**

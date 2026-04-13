@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('lead_category', function (Blueprint $table) {
-            $table->boolean('is_default')->default(0)->notNullable();
-        });
+        if (!Schema::hasColumn('lead_category', 'is_default')) {
+            Schema::table('lead_category', function (Blueprint $table) {
+                $table->boolean('is_default')->default(0)->notNullable();
+            });
+        }
     }
 
     /**

@@ -20,9 +20,11 @@ return new class extends Migration
             ->join('currencies', 'expenses.currency_id', '=', 'currencies.id')
             ->update(['expenses.exchange_rate' => DB::raw('currencies.exchange_rate')]);
 
-        Schema::table('global_settings', function (Blueprint $table) {
-            $table->string('dedicated_subdomain')->nullable()->after('currency_key_version'); // Adjust the 'after' field as needed
-        });
+        if (!Schema::hasColumn('global_settings', 'dedicated_subdomain')) {
+            Schema::table('global_settings', function (Blueprint $table) {
+                $table->string('dedicated_subdomain')->nullable()->after('currency_key_version'); // Adjust the 'after' field as needed
+            });
+        }
 
     }
 

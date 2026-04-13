@@ -13,10 +13,12 @@ return new class extends Migration {
 
     public function up()
     {
-        \Schema::table('companies', function (Blueprint $table) {
-            $table->string('pm_type')->nullable();
-            $table->string('pm_last_four')->nullable();
-        });
+        if (!Schema::hasColumn('companies', 'pm_type')) {
+            \Schema::table('companies', function (Blueprint $table) {
+                $table->string('pm_type')->nullable();
+                $table->string('pm_last_four')->nullable();
+            });
+        }
     }
 
     /**

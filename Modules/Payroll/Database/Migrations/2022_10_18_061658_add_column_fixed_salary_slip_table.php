@@ -16,9 +16,11 @@ return new class extends Migration
         if (! Schema::hasTable('salary_slips')) {
             return;
         }
-        Schema::table('salary_slips', function (Blueprint $table) {
-            $table->double('fixed_allowance')->default(0);
-        });
+        if (!Schema::hasColumn('salary_slips', 'fixed_allowance')) {
+            Schema::table('salary_slips', function (Blueprint $table) {
+                $table->double('fixed_allowance')->default(0);
+            });
+        }
     }
 
     /**

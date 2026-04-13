@@ -15,11 +15,15 @@ return new class extends Migration
         if (! Schema::hasTable('performance_settings')) {
             return;
         }
-        Schema::table('performance_settings', function (Blueprint $table) {
-            $table->enum('meeting_slack_notification', ['yes', 'no'])->default('no')->after('send_email_notification');
-            $table->enum('meeting_push_notification', ['yes', 'no'])->default('no')->after('meeting_slack_notification');
-            $table->enum('meeting_email_notification', ['yes', 'no'])->default('no')->after('meeting_push_notification');
+        if (!Schema::hasColumn('performance_settings', 'meeting_slack_notification')) {
+            Schema::table('performance_settings', function (Blueprint $table) {
+                $table->enum('meeting_slack_notification', ['yes', 'no'])->default('no')->after('send_email_notification');
+                $table->enum('meeting_push_notification', ['yes', 'no'])->default('no')->after('meeting_slack_notification');
+                $table->enum('meeting_email_notification', ['yes', 'no'])->default('no')->after('meeting_push_notification');
+            });
+        }
 
+        Schema::table('performance_settings', function (Blueprint $table) {
             $table->renameColumn('send_slack_notification', 'objective_slack_notification');
             $table->renameColumn('send_push_notification', 'objective_push_notification');
             $table->renameColumn('send_email_notification', 'objective_email_notification');

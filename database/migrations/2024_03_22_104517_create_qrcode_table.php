@@ -12,6 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('qrcode')) {
+            return;
+        }
+
         Schema::create('qrcode', function (Blueprint $table) {
             $table->id();
             $table->enum('qr_enable', ['1', '0'])->default('1');

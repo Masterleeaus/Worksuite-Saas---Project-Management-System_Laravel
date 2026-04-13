@@ -23,6 +23,10 @@ return new class extends Migration {
 
     public function up()
     {
+        if (Schema::hasTable('contract_templates')) {
+            return;
+        }
+
         Company::renameOrganisationTableToCompanyTable();
 
         Schema::create('contract_templates', function (Blueprint $table) {

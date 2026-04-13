@@ -16,9 +16,11 @@ class AddColToProvidersTable extends Migration
         if (! Schema::hasTable('providers')) {
             return;
         }
-        Schema::table('providers', function (Blueprint $table) {
-            $table->json('coordinates')->nullable();
-        });
+        if (!Schema::hasColumn('providers', 'coordinates')) {
+            Schema::table('providers', function (Blueprint $table) {
+                $table->json('coordinates')->nullable();
+            });
+        }
     }
 
     /**

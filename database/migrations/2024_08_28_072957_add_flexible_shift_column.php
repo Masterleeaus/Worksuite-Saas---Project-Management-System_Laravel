@@ -12,12 +12,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('employee_shifts', function (Blueprint $table) {
-            $table->enum('shift_type', ['strict', 'flexible'])->default('strict')->after('shift_short_code');
-            $table->float('flexible_half_day_hours')->after('shift_type');
-            $table->float('flexible_total_hours')->after('shift_type');
-            $table->float('flexible_auto_clockout')->after('flexible_total_hours');
-        });
+        if (!Schema::hasColumn('employee_shifts', 'shift_type')) {
+            Schema::table('employee_shifts', function (Blueprint $table) {
+                $table->enum('shift_type', ['strict', 'flexible'])->default('strict')->after('shift_short_code');
+                $table->float('flexible_half_day_hours')->after('shift_type');
+                $table->float('flexible_total_hours')->after('shift_type');
+                $table->float('flexible_auto_clockout')->after('flexible_total_hours');
+            });
+        }
     }
 
     /**

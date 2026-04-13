@@ -14,9 +14,11 @@ return new class extends Migration {
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->boolean('customised_permissions')->default(0);
-        });
+        if (!Schema::hasColumn('users', 'customised_permissions')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->boolean('customised_permissions')->default(0);
+            });
+        }
 
         Permission::where('name', 'view_client_note')
             ->update([

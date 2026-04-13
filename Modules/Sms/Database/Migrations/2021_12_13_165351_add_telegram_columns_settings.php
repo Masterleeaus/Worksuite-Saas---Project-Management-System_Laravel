@@ -16,14 +16,18 @@ return new class extends Migration
         if (! Schema::hasTable('sms_settings')) {
             return;
         }
-        Schema::table('sms_settings', function (Blueprint $table) {
-            $table->boolean('telegram_status')->default(0);
-            $table->string('telegram_bot_token')->nullable();
-        });
+        if (!Schema::hasColumn('sms_settings', 'telegram_status')) {
+            Schema::table('sms_settings', function (Blueprint $table) {
+                $table->boolean('telegram_status')->default(0);
+                $table->string('telegram_bot_token')->nullable();
+            });
+        }
 
-        Schema::table('users', function (Blueprint $table) {
-            $table->bigInteger('telegram_user_id')->nullable();
-        });
+        if (!Schema::hasColumn('users', 'telegram_user_id')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->bigInteger('telegram_user_id')->nullable();
+            });
+        }
     }
 
     /**

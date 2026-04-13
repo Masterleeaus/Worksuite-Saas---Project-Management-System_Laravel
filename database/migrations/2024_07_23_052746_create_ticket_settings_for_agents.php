@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('ticket_settings_for_agents')) {
+            return;
+        }
+
         Schema::create('ticket_settings_for_agents', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('user_id')->index('ticket_setting_user_id_foreign');

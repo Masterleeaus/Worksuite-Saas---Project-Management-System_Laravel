@@ -14,9 +14,11 @@ return new class extends Migration
 
     public function up()
     {
-        Schema::table('attendance_settings', function (Blueprint $table) {
-            $table->string('early_clock_in')->nullable();
-        });
+        if (!Schema::hasColumn('attendance_settings', 'early_clock_in')) {
+            Schema::table('attendance_settings', function (Blueprint $table) {
+                $table->string('early_clock_in')->nullable();
+            });
+        }
     }
 
     /**

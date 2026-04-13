@@ -12,9 +12,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('employee_shift_schedules', function (Blueprint $table) {
-            $table->string('file')->after('remarks');
-        });
+        if (!Schema::hasColumn('employee_shift_schedules', 'file')) {
+            Schema::table('employee_shift_schedules', function (Blueprint $table) {
+                $table->string('file')->after('remarks');
+            });
+        }
     }
 
     /**

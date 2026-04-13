@@ -16,9 +16,11 @@ class AddToColReadableIdInReviewTable extends Migration
         if (! Schema::hasTable('reviews')) {
             return;
         }
-        Schema::table('reviews', function (Blueprint $table) {
-            $table->bigInteger('readable_id')->after('id');
-        });
+        if (!Schema::hasColumn('reviews', 'readable_id')) {
+            Schema::table('reviews', function (Blueprint $table) {
+                $table->bigInteger('readable_id')->after('id');
+            });
+        }
     }
 
     /**

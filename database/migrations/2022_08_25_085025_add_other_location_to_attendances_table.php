@@ -14,8 +14,13 @@ return new class extends Migration {
 
     public function up()
     {
+        if (!Schema::hasColumn('attendances', 'work_from_type')) {
+            Schema::table('attendances', function (Blueprint $table) {
+                $table->enum('work_from_type', ['home', 'office', 'other'])->default('other');
+            });
+        }
+
         Schema::table('attendances', function (Blueprint $table) {
-            $table->enum('work_from_type', ['home', 'office', 'other'])->default('other');
             $table->string('working_from')->nullable()->change();
         });
     }

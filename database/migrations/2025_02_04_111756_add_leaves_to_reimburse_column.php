@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('employee_leave_quotas', function (Blueprint $table) {
-            $table->integer('leaves_to_reimburse')->default(0)->after('carry_forward_applied'); // This is the number of leaves that are to be reimbursed. Set this to 0 after reimbursing the leaves.
-            $table->integer('leaves_actually_reimbursed')->default(0)->after('leaves_to_reimburse'); // This is the actual number of leaves that have been reimbursed. This is just for the record.
-        });
+        if (!Schema::hasColumn('employee_leave_quotas', 'leaves_to_reimburse')) {
+            Schema::table('employee_leave_quotas', function (Blueprint $table) {
+                $table->integer('leaves_to_reimburse')->default(0)->after('carry_forward_applied'); // This is the number of leaves that are to be reimbursed. Set this to 0 after reimbursing the leaves.
+                $table->integer('leaves_actually_reimbursed')->default(0)->after('leaves_to_reimburse'); // This is the actual number of leaves that have been reimbursed. This is just for the record.
+            });
+        }
     }
 
     /**

@@ -21,6 +21,9 @@ return new class extends Migration
 
     public function up()
     {
+        if (Schema::hasTable('passport_details')) {
+            return;
+        }
 
         $module = Module::where('module_name', 'employees')->first();
 

@@ -15,9 +15,11 @@ return new class extends Migration {
 
     public function up()
     {
-        Schema::table('language_settings', function (Blueprint $table) {
-            $table->string('flag_code')->nullable();
-        });
+        if (!Schema::hasColumn('language_settings', 'flag_code')) {
+            Schema::table('language_settings', function (Blueprint $table) {
+                $table->string('flag_code')->nullable();
+            });
+        }
 
         $langCode = LanguageSetting::get();
 

@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('push_notification_settings', function (Blueprint $table) {
-            $table->enum('beams_push_status', ['active', 'inactive'])->default('inactive');
-            $table->string('instance_id')->nullable();
-            $table->string('beam_secret')->nullable();
-        });
+        if (!Schema::hasColumn('push_notification_settings', 'beams_push_status')) {
+            Schema::table('push_notification_settings', function (Blueprint $table) {
+                $table->enum('beams_push_status', ['active', 'inactive'])->default('inactive');
+                $table->string('instance_id')->nullable();
+                $table->string('beam_secret')->nullable();
+            });
+        }
     }
 
     /**

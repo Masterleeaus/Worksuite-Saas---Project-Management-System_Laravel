@@ -10,6 +10,10 @@ return new class extends Migration {
      */
     public function up(): void
     {
+        if (Schema::hasTable('pay_codes')) {
+            return;
+        }
+
         if (!Schema::hasColumn('employee_details', 'overtime_hourly_rate')) {
             Schema::table('employee_details', function (Blueprint $table) {
                 $table->double('overtime_hourly_rate', 16, 2)->nullable()->comment('This field is only for overtime calculation');

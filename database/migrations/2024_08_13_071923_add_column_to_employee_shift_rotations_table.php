@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('employee_shift_rotations', function (Blueprint $table) {
-            $table->enum('send_mail', ['yes', 'no'])->default('yes');
-        });
+        if (!Schema::hasColumn('employee_shift_rotations', 'send_mail')) {
+            Schema::table('employee_shift_rotations', function (Blueprint $table) {
+                $table->enum('send_mail', ['yes', 'no'])->default('yes');
+            });
+        }
     }
 
     /**

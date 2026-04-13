@@ -18,6 +18,10 @@ return new class extends Migration {
 
     public function up()
     {
+        if (Schema::hasTable('leave_settings') && Schema::hasColumn('leaves', 'manager_status_permission')) {
+            return;
+        }
+
         Schema::table('leaves', function (Blueprint $table) {
             $table->enum('manager_status_permission', ['pre-approve', 'approved'])->nullable();
         });

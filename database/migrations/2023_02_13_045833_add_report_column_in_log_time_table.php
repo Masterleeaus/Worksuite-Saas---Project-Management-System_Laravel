@@ -14,18 +14,24 @@ return new class extends Migration
 
     public function up()
     {
-        Schema::table('log_time_for', function (Blueprint $table) {
-            $table->boolean('timelog_report')->after('tracker_reminder');
-            $table->string('daily_report_roles')->nullable()->after('timelog_report');
-        });
+        if (!Schema::hasColumn('log_time_for', 'timelog_report')) {
+            Schema::table('log_time_for', function (Blueprint $table) {
+                $table->boolean('timelog_report')->after('tracker_reminder');
+                $table->string('daily_report_roles')->nullable()->after('timelog_report');
+            });
+        }
 
-        Schema::table('users_chat', function (Blueprint $table) {
-            $table->boolean('notification_sent')->default(1);
-        });
+        if (!Schema::hasColumn('users_chat', 'notification_sent')) {
+            Schema::table('users_chat', function (Blueprint $table) {
+                $table->boolean('notification_sent')->default(1);
+            });
+        }
 
-        Schema::table('message_settings', function (Blueprint $table) {
-            $table->boolean('send_sound_notification')->default(0);
-        });
+        if (!Schema::hasColumn('message_settings', 'send_sound_notification')) {
+            Schema::table('message_settings', function (Blueprint $table) {
+                $table->boolean('send_sound_notification')->default(0);
+            });
+        }
 
         DB::statement("ALTER TABLE smtp_settings CHANGE COLUMN mail_encryption mail_encryption ENUM('ssl', 'tls','starttls') NULL DEFAULT 'tls'");
 

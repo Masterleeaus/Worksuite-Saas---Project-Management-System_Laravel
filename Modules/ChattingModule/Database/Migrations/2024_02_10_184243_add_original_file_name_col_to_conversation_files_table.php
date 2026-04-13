@@ -16,9 +16,11 @@ class AddOriginalFileNameColToConversationFilesTable extends Migration
         if (! Schema::hasTable('conversation_files')) {
             return;
         }
-        Schema::table('conversation_files', function (Blueprint $table) {
-            $table->string('original_file_name')->nullable()->after('stored_file_name');
-        });
+        if (!Schema::hasColumn('conversation_files', 'original_file_name')) {
+            Schema::table('conversation_files', function (Blueprint $table) {
+                $table->string('original_file_name')->nullable()->after('stored_file_name');
+            });
+        }
     }
 
     /**

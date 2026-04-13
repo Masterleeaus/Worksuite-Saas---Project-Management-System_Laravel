@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('dispatch_jobs')) {
+            return;
+        }
+
         Schema::create('dispatch_jobs', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('code', 64)->unique();

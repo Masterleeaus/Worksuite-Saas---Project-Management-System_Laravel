@@ -15,9 +15,11 @@ return new class extends Migration
         if (! Schema::hasTable('services')) {
             return;
         }
-        Schema::table('services', function (Blueprint $table) {
-            $table->string('slug')->nullable()->after('name');
-        });
+        if (!Schema::hasColumn('services', 'slug')) {
+            Schema::table('services', function (Blueprint $table) {
+                $table->string('slug')->nullable()->after('name');
+            });
+        }
 
         Service::whereNull('slug')
             ->orWhere('slug', '')

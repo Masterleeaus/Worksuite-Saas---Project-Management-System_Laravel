@@ -16,10 +16,12 @@ class AddHouseAndStreetColInUserAddressesTable extends Migration
         if (! Schema::hasTable('user_addresses')) {
             return;
         }
-        Schema::table('user_addresses', function (Blueprint $table) {
-            $table->string('house')->nullable();
-            $table->string('floor')->nullable();
-        });
+        if (!Schema::hasColumn('user_addresses', 'house')) {
+            Schema::table('user_addresses', function (Blueprint $table) {
+                $table->string('house')->nullable();
+                $table->string('floor')->nullable();
+            });
+        }
     }
 
     /**

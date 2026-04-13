@@ -11,9 +11,11 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::table('employee_leave_quotas', function (Blueprint $table) {
-            $table->boolean('leave_type_impact')->default(0)->after('carry_forward_status');
-        });
+        if (!Schema::hasColumn('employee_leave_quotas', 'leave_type_impact')) {
+            Schema::table('employee_leave_quotas', function (Blueprint $table) {
+                $table->boolean('leave_type_impact')->default(0)->after('carry_forward_status');
+            });
+        }
     }
 
     /**

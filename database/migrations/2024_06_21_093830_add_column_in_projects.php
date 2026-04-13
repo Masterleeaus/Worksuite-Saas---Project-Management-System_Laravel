@@ -11,10 +11,12 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::table('projects', function (Blueprint $table) {
-            $table->enum('public_taskboard', ['enable', 'disable'])->default('enable');
-            $table->enum('public_gantt_chart', ['enable', 'disable'])->default('enable');
-        });
+        if (!Schema::hasColumn('projects', 'public_taskboard')) {
+            Schema::table('projects', function (Blueprint $table) {
+                $table->enum('public_taskboard', ['enable', 'disable'])->default('enable');
+                $table->enum('public_gantt_chart', ['enable', 'disable'])->default('enable');
+            });
+        }
     }
 
     /**

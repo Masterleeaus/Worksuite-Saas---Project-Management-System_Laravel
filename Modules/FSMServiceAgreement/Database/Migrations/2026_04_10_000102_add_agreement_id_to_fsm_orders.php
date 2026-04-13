@@ -8,11 +8,13 @@ return new class extends Migration {
     public function up(): void
     {
         // Link FSM orders back to the service agreement that generated them
-        Schema::table('fsm_orders', function (Blueprint $table) {
-            $table->unsignedBigInteger('agreement_id')->nullable()->after('template_id')->index();
-            $table->foreign('agreement_id')
-                ->references('id')->on('fsm_service_agreements')->nullOnDelete();
-        });
+        if (!Schema::hasColumn('fsm_orders', 'agreement_id')) {
+            Schema::table('fsm_orders', function (Blueprint $table) {
+                $table->unsignedBigInteger('agreement_id')->nullable()->after('template_id')->index();
+                $table->foreign('agreement_id')
+                    ->references('id')->on('fsm_service_agreements')->nullOnDelete();
+            });
+        }
     }
 
     public function down(): void

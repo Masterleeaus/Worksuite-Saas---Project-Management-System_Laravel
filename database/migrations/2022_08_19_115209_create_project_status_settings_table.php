@@ -14,6 +14,10 @@ return new class extends Migration {
 
     public function up()
     {
+        if (Schema::hasTable('project_status_settings')) {
+            return;
+        }
+
         Schema::create('project_status_settings', function (Blueprint $table) {
             $table->id();
             $table->integer('company_id')->unsigned()->nullable();

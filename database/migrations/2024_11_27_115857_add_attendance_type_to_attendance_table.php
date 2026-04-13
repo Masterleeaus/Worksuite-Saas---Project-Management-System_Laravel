@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('attendances', function (Blueprint $table) {
-            $table->string('clock_in_type')->nullable()->after('clock_out_time');
-            $table->string('clock_out_type')->nullable()->after('clock_in_type');
-        });
+        if (!Schema::hasColumn('attendances', 'clock_in_type')) {
+            Schema::table('attendances', function (Blueprint $table) {
+                $table->string('clock_in_type')->nullable()->after('clock_out_time');
+                $table->string('clock_out_type')->nullable()->after('clock_in_type');
+            });
+        }
     }
 
     /**

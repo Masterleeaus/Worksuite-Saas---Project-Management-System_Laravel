@@ -14,10 +14,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('theme_settings', function (Blueprint $table) {
-            $table->boolean('restrict_admin_theme_change')->default(false);
-        });
-        
+        if (!Schema::hasColumn('theme_settings', 'restrict_admin_theme_change')) {
+            Schema::table('theme_settings', function (Blueprint $table) {
+                $table->boolean('restrict_admin_theme_change')->default(false);
+            });
+        }
     }
 
     /**

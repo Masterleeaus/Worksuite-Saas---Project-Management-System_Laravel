@@ -16,9 +16,11 @@ class AddIsUpdatedToAdvertisementsTable extends Migration
         if (! Schema::hasTable('advertisements')) {
             return;
         }
-        Schema::table('advertisements', function (Blueprint $table) {
-            $table->boolean('is_updated')->default(0);
-        });
+        if (!Schema::hasColumn('advertisements', 'is_updated')) {
+            Schema::table('advertisements', function (Blueprint $table) {
+                $table->boolean('is_updated')->default(0);
+            });
+        }
     }
 
     /**
