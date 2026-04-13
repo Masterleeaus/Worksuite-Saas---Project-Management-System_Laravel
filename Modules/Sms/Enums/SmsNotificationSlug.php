@@ -77,6 +77,10 @@ enum SmsNotificationSlug: string
     case CleaningJobComplete = 'cleaning-job-complete';
     case CleaningUpcomingReminder = 'cleaning-upcoming-reminder';
     case ReviewRequest = 'review-request';
+    // TitanTalk triggers
+    case TitanTalkMention = 'titan-talk-mention';
+    case TitanTalkDispatchAlert = 'titan-talk-dispatch-alert';
+    case TitanTalkIssueAlert = 'titan-talk-issue-alert';
     // phpcs:enable
 
     public function whatsappTemplate(): string

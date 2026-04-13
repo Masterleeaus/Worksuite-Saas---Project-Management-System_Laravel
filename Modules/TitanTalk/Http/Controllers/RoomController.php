@@ -3,15 +3,17 @@
 namespace Modules\TitanTalk\Http\Controllers;
 
 use App\Http\Controllers\AccountBaseController;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Modules\TitanTalk\Models\TitanTalkRoom;
 use Modules\TitanTalk\Models\TitanTalkRoomMember;
+use Modules\TitanTalk\Services\TitanTalkService;
 
 class RoomController extends AccountBaseController
 {
-    public function __construct()
+    public function __construct(private readonly TitanTalkService $ttService)
     {
         parent::__construct();
         $this->pageTitle = 'TitanTalk';
@@ -21,6 +23,11 @@ class RoomController extends AccountBaseController
     {
         $companyId = company()->id;
         $userId    = user()->id;
+
+        if (request()->filled('dm_user_id')) {
+            $dmRoom = $this->ttService->resolveDmRoom($userId, (int) request('dm_user_id'), $companyId);
+            return redirect()->route('titan.talk.room.show', $dmRoom->id);
+        }
 
         $this->rooms = TitanTalkRoom::accessibleByUser($userId, $companyId)
             ->with(['roomMembers' => fn($q) => $q->where('user_id', $userId)])
@@ -50,6 +57,11 @@ class RoomController extends AccountBaseController
             ->orderBy('created_at')
             ->paginate(50);
 
+        // Mark room as read
+        TitanTalkRoomMember::where('room_id', $room->id)
+            ->where('user_id', $userId)
+            ->update(['last_read_at' => now()]);
+
         return view('titantalk::app', $this->data);
     }
 
@@ -63,10 +75,31 @@ class RoomController extends AccountBaseController
             'members.*'   => 'integer|exists:users,id',
         ]);
 
+        // DM rooms use TitanTalkService to enforce canonical slug and dedup
+        if ($validated['type'] === 'dm') {
+            $request->validate(['dm_user_id' => 'required|integer|exists:users,id']);
+            $room = $this->ttService->resolveDmRoom(user()->id, (int) $request->dm_user_id, company()->id);
+
+            if ($request->ajax()) {
+                return response()->json(['status' => 'success', 'room' => $room]);
+            }
+
+            return redirect()->route('titan.talk.room.show', $room->id);
+        }
+
+        // Ensure unique slug within company
+        $baseSlug = \Illuminate\Support\Str::slug($validated['name']);
+        $slug     = $baseSlug;
+        $i        = 2;
+        while (TitanTalkRoom::where('company_id', company()->id)->where('slug', $slug)->exists()) {
+            $slug = "{$baseSlug}-{$i}";
+            $i++;
+        }
+
         $room = TitanTalkRoom::create([
             'company_id'  => company()->id,
             'name'        => $validated['name'],
-            'slug'        => \Illuminate\Support\Str::slug($validated['name']),
+            'slug'        => $slug,
             'description' => $validated['description'] ?? null,
             'type'        => $validated['type'],
             'created_by'  => user()->id,
@@ -120,7 +153,7 @@ class RoomController extends AccountBaseController
 
     public function join(TitanTalkRoom $room): JsonResponse
     {
-        if ($room->type === 'private' || $room->type === 'dm') {
+        if (in_array($room->type, ['private', 'dm'])) {
             return response()->json(['status' => 'error', 'message' => 'Cannot join private rooms directly.'], 403);
         }
 

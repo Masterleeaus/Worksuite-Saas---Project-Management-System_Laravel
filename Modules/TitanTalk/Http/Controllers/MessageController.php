@@ -5,6 +5,7 @@ namespace Modules\TitanTalk\Http\Controllers;
 use App\Http\Controllers\AccountBaseController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Modules\TitanTalk\Events\TitanTalkMentionEvent;
 use Modules\TitanTalk\Events\TitanTalkMessageSent;
 use Modules\TitanTalk\Models\TitanTalkMessage;
 use Modules\TitanTalk\Models\TitanTalkMessageSave;
@@ -12,10 +13,11 @@ use Modules\TitanTalk\Models\TitanTalkRoom;
 use Modules\TitanTalk\Models\TitanTalkRoomMember;
 use Modules\TitanTalk\Models\TitanTalkRoomPin;
 use Modules\TitanTalk\Notifications\TitanTalkNewMessage;
+use Modules\TitanTalk\Services\TitanTalkService;
 
 class MessageController extends AccountBaseController
 {
-    public function __construct()
+    public function __construct(private readonly TitanTalkService $ttService)
     {
         parent::__construct();
     }
@@ -42,8 +44,9 @@ class MessageController extends AccountBaseController
         $this->authorizeRoomAccess($room);
 
         $request->validate([
-            'body'  => 'required|string|max:10000',
-            'files' => 'nullable|array',
+            'body'    => 'required|string|max:10000',
+            'files'   => 'nullable|array',
+            'files.*' => 'file|max:10240',
         ]);
 
         $message = TitanTalkMessage::create([
@@ -53,26 +56,19 @@ class MessageController extends AccountBaseController
             'body'       => $request->body,
         ]);
 
-        // Handle file attachments
+        // File attachments — uses Worksuite Files::uploadLocalOrS3 via TitanTalkService
         if ($request->hasFile('files')) {
             foreach ($request->file('files') as $file) {
-                $path = $file->store('titan-talk/' . $room->id, 'public');
-                $message->files()->create([
-                    'filename'          => $path,
-                    'original_filename' => $file->getClientOriginalName(),
-                    'mime_type'         => $file->getMimeType(),
-                    'file_size'         => $file->getSize(),
-                    'disk'              => 'public',
-                ]);
+                $this->ttService->attachFile($message, $file);
             }
         }
 
         $message->load(['author', 'files', 'reactions']);
 
-        // Broadcast
+        // Broadcast to room channel (reuses Pusher/Echo PrivateChannel stack)
         event(new TitanTalkMessageSent($message));
 
-        // Notify members (skip muted and sender)
+        // Notify non-muted members (database + optional mail/push via TitanTalkNewMessage)
         $members = TitanTalkRoomMember::where('room_id', $room->id)
             ->where('user_id', '!=', user()->id)
             ->where('is_muted', false)
@@ -84,6 +80,32 @@ class MessageController extends AccountBaseController
                 $member->user->notify(new TitanTalkNewMessage($message));
             }
         }
+
+        // Mention detection — mirrors NewChatObserver mention logic
+        $mentionedUsers = $this->ttService->parseMentions($message->body, company()->id);
+        foreach ($mentionedUsers as $mentioned) {
+            if ($mentioned->id !== user()->id) {
+                event(new TitanTalkMentionEvent($message, $mentioned));
+            }
+        }
+
+        // For DM rooms: mirror to Worksuite UserChat inbox so /messages stays in sync
+        if ($room->type === 'dm' && config('titantalk.mirror_dm_to_userchat', true)) {
+            $otherMember = $members->first();
+            if ($otherMember?->user) {
+                $this->ttService->mirrorToUserChat($message, $otherMember->user->id);
+            }
+        }
+
+        // Log to Communication module history (audit trail)
+        $this->ttService->logToCommunication(
+            companyId:  company()->id,
+            fromUserId: user()->id,
+            toUserId:   null,
+            subject:    'TitanTalk message in #' . $room->name,
+            body:       \Illuminate\Support\Str::limit($message->body, 500),
+            roomId:     $room->id,
+        );
 
         return response()->json(['status' => 'success', 'message' => $message], 201);
     }

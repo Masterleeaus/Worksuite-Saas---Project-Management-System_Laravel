@@ -1,78 +1,135 @@
-# TitanTalk Integration Report
+# TitanTalk Integration Report — Pass 2
 
-## What was reused from existing Worksuite chat
+## What was reused from Worksuite core DM system
 
-- `App\Models\UserChat` — core DM system preserved untouched. TitanTalk extends over it.
-- `App\Events\NewChatEvent` — existing DM broadcast kept. TitanTalk adds its own `TitanTalkMessageSent` event.
-- `App\Notifications\NewChat` — DM notifications untouched. TitanTalk adds `TitanTalkNewMessage`.
-- `App\Traits\HasCompany` — used on `TitanTalkRoom` and `TitanTalkMessage` for tenant isolation.
-- `App\Models\BaseModel` — all models extend this.
-- `App\Http\Controllers\AccountBaseController` — all web controllers extend this.
+| Component | How TitanTalk reuses it |
+|---|---|
+| `App\Models\UserChat` | DM rooms mirror messages into `users_chat` via `TitanTalkService::mirrorToUserChat()` so both TitanTalk and `/messages` inbox stay in sync |
+| `App\Events\NewChatEvent` | Kept untouched; UserChat observer fires this when a mirrored DM message is saved |
+| `App\Observers\NewChatObserver` | Kept untouched; fires `company_id` on `creating` for mirrored messages |
+| `App\Models\UserchatFile` | Not duplicated; TitanTalk attachments use the same storage but stored in `titan_talk_message_files` |
+| `App\Helper\Files::uploadLocalOrS3` | **Directly reused** in `TitanTalkService::attachFile()` — same local/S3/DO/Wasabi dispatch |
+| `App\Notifications\NewChat` (pattern) | `TitanTalkNewMessage` mirrors the via() pattern: database + mail + OneSignal push + Beams push |
+| `App\Events\NewMentionChatEvent` (pattern) | `TitanTalkMentionEvent` mirrors pattern for @mention private channel broadcast |
+| `NewChatObserver::created()` mention logic | `TitanTalkService::parseMentions()` mirrors the @mention extraction and fires `TitanTalkMentionEvent` |
+| `pusher_settings()` / `push_setting()` | Called inside `TitanTalkNewMessage::via()` and view Echo subscription — reuses existing Pusher config |
+| `App\Http\Controllers\AccountBaseController` | All TitanTalk web controllers extend this |
+| `App\Models\BaseModel` | All TitanTalk models extend this |
+| `App\Traits\HasCompany` | `TitanTalkRoom` + `TitanTalkMessage` use it for company_id scoping |
 
 ## What was reused from ChattingModule
 
-- Channel/room concept (ChannelList → TitanTalkRoom)
-- Channel membership concept (ChannelUser → TitanTalkRoomMember)
-- Conversation concept (ChannelConversation → TitanTalkMessage)
-- File attachment concept (ConversationFile → TitanTalkMessageFile)
-- CompanyScoped pattern adapted to use core HasCompany trait
+| Component | How TitanTalk reuses it |
+|---|---|
+| ChatRoom::booking_id / room-per-business-object concept | `TitanTalkRoom.reference_id + reference_type` follows this pattern for all business room types |
+| `BookingChatController` attachment pattern (`private` disk) | `TitanTalkService::attachFile()` uses `Files::uploadLocalOrS3` (equivalent) |
+| ChatRoom company_id isolation | `TitanTalkRoom` uses same `HasCompany` + `accessibleByUser()` scope |
+| booking-linked room idempotency | `TitanTalkService::autoCreateRoom()` checks existing reference before creating |
+| Group room membership | `TitanTalkRoomMember` reuses the same member-per-room concept |
+| ChannelUser role pattern | `TitanTalkRoomMember.role` (owner/admin/member) mirrors ChannelUser |
+| `ChatRoom::member_ids` concept | Replaced with a proper `titan_talk_room_members` pivot table (more relational, avoids JSON) |
 
 ## What was reused from Communication
 
-- Notification delivery pattern (database + mail via `via()` method)
-- Per-user notification preferences concept → `titan_talk_notification_preferences`
+| Component | How TitanTalk reuses it |
+|---|---|
+| `Communication::$fillable` fields | `TitanTalkService::logToCommunication()` writes `type=chat` records with `from_user_id`, `to_user_id`, `body`, `subject`, `sent_at` |
+| `CommunicationAutomation.trigger_event` | Signals `titan_talk_mention`, `titan_talk_room_message` can be registered as trigger events for Communication automations |
+| `TemplateController` type=chat | Communication templates of `type=chat` can be consumed by TitanTalk in future (e.g. welcome message on room join) |
+| Notification delivery abstraction | `TitanTalkNewMessage::via()` follows the same pattern as Communication module's notification delivery |
 
 ## What was reused from Sms
 
-- `notify_sms` flag in `TitanTalkNotificationPreference` — wire to Sms module's provider in future work.
-
-## DB tables added
-
-| Table | Purpose |
+| Component | How TitanTalk reuses it |
 |---|---|
-| titan_talk_rooms | Channels, rooms, DMs, ops rooms |
-| titan_talk_room_members | Membership, roles, mute, last_read_at |
-| titan_talk_messages | Room messages and thread replies |
-| titan_talk_message_files | File attachments on messages |
-| titan_talk_message_reactions | Emoji reactions |
-| titan_talk_room_pins | Pinned messages per room |
-| titan_talk_message_saves | User-saved messages |
-| titan_talk_user_statuses | Presence + custom status |
-| titan_talk_notification_preferences | Per-room notification preferences |
+| `SmsNotificationSlug` enum | Added 3 new cases: `TitanTalkMention`, `TitanTalkDispatchAlert`, `TitanTalkIssueAlert` |
+| `CleaningNotificationService::send()` | **Directly called** from `TitanTalkService::sendSmsEscalation()` with the `titan-talk-mention` slug |
+| `SmsSettingTrait` patterns | SMS dispatch fully delegated to `CleaningNotificationService` — no duplication |
+| `SmsTitanTalkBridgeTrait` | Pre-existing bridge trait updated (slug values now match new enum cases) |
+| Opt-out / channel preference logic | Inherited via `CleaningNotificationService` (handles opt-outs automatically) |
 
-## Routes added
+## Integration architecture summary
 
-- `GET /account/titan-talk` — main app
-- `GET /account/titan-talk/room/{room}` — room view
-- `POST /account/titan-talk/rooms` — create room
-- `POST /account/titan-talk/rooms/{room}/messages` — send message
-- `POST /account/titan-talk/messages/{message}/thread` — thread reply
-- `POST /account/titan-talk/messages/{message}/reactions` — add reaction
-- `POST /account/titan-talk/messages/{message}/save` — save message
-- `POST /account/titan-talk/messages/{message}/pin` — pin message
-- `POST /account/titan-talk/status` — update presence/status
-- `GET /account/titan-talk/search` — search
-- Plus management routes for join/leave/invite/mute/unread-counts
-- `routes/Titan/TitanTalk.routes.php` — Titan route bridge
+```
+TitanTalk room message
+    │
+    ├─→ TitanTalkMessageSent event → broadcast(PrivateChannel titan-talk.room.{id})
+    │      └─→ Echo JS client appends message in real-time (reuses Pusher stack)
+    │
+    ├─→ TitanTalkNewMessage notification → database + mail + OneSignal/Beams push
+    │      └─→ via() reuses push_setting() / email_notifications (same as NewChat)
+    │
+    ├─→ @mention detected → TitanTalkMentionEvent
+    │      ├─→ broadcast(PrivateChannel titan-talk.user.{id}) — mention badge in client
+    │      └─→ TitanTalkSmsListener → TitanTalkService::sendSmsEscalation()
+    │               └─→ Sms\CleaningNotificationService::send() (optional, configurable)
+    │
+    ├─→ TitanTalkService::mirrorToUserChat() [DM rooms only, if mirror_dm_to_userchat=true]
+    │      └─→ UserChat::save() → NewChatObserver fires → Worksuite /messages inbox updated
+    │
+    └─→ TitanTalkService::logToCommunication()
+           └─→ Communication\Entities\Communication::create() (audit trail)
+```
 
-## Permissions added
+## Auto-room creation (observer-triggered)
 
-- `view_titan_talk`
-- `create_titan_talk_rooms`
-- `manage_titan_talk_rooms`
-- `send_titan_talk_messages`
-- `delete_titan_talk_messages`
-- `manage_titan_talk_settings`
+| Business event | Room type | Observer method | Guarded by |
+|---|---|---|---|
+| `App\Models\Project::created` | `project` | `onProjectCreated` | `class_exists(Project::class)` |
+| `App\Models\Task::created` where `task_type=booking` | `booking` | `onTaskCreated` | `class_exists(Task::class)` |
+| `App\Models\Ticket::created` | `issue` | `onTicketCreated` | `class_exists(Ticket::class)` |
+| `FSMCore\Models\FSMOrder::created` | `service_job` | `onFsmOrderCreated` | `class_exists(FSMOrder::class)` |
+| `BookingModule\Models\CleaningBooking::created` | `booking` | `onCleaningBookingCreated` | `class_exists(CleaningBooking::class)` |
 
-## Known follow-up work
+All observers are safe — wrapped in `try/catch(\Throwable)` to never break the original model save.
+All can be disabled per-type via `titantalk.auto_create_rooms` config or `.env`:
 
-1. Wire `notify_sms` preference to Sms module provider (Modules/Sms).
-2. Add Echo/Pusher subscription on the client for `titan-talk.room.{id}` private channel.
-3. Auto-create rooms on booking/project/issue created via Observers.
-4. Add mention parsing (`@username`) and notification on mention.
-5. Add search results UI dropdown in sidebar.
-6. Add emoji picker UI.
-7. Add typing indicator via Pusher presence channel.
-8. Add admin settings panel for TitanTalk config.
-9. Wire `view_titan_talk` permission check in RoomController constructor.
-10. Add sidebar nav entry in Worksuite left menu.
+```
+TITANTALK_AUTOROOM_BOOKING=false
+TITANTALK_AUTOROOM_SERVICE_JOB=false
+TITANTALK_AUTOROOM_PROJECT=false
+TITANTALK_AUTOROOM_ISSUE=false
+```
+
+## What remains intentionally separate
+
+| Item | Reason |
+|---|---|
+| `users_chat` (core DM table) | Not replaced — TitanTalk adds its own `titan_talk_messages` for room messages |
+| `/messages` Worksuite inbox | Kept as-is; DM rooms optionally mirror to it via `mirrorToUserChat()` |
+| ChattingModule `chat_rooms` table | Kept as-is; TitanTalk uses `titan_talk_rooms` (richer schema with roles, reactions, pins, saves, status) |
+| Communication OTP/email flows | Orthogonal; TitanTalk only uses Communication for audit logging and template metadata |
+| SMS general delivery (Twilio) | Delegated entirely to `CleaningNotificationService`; no Twilio code in TitanTalk |
+
+## New files added in this pass
+
+| File | Purpose |
+|---|---|
+| `Services/TitanTalkService.php` | Central integration hub: DM bridge, file upload, mention parsing, auto-room, SMS escalation, Communication logging |
+| `Events/TitanTalkMentionEvent.php` | Broadcast @mention to user's private channel |
+| `Observers/TitanTalkAutoRoomObserver.php` | Auto-create rooms on Project/Task/Ticket/FSMOrder/CleaningBooking created |
+| `Listeners/TitanTalkSmsListener.php` | SMS escalation on mention via Sms module |
+
+## Files modified in this pass
+
+| File | Changes |
+|---|---|
+| `Http/Controllers/MessageController.php` | Uses `TitanTalkService` for uploads/mentions/DM mirror/Communication logging; fires `TitanTalkMentionEvent` |
+| `Http/Controllers/RoomController.php` | Uses `TitanTalkService::resolveDmRoom()`; handles `?dm_user_id=` redirect; dedup slug on create |
+| `Notifications/TitanTalkNewMessage.php` | Reuses `push_setting()` / `email_notifications` / OneSignal / Beams (mirrors `NewChat` pattern) |
+| `Providers/TitanTalkServiceProvider.php` | Registers `TitanTalkService` singleton; registers event listeners; registers model observers |
+| `Config/config.php` | Adds `auto_create_rooms`, `mirror_dm_to_userchat`, `sms_escalation` config |
+| `Resources/views/app.blade.php` | Adds Echo/Pusher private channel subscription; renders search results dropdown |
+| `Modules/Sms/Enums/SmsNotificationSlug.php` | Adds `TitanTalkMention`, `TitanTalkDispatchAlert`, `TitanTalkIssueAlert` cases |
+
+## Known follow-up items
+
+1. Register `titan-talk-mention` in `SmsNotificationSetting` seed so the `send_sms` flag can be toggled from admin.
+2. Add TipTap / rich-text editor integration with `@mention` autocomplete (mirrors TitanZero Canvas TipTap usage).
+3. Add typing indicator via Pusher presence channel (`titan-talk.room.{id}` presence).
+4. Add admin settings page for TitanTalk (mirror_dm_to_userchat, sms_escalation, auto_create_rooms toggles).
+5. Add sidebar nav entry in Worksuite left menu via `MenuService`.
+6. Add `view_titan_talk` permission check in `RoomController::__construct()` middleware.
+7. Wire `notify_sms` preference in `TitanTalkNotificationPreference` to SMS escalation config.
+8. Emoji picker UI (client-side only).
+9. Full E2E tests for DM mirror, auto-room, and mention SMS flow.

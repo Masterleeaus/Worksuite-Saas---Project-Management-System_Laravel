@@ -288,7 +288,33 @@
 @section('scripts')
 <script>
 (function () {
-    const CSRF = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+    const CSRF     = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+    const ROOM_ID  = @json($activeRoom->id ?? null);
+    const USER_ID  = @json(user()->id ?? null);
+
+    // ---- Real-time: subscribe to active room's private channel via Pusher/Echo ----
+    // Reuses the same Pusher/Echo stack as the Worksuite built-in chat system.
+    @if(pusher_settings()->status == 1)
+    if (ROOM_ID && typeof window.Echo !== 'undefined') {
+        window.Echo.private('titan-talk.room.' + ROOM_ID)
+            .listen('.message.sent', function (data) {
+                // Only append if the message is from another user
+                if (data.user_id !== USER_ID) {
+                    appendMessage(data);
+                    scrollMessages();
+                }
+            });
+
+        window.Echo.private('titan-talk.user.' + USER_ID)
+            .listen('.mention.received', function (data) {
+                if (data.room_id !== ROOM_ID) {
+                    // Show badge on the sidebar room link
+                    const badge = document.querySelector('.tt-unread-badge[data-room="' + data.room_id + '"]');
+                    if (badge) { badge.textContent = '@'; badge.style.display = ''; }
+                }
+            });
+    }
+    @endif
 
     // ---- AJAX helper ----
     async function apiPost(url, data, isFormData = false) {
@@ -468,8 +494,7 @@
                         { headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }, signal: searchController.signal }
                     );
                     const data = await res.json();
-                    console.log('TitanTalk search:', data);
-                    // TODO: render results in a dropdown
+                    renderSearchResults(data, q);
                 } catch (err) {
                     if (err.name !== 'AbortError') console.error('Search error:', err);
                 }
@@ -495,6 +520,59 @@
     }
     loadUnreadCounts();
     setInterval(loadUnreadCounts, 30000);
+
+    // ---- Search result rendering ----
+    function renderSearchResults(data, q) {
+        let dropdown = document.getElementById('tt-search-dropdown');
+        if (!dropdown) {
+            dropdown = document.createElement('div');
+            dropdown.id = 'tt-search-dropdown';
+            dropdown.style.cssText = 'position:absolute;z-index:9999;background:#fff;border:1px solid #ccc;border-radius:4px;max-height:320px;overflow-y:auto;width:230px;box-shadow:0 4px 12px rgba(0,0,0,.1);';
+            const searchWrap = document.getElementById('tt-search-input')?.parentElement;
+            if (searchWrap) { searchWrap.style.position = 'relative'; searchWrap.appendChild(dropdown); }
+        }
+        dropdown.innerHTML = '';
+
+        const total = (data.messages?.length ?? 0) + (data.rooms?.length ?? 0) + (data.users?.length ?? 0);
+        if (total === 0) {
+            dropdown.innerHTML = '<div class="px-3 py-2 text-muted small">No results for "' + escHtml(q) + '"</div>';
+            dropdown.style.display = 'block';
+            return;
+        }
+
+        function section(label, items, href) {
+            if (!items?.length) return;
+            const h = document.createElement('div');
+            h.className = 'px-3 pt-2 pb-1';
+            h.innerHTML = '<small class="text-muted font-weight-bold text-uppercase">' + escHtml(label) + '</small>';
+            dropdown.appendChild(h);
+            items.forEach(item => {
+                const a = document.createElement('a');
+                a.href = href(item);
+                a.className = 'd-block px-3 py-1 text-dark small';
+                a.style.cssText = 'text-decoration:none;';
+                a.onmouseenter = () => { a.style.background = '#f8f9fa'; };
+                a.onmouseleave = () => { a.style.background = ''; };
+                const text = item.name ?? (item.author?.name ?? '') + ': ' + (item.body ?? '');
+                a.textContent = text.length > 60 ? text.slice(0, 57) + '…' : text;
+                dropdown.appendChild(a);
+            });
+        }
+
+        section('Rooms',    data.rooms,    r => '/account/titan-talk/room/' + r.id);
+        section('Messages', data.messages, m => '/account/titan-talk/room/' + m.room_id);
+        section('Users',    data.users,    u => '/account/titan-talk?dm_user_id=' + u.id);
+
+        dropdown.style.display = 'block';
+    }
+
+    // Hide dropdown on outside click
+    document.addEventListener('click', function (e) {
+        const dd = document.getElementById('tt-search-dropdown');
+        if (dd && !dd.contains(e.target) && e.target.id !== 'tt-search-input') {
+            dd.style.display = 'none';
+        }
+    });
 
     // ---- Helpers ----
     function escHtml(str) {
