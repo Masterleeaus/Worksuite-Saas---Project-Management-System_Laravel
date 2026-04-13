@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('ticket_activities')) {
+        if (Schema::hasTable('ticket_activities') && Schema::hasColumn('tickets', 'project_id')) {
             return;
         }
 

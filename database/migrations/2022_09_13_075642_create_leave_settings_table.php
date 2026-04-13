@@ -18,7 +18,7 @@ return new class extends Migration {
 
     public function up()
     {
-        if (Schema::hasTable('leave_settings')) {
+        if (Schema::hasTable('leave_settings') && Schema::hasColumn('leaves', 'manager_status_permission')) {
             return;
         }
 
