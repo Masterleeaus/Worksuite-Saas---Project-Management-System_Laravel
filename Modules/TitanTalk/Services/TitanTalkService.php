@@ -75,23 +75,32 @@ class TitanTalkService
 
     /**
      * Mirror a TitanTalk DM message into the Worksuite UserChat inbox so both
-     * TitanTalk and /messages stay in sync. The UserChat observer fires its own
-     * broadcast (NewChatEvent) which powers the existing Worksuite inbox popup.
+     * TitanTalk and /messages stay in sync.
+     *
+     * IMPORTANT: We use UserChat::withoutObservers() so that NewChatObserver does
+     * NOT fire its own NewChatEvent / NewChat notification / NewMessage broadcast.
+     * TitanTalk's own TitanTalkNewMessage notification is the single source of truth
+     * for DM notifications. The UserChat record is created only so the /messages
+     * inbox shows the conversation — not to trigger a second notification chain.
      */
     public function mirrorToUserChat(TitanTalkMessage $message, int $toUserId): ?UserChat
     {
         try {
-            $chat = new UserChat();
-            $chat->user_one          = $message->user_id;
-            $chat->user_id           = $toUserId;
-            $chat->from              = $message->user_id;
-            $chat->to                = $toUserId;
-            $chat->message           = $message->body;
-            $chat->notification_sent = 0;
-            // company_id set by NewChatObserver::creating()
-            $chat->save();
+            // withoutObservers prevents NewChatObserver::created() from firing,
+            // which eliminates the duplicate NewChat notification + NewMessage broadcast.
+            return UserChat::withoutObservers(function () use ($message, $toUserId) {
+                $chat = new UserChat();
+                $chat->user_one          = $message->user_id;
+                $chat->user_id           = $toUserId;
+                $chat->from              = $message->user_id;
+                $chat->to                = $toUserId;
+                $chat->message           = $message->body;
+                $chat->notification_sent = 1; // Suppress any future notification queries
+                $chat->company_id        = $message->company_id;
+                $chat->save();
 
-            return $chat;
+                return $chat;
+            });
         } catch (\Throwable) {
             return null;
         }
@@ -265,21 +274,29 @@ class TitanTalkService
         }
 
         try {
-            \Modules\Communication\Entities\Communication::create([
+            $data = [
                 'company_id'   => $companyId,
                 'type'         => 'chat',
                 'from_user_id' => $fromUserId,
                 'to_user_id'   => $toUserId,
-                // 'booking_id' is a VARCHAR(36) used here as a generic reference ID.
-                // The Communication schema predates TitanTalk; we store the room ID here as
-                // a string reference. A migration to add a dedicated room_id column is a
-                // recommended follow-up.
-                'booking_id'   => $roomId !== null ? (string) $roomId : null,
                 'subject'      => $subject,
                 'body'         => $body,
                 'status'       => 'sent',
                 'sent_at'      => now(),
-            ]);
+            ];
+
+            // Use titan_talk_room_id if the column exists (added by migration 000010).
+            // Fall back to booking_id for backward compatibility with un-migrated installs.
+            if ($roomId !== null) {
+                $commsTable = (new \Modules\Communication\Entities\Communication())->getTable();
+                if (\Illuminate\Support\Facades\Schema::hasColumn($commsTable, 'titan_talk_room_id')) {
+                    $data['titan_talk_room_id'] = $roomId;
+                } else {
+                    $data['booking_id'] = (string) $roomId;
+                }
+            }
+
+            \Modules\Communication\Entities\Communication::create($data);
         } catch (\Throwable) {
             // Communication module may not be migrated yet; fail silently
         }

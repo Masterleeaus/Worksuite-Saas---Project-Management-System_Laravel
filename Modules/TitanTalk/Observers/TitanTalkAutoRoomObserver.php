@@ -11,9 +11,15 @@ use Modules\TitanTalk\Services\TitanTalkService;
  * Only fires when the relevant model exists in this repo and when the
  * auto_create_rooms config permits it.
  *
- * Uses the safe pattern from ChattingModule (booking-linked room concept).
+ * Active source models (verified in this repo):
+ *  - App\Models\Project        (app/Models/Project.php)    fields: project_name, added_by, company_id
+ *  - App\Models\Task           (app/Models/Task.php)       fields: heading, added_by, company_id, task_type
+ *  - App\Models\Ticket         (app/Models/Ticket.php)     fields: subject, added_by, user_id, company_id
+ *  - Modules\FSMCore\Models\FSMOrder    (if FSMCore installed)  fields: name, person_id, company_id
+ *  - Modules\BookingModule\Models\CleaningBooking (if BookingModule installed) fields: heading, created_by, added_by, company_id
+ *
  * All operations are wrapped in try/catch so a TitanTalk failure never
- * breaks the original save operation.
+ * breaks the original model save.
  *
  * Registered in TitanTalkServiceProvider::boot().
  */
@@ -35,9 +41,9 @@ class TitanTalkAutoRoomObserver
 
             $this->service->autoCreateRoom(
                 type:          'project',
-                name:          'Project: ' . $project->project_name,
-                companyId:     $companyId,
-                createdBy:     $project->added_by ?? $project->client_id ?? 0,
+                name:          'Project: ' . ($project->project_name ?? "Project #{$project->id}"),
+                companyId:     (int) $companyId,
+                createdBy:     (int) ($project->added_by ?? 0),
                 referenceId:   $project->id,
                 referenceType: \App\Models\Project::class,
             );
@@ -45,7 +51,8 @@ class TitanTalkAutoRoomObserver
     }
 
     // -------------------------------------------------------------------------
-    // Task (booking) → booking room
+    // Task → booking room (only for task_type = 'booking')
+    // task_type field confirmed present via app/Mcp/Tools/CreateBookingTool.php
     // -------------------------------------------------------------------------
 
     public function onTaskCreated(\App\Models\Task $task): void
@@ -64,8 +71,8 @@ class TitanTalkAutoRoomObserver
             $this->service->autoCreateRoom(
                 type:          'booking',
                 name:          'Booking: ' . ($task->heading ?? "Task #{$task->id}"),
-                companyId:     $companyId,
-                createdBy:     $task->added_by ?? $task->created_by ?? 0,
+                companyId:     (int) $companyId,
+                createdBy:     (int) ($task->added_by ?? 0),
                 referenceId:   $task->id,
                 referenceType: \App\Models\Task::class,
             );
@@ -86,9 +93,9 @@ class TitanTalkAutoRoomObserver
 
             $this->service->autoCreateRoom(
                 type:          'issue',
-                name:          'Issue: ' . $ticket->subject,
-                companyId:     $companyId,
-                createdBy:     $ticket->added_by ?? $ticket->user_id ?? 0,
+                name:          'Issue: ' . ($ticket->subject ?? "Ticket #{$ticket->id}"),
+                companyId:     (int) $companyId,
+                createdBy:     (int) ($ticket->added_by ?? $ticket->user_id ?? 0),
                 referenceId:   $ticket->id,
                 referenceType: \App\Models\Ticket::class,
             );
@@ -97,6 +104,7 @@ class TitanTalkAutoRoomObserver
 
     // -------------------------------------------------------------------------
     // FSMOrder (service job) → service_job room (if FSMCore installed)
+    // FSMOrder fields verified: name, person_id, company_id
     // -------------------------------------------------------------------------
 
     public function onFsmOrderCreated(object $order): void
@@ -110,8 +118,8 @@ class TitanTalkAutoRoomObserver
             $this->service->autoCreateRoom(
                 type:          'service_job',
                 name:          'Job: ' . ($order->name ?? "Order #{$order->id}"),
-                companyId:     $companyId,
-                createdBy:     $order->person_id ?? 0,
+                companyId:     (int) $companyId,
+                createdBy:     (int) ($order->person_id ?? 0),
                 referenceId:   $order->id,
                 referenceType: 'Modules\\FSMCore\\Models\\FSMOrder',
             );
@@ -120,6 +128,7 @@ class TitanTalkAutoRoomObserver
 
     // -------------------------------------------------------------------------
     // CleaningBooking → booking room (if BookingModule installed)
+    // CleaningBooking fields verified: heading, created_by, added_by, company_id
     // -------------------------------------------------------------------------
 
     public function onCleaningBookingCreated(object $booking): void
@@ -133,8 +142,8 @@ class TitanTalkAutoRoomObserver
             $this->service->autoCreateRoom(
                 type:          'booking',
                 name:          'Booking: ' . ($booking->heading ?? "Booking #{$booking->id}"),
-                companyId:     $companyId,
-                createdBy:     $booking->added_by ?? $booking->created_by ?? 0,
+                companyId:     (int) $companyId,
+                createdBy:     (int) ($booking->created_by ?? $booking->added_by ?? 0),
                 referenceId:   $booking->id,
                 referenceType: 'Modules\\BookingModule\\Models\\CleaningBooking',
             );

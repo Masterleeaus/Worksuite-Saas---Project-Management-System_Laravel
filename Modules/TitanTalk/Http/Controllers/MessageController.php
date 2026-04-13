@@ -97,15 +97,17 @@ class MessageController extends AccountBaseController
             }
         }
 
-        // Log to Communication module history (audit trail)
-        $this->ttService->logToCommunication(
-            companyId:  company()->id,
-            fromUserId: user()->id,
-            toUserId:   null,
-            subject:    'TitanTalk message in #' . $room->name,
-            body:       \Illuminate\Support\Str::limit($message->body, 500),
-            roomId:     $room->id,
-        );
+        // Log to Communication module history (top-level messages only, not thread replies)
+        if (!$request->has('thread_parent_id')) {
+            $this->ttService->logToCommunication(
+                companyId:  company()->id,
+                fromUserId: user()->id,
+                toUserId:   ($room->type === 'dm') ? ($members->first()?->user_id) : null,
+                subject:    'TitanTalk message in #' . $room->name,
+                body:       \Illuminate\Support\Str::limit($message->body, 500),
+                roomId:     $room->id,
+            );
+        }
 
         return response()->json(['status' => 'success', 'message' => $message], 201);
     }

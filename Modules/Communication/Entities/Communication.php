@@ -37,6 +37,7 @@ class Communication extends Model
         'to_address',
         'customer_id',
         'booking_id',
+        'titan_talk_room_id',
         'template_id',
         'subject',
         'body',
