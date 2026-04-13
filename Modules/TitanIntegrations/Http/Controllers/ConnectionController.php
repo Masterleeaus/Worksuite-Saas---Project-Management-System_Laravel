@@ -145,9 +145,13 @@ class ConnectionController extends AccountBaseController
     private function resolveService(string $provider): ?object
     {
         return match ($provider) {
-            'google_calendar' => app(\Modules\TitanIntegrations\Services\Integrations\GoogleCalendarIntegration::class),
-            'xero'            => app(\Modules\TitanIntegrations\Services\Integrations\XeroIntegration::class),
-            default           => null,
+            'google_calendar'  => app(\Modules\TitanIntegrations\Services\Integrations\GoogleCalendarIntegration::class),
+            'outlook_calendar' => app(\Modules\TitanIntegrations\Services\Integrations\OutlookCalendarIntegration::class),
+            'xero'             => app(\Modules\TitanIntegrations\Services\Integrations\XeroIntegration::class),
+            'quickbooks'       => app(\Modules\TitanIntegrations\Services\Integrations\QuickBooksIntegration::class),
+            'myob'             => app(\Modules\TitanIntegrations\Services\Integrations\MYOBIntegration::class),
+            'google_sheets'    => app(\Modules\TitanIntegrations\Services\Integrations\GoogleSheetsIntegration::class),
+            default            => null,
         };
     }
 }

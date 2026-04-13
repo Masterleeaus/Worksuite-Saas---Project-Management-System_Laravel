@@ -7,10 +7,14 @@ use Illuminate\Support\Facades\Route;
 use Modules\TitanIntegrations\Services\OAuthService;
 use Modules\TitanIntegrations\Services\WebhookDispatcher;
 use Modules\TitanIntegrations\Services\Integrations\GoogleCalendarIntegration;
+use Modules\TitanIntegrations\Services\Integrations\OutlookCalendarIntegration;
 use Modules\TitanIntegrations\Services\Integrations\XeroIntegration;
+use Modules\TitanIntegrations\Services\Integrations\QuickBooksIntegration;
+use Modules\TitanIntegrations\Services\Integrations\MYOBIntegration;
 use Modules\TitanIntegrations\Services\Integrations\HubSpotIntegration;
 use Modules\TitanIntegrations\Services\Integrations\MailchimpIntegration;
 use Modules\TitanIntegrations\Services\Integrations\SlackIntegration;
+use Modules\TitanIntegrations\Services\Integrations\GoogleSheetsIntegration;
 
 class TitanIntegrationsServiceProvider extends ServiceProvider
 {
@@ -35,8 +39,20 @@ class TitanIntegrationsServiceProvider extends ServiceProvider
         $this->app->singleton(GoogleCalendarIntegration::class, fn($app) =>
             new GoogleCalendarIntegration($app->make(OAuthService::class))
         );
+        $this->app->singleton(OutlookCalendarIntegration::class, fn($app) =>
+            new OutlookCalendarIntegration($app->make(OAuthService::class))
+        );
         $this->app->singleton(XeroIntegration::class, fn($app) =>
             new XeroIntegration($app->make(OAuthService::class))
+        );
+        $this->app->singleton(QuickBooksIntegration::class, fn($app) =>
+            new QuickBooksIntegration($app->make(OAuthService::class))
+        );
+        $this->app->singleton(MYOBIntegration::class, fn($app) =>
+            new MYOBIntegration($app->make(OAuthService::class))
+        );
+        $this->app->singleton(GoogleSheetsIntegration::class, fn($app) =>
+            new GoogleSheetsIntegration($app->make(OAuthService::class))
         );
         $this->app->singleton(HubSpotIntegration::class);
         $this->app->singleton(MailchimpIntegration::class);

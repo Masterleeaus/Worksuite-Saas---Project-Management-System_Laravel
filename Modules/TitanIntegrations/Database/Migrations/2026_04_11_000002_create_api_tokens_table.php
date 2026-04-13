@@ -8,10 +8,14 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('api_tokens')) {
+            return;
+        }
+
         Schema::create('api_tokens', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('company_id')->index();
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedInteger('company_id')->index();
+            $table->unsignedInteger('user_id');
             $table->string('name');                                  // "Mobile App", "Booking Platform"
             $table->string('token_hash', 64)->unique();              // SHA-256 of the actual token
             $table->json('scopes')->nullable();                      // ['read:bookings', 'write:bookings']
