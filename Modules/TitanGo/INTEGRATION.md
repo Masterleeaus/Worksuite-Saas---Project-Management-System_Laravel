@@ -195,8 +195,26 @@ Full module scaffold: 8 API controllers, 5 models, 6 migrations, React/TS/Capaci
 
 ---
 
+### Pass 4 (2026-04-13) — Proof-of-Delivery Report
+
+1. **`DeliveryReportController`** ✅ — Three actions: `show` (HTML preview), `download` (dompdf PDF), `email` (sends PDF attachment via `ProofOfDeliveryMail`). Shared `buildReportData()` method loads `FSMOrder` with `template`, `location`, `person`, `stage`; merges all `TitanGoChecklistCompletion` rows (including raw `photo_data` / `signature_data`) into a unified steps collection that supports both rich and plain checklist schemas.
+
+2. **`ProofOfDeliveryMail`** ✅ — `Mailable` with `attachData()` of the pre-rendered PDF binary; email body in `titango::mail.proof_of_delivery`.
+
+3. **Blade views** ✅:
+   - `titango::admin.delivery.show` — Bootstrap card preview with toolbar (Download PDF / Email to Customer / Back), completion progress bar, checklist table with inline photo/signature thumbnails, collapsible email form pre-filled with location partner email.
+   - `titango::admin.delivery.pdf` — Standalone self-contained HTML (DejaVu Sans / dompdf-safe CSS, no Bootstrap), with header, meta-grid, progress bar, checklist table, evidence images rendered from base64, footer.
+   - `titango::mail.proof_of_delivery` — Plain HTML email body.
+
+4. **Routes** ✅ — `GET /account/titan-go/delivery/{visitId}` (preview), `GET /account/titan-go/delivery/{visitId}/pdf` (download), `POST /account/titan-go/delivery/{visitId}/email` (email).
+
+5. **Entry points** ✅:
+   - Sidebar: "TG Proof of Delivery" sub-item (→ FSM orders list).
+   - `FSMCore orders/show.blade.php`: `📋 Proof of Delivery` button (class_exists-guarded).
+
+---
+
 ## Passes Remaining Before MVP-Ready Titan Go
 
-1. **Android build** — Run `npx cap sync android` after `npm run build` in `Resources/js/`; add `google-services.json` for FCM; enable `INTERNET` and `ACCESS_FINE_LOCATION` permissions in `AndroidManifest.xml`
-2. **E2E testing** — Add integration tests for `SyncController` replay scenarios (offline → online transitions)
-3. **Proof-of-delivery report** — PDF/email summary of completed checklist with photo evidence and signature for a given visit (admin + customer copy)
+1. **Android build** — Run `npx cap sync android` after `npm run build` in `Resources/js/`; add `google-services.json` for FCM; enable `INTERNET`, `ACCESS_FINE_LOCATION`, and `FOREGROUND_SERVICE` permissions in `AndroidManifest.xml`
+2. **E2E testing** — Add integration tests for `SyncController` offline replay scenarios (offline → online transitions)

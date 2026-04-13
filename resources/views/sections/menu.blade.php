@@ -443,6 +443,7 @@
                 <x-sub-menu-item :link="route('titango.admin.issues.index')"   text="TG Issues" />
                 <x-sub-menu-item :link="route('titango.admin.statuses.index')"  text="TG Worker Signals" />
                 <x-sub-menu-item :link="route('titango.admin.tracking.index')"  text="TG GPS Tracking" />
+                <x-sub-menu-item :link="route('fsmcore.orders.index')"           text="TG Proof of Delivery" />
             </div>
         </x-menu-item>
     @endif
