@@ -59,7 +59,7 @@
             <a href="#" class="text-muted mr-2 tt-react-btn" data-msg="{{ $message->id }}">😊</a>
             <a href="#" class="text-muted mr-2 tt-thread-btn" data-msg="{{ $message->id }}">Reply in thread</a>
             <a href="#" class="text-muted mr-2 tt-save-btn" data-msg="{{ $message->id }}">Save</a>
-            @if(in_array($activeRoom->getMemberRole(user()->id), ['owner', 'admin']) ?? false)
+            @if(in_array($activeRoom->getMemberRole(user()->id) ?? '', ['owner', 'admin']))
                 <a href="#" class="text-muted mr-2 tt-pin-btn" data-msg="{{ $message->id }}">Pin</a>
             @endif
         </div>
