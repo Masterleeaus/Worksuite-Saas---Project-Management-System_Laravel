@@ -37,8 +37,25 @@ class PayrollRun extends BaseModel
         return $this->hasMany(PayrollRunLineItem::class, 'payroll_run_id');
     }
 
+    public function payslips(): HasMany
+    {
+        return $this->hasMany(Payslip::class, 'payroll_run_id');
+    }
+
+    /**
+     * A run is locked (read-only) once approved or exported.
+     * No line items or payslips may be modified after this point.
+     */
     public function isApproved(): bool
     {
         return in_array($this->status, ['approved', 'exported']);
+    }
+
+    /**
+     * Convenience alias — consistent with "locked" terminology.
+     */
+    public function isLocked(): bool
+    {
+        return $this->isApproved();
     }
 }
