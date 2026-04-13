@@ -17,7 +17,9 @@ class AddCoverImageInProvidersTable extends Migration
             return;
         }
         Schema::table('providers', function (Blueprint $table) {
-            $table->string('cover_image',191)->nullable();
+            if (! Schema::hasColumn('providers', 'cover_image')) {
+                $table->string('cover_image',191)->nullable();
+            }
         });
     }
 

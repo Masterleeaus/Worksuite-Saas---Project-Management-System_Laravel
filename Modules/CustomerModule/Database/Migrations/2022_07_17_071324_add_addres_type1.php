@@ -17,7 +17,9 @@ class AddAddresType1 extends Migration
             return;
         }
         Schema::table('user_addresses', function (Blueprint $table) {
-            $table->string('address_label')->nullable();
+            if (! Schema::hasColumn('user_addresses', 'address_label')) {
+                $table->string('address_label')->nullable();
+            }
         });
     }
 

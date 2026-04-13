@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('job_checklists')) {
+            return;
+        }
+        
         Schema::create('job_checklists', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedInteger('task_id')->index();
@@ -17,6 +21,10 @@ return new class extends Migration {
             $table->foreign('task_id')->references('id')->on('tasks')->cascadeOnDelete();
         });
 
+        if (Schema::hasTable('job_checklist_items')) {
+            return;
+        }
+        
         Schema::create('job_checklist_items', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('job_checklist_id')->index();

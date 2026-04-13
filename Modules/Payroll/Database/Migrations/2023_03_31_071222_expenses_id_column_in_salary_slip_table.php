@@ -16,7 +16,9 @@ return new class extends Migration
             return;
         }
         Schema::table('salary_slips', function (Blueprint $table) {
-            $table->boolean('expenses_created')->default(0);
+            if (! Schema::hasColumn('salary_slips', 'expenses_created')) {
+                $table->boolean('expenses_created')->default(0)->nullable();
+            }
         });
     }
 

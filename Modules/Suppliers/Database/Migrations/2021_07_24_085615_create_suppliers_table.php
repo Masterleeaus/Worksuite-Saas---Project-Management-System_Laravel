@@ -13,6 +13,10 @@ class CreateSuppliersTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('suppliers')) {
+            return;
+        }
+        
         Schema::create('suppliers', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('company_id')->nullable();

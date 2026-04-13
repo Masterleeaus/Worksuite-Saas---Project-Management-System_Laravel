@@ -15,7 +15,9 @@ return new class extends Migration
             return;
         }
         Schema::table('ai_tools_usage_history', function (Blueprint $table) {
-            $table->bigInteger('total_requests')->default(1)->after('total_tokens');
+            if (! Schema::hasColumn('ai_tools_usage_history', 'total_requests')) {
+                $table->bigInteger('total_requests')->default(1)->after('total_tokens')->nullable();
+            }
         });
     }
 

@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('dispatch_events')) {
+            return;
+        }
+        
         Schema::create('dispatch_events', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->uuid('uuid')->unique();

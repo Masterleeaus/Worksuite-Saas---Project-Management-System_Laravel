@@ -31,6 +31,10 @@ return new class extends Migration {
             $table->timestamps();
         });
 
+        if (Schema::hasTable('biolink_settings')) {
+            return;
+        }
+        
         Schema::create('biolink_settings', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('biolink_id')->unsigned()->nullable();

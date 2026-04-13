@@ -16,7 +16,9 @@ return new class extends Migration
             return;
         }
         Schema::table('biometric_employees', function (Blueprint $table) {
-            $table->boolean('force_biometric_clockin')->default(true)->after('company_id');
+            if (! Schema::hasColumn('biometric_employees', 'force_biometric_clockin')) {
+                $table->boolean('force_biometric_clockin')->default(true)->after('company_id')->nullable();
+            }
         });
     }
 

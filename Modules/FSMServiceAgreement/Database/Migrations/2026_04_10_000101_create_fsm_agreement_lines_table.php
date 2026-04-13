@@ -8,6 +8,10 @@ return new class extends Migration {
     public function up(): void
     {
         // Per-site / per-service pricing lines under an agreement
+        if (Schema::hasTable('fsm_agreement_lines')) {
+            return;
+        }
+        
         Schema::create('fsm_agreement_lines', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('agreement_id')->index();

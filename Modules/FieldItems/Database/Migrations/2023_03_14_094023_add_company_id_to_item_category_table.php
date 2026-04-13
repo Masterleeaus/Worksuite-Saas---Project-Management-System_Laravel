@@ -13,8 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('item_category')) {
+            return;
+        }
+        
         Schema::table('item_category', function (Blueprint $table) {
-            $table->integer('company_id')->unsigned()->nullable();
+            if (! Schema::hasColumn('item_category', 'company_id')) {
+                $table->integer('company_id')->unsigned()->nullable();
+            }
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade')->onUpdate('cascade');
         });
     }
@@ -26,6 +32,10 @@ return new class extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('item_category')) {
+            return;
+        }
+        
         Schema::table('item_category', function (Blueprint $table) {
                 $table->dropForeign(['company_id']);
                 $table->dropColumn('company_id');

@@ -18,10 +18,14 @@ return new class extends Migration
             return;
         }
         Schema::table('sms_settings', function (Blueprint $table) {
-            $table->integer('added_by')->unsigned()->nullable();
+            if (! Schema::hasColumn('sms_settings', 'added_by')) {
+                $table->integer('added_by')->unsigned()->nullable();
+            }
             $table->foreign('added_by')->references('id')->on('users')->onDelete('SET NULL')->onUpdate('cascade');
 
-            $table->integer('last_updated_by')->unsigned()->nullable();
+            if (! Schema::hasColumn('sms_settings', 'last_updated_by')) {
+                $table->integer('last_updated_by')->unsigned()->nullable();
+            }
             $table->foreign('last_updated_by')->references('id')->on('users')->onDelete('SET NULL')->onUpdate('cascade');
         });
 

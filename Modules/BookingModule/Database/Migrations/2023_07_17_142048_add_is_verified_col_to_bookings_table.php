@@ -20,7 +20,9 @@ return new class extends Migration
             return;
         }
         Schema::table('bookings', function (Blueprint $table) {
-            $table->boolean('is_verified')->default(0);
+            if (! Schema::hasColumn('bookings', 'is_verified')) {
+                $table->boolean('is_verified')->default(0)->nullable();
+            }
         });
     }
 

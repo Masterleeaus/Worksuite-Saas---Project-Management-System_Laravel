@@ -6,6 +6,10 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
     public function up(): void {
+        if (Schema::hasTable('warehouses')) {
+            return;
+        }
+        
         Schema::create('warehouses', function (Blueprint $t) {
             $t->id();
             $t->string('name');

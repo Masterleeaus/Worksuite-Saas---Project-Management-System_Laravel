@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('reach_telegram_bots')) {
+            return;
+        }
+        
         Schema::create('reach_telegram_bots', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();

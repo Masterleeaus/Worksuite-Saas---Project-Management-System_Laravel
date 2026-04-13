@@ -12,6 +12,10 @@ return new class extends Migration {
     public function up(): void
     {
         if (!Schema::hasColumn('salary_slips', 'expense_id')) {
+            if (! Schema::hasTable('salary_slips')) {
+                return;
+            }
+            
             Schema::table('salary_slips', function (Blueprint $table) {
                 $table->integer('expense_id')->unsigned()->nullable();
                 $table->foreign('expense_id')->references('id')

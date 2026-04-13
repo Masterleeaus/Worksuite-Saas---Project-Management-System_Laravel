@@ -16,6 +16,10 @@ return new class extends Migration
     public function up(): void
     {
         if (!Schema::hasColumn('performance_settings', 'company_id')) {
+            if (! Schema::hasTable('performance_settings')) {
+                return;
+            }
+            
             Schema::table('performance_settings', function (Blueprint $table) {
                 $table->integer('company_id')->unsigned()->nullable()->after('id');
                 $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade')->onUpdate('cascade');
@@ -23,6 +27,10 @@ return new class extends Migration
         }
 
         if (Schema::hasColumn('performance_settings', 'purchase_code')) {
+            if (! Schema::hasTable('performance_settings')) {
+                return;
+            }
+            
             Schema::table('performance_settings', function (Blueprint $table) {
                 $table->dropColumn('purchase_code');
                 $table->dropColumn('supported_until');

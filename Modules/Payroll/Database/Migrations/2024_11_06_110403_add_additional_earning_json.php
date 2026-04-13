@@ -12,6 +12,10 @@ return new class extends Migration {
     public function up(): void
     {
         if (!Schema::hasColumn('salary_slips', 'additional_earning_json')) {
+            if (! Schema::hasTable('salary_slips')) {
+                return;
+            }
+            
             Schema::table('salary_slips', function (Blueprint $table) {
                 $table->text('additional_earning_json')->nullable();
             });

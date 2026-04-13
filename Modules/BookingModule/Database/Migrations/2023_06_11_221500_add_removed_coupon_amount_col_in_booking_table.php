@@ -20,7 +20,9 @@ return new class extends Migration
             return;
         }
         Schema::table('bookings', function (Blueprint $table) {
-            $table->decimal('removed_coupon_amount',24,2)->default(0);
+            if (! Schema::hasColumn('bookings', 'removed_coupon_amount')) {
+                $table->decimal('removed_coupon_amount',24,2)->default(0)->nullable();
+            }
         });
     }
 

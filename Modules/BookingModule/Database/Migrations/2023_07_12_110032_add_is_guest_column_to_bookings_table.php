@@ -20,7 +20,9 @@ return new class extends Migration
             return;
         }
         Schema::table('bookings', function (Blueprint $table) {
-            $table->boolean('is_guest')->default(0);
+            if (! Schema::hasColumn('bookings', 'is_guest')) {
+                $table->boolean('is_guest')->default(0)->nullable();
+            }
         });
     }
 

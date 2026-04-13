@@ -7,13 +7,23 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (! Schema::hasTable('attendances')) {
+            return;
+        }
+        
         Schema::table('attendances', function (Blueprint $table) {
-            $table->unsignedBigInteger('booking_id')->nullable()->after('longitude');
+            if (! Schema::hasColumn('attendances', 'booking_id')) {
+                $table->unsignedBigInteger('booking_id')->nullable()->after('longitude');
+            }
         });
     }
 
     public function down(): void
     {
+        if (! Schema::hasTable('attendances')) {
+            return;
+        }
+        
         Schema::table('attendances', function (Blueprint $table) {
             $table->dropColumn('booking_id');
         });

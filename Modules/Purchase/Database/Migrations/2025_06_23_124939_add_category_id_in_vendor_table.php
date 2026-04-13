@@ -17,7 +17,9 @@ return new class extends Migration
             return;
         }
         Schema::table('purchase_vendors', function (Blueprint $table) {
-            $table->integer('category_id')->unsigned()->nullable();
+            if (! Schema::hasColumn('purchase_vendors', 'category_id')) {
+                $table->integer('category_id')->unsigned()->nullable();
+            }
             $table->foreign('category_id')->references('id')->on('purchase_vendor_categories')->onDelete('set null');
 
         });

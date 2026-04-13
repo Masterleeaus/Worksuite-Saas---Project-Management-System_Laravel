@@ -17,7 +17,9 @@ class AddColToBankDestails extends Migration
             return;
         }
         Schema::table('bank_details', function (Blueprint $table) {
-            $table->string('routing_number',191)->nullable();
+            if (! Schema::hasColumn('bank_details', 'routing_number')) {
+                $table->string('routing_number',191)->nullable();
+            }
         });
     }
 

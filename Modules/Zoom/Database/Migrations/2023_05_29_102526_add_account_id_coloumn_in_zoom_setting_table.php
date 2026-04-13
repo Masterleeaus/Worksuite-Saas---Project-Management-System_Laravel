@@ -18,9 +18,15 @@ return new class extends Migration
             return;
         }
         Schema::table('zoom_setting', function (Blueprint $table) {
-            $table->string('account_id')->nullable();
-            $table->string('meeting_client_id')->nullable();
-            $table->string('meeting_client_secret')->nullable();
+            if (! Schema::hasColumn('zoom_setting', 'account_id')) {
+                $table->string('account_id')->nullable();
+            }
+            if (! Schema::hasColumn('zoom_setting', 'meeting_client_id')) {
+                $table->string('meeting_client_id')->nullable();
+            }
+            if (! Schema::hasColumn('zoom_setting', 'meeting_client_secret')) {
+                $table->string('meeting_client_secret')->nullable();
+            }
         });
     }
 

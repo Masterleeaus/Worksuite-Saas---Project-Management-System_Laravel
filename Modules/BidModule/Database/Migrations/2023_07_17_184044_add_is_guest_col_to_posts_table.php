@@ -17,7 +17,9 @@ class AddIsGuestColToPostsTable extends Migration
             return;
         }
         Schema::table('posts', function (Blueprint $table) {
-            $table->boolean('is_guest')->default(0);
+            if (! Schema::hasColumn('posts', 'is_guest')) {
+                $table->boolean('is_guest')->default(0)->nullable();
+            }
         });
     }
 

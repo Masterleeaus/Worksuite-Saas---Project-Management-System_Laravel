@@ -15,7 +15,9 @@ return new class extends Migration
             return;
         }
         Schema::table('recruit_job_offer_letter', function (Blueprint $table) {
-            $table->longText('description')->nullable();
+            if (! Schema::hasColumn('recruit_job_offer_letter', 'description')) {
+                $table->longText('description')->nullable();
+            }
         });
     }
 

@@ -17,7 +17,9 @@ return new class extends Migration
             return;
         }
         Schema::table('sms_settings', function (Blueprint $table) {
-            $table->string('telegram_bot_name')->nullable()->after('telegram_bot_token');
+            if (! Schema::hasColumn('sms_settings', 'telegram_bot_name')) {
+                $table->string('telegram_bot_name')->nullable()->after('telegram_bot_token');
+            }
         });
     }
 

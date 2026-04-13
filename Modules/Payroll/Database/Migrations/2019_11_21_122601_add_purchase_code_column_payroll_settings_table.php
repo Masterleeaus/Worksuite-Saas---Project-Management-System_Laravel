@@ -17,7 +17,9 @@ return new class extends Migration
             return;
         }
         Schema::table('payroll_settings', function (Blueprint $table) {
-            $table->string('purchase_code')->nullable();
+            if (! Schema::hasColumn('payroll_settings', 'purchase_code')) {
+                $table->string('purchase_code')->nullable();
+            }
         });
     }
 

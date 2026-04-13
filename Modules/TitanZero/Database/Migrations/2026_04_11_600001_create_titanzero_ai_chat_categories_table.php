@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('titanzero_ai_chat_categories')) {
+            return;
+        }
+        
         Schema::create('titanzero_ai_chat_categories', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();

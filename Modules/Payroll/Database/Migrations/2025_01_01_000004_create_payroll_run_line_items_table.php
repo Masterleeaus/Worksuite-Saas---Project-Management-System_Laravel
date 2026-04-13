@@ -6,6 +6,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('payroll_run_line_items')) {
+            return;
+        }
+        
         Schema::create('payroll_run_line_items', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('payroll_run_id');

@@ -13,6 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('item_sub_category')) {
+            return;
+        }
+        
         Schema::create('item_sub_category', function (Blueprint $table) {
             $table->id();
             $table->integer('company_id')->unsigned()->nullable();

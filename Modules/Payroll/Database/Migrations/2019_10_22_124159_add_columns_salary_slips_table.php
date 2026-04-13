@@ -24,15 +24,25 @@ return new class extends Migration
         });
 
         Schema::table('salary_slips', function (Blueprint $table) {
-            $table->text('salary_json')->nullable();
-            $table->text('extra_json')->nullable();
+            if (! Schema::hasColumn('salary_slips', 'salary_json')) {
+                $table->text('salary_json')->nullable();
+            }
+            if (! Schema::hasColumn('salary_slips', 'extra_json')) {
+                $table->text('extra_json')->nullable();
+            }
         if (! Schema::hasTable('salary_slips')) {
             return;
         }
-            $table->string('expense_claims')->default('0');
-            $table->integer('pay_days');
+            if (! Schema::hasColumn('salary_slips', 'expense_claims')) {
+                $table->string('expense_claims')->default('0')->nullable();
+            }
+            if (! Schema::hasColumn('salary_slips', 'pay_days')) {
+                $table->integer('pay_days')->nullable();
+            }
 
-            $table->unsignedBigInteger('salary_payment_method_id')->nullable();
+            if (! Schema::hasColumn('salary_slips', 'salary_payment_method_id')) {
+                $table->unsignedBigInteger('salary_payment_method_id')->nullable();
+            }
             $table->foreign('salary_payment_method_id')->references('id')->on('salary_payment_methods')->onDelete('SET NULL');
         });
     }

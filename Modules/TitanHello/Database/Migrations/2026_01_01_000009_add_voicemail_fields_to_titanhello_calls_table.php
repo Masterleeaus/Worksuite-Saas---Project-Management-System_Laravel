@@ -11,11 +11,21 @@ return new class extends Migration {
             return;
         }
         Schema::table('titanhello_calls', function (Blueprint $table) {
-            $table->boolean('voicemail_flag')->default(false)->index();
-            $table->timestamp('voicemail_received_at')->nullable()->index();
-            $table->unsignedBigInteger('voicemail_recording_id')->nullable()->index();
-            $table->unsignedBigInteger('voicemail_transcript_artifact_id')->nullable();
-            $table->unsignedBigInteger('voicemail_summary_artifact_id')->nullable();
+            if (! Schema::hasColumn('titanhello_calls', 'voicemail_flag')) {
+                $table->boolean('voicemail_flag')->default(false)->index()->nullable();
+            }
+            if (! Schema::hasColumn('titanhello_calls', 'voicemail_received_at')) {
+                $table->timestamp('voicemail_received_at')->nullable()->index();
+            }
+            if (! Schema::hasColumn('titanhello_calls', 'voicemail_recording_id')) {
+                $table->unsignedBigInteger('voicemail_recording_id')->nullable()->index();
+            }
+            if (! Schema::hasColumn('titanhello_calls', 'voicemail_transcript_artifact_id')) {
+                $table->unsignedBigInteger('voicemail_transcript_artifact_id')->nullable();
+            }
+            if (! Schema::hasColumn('titanhello_calls', 'voicemail_summary_artifact_id')) {
+                $table->unsignedBigInteger('voicemail_summary_artifact_id')->nullable();
+            }
         });
     }
 

@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('reach_whatsapp_channels')) {
+            return;
+        }
+        
         Schema::create('reach_whatsapp_channels', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();

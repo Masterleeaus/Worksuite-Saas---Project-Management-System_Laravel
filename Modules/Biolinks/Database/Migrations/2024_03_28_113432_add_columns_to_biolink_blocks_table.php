@@ -17,18 +17,42 @@ return new class extends Migration {
             return;
         }
         Schema::table('biolink_blocks', function (Blueprint $table) {
-            $table->string('placeholder')->nullable();
-            $table->string('name_placeholder')->nullable();
-            $table->string('button_text')->nullable();
-            $table->string('thank_you_message')->nullable();
-            $table->string('thank_you_url')->nullable();
-            $table->boolean('show_agreement')->default(false)->nullable();
-            $table->string('agreement_text')->nullable();
-            $table->string('agreement_url')->nullable();
-            $table->string('api_key')->nullable();
-            $table->string('mailchimp_list')->nullable();
-            $table->string('webhook_url')->nullable();
-            $table->string('cancelled_payment_url')->nullable();
+            if (! Schema::hasColumn('biolink_blocks', 'placeholder')) {
+                $table->string('placeholder')->nullable();
+            }
+            if (! Schema::hasColumn('biolink_blocks', 'name_placeholder')) {
+                $table->string('name_placeholder')->nullable();
+            }
+            if (! Schema::hasColumn('biolink_blocks', 'button_text')) {
+                $table->string('button_text')->nullable();
+            }
+            if (! Schema::hasColumn('biolink_blocks', 'thank_you_message')) {
+                $table->string('thank_you_message')->nullable();
+            }
+            if (! Schema::hasColumn('biolink_blocks', 'thank_you_url')) {
+                $table->string('thank_you_url')->nullable();
+            }
+            if (! Schema::hasColumn('biolink_blocks', 'show_agreement')) {
+                $table->boolean('show_agreement')->default(false)->nullable();
+            }
+            if (! Schema::hasColumn('biolink_blocks', 'agreement_text')) {
+                $table->string('agreement_text')->nullable();
+            }
+            if (! Schema::hasColumn('biolink_blocks', 'agreement_url')) {
+                $table->string('agreement_url')->nullable();
+            }
+            if (! Schema::hasColumn('biolink_blocks', 'api_key')) {
+                $table->string('api_key')->nullable();
+            }
+            if (! Schema::hasColumn('biolink_blocks', 'mailchimp_list')) {
+                $table->string('mailchimp_list')->nullable();
+            }
+            if (! Schema::hasColumn('biolink_blocks', 'webhook_url')) {
+                $table->string('webhook_url')->nullable();
+            }
+            if (! Schema::hasColumn('biolink_blocks', 'cancelled_payment_url')) {
+                $table->string('cancelled_payment_url')->nullable();
+            }
 
         });
 

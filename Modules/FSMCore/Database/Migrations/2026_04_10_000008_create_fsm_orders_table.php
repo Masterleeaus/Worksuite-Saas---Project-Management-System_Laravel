@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('fsm_orders')) {
+            return;
+        }
+        
         Schema::create('fsm_orders', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -31,6 +35,10 @@ return new class extends Migration {
             $table->foreign('template_id')->references('id')->on('fsm_templates')->nullOnDelete();
         });
 
+        if (Schema::hasTable('fsm_order_equipment')) {
+            return;
+        }
+        
         Schema::create('fsm_order_equipment', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('fsm_order_id');
@@ -40,6 +48,10 @@ return new class extends Migration {
             $table->foreign('fsm_equipment_id')->references('id')->on('fsm_equipment')->cascadeOnDelete();
         });
 
+        if (Schema::hasTable('fsm_order_tag')) {
+            return;
+        }
+        
         Schema::create('fsm_order_tag', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('fsm_order_id');

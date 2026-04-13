@@ -69,6 +69,10 @@ return new class extends Migration {
      */
     public function down(): void
     {
+        if (! Schema::hasTable('application_sources')) {
+            return;
+        }
+        
         Schema::table('application_sources', function (Blueprint $table) {
             $table->dropColumn('company_id');
         });

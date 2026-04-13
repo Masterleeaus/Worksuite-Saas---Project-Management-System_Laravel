@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('reach_segments')) {
+            return;
+        }
+        
         Schema::create('reach_segments', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();

@@ -25,6 +25,10 @@ return new class extends Migration {
             $table->timestamps();
         });
 
+        if (Schema::hasTable('titanzero_audit_logs')) {
+            return;
+        }
+        
         Schema::create('titanzero_audit_logs', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('intent_run_id')->index();
@@ -34,6 +38,10 @@ return new class extends Migration {
             $table->timestamps();
         });
 
+        if (Schema::hasTable('titanzero_artifacts')) {
+            return;
+        }
+        
         Schema::create('titanzero_artifacts', function (Blueprint $table) {
             $table->id();
             $table->string('record_type', 80)->index();

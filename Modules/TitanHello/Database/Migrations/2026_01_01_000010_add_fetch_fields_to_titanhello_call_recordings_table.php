@@ -11,12 +11,22 @@ return new class extends Migration {
             return;
         }
         Schema::table('titanhello_call_recordings', function (Blueprint $table) {
-            $table->string('kind', 30)->default('call')->index();
-            $table->timestamp('fetched_at')->nullable();
+            if (! Schema::hasColumn('titanhello_call_recordings', 'kind')) {
+                $table->string('kind', 30)->default('call')->index()->nullable();
+            }
+            if (! Schema::hasColumn('titanhello_call_recordings', 'fetched_at')) {
+                $table->timestamp('fetched_at')->nullable();
+            }
             $table->string('fetch_status', 30)->nullable()->index(); // ok/failed/pending
-            $table->text('fetch_error')->nullable();
-            $table->bigInteger('bytes')->nullable();
-            $table->string('sha256', 64)->nullable()->index();
+            if (! Schema::hasColumn('titanhello_call_recordings', 'fetch_error')) {
+                $table->text('fetch_error')->nullable();
+            }
+            if (! Schema::hasColumn('titanhello_call_recordings', 'bytes')) {
+                $table->bigInteger('bytes')->nullable();
+            }
+            if (! Schema::hasColumn('titanhello_call_recordings', 'sha256')) {
+                $table->string('sha256', 64)->nullable()->index();
+            }
             $table->string('disk', 30)->nullable(); // local/s3 etc
         });
     }

@@ -17,7 +17,9 @@ class AddColToTransactionsTable extends Migration
             return;
         }
         Schema::table('transactions', function (Blueprint $table) {
-            $table->string('reference_note', 100)->nullable();
+            if (! Schema::hasColumn('transactions', 'reference_note')) {
+                $table->string('reference_note', 100)->nullable();
+            }
         });
     }
 

@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('fsm_service_agreements')) {
+            return;
+        }
+        
         Schema::create('fsm_service_agreements', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -22,6 +26,10 @@ return new class extends Migration {
         });
 
         // Many-to-many: agreement ↔ fsm_locations
+        if (Schema::hasTable('fsm_agreement_location')) {
+            return;
+        }
+        
         Schema::create('fsm_agreement_location', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('fsm_service_agreement_id');
@@ -36,6 +44,10 @@ return new class extends Migration {
         });
 
         // Many-to-many: agreement ↔ fsm_templates
+        if (Schema::hasTable('fsm_agreement_template')) {
+            return;
+        }
+        
         Schema::create('fsm_agreement_template', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('fsm_service_agreement_id');

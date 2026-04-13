@@ -34,6 +34,10 @@ return new class extends Migration
             $table->foreign('bank_account_id')->references('id')->on('acc_bank_accounts')->onDelete('cascade');
         });
 
+        if (Schema::hasTable('acc_bank_reconciliation_lines')) {
+            return;
+        }
+        
         Schema::create('acc_bank_reconciliation_lines', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->index();

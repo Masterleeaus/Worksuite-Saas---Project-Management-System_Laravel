@@ -17,7 +17,9 @@ class AddIsNotifiedInPackageSubscribers extends Migration
             return;
         }
         Schema::table('package_subscribers', function (Blueprint $table) {
-            $table->tinyInteger('is_notified')->default(0);
+            if (! Schema::hasColumn('package_subscribers', 'is_notified')) {
+                $table->tinyInteger('is_notified')->default(0)->nullable();
+            }
         });
     }
 

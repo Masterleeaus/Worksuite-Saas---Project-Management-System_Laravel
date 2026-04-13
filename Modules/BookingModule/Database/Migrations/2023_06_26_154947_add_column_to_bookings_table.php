@@ -20,8 +20,12 @@ return new class extends Migration
             return;
         }
         Schema::table('bookings', function (Blueprint $table) {
-            $table->json('evidence_photos')->nullable();
-            $table->string('booking_otp')->nullable();
+            if (! Schema::hasColumn('bookings', 'evidence_photos')) {
+                $table->json('evidence_photos')->nullable();
+            }
+            if (! Schema::hasColumn('bookings', 'booking_otp')) {
+                $table->string('booking_otp')->nullable();
+            }
         });
     }
 

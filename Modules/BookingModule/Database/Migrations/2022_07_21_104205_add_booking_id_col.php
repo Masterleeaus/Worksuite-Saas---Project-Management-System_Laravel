@@ -20,7 +20,9 @@ return new class extends Migration
             return;
         }
         Schema::table('bookings', function (Blueprint $table) {
-            $table->bigInteger('readable_id')->after('id');
+            if (! Schema::hasColumn('bookings', 'readable_id')) {
+                $table->bigInteger('readable_id')->after('id')->nullable();
+            }
         });
     }
 

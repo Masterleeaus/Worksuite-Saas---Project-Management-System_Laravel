@@ -17,7 +17,9 @@ class AddIsGuestColumnToTransactionsTable extends Migration
             return;
         }
         Schema::table('transactions', function (Blueprint $table) {
-            $table->boolean('is_guest')->default(0);
+            if (! Schema::hasColumn('transactions', 'is_guest')) {
+                $table->boolean('is_guest')->default(0)->nullable();
+            }
         });
     }
 

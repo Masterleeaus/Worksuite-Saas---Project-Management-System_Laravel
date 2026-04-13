@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('fsm_routes')) {
+            return;
+        }
+        
         Schema::create('fsm_routes', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -18,6 +22,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('fsm_route_day_pivot')) {
+            return;
+        }
+        
         Schema::create('fsm_route_day_pivot', function (Blueprint $table) {
             $table->unsignedBigInteger('fsm_route_id');
             $table->unsignedBigInteger('fsm_route_day_id');
@@ -28,6 +36,10 @@ return new class extends Migration
             $table->primary(['fsm_route_id', 'fsm_route_day_id']);
         });
 
+        if (Schema::hasTable('fsm_route_location')) {
+            return;
+        }
+        
         Schema::create('fsm_route_location', function (Blueprint $table) {
             $table->unsignedBigInteger('fsm_route_id');
             $table->unsignedBigInteger('fsm_location_id');

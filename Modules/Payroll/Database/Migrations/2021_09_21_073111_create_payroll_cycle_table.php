@@ -43,6 +43,10 @@ return new class extends Migration
         $payrollCycle = PayrollCycle::where('cycle', 'monthly')->first();
 
         if (! Schema::hasColumn('salary_slips', 'salary_from')) {
+            if (! Schema::hasTable('salary_slips')) {
+                return;
+            }
+            
             Schema::table('salary_slips', function (Blueprint $table) {
                 $table->dateTime('salary_from')->nullable();
                 $table->dateTime('salary_to')->nullable();
@@ -50,6 +54,10 @@ return new class extends Migration
                 $table->foreign('payroll_cycle_id')->references('id')->on('payroll_cycles')->onDelete('cascade')->onUpdate('cascade');
             });
 
+            if (! Schema::hasTable('payroll_settings')) {
+                return;
+            }
+            
             Schema::table('payroll_settings', function (Blueprint $table) {
                 $table->integer('semi_monthly_start')->nullable()->default(1);
                 $table->integer('semi_monthly_end')->nullable()->default(30);

@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('fsm_teams')) {
+            return;
+        }
+        
         Schema::create('fsm_teams', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -16,6 +20,10 @@ return new class extends Migration {
             $table->timestamps();
         });
 
+        if (Schema::hasTable('fsm_team_user')) {
+            return;
+        }
+        
         Schema::create('fsm_team_user', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('fsm_team_id');

@@ -8,6 +8,10 @@ return new class extends Migration {
     public function up(): void
     {
         // Skill requirements attached to FSM Orders
+        if (Schema::hasTable('fsm_order_skill_requirements')) {
+            return;
+        }
+        
         Schema::create('fsm_order_skill_requirements', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('fsm_order_id')->index();
@@ -22,6 +26,10 @@ return new class extends Migration {
         });
 
         // Skill requirements attached to FSM Templates
+        if (Schema::hasTable('fsm_template_skill_requirements')) {
+            return;
+        }
+        
         Schema::create('fsm_template_skill_requirements', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('fsm_template_id')->index();

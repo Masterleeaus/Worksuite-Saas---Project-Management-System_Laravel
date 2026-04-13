@@ -20,7 +20,9 @@ return new class extends Migration
             return;
         }
         Schema::table('booking_details', function (Blueprint $table) {
-            $table->string('service_name')->nullable()->after('service_id');
+            if (! Schema::hasColumn('booking_details', 'service_name')) {
+                $table->string('service_name')->nullable()->after('service_id');
+            }
         });
     }
 

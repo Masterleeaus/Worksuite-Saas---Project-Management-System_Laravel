@@ -19,6 +19,10 @@ return new class extends Migration
     public function up()
     {
         if (! Schema::hasColumn('assets', 'value')) {
+            if (! Schema::hasTable('assets')) {
+                return;
+            }
+            
             Schema::table('assets', function (Blueprint $table) {
 
                 $table->string('value')->nullable();

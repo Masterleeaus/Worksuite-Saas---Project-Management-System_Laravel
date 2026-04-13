@@ -17,7 +17,9 @@ class AddColToPostsTable extends Migration
             return;
         }
         Schema::table('posts', function (Blueprint $table) {
-            $table->boolean('is_checked')->default(0)->after('is_booked');
+            if (! Schema::hasColumn('posts', 'is_checked')) {
+                $table->boolean('is_checked')->default(0)->after('is_booked')->nullable();
+            }
             $table->foreignUuid('zone_id')->after('service_address_id')->nullable();
         });
     }

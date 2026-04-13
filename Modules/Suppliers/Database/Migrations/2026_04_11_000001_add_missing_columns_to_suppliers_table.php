@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('suppliers')) {
+            return;
+        }
+        
         Schema::table('suppliers', function (Blueprint $table) {
             if (!Schema::hasColumn('suppliers', 'abn')) {
                 $table->string('abn', 50)->nullable()->after('email');
@@ -30,6 +34,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (! Schema::hasTable('suppliers')) {
+            return;
+        }
+        
         Schema::table('suppliers', function (Blueprint $table) {
             $drop = array_filter(
                 ['abn', 'website', 'notes', 'is_active', 'user_id'],

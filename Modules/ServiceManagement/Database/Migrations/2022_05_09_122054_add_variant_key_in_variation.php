@@ -17,7 +17,9 @@ class AddVariantKeyInVariation extends Migration
             return;
         }
         Schema::table('variations', function (Blueprint $table) {
-            $table->string('variant_key',191)->after('variant');
+            if (! Schema::hasColumn('variations', 'variant_key')) {
+                $table->string('variant_key',191)->after('variant')->nullable();
+            }
         });
     }
 

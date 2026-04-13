@@ -31,6 +31,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('recruit_job_types')) {
+            return;
+        }
+        
         Schema::create('recruit_job_types', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -38,6 +42,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('recruit_work_experiences')) {
+            return;
+        }
+        
         Schema::create('recruit_work_experiences', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -45,6 +53,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('recruit_jobs')) {
+            return;
+        }
+        
         Schema::create('recruit_jobs', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -92,6 +104,10 @@ return new class extends Migration
             $table->softDeletes();
         });
 
+        if (Schema::hasTable('recruit_interview_stages')) {
+            return;
+        }
+        
         Schema::create('recruit_interview_stages', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -99,6 +115,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('recruit_job_skills')) {
+            return;
+        }
+        
         Schema::create('recruit_job_skills', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -109,6 +129,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('recruit_application_status_categories')) {
+            return;
+        }
+        
         Schema::create('recruit_application_status_categories', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -116,6 +140,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('application_sources')) {
+            return;
+        }
+        
         Schema::create('application_sources', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -123,6 +151,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('recruit_application_status')) {
+            return;
+        }
+        
         Schema::create('recruit_application_status', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -136,6 +168,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('recruit_job_files')) {
+            return;
+        }
+        
         Schema::create('recruit_job_files', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -160,6 +196,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('recruit_job_applications')) {
+            return;
+        }
+        
         Schema::create('recruit_job_applications', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -202,6 +242,10 @@ return new class extends Migration
             $table->softDeletes();
         });
 
+        if (Schema::hasTable('recruit_applicant_notes')) {
+            return;
+        }
+        
         Schema::create('recruit_applicant_notes', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -215,6 +259,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('recruit_application_skills')) {
+            return;
+        }
+        
         Schema::create('recruit_application_skills', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -225,6 +273,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('recruit_jobboard_settings')) {
+            return;
+        }
+        
         Schema::create('recruit_jobboard_settings', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -240,6 +292,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('recruiters')) {
+            return;
+        }
+        
         Schema::create('recruiters', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -258,6 +314,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('recruit_interview_schedules')) {
+            return;
+        }
+        
         Schema::create('recruit_interview_schedules', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -293,6 +353,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('recruit_interview_employees')) {
+            return;
+        }
+        
         Schema::create('recruit_interview_employees', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -310,6 +374,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('recruit_interview_comments')) {
+            return;
+        }
+        
         Schema::create('recruit_interview_comments', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -326,6 +394,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('recruit_application_files')) {
+            return;
+        }
+        
         Schema::create('recruit_application_files', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -345,6 +417,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('recruit_candidate_database')) {
+            return;
+        }
+        
         Schema::create('recruit_candidate_database', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -359,6 +435,10 @@ return new class extends Migration
 
         ModuleSetting::where(['module_name' => 'jobApplication'])->delete();
 
+        if (Schema::hasTable('recruit_footer_links')) {
+            return;
+        }
+        
         Schema::create('recruit_footer_links', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -369,6 +449,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('recruit_job_offer_letter')) {
+            return;
+        }
+        
         Schema::create('recruit_job_offer_letter', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -402,6 +486,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('recruit_job_histories')) {
+            return;
+        }
+        
         Schema::create('recruit_job_histories', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -426,6 +514,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('recruit_interview_files')) {
+            return;
+        }
+        
         Schema::create('recruit_interview_files', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -451,6 +543,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('recruit_interview_histories')) {
+            return;
+        }
+        
         Schema::create('recruit_interview_histories', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -469,6 +565,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('recruit_recommendation_statuses')) {
+            return;
+        }
+        
         Schema::create('recruit_recommendation_statuses', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -483,6 +583,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('recruit_settings')) {
+            return;
+        }
+        
         Schema::create('recruit_settings', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedInteger('company_id')->nullable();
@@ -500,6 +604,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('recruit_job_offer_files')) {
+            return;
+        }
+        
         Schema::create('recruit_job_offer_files', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -519,6 +627,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('recruit_interview_evaluations')) {
+            return;
+        }
+        
         Schema::create('recruit_interview_evaluations', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -543,6 +655,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('recruit_job_addresses')) {
+            return;
+        }
+        
         Schema::create('recruit_job_addresses', function (Blueprint $table) {            $table->unsignedBigInteger('company_id')->nullable()->index();
 
             $table->unsignedBigInteger('job_id');
@@ -552,6 +668,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('offer_letter_histories')) {
+            return;
+        }
+        
         Schema::create('offer_letter_histories', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -568,6 +688,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('recruit_email_notification_settings')) {
+            return;
+        }
+        
         Schema::create('recruit_email_notification_settings', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -577,6 +701,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('job_interview_stages')) {
+            return;
+        }
+        
         Schema::create('job_interview_stages', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();

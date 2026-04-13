@@ -20,7 +20,9 @@ return new class extends Migration
             return;
         }
         Schema::table('bookings', function (Blueprint $table) {
-            $table->boolean('is_checked')->default(false);
+            if (! Schema::hasColumn('bookings', 'is_checked')) {
+                $table->boolean('is_checked')->default(false)->nullable();
+            }
         });
     }
 

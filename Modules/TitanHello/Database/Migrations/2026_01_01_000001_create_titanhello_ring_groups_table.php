@@ -20,6 +20,10 @@ return new class extends Migration {
             $table->timestamps();
         });
 
+        if (Schema::hasTable('titanhello_ring_group_members')) {
+            return;
+        }
+        
         Schema::create('titanhello_ring_group_members', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('ring_group_id')->index();

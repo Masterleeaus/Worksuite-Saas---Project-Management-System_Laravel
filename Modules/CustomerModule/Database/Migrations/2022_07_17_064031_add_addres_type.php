@@ -17,9 +17,15 @@ class AddAddresType extends Migration
             return;
         }
         Schema::table('user_addresses', function (Blueprint $table) {
-            $table->string('address_type')->nullable();
-            $table->string('contact_person_name')->nullable();
-            $table->string('contact_person_number')->nullable();
+            if (! Schema::hasColumn('user_addresses', 'address_type')) {
+                $table->string('address_type')->nullable();
+            }
+            if (! Schema::hasColumn('user_addresses', 'contact_person_name')) {
+                $table->string('contact_person_name')->nullable();
+            }
+            if (! Schema::hasColumn('user_addresses', 'contact_person_number')) {
+                $table->string('contact_person_number')->nullable();
+            }
         });
     }
 

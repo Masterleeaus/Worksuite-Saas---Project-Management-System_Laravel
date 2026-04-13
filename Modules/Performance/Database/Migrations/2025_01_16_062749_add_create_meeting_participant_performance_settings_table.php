@@ -19,7 +19,9 @@ return new class extends Migration
             return;
         }
         Schema::table('performance_settings', function (Blueprint $table) {
-            $table->boolean('create_meeting_participant')->default(false)->after('create_meeting_manager');
+            if (! Schema::hasColumn('performance_settings', 'create_meeting_participant')) {
+                $table->boolean('create_meeting_participant')->default(false)->after('create_meeting_manager')->nullable();
+            }
         });
 
         $meetingSeetings = PerformanceSetting::all();

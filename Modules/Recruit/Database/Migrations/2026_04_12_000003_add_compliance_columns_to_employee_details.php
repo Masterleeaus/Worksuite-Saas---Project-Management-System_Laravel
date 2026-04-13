@@ -18,6 +18,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('employee_details')) {
+            return;
+        }
+        
         Schema::table('employee_details', function (Blueprint $table) {
             if (!Schema::hasColumn('employee_details', 'police_check_date')) {
                 $table->date('police_check_date')->nullable()->after('probation_end_date');
@@ -96,6 +100,10 @@ return new class extends Migration
             'induction_completed_date',
         ];
 
+        if (! Schema::hasTable('employee_details')) {
+            return;
+        }
+        
         Schema::table('employee_details', function (Blueprint $table) use ($columns) {
             foreach ($columns as $column) {
                 if (Schema::hasColumn('employee_details', $column)) {

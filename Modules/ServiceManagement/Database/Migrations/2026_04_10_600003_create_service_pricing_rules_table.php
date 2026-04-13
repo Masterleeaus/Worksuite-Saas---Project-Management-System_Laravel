@@ -12,6 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('service_pricing_rules')) {
+            return;
+        }
+        
         Schema::create('service_pricing_rules', function (Blueprint $table) {
             $table->id();
             $table->string('service_id', 36)->index();

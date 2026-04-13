@@ -21,6 +21,10 @@ return new class extends Migration {
             $table->timestamps();
         });
 
+        if (Schema::hasTable('titanhello_ivr_options')) {
+            return;
+        }
+        
         Schema::create('titanhello_ivr_options', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('ivr_menu_id')->index();

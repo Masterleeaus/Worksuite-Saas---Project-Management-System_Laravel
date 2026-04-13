@@ -28,6 +28,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('acc_bank_transactions')) {
+            return;
+        }
+        
         Schema::create('acc_bank_transactions', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->index();

@@ -33,6 +33,10 @@ return new class extends Migration {
         });
 
         // Feedback Insights (AI-generated per ticket)
+        if (Schema::hasTable('feedback_insights')) {
+            return;
+        }
+        
         Schema::create('feedback_insights', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();

@@ -15,7 +15,9 @@ return new class extends Migration
             return;
         }
         Schema::table('purchase_settings', function (Blueprint $table) {
-            $table->text('purchase_terms')->nullable();
+            if (! Schema::hasColumn('purchase_settings', 'purchase_terms')) {
+                $table->text('purchase_terms')->nullable();
+            }
 
         });
     }
@@ -25,6 +27,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (! Schema::hasTable('purchase_setting')) {
+            return;
+        }
+        
         Schema::table('purchase_setting', function (Blueprint $table) {
             $table->dropColumn('purchase_terms');
         });

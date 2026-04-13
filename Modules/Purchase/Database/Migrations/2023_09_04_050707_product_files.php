@@ -18,7 +18,9 @@ return new class extends Migration
             return;
         }
         Schema::table('product_files', function(Blueprint $table){
-            $table->boolean('default_status')->default(false);
+            if (! Schema::hasColumn('product_files', 'default_status')) {
+                $table->boolean('default_status')->default(false)->nullable();
+            }
         });
     }
 

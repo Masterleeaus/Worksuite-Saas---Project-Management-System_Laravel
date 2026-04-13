@@ -16,7 +16,9 @@ return new class extends Migration
             return;
         }
         Schema::table('rest_api_settings', function (Blueprint $table) {
-            $table->string('fcm_key')->nullable();
+            if (! Schema::hasColumn('rest_api_settings', 'fcm_key')) {
+                $table->string('fcm_key')->nullable();
+            }
         });
     }
 

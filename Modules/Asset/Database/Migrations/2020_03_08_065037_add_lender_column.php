@@ -18,6 +18,10 @@ return new class extends Migration
 
             \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
+            if (! Schema::hasTable('asset_lending_history')) {
+                return;
+            }
+            
             Schema::table('asset_lending_history', function (Blueprint $table) {
                 $table->unsignedInteger('lender_id')->after('user_id');
                 $table->foreign('lender_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');

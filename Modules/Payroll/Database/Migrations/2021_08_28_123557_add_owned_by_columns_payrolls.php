@@ -18,6 +18,10 @@ return new class extends Migration
     {
 
         if (! Schema::hasColumn('salary_slips', 'added_by')) {
+            if (! Schema::hasTable('salary_slips')) {
+                return;
+            }
+            
             Schema::table('salary_slips', function (Blueprint $table) {
                 $table->integer('added_by')->unsigned()->nullable();
                 $table->foreign('added_by')->references('id')->on('users')->onDelete('SET NULL')->onUpdate('cascade');
@@ -28,6 +32,10 @@ return new class extends Migration
         }
 
         if (! Schema::hasColumn('salary_slips', 'company_id')) {
+            if (! Schema::hasTable('salary_slips')) {
+                return;
+            }
+            
             Schema::table('salary_slips', function (Blueprint $table) {
                 $table->integer('company_id')->unsigned()->nullable()->after('id');
                 $table->foreign('company_id')->references('id')

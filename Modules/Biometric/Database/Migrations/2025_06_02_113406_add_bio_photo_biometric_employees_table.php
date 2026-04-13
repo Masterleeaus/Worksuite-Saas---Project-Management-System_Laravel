@@ -16,9 +16,15 @@ return new class extends Migration
             return;
         }
         Schema::table('biometric_employees', function (Blueprint $table) {
-            $table->boolean('has_photo')->default(false)->after('user_id');
-            $table->text('photo')->nullable()->after('has_photo');
-            $table->boolean('has_card')->default(false)->before('card_number');
+            if (! Schema::hasColumn('biometric_employees', 'has_photo')) {
+                $table->boolean('has_photo')->default(false)->after('user_id')->nullable();
+            }
+            if (! Schema::hasColumn('biometric_employees', 'photo')) {
+                $table->text('photo')->nullable()->after('has_photo');
+            }
+            if (! Schema::hasColumn('biometric_employees', 'has_card')) {
+                $table->boolean('has_card')->default(false)->before('card_number')->nullable();
+            }
         });
     }
 

@@ -17,8 +17,12 @@ return new class extends Migration
             return;
         }
         Schema::table('salary_slips', function (Blueprint $table) {
-            $table->double('tds', 16, 2);
-            $table->double('monthly_salary', 16, 2);
+            if (! Schema::hasColumn('salary_slips', 'tds')) {
+                $table->double('tds', 16, 2)->nullable();
+            }
+            if (! Schema::hasColumn('salary_slips', 'monthly_salary')) {
+                $table->double('monthly_salary', 16, 2)->nullable();
+            }
         });
     }
 

@@ -24,6 +24,10 @@ return new class extends Migration {
         });
 
         // Feedback Types
+        if (Schema::hasTable('feedback_types')) {
+            return;
+        }
+        
         Schema::create('feedback_types', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
@@ -37,6 +41,10 @@ return new class extends Migration {
         });
 
         // Feedback Groups
+        if (Schema::hasTable('feedback_groups')) {
+            return;
+        }
+        
         Schema::create('feedback_groups', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
@@ -48,6 +56,10 @@ return new class extends Migration {
         });
 
         // Feedback Agent Groups (pivot)
+        if (Schema::hasTable('feedback_agent_groups')) {
+            return;
+        }
+        
         Schema::create('feedback_agent_groups', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
@@ -60,6 +72,10 @@ return new class extends Migration {
         });
 
         // Feedback Files
+        if (Schema::hasTable('feedback_files')) {
+            return;
+        }
+        
         Schema::create('feedback_files', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
@@ -77,6 +93,10 @@ return new class extends Migration {
         });
 
         // Feedback Tags
+        if (Schema::hasTable('feedback_tags_list')) {
+            return;
+        }
+        
         Schema::create('feedback_tags_list', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
@@ -88,6 +108,10 @@ return new class extends Migration {
         });
 
         // Feedback Tags Pivot
+        if (Schema::hasTable('feedback_tags')) {
+            return;
+        }
+        
         Schema::create('feedback_tags', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
@@ -99,6 +123,10 @@ return new class extends Migration {
         });
 
         // Reply Templates
+        if (Schema::hasTable('feedback_reply_templates')) {
+            return;
+        }
+        
         Schema::create('feedback_reply_templates', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
@@ -112,6 +140,10 @@ return new class extends Migration {
         });
 
         // Custom Forms
+        if (Schema::hasTable('feedback_custom_forms')) {
+            return;
+        }
+        
         Schema::create('feedback_custom_forms', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
@@ -124,6 +156,10 @@ return new class extends Migration {
         });
 
         // Email Settings
+        if (Schema::hasTable('feedback_email_settings')) {
+            return;
+        }
+        
         Schema::create('feedback_email_settings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();

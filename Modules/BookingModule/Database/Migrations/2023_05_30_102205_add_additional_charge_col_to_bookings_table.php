@@ -20,7 +20,9 @@ return new class extends Migration
             return;
         }
         Schema::table('bookings', function (Blueprint $table) {
-            $table->decimal('additional_charge',24,2)->default(0);
+            if (! Schema::hasColumn('bookings', 'additional_charge')) {
+                $table->decimal('additional_charge',24,2)->default(0)->nullable();
+            }
         });
     }
 

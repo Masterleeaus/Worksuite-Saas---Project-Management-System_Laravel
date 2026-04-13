@@ -7,14 +7,24 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (! Schema::hasTable('fsm_orders')) {
+            return;
+        }
+        
         Schema::table('fsm_orders', function (Blueprint $table) {
-            $table->unsignedBigInteger('lead_id')->nullable()->after('agreement_id')->index();
+            if (! Schema::hasColumn('fsm_orders', 'lead_id')) {
+                $table->unsignedBigInteger('lead_id')->nullable()->after('agreement_id')->index();
+            }
             $table->foreign('lead_id')->references('id')->on('fsm_leads')->nullOnDelete();
         });
     }
 
     public function down(): void
     {
+        if (! Schema::hasTable('fsm_orders')) {
+            return;
+        }
+        
         Schema::table('fsm_orders', function (Blueprint $table) {
             $table->dropForeign(['lead_id']);
             $table->dropColumn('lead_id');

@@ -17,11 +17,19 @@ return new class extends Migration
             return;
         }
         Schema::table('zoom_setting', function (Blueprint $table) {
-            $table->string('meeting_app')->default('in_app');
+            if (! Schema::hasColumn('zoom_setting', 'meeting_app')) {
+                $table->string('meeting_app')->default('in_app')->nullable();
+            }
         });
 
+        if (! Schema::hasTable('zoom_meetings')) {
+            return;
+        }
+        
         Schema::table('zoom_meetings', function (Blueprint $table) {
-            $table->string('password')->nullable();
+            if (! Schema::hasColumn('zoom_meetings', 'password')) {
+                $table->string('password')->nullable();
+            }
         });
     }
 
@@ -32,10 +40,18 @@ return new class extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('zoom_setting')) {
+            return;
+        }
+        
         Schema::table('zoom_setting', function (Blueprint $table) {
             $table->dropColumn(['meeting_app']);
         });
 
+        if (! Schema::hasTable('zoom_meetings')) {
+            return;
+        }
+        
         Schema::table('zoom_meetings', function (Blueprint $table) {
             $table->dropColumn(['password']);
         });

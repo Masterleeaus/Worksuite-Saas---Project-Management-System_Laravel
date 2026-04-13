@@ -20,9 +20,15 @@ return new class extends Migration
             return;
         }
         Schema::table('bookings', function (Blueprint $table) {
-            $table->decimal('additional_tax_amount',24,2)->default(0);
-            $table->decimal('additional_discount_amount',24,2)->default(0);
-            $table->decimal('additional_campaign_discount_amount',24,2)->default(0);
+            if (! Schema::hasColumn('bookings', 'additional_tax_amount')) {
+                $table->decimal('additional_tax_amount',24,2)->default(0)->nullable();
+            }
+            if (! Schema::hasColumn('bookings', 'additional_discount_amount')) {
+                $table->decimal('additional_discount_amount',24,2)->default(0)->nullable();
+            }
+            if (! Schema::hasColumn('bookings', 'additional_campaign_discount_amount')) {
+                $table->decimal('additional_campaign_discount_amount',24,2)->default(0)->nullable();
+            }
         });
     }
 

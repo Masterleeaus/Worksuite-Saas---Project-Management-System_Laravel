@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('dispatch_jobs')) {
+            return;
+        }
+        
         Schema::create('dispatch_jobs', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('code', 64)->unique();
@@ -34,6 +38,10 @@ return new class extends Migration {
             $table->foreign('scheduled_primary_worker_id')->references('id')->on('dispatch_workers')->nullOnDelete();
         });
 
+        if (Schema::hasTable('dispatch_job_secondary_workers')) {
+            return;
+        }
+        
         Schema::create('dispatch_job_secondary_workers', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('job_id');
@@ -45,6 +53,10 @@ return new class extends Migration {
             $table->unique(['job_id', 'worker_id']);
         });
 
+        if (Schema::hasTable('dispatch_job_tags')) {
+            return;
+        }
+        
         Schema::create('dispatch_job_tags', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('job_id');

@@ -17,6 +17,10 @@ return new class extends Migration
     public function up()
     {
         if (! Schema::hasColumn('rest_api_settings', 'added_by')) {
+            if (! Schema::hasTable('rest_api_settings')) {
+                return;
+            }
+            
             Schema::table('rest_api_settings', function (Blueprint $table) {
                 $table->integer('added_by')->unsigned()->nullable();
                 $table->foreign('added_by')->references('id')->on('users')->onDelete('SET NULL')->onUpdate('cascade');

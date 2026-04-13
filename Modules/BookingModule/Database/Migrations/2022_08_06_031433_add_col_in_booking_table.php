@@ -20,9 +20,15 @@ return new class extends Migration
             return;
         }
         Schema::table('bookings', function (Blueprint $table) {
-            $table->decimal('total_campaign_discount_amount',24,3)->default(0);
-            $table->decimal('total_coupon_discount_amount',24,3)->default(0);
-            $table->string('coupon_code')->nullable();
+            if (! Schema::hasColumn('bookings', 'total_campaign_discount_amount')) {
+                $table->decimal('total_campaign_discount_amount',24,3)->default(0)->nullable();
+            }
+            if (! Schema::hasColumn('bookings', 'total_coupon_discount_amount')) {
+                $table->decimal('total_coupon_discount_amount',24,3)->default(0)->nullable();
+            }
+            if (! Schema::hasColumn('bookings', 'coupon_code')) {
+                $table->string('coupon_code')->nullable();
+            }
         });
     }
 

@@ -41,6 +41,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('performance_meeting_agenda')) {
+            return;
+        }
+        
         Schema::create('performance_meeting_agenda', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -53,6 +57,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        if (Schema::hasTable('performance_meeting_actions')) {
+            return;
+        }
+        
         Schema::create('performance_meeting_actions', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();

@@ -8,6 +8,10 @@ return new class extends Migration {
     public function up(): void
     {
         // Frequency Rules
+        if (Schema::hasTable('fsm_frequencies')) {
+            return;
+        }
+        
         Schema::create('fsm_frequencies', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -52,6 +56,10 @@ return new class extends Migration {
         });
 
         // Frequency Sets (collections of frequency rules)
+        if (Schema::hasTable('fsm_frequency_sets')) {
+            return;
+        }
+        
         Schema::create('fsm_frequency_sets', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -64,6 +72,10 @@ return new class extends Migration {
         });
 
         // Pivot: frequency_set ↔ frequencies
+        if (Schema::hasTable('fsm_frequency_set_rule')) {
+            return;
+        }
+        
         Schema::create('fsm_frequency_set_rule', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('frequency_set_id');

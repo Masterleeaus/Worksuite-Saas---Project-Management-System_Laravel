@@ -17,10 +17,16 @@ return new class extends Migration
             return;
         }
         Schema::table('zoom_meetings', function (Blueprint $table) {
-            $table->unsignedBigInteger('source_meeting_id')->nullable();
+            if (! Schema::hasColumn('zoom_meetings', 'source_meeting_id')) {
+                $table->unsignedBigInteger('source_meeting_id')->nullable();
+            }
             $table->foreign('source_meeting_id')->references('id')->on('zoom_meetings')->onDelete('cascade')->onUpdate('cascade');
-            $table->bigInteger('occurrence_id')->nullable();
-            $table->integer('occurrence_order')->nullable();
+            if (! Schema::hasColumn('zoom_meetings', 'occurrence_id')) {
+                $table->bigInteger('occurrence_id')->nullable();
+            }
+            if (! Schema::hasColumn('zoom_meetings', 'occurrence_order')) {
+                $table->integer('occurrence_order')->nullable();
+            }
         });
     }
 

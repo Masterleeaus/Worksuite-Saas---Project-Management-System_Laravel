@@ -11,11 +11,19 @@ return new class extends Migration {
     public function up(): void
     {
         if (!Schema::hasColumn('employee_details', 'overtime_hourly_rate')) {
+            if (! Schema::hasTable('employee_details')) {
+                return;
+            }
+            
             Schema::table('employee_details', function (Blueprint $table) {
                 $table->double('overtime_hourly_rate', 16, 2)->nullable()->comment('This field is only for overtime calculation');
             });
         }
 
+        if (Schema::hasTable('pay_codes')) {
+            return;
+        }
+        
         Schema::create('pay_codes', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('company_id')->unsigned()->nullable();
@@ -29,6 +37,10 @@ return new class extends Migration {
             $table->timestamps();
         });
 
+        if (Schema::hasTable('overtime_policies')) {
+            return;
+        }
+        
         Schema::create('overtime_policies', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('company_id')->unsigned()->nullable();
@@ -46,6 +58,10 @@ return new class extends Migration {
             $table->timestamps();
         });
 
+        if (Schema::hasTable('overtime_policy_employees')) {
+            return;
+        }
+        
         Schema::create('overtime_policy_employees', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('company_id')->unsigned()->nullable();
@@ -57,6 +73,10 @@ return new class extends Migration {
             $table->timestamps();
         });
 
+        if (Schema::hasTable('overtime_requests')) {
+            return;
+        }
+        
         Schema::create('overtime_requests', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('company_id')->unsigned()->nullable();

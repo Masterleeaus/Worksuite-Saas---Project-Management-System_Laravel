@@ -17,7 +17,9 @@ return new class extends Migration
             return;
         }
         Schema::table('zoom_setting', function (Blueprint $table) {
-            $table->string('secret_token')->nullable();
+            if (! Schema::hasColumn('zoom_setting', 'secret_token')) {
+                $table->string('secret_token')->nullable();
+            }
 
         });
     }

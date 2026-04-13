@@ -17,8 +17,12 @@ class ColumnAddToWithdrawRequestTable extends Migration
             return;
         }
         Schema::table('withdraw_requests', function (Blueprint $table) {
-            $table->boolean('is_paid')->default(0);
-            $table->string('note')->nullable();
+            if (! Schema::hasColumn('withdraw_requests', 'is_paid')) {
+                $table->boolean('is_paid')->default(0)->nullable();
+            }
+            if (! Schema::hasColumn('withdraw_requests', 'note')) {
+                $table->string('note')->nullable();
+            }
         });
     }
 

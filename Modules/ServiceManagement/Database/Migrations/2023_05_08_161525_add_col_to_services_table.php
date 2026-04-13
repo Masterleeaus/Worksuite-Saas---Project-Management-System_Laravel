@@ -17,7 +17,9 @@ class AddColToServicesTable extends Migration
             return;
         }
         Schema::table('services', function (Blueprint $table) {
-            $table->decimal('min_bidding_price', 24, 3)->default(0)->after('avg_rating');
+            if (! Schema::hasColumn('services', 'min_bidding_price')) {
+                $table->decimal('min_bidding_price', 24, 3)->default(0)->after('avg_rating')->nullable();
+            }
         });
     }
 

@@ -17,7 +17,9 @@ class AddToColCronJobsTable extends Migration
             return;
         }
         Schema::table('cron_jobs', function (Blueprint $table) {
-            $table->string('type')->nullable();
+            if (! Schema::hasColumn('cron_jobs', 'type')) {
+                $table->string('type')->nullable();
+            }
         });
     }
 

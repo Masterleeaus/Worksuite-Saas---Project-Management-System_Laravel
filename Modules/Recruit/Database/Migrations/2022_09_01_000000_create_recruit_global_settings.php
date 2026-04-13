@@ -33,6 +33,10 @@ return new class extends Migration
         }
         $newSetting->saveQuietly();
 
+        if (! Schema::hasTable('recruit_settings')) {
+            return;
+        }
+        
         Schema::table('recruit_settings', function (Blueprint $table) {
             $table->dropColumn(['purchase_code']);
         });
@@ -49,6 +53,10 @@ return new class extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('zoom_setting')) {
+            return;
+        }
+        
         Schema::table('zoom_setting', function (Blueprint $table) {
             $table->dropColumn(['purchase_code']);
         });

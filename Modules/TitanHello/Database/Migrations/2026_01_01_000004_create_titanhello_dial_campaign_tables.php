@@ -22,6 +22,10 @@ return new class extends Migration {
             $table->timestamps();
         });
 
+        if (Schema::hasTable('titanhello_dial_campaign_contacts')) {
+            return;
+        }
+        
         Schema::create('titanhello_dial_campaign_contacts', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('campaign_id')->index();

@@ -8,6 +8,10 @@ return new class extends Migration {
     public function up(): void
     {
         // Recurring Order Templates (named presets for recurring configs)
+        if (Schema::hasTable('fsm_recurring_templates')) {
+            return;
+        }
+        
         Schema::create('fsm_recurring_templates', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -25,6 +29,10 @@ return new class extends Migration {
         });
 
         // Recurring Orders (the repeating schedule)
+        if (Schema::hasTable('fsm_recurrings')) {
+            return;
+        }
+        
         Schema::create('fsm_recurrings', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -53,6 +61,10 @@ return new class extends Migration {
         });
 
         // Pivot: recurring ↔ equipment
+        if (Schema::hasTable('fsm_recurring_equipment')) {
+            return;
+        }
+        
         Schema::create('fsm_recurring_equipment', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('fsm_recurring_id');

@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('titanzero_ai_chat_messages')) {
+            return;
+        }
+        
         Schema::create('titanzero_ai_chat_messages', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('ai_chat_session_id')->index();

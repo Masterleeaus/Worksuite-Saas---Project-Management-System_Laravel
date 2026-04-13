@@ -16,7 +16,9 @@ return new class extends Migration
             return;
         }
         Schema::table('recruit_job_histories', function (Blueprint $table) {
-            $table->integer('recruit_job_application_status_id')->unsigned()->nullable();
+            if (! Schema::hasColumn('recruit_job_histories', 'recruit_job_application_status_id')) {
+                $table->integer('recruit_job_application_status_id')->unsigned()->nullable();
+            }
             $table->foreign('recruit_job_application_status_id')->references('id')->on('recruit_application_status')
                 ->onUpdate('cascade')->onDelete('cascade');
         });

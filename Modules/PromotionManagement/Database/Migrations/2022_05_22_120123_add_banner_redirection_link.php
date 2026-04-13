@@ -17,7 +17,9 @@ class AddBannerRedirectionLink extends Migration
             return;
         }
         Schema::table('banners', function ($table) {
-            $table->string('redirect_link', 191)->after('resource_id')->nullable();
+            if (! Schema::hasColumn('banners', 'redirect_link')) {
+                $table->string('redirect_link', 191)->after('resource_id')->nullable();
+            }
         });
     }
 

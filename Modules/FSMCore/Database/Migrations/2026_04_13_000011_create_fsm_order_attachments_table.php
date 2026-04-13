@@ -13,6 +13,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('fsm_order_attachments')) {
+            return;
+        }
+        
         Schema::create('fsm_order_attachments', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('fsm_order_id')->index();

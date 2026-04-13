@@ -12,6 +12,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('fsm_sales_invoices')) {
+            return;
+        }
+        
         Schema::create('fsm_sales_invoices', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -51,6 +55,10 @@ return new class extends Migration {
         });
 
         // Pivot: invoices ↔ fsm orders (one invoice may cover several orders)
+        if (Schema::hasTable('fsm_sales_invoice_order')) {
+            return;
+        }
+        
         Schema::create('fsm_sales_invoice_order', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('fsm_sales_invoice_id')->index();

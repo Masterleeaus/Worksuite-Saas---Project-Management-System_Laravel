@@ -17,7 +17,9 @@ return new class extends Migration
             return;
         }
         Schema::table('employee_monthly_salaries', function (Blueprint $table) {
-            $table->string('fixed_allowance')->after('basic_salary');
+            if (! Schema::hasColumn('employee_monthly_salaries', 'fixed_allowance')) {
+                $table->string('fixed_allowance')->after('basic_salary')->nullable();
+            }
         });
     }
 

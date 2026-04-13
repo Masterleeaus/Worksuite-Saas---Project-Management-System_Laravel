@@ -17,9 +17,15 @@ return new class extends Migration
             return;
         }
         Schema::table('employee_monthly_salaries', function (Blueprint $table) {
-            $table->string('annual_salary')->after('user_id')->nullable();
-            $table->string('basic_salary')->after('amount')->nullable();
-            $table->enum('basic_value_type', ['fixed', 'ctc_percent'])->default(null)->after('basic_salary')->nullable();
+            if (! Schema::hasColumn('employee_monthly_salaries', 'annual_salary')) {
+                $table->string('annual_salary')->after('user_id')->nullable();
+            }
+            if (! Schema::hasColumn('employee_monthly_salaries', 'basic_salary')) {
+                $table->string('basic_salary')->after('amount')->nullable();
+            }
+            if (! Schema::hasColumn('employee_monthly_salaries', 'basic_value_type')) {
+                $table->enum('basic_value_type', ['fixed', 'ctc_percent'])->default(null)->after('basic_salary')->nullable();
+            }
         });
     }
 
