@@ -28,6 +28,11 @@
             </a>
         @endif
         <a href="{{ route('fsmcore.orders.edit', $order->id) }}" class="btn btn-primary">Edit</a>
+        @if(class_exists(\Modules\TitanGo\Http\Controllers\Admin\DeliveryReportController::class))
+            <a href="{{ route('titango.admin.delivery.show', $order->id) }}" class="btn btn-outline-danger">
+                📋 Proof of Delivery
+            </a>
+        @endif
         <a href="{{ route('fsmcore.orders.index') }}" class="btn btn-outline-secondary">Back</a>
     </div>
 </div>
