@@ -498,9 +498,13 @@ return new class extends Migration {
             }
 
             Schema::table('employee_details', function (Blueprint $table) {
-                $table->text('about_me')->nullable();
-                $table->integer('reporting_to')->unsigned()->nullable();
-                $table->foreign('reporting_to')->references('id')->on('users')->onDelete('SET NULL')->onUpdate('cascade');
+                if (!Schema::hasColumn('employee_details', 'about_me')) {
+                    $table->text('about_me')->nullable();
+                }
+                if (!Schema::hasColumn('employee_details', 'reporting_to')) {
+                    $table->integer('reporting_to')->unsigned()->nullable();
+                    $table->foreign('reporting_to')->references('id')->on('users')->onDelete('SET NULL')->onUpdate('cascade');
+                }
             });
         }
 
@@ -512,11 +516,16 @@ return new class extends Migration {
 
         if (!Schema::hasColumn('leaves', 'approved_by')) {
             Schema::table('leaves', function (Blueprint $table) {
-                $table->integer('approved_by')->unsigned()->nullable();
-                $table->foreign('approved_by')->references('id')->on('users')->onDelete('SET NULL')->onUpdate('cascade');
-                $table->string('half_day_type')->nullable();
-
-                $table->dateTime('approved_at')->nullable();
+                if (!Schema::hasColumn('leaves', 'approved_by')) {
+                    $table->integer('approved_by')->unsigned()->nullable();
+                    $table->foreign('approved_by')->references('id')->on('users')->onDelete('SET NULL')->onUpdate('cascade');
+                }
+                if (!Schema::hasColumn('leaves', 'half_day_type')) {
+                    $table->string('half_day_type')->nullable();
+                }
+                if (!Schema::hasColumn('leaves', 'approved_at')) {
+                    $table->dateTime('approved_at')->nullable();
+                }
             });
         }
 

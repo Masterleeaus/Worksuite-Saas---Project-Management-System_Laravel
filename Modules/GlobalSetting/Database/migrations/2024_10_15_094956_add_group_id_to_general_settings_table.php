@@ -17,7 +17,9 @@ class AddGroupIdToGeneralSettingsTable extends Migration
             return;
         }
         Schema::table('general_settings', function (Blueprint $table) {
-            $table->unsignedBigInteger('group_id')->nullable()->after('value');
+            if (!Schema::hasColumn('general_settings', 'group_id')) {
+                $table->unsignedBigInteger('group_id')->nullable()->after('value');
+            }
         });
     }
 

@@ -56,14 +56,18 @@ return new class extends Migration {
             dd($e->getMessage());
         }
 
-        if (!Schema::hasColumn('companies', 'status')) {
-            Schema::table('companies', function (Blueprint $table) {
-                $table->integer('default_task_status')->unsigned()->nullable()->default(null)->change();
+        Schema::table('companies', function (Blueprint $table) {
+            $table->integer('default_task_status')->unsigned()->nullable()->default(null)->change();
+            if (!Schema::hasColumn('companies', 'status')) {
                 $table->enum('status', ['active', 'inactive'])->after('active_theme')->default('active');
+            }
+            if (!Schema::hasColumn('companies', 'last_login')) {
                 $table->dateTime('last_login')->nullable();
+            }
+            if (!Schema::hasColumn('companies', 'rtl')) {
                 $table->boolean('rtl')->default(false);
-            });
-        }
+            }
+        });
 
         if (!Schema::hasColumn('companies', 'hash')) {
             Schema::table('companies', function (Blueprint $table) {

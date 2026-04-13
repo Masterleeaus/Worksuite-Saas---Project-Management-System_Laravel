@@ -213,7 +213,9 @@ return new class extends Migration {
         });
 
         Schema::table('global_settings', function (Blueprint $table) {
-            $table->timestamp('last_license_verified_at')->nullable()->default(null)->after('supported_until');
+            if (!Schema::hasColumn('global_settings', 'last_license_verified_at')) {
+                $table->timestamp('last_license_verified_at')->nullable()->default(null)->after('supported_until');
+            }
         });
 
     }
