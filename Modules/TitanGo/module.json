@@ -1,0 +1,16 @@
+{
+  "name": "TitanGo",
+  "alias": "titango",
+  "description": "Titan Go — Field worker execution client. Transforms Nexus Field Ops into the canonical worker-facing surface for the FSM platform. Provides today-first workflow, offline sync, GPS tracking, proof-of-service lifecycle, and checklist execution.",
+  "keywords": ["fsm", "titan-go", "field-worker", "mobile", "pwa"],
+  "active": 1,
+  "order": 0,
+  "providers": [
+    "Modules\\TitanGo\\Providers\\TitanGoServiceProvider",
+    "Modules\\TitanGo\\Providers\\RouteServiceProvider"
+  ],
+  "aliases": {},
+  "files": [],
+  "requires": ["FSMCore"],
+  "version": "1.0.0"
+}
