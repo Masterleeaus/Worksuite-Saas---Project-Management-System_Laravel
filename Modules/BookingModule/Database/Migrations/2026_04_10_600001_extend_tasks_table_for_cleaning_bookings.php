@@ -134,10 +134,6 @@ return new class extends Migration
         });
 
         // Performance indexes — only add if the column was just created.
-        if (! Schema::hasTable('tasks')) {
-            return;
-        }
-        
         Schema::table('tasks', function (Blueprint $table) {
             if (Schema::hasColumn('tasks', 'task_type') && ! $this->indexExists('tasks', 'tasks_task_type_index')) {
                 $table->index('task_type', 'tasks_task_type_index');

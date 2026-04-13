@@ -32,7 +32,7 @@ class MakeColNullableToServiceRequestsTable extends Migration
     {
         Schema::table('service_requests', function (Blueprint $table) {
             if (Schema::hasColumn('service_requests', 'category_id')) {
-                $table->string('category_id')->nullable(false)->change()->nullable();
+                $table->string('category_id')->nullable(false)->change();
             }
         });
     }

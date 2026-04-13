@@ -37,7 +37,7 @@ return new class extends Migration
 
             // Change the column back to NOT NULL (if needed)
             if (Schema::hasColumn('recruit_jobs', 'recruiter_id')) {
-                $table->unsignedInteger('recruiter_id')->nullable(false)->change()->nullable();
+                $table->unsignedInteger('recruiter_id')->nullable(false)->change();
             }
         });
     }
