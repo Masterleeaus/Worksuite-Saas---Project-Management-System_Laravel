@@ -11,7 +11,7 @@ use Modules\TitanZero\Entities\AssistantTemplate;
 use Modules\TitanZero\Services\TitanZeroService;
 use Modules\TitanZero\Events\TitanZeroContentGenerated;
 
-class TitanZeroController extends Controller
+class AIAssistantController extends Controller
 {
     /**
      * Titan Zero uses Titan Core for all AI operations.
