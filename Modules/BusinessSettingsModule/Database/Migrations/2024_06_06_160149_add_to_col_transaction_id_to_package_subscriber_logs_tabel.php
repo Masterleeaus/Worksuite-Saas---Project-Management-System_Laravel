@@ -13,8 +13,13 @@ class AddToColTransactionIdToPackageSubscriberLogsTabel extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('package_subscriber_logs')) {
+            return;
+        }
         Schema::table('package_subscriber_logs', function (Blueprint $table) {
-            $table->foreignUuid('primary_transaction_id')->default(0);
+            if (! Schema::hasColumn('package_subscriber_logs', 'primary_transaction_id')) {
+                $table->foreignUuid('primary_transaction_id')->default(0)->nullable();
+            }
         });
     }
 
@@ -25,12 +30,8 @@ class AddToColTransactionIdToPackageSubscriberLogsTabel extends Migration
      */
     public function down()
     {
-        if (Schema::hasTable('package_subscriber_logs')) {
         Schema::table('package_subscriber_logs', function (Blueprint $table) {
-            if (Schema::hasColumn('package_subscriber_logs', 'primary_transaction_id')) {
-                $table->dropColumn('primary_transaction_id');
-            }
+            $table->dropColumn('primary_transaction_id');
         });
-    }
     }
 }

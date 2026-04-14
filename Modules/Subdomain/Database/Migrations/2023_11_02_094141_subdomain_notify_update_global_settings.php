@@ -2,34 +2,26 @@
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
-        if (! Schema::hasTable('sub_domain_module_settings') || Schema::hasColumn('sub_domain_module_settings', 'notify_update')) {
-            return;
-        }
-
-        $afterColumn = Schema::hasColumn('sub_domain_module_settings', 'supported_until') ? 'supported_until' : null;
-
-        Schema::table('sub_domain_module_settings', function (Blueprint $table) use ($afterColumn) {
-            $column = $table->boolean('notify_update')->default(1);
-            if ($afterColumn) {
-                $column->after($afterColumn);
-            }
+        Schema::whenTableDoesntHaveColumn('sub_domain_module_settings', 'notify_update', function (Blueprint $table) {
+            $table->boolean('notify_update')->default(1)->after('supported_until');
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
-        if (! Schema::hasTable('sub_domain_module_settings') || ! Schema::hasColumn('sub_domain_module_settings', 'notify_update')) {
-            return;
-        }
-
-        Schema::table('sub_domain_module_settings', function (Blueprint $table) {
-            $table->dropColumn('notify_update');
-        });
+        //
     }
+
 };

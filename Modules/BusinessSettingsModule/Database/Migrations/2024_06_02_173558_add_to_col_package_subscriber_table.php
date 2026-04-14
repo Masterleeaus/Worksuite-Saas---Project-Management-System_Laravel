@@ -13,13 +13,14 @@ class AddToColPackageSubscriberTable extends Migration
      */
     public function up()
     {
-        if (Schema::hasTable('package_subscribers')) {
-        Schema::table('package_subscribers', function (Blueprint $table) {
-            if (!Schema::hasColumn('package_subscribers', 'is_canceled')) {
+        if (! Schema::hasTable('package_subscribers')) {
+            return;
+        }
+        if (!Schema::hasColumn('package_subscribers', 'is_canceled')) {
+            Schema::table('package_subscribers', function (Blueprint $table) {
                 $table->tinyInteger('is_canceled')->default(0);
-            }
-        });
-    }
+            });
+        }
     }
 
     /**
@@ -29,12 +30,8 @@ class AddToColPackageSubscriberTable extends Migration
      */
     public function down()
     {
-        if (Schema::hasTable('package_subscribers')) {
         Schema::table('package_subscribers', function (Blueprint $table) {
-            if (Schema::hasColumn('package_subscribers', 'is_canceled')) {
-                $table->dropColumn('is_canceled');
-            }
+            $table->dropColumn('is_canceled');
         });
-    }
     }
 }

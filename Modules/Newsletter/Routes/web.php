@@ -1,7 +1,28 @@
 <?php
 
-$routes = module_path('Newsletter', 'Routes/web.php');
+use Illuminate\Support\Facades\Route;
+use Modules\Newsletter\Http\Controllers\NewsletterController;
 
-if (file_exists($routes)) {
-    require_once $routes;
-}
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+
+Route::middleware(['web','auth'])
+    ->prefix('account')
+    ->group(function () {
+
+Route::group(['prefix' => 'admin/content'], function () {
+
+    Route::get('/subscriber-list', function () {
+        return view('newsletter::newsletter.subscriber-list');
+    })->name('admin.subscriber-list')->middleware('admin.auth', 'permission');
+});
+
+});

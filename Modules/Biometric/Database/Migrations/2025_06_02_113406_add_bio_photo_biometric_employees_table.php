@@ -12,19 +12,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('biometric_employees')) {
-        Schema::table('biometric_employees', function (Blueprint $table) {
-            if (!Schema::hasColumn('biometric_employees', 'has_photo')) {
+        if (! Schema::hasTable('biometric_employees')) {
+            return;
+        }
+        if (!Schema::hasColumn('biometric_employees', 'has_photo')) {
+            Schema::table('biometric_employees', function (Blueprint $table) {
                 $table->boolean('has_photo')->default(false)->after('user_id');
-            }
-            if (!Schema::hasColumn('biometric_employees', 'photo')) {
                 $table->text('photo')->nullable()->after('has_photo');
-            }
-            if (!Schema::hasColumn('biometric_employees', 'has_card')) {
                 $table->boolean('has_card')->default(false)->before('card_number');
-            }
-        });
-    }
+            });
+        }
     }
 
     /**
@@ -32,18 +29,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (Schema::hasTable('biometric_employees')) {
         Schema::table('biometric_employees', function (Blueprint $table) {
-            if (Schema::hasColumn('biometric_employees', 'has_photo')) {
-                $table->dropColumn('has_photo');
-            }
-            if (Schema::hasColumn('biometric_employees', 'photo')) {
-                $table->dropColumn('photo');
-            }
-            if (Schema::hasColumn('biometric_employees', 'has_card')) {
-                $table->dropColumn('has_card');
-            }
+            $table->dropColumn('has_photo');
+            $table->dropColumn('photo');
+            $table->dropColumn('has_card');
         });
-    }
     }
 };

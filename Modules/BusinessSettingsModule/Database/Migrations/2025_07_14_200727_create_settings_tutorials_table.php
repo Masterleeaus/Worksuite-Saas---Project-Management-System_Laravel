@@ -13,6 +13,9 @@ class CreateSettingsTutorialsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('settings_tutorials')) {
+            return;
+        }
         Schema::create('settings_tutorials', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();

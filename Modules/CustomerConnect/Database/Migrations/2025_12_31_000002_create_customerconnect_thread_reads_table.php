@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('customerconnect_thread_reads')) {
+            return;
+        }
         Schema::create('customerconnect_thread_reads', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->index();

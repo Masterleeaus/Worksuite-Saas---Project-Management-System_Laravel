@@ -11,4 +11,8 @@ return [
     'script_name' => $addOnOf . '-recruit-module',
     'parent_product_name' => $addOnOf,
     'setting' => \Modules\Recruit\Entities\RecruitGlobalSetting::class,
+
+    // Compliance expiry alert thresholds in days (Police Check, WWCC, Insurance)
+    // Used by: recruit:compliance-expiry-reminder artisan command
+    'compliance_expiry_alert_days' => [30, 14, 7],
 ];

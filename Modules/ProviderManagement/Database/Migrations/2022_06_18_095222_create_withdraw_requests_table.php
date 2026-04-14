@@ -13,6 +13,9 @@ class CreateWithdrawRequestsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('withdraw_requests')) {
+            return;
+        }
         Schema::create('withdraw_requests', function (Blueprint $table) {
             $table->uuid('id')->primary()->index();
             $table->unsignedBigInteger('company_id')->nullable()->index();

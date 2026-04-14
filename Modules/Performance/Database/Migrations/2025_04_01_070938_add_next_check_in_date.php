@@ -15,14 +15,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('key_results')) {
-
-        Schema::table('key_results', function (Blueprint $table) {
-            $table->decimal('target_value', 16, 2)->nullable()->change();
-            $table->decimal('current_value', 16, 2)->nullable()->change();
-        });
-
+        if (! Schema::hasTable('key_results')) {
+            return;
         }
+        Schema::table('key_results', function (Blueprint $table) {
+            if (Schema::hasColumn('key_results', 'target_value')) {
+                $table->decimal('target_value', 16, 2)->nullable()->change();
+            }
+            if (Schema::hasColumn('key_results', 'current_value')) {
+                $table->decimal('current_value', 16, 2)->nullable()->change();
+            }
+        });
 
         $companies = Company::all();
 

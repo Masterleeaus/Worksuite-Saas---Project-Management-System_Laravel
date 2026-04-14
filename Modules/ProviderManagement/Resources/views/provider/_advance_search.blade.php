@@ -27,6 +27,8 @@
 
             @foreach ($routes as $key => $item)
                 @php
+    try {
+
                     $provider = \Modules\ProviderManagement\Entities\Provider::where('user_id', auth()->user()->id)->first();
                     $providerId = $provider->id;
                     $subscriptionDetails = \Modules\BusinessSettingsModule\Entities\PackageSubscriber::where('provider_id', $providerId)->first();
@@ -39,7 +41,11 @@
                     $title = str_replace(':', '', $title);
                     $highlightedTitle = $keyword ? highlightKeyword($title, $keyword): $title;
                     $highlightedUri = $keyword? highlightKeyword($item['uri'], $keyword): $item['uri'];
-                @endphp
+                
+    } catch (\Exception $e) {
+        // Table may not exist yet
+    }
+@endphp
 
                 <form action="{{ route('provider.search.routing.store') }}" method="POST" class="w-100 d-block">
                     @csrf

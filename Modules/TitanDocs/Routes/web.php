@@ -49,3 +49,18 @@ Route::group(['middleware' => ['super-admin','auth']], function () {
     Route::post('/titan-docs/templates/{id}/approve', [\Modules\TitanDocs\Http\Controllers\TemplateAdminController::class, 'approve'])->name('titan.docs.templates.approve');
     Route::post('/titan-docs/templates/{id}/unapprove', [\Modules\TitanDocs\Http\Controllers\TemplateAdminController::class, 'unapprove'])->name('titan.docs.templates.unapprove');
 });
+
+/*
+|--------------------------------------------------------------------------
+| TitanDocs Document Templates (CRUD)
+|--------------------------------------------------------------------------
+*/
+Route::group(['middleware' => ['auth', 'web']], function () {
+    Route::get('/titandocs/templates', [\Modules\TitanDocs\Http\Controllers\DocumentTemplateController::class, 'index'])->name('titandocs.templates.index');
+    Route::get('/titandocs/templates/create', [\Modules\TitanDocs\Http\Controllers\DocumentTemplateController::class, 'create'])->name('titandocs.templates.create');
+    Route::post('/titandocs/templates', [\Modules\TitanDocs\Http\Controllers\DocumentTemplateController::class, 'store'])->name('titandocs.templates.store');
+    Route::get('/titandocs/templates/{id}/edit', [\Modules\TitanDocs\Http\Controllers\DocumentTemplateController::class, 'edit'])->name('titandocs.templates.edit');
+    Route::put('/titandocs/templates/{id}', [\Modules\TitanDocs\Http\Controllers\DocumentTemplateController::class, 'update'])->name('titandocs.templates.update');
+    Route::delete('/titandocs/templates/{id}', [\Modules\TitanDocs\Http\Controllers\DocumentTemplateController::class, 'destroy'])->name('titandocs.templates.destroy');
+    Route::post('/titandocs/templates/{id}/approve', [\Modules\TitanDocs\Http\Controllers\DocumentTemplateController::class, 'approve'])->name('titandocs.templates.approve');
+});

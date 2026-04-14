@@ -13,6 +13,9 @@ class CreateProviderNotificationSetupsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('provider_notification_setups')) {
+            return;
+        }
         Schema::create('provider_notification_setups', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();

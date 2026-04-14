@@ -13,13 +13,14 @@ class AddAddresType1 extends Migration
      */
     public function up()
     {
-        if (Schema::hasTable('user_addresses')) {
-        Schema::table('user_addresses', function (Blueprint $table) {
-            if (!Schema::hasColumn('user_addresses', 'address_label')) {
+        if (! Schema::hasTable('user_addresses')) {
+            return;
+        }
+        if (!Schema::hasColumn('user_addresses', 'address_label')) {
+            Schema::table('user_addresses', function (Blueprint $table) {
                 $table->string('address_label')->nullable();
-            }
-        });
-    }
+            });
+        }
     }
 
     /**

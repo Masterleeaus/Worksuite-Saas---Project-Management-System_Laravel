@@ -26,8 +26,14 @@ return new class extends Migration
         ]);
 
         if (! Schema::hasColumn('recruit_job_offer_letter', 'add_structure')) {
+            if (! Schema::hasTable('recruit_job_offer_letter')) {
+                return;
+            }
+            
             Schema::table('recruit_job_offer_letter', function (Blueprint $table) {
-                $table->integer('add_structure')->default(0)->after('sign_require');
+                if (! Schema::hasColumn('recruit_job_offer_letter', 'add_structure')) {
+                    $table->integer('add_structure')->default(0)->after('sign_require')->nullable();
+                }
             });
         }
 
@@ -97,24 +103,46 @@ return new class extends Migration
         }
 
         if (! Schema::hasColumn('recruit_settings', 'google_recaptcha_status')) {
+            if (! Schema::hasTable('recruit_settings')) {
+                return;
+            }
+            
             Schema::table('recruit_settings', function (Blueprint $table) {
-                $table->enum('google_recaptcha_status', ['active', 'deactive'])->default('deactive');
+                if (! Schema::hasColumn('recruit_settings', 'google_recaptcha_status')) {
+                    $table->enum('google_recaptcha_status', ['active', 'deactive'])->default('deactive')->nullable();
+                }
             });
         }
 
         if (! Schema::hasColumn('recruit_job_applications', 'expected_ctc_rate')) {
+            if (! Schema::hasTable('recruit_job_applications')) {
+                return;
+            }
+            
             Schema::table('recruit_job_applications', function (Blueprint $table) {
-                $table->string('currenct_ctc_rate')->after('current_ctc')->nullable();
+                if (! Schema::hasColumn('recruit_job_applications', 'currenct_ctc_rate')) {
+                    $table->string('currenct_ctc_rate')->after('current_ctc')->nullable();
+                }
             });
         }
 
         if (! Schema::hasColumn('recruit_job_applications', 'expected_ctc_rate')) {
+            if (! Schema::hasTable('recruit_job_applications')) {
+                return;
+            }
+            
             Schema::table('recruit_job_applications', function (Blueprint $table) {
-                $table->string('expected_ctc_rate')->after('expected_ctc')->nullable();
+                if (! Schema::hasColumn('recruit_job_applications', 'expected_ctc_rate')) {
+                    $table->string('expected_ctc_rate')->after('expected_ctc')->nullable();
+                }
             });
         }
 
         if (Schema::hasColumn('recruit_jobs', 'location_id')) {
+            if (! Schema::hasTable('recruit_jobs')) {
+                return;
+            }
+            
             Schema::table('recruit_jobs', function (Blueprint $table) {
 
                 $foreignKeys = $this->listTableForeignKeys('recruit_jobs');
@@ -128,8 +156,14 @@ return new class extends Migration
         }
 
         if (! Schema::hasColumn('recruit_job_applications', 'rejection_remark')) {
+            if (! Schema::hasTable('recruit_job_applications')) {
+                return;
+            }
+            
             Schema::table('recruit_job_applications', function (Blueprint $table) {
-                $table->string('rejection_remark')->after('remark')->nullable();
+                if (! Schema::hasColumn('recruit_job_applications', 'rejection_remark')) {
+                    $table->string('rejection_remark')->after('remark')->nullable();
+                }
             });
         }
 

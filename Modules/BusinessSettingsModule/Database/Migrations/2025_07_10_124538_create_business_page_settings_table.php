@@ -13,6 +13,9 @@ class CreateBusinessPageSettingsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('business_page_settings')) {
+            return;
+        }
         Schema::create('business_page_settings', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();

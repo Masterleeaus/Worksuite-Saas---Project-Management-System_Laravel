@@ -12,15 +12,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('recruit_job_histories')) {
-        Schema::table('recruit_job_histories', function (Blueprint $table) {
-            if (!Schema::hasColumn('recruit_job_histories', 'recruit_job_application_status_id')) {
+        if (! Schema::hasTable('recruit_job_histories')) {
+            return;
+        }
+        if (!Schema::hasColumn('recruit_job_histories', 'recruit_job_application_status_id')) {
+            Schema::table('recruit_job_histories', function (Blueprint $table) {
                 $table->integer('recruit_job_application_status_id')->unsigned()->nullable();
-            }
-            $table->foreign('recruit_job_application_status_id')->references('id')->on('recruit_application_status')
-                ->onUpdate('cascade')->onDelete('cascade');
-        });
-    }
+                $table->foreign('recruit_job_application_status_id')->references('id')->on('recruit_application_status')
+                    ->onUpdate('cascade')->onDelete('cascade');
+            });
+        }
     }
 
     public function down(): void

@@ -248,3 +248,6 @@ $addInventoryPermission = user()->permission('add_inventory');
 
     </script>
 @endpush
+
+{{-- Pending reorder suggestions as draft POs (injected by Product module or Purchase module) --}}
+@stack('reorder-suggestions')

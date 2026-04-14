@@ -13,6 +13,9 @@ class CreateVisitedServicesTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('visited_services')) {
+            return;
+        }
         Schema::create('visited_services', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();

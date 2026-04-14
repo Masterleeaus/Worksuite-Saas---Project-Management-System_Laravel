@@ -146,8 +146,14 @@
                     <div class="col-lg-10 col-10  my-2 mb-3">
                         @if($interview->status == 'hired' || $interview->status == 'completed')
                             @php
+    try {
+
                                 $selected_employees = $interview->employees->pluck('id')->toArray();
-                            @endphp
+                            
+    } catch (\Exception $e) {
+        // Table may not exist yet
+    }
+@endphp
                             @foreach ($selected_employees as $attendee)
                                 @if (!in_array($attendee, $interview->evaluation->pluck('submitted_by')->toArray()) && $attendee == user()->id)
                                     <div class="d-flex flex-wrap">
@@ -215,6 +221,8 @@
                                     @endif
 
                                     @php
+    try {
+
                                         $secEmp = [];
 
                                         foreach($interview->employees as $usrdt){
@@ -224,7 +232,11 @@
                                         $employeeStatus = $interview->employeesData->filter(function ($value, $key) use ($loggedEmployee)  {
                                             return $value->user_id == $loggedEmployee->id;
                                         })->first();
-                                    @endphp
+                                    
+    } catch (\Exception $e) {
+        // Table may not exist yet
+    }
+@endphp
 
                                     @if (in_array($loggedEmployee->id, $secEmp) && $employeeStatus->user_accept_status == 'waiting' && $interview->status == 'pending')
                                         <br>
@@ -272,6 +284,8 @@
                                     @endif
 
                                     @php
+    try {
+
                                         $secEmp = [];
                                         foreach($interview->employees as $usrdt){
                                             $secEmp[] = $usrdt->id;
@@ -280,7 +294,11 @@
                                         $employeeStatus = $interview->employeesData->filter(function ($value, $key) use ($loggedEmployee)  {
                                             return $value->user_id == $loggedEmployee->id;
                                         })->first();
-                                    @endphp
+                                    
+    } catch (\Exception $e) {
+        // Table may not exist yet
+    }
+@endphp
 
                                     @if (in_array($loggedEmployee->id, $secEmp) && $employeeStatus->user_accept_status == 'waiting' && $interview->status == 'pending')
                                         <a class="dropdown-item employeeResponse"
@@ -420,8 +438,14 @@
 
                     <div class="col-lg-10 col-10  my-2 mb-3">
                         @php
+    try {
+
                             $selected_employees = $childInterview->employees->pluck('id')->toArray();
-                        @endphp
+                        
+    } catch (\Exception $e) {
+        // Table may not exist yet
+    }
+@endphp
                         @if($childInterview->status == 'hired' || $childInterview->status == 'completed')
                             @foreach ($selected_employees as $attendee)
                                 @if (!in_array($attendee, $childInterview->evaluation->pluck('submitted_by')->toArray()) && $attendee == user()->id)
@@ -489,6 +513,8 @@
                                         </a>
                                         @endif
                                     @php
+    try {
+
                                         $secEmp = [];
                                         foreach($childInterview->employees as $usrdt){
                                             $secEmp[] = $usrdt->id;
@@ -497,7 +523,11 @@
                                         $employeeStatus = $childInterview->employeesData->filter(function ($value, $key) use ($loggedEmployee)  {
                                             return $value->user_id == $loggedEmployee->id;
                                         })->first();
-                                    @endphp
+                                    
+    } catch (\Exception $e) {
+        // Table may not exist yet
+    }
+@endphp
 
                                     @if (in_array($loggedEmployee->id, $secEmp) && $employeeStatus->user_accept_status == 'waiting' && $childInterview->status == 'pending')
                                         <br>
@@ -545,6 +575,8 @@
                                     @endif
 
                                     @php
+    try {
+
                                         $secEmp = [];
                                         foreach($childInterview->employees as $usrdt){
                                             $secEmp[] = $usrdt->id;
@@ -553,7 +585,11 @@
                                         $employeeStatus = $childInterview->employeesData->filter(function ($value, $key) use ($loggedEmployee)  {
                                             return $value->user_id == $loggedEmployee->id;
                                         })->first();
-                                    @endphp
+                                    
+    } catch (\Exception $e) {
+        // Table may not exist yet
+    }
+@endphp
 
                                     @if (in_array($loggedEmployee->id, $secEmp) && $employeeStatus->user_accept_status == 'waiting' && $interview->status == 'pending')
                                         <a class="dropdown-item employeeResponse"

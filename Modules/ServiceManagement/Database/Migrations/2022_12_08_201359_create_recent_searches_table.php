@@ -13,6 +13,9 @@ class CreateRecentSearchesTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('recent_searches')) {
+            return;
+        }
         Schema::create('recent_searches', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();

@@ -13,6 +13,9 @@ class CreateRecentViewsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('recent_views')) {
+            return;
+        }
         Schema::create('recent_views', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();

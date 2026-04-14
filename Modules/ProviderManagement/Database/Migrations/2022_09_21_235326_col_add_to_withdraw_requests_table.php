@@ -13,13 +13,14 @@ class ColAddToWithdrawRequestsTable extends Migration
      */
     public function up()
     {
-        if (Schema::hasTable('withdraw_requests')) {
-        Schema::table('withdraw_requests', function (Blueprint $table) {
-            if (!Schema::hasColumn('withdraw_requests', 'admin_note')) {
+        if (! Schema::hasTable('withdraw_requests')) {
+            return;
+        }
+        if (!Schema::hasColumn('withdraw_requests', 'admin_note')) {
+            Schema::table('withdraw_requests', function (Blueprint $table) {
                 $table->string('admin_note')->nullable();
-            }
-        });
-    }
+            });
+        }
     }
 
     /**
@@ -29,12 +30,8 @@ class ColAddToWithdrawRequestsTable extends Migration
      */
     public function down()
     {
-        if (Schema::hasTable('withdraw_requests')) {
         Schema::table('withdraw_requests', function (Blueprint $table) {
-            if (Schema::hasColumn('withdraw_requests', 'admin_note')) {
-                $table->dropColumn('admin_note');
-            }
+            $table->dropColumn('admin_note');
         });
-    }
     }
 }

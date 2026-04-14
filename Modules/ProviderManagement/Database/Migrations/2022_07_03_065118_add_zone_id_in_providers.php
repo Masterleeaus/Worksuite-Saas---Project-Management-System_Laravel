@@ -13,13 +13,14 @@ class AddZoneIdInProviders extends Migration
      */
     public function up()
     {
-        if (Schema::hasTable('providers')) {
-
-        Schema::table('providers', function (Blueprint $table) {
-            $table->foreignUuid('zone_id')->nullable();
-        });
-
+        if (! Schema::hasTable('providers')) {
+            return;
         }
+        Schema::table('providers', function (Blueprint $table) {
+            if (! Schema::hasColumn('providers', 'zone_id')) {
+                $table->foreignUuid('zone_id')->nullable();
+            }
+        });
     }
 
     /**

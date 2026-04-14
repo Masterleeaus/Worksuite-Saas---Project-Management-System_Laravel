@@ -11,14 +11,23 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('blog_comments')) {
+            return;
+        }
         Schema::create('blog_comments', function (Blueprint $table) {
             $table->id();
+            $table->unsignedInteger('company_id')->nullable()->index();
+            $table->unsignedBigInteger('post_id')->index();
+            $table->unsignedInteger('user_id')->nullable()->index();
             $table->string('name');
             $table->string('email');
             $table->string('image')->nullable();
+            $table->text('comment');
             $table->dateTime('comment_date');
             $table->timestamps();
             $table->softDeletes();
+
+            $table->foreign('post_id')->references('id')->on('blog_posts')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 

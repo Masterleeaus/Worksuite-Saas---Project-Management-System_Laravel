@@ -15,13 +15,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('performance_settings')) {
-        Schema::table('performance_settings', function (Blueprint $table) {
-            if (!Schema::hasColumn('performance_settings', 'create_meeting_participant')) {
+        if (! Schema::hasTable('performance_settings')) {
+            return;
+        }
+        if (!Schema::hasColumn('performance_settings', 'create_meeting_participant')) {
+            Schema::table('performance_settings', function (Blueprint $table) {
                 $table->boolean('create_meeting_participant')->default(false)->after('create_meeting_manager');
-            }
-        });
-    }
+            });
+        }
 
         $meetingSeetings = PerformanceSetting::all();
 

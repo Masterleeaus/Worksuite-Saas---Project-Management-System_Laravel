@@ -14,8 +14,10 @@ return [
     'parent_product_name' => $addOnOf,
     'setting' => \Modules\Performance\Entities\PerformanceGlobalSetting::class,
 
-'job_performance' => require __DIR__ . '/job_performance.php',
-'job_quality_metrics' => require __DIR__ . '/job_quality_metrics.php',
-'job_safety_metrics' => require __DIR__ . '/job_safety_metrics.php',
+    'low_performer_threshold' => 40,
+
+    'job_performance' => require __DIR__ . '/job_performance.php',
+    'job_quality_metrics' => require __DIR__ . '/job_quality_metrics.php',
+    'job_safety_metrics' => require __DIR__ . '/job_safety_metrics.php',
 
 ];

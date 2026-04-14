@@ -13,6 +13,9 @@ class CreateProvidersWithdrawMethodsDataTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('providers_withdraw_methods_data')) {
+            return;
+        }
         Schema::create('providers_withdraw_methods_data', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();

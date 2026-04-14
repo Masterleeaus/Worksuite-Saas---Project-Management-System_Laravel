@@ -1,8 +1,16 @@
 <?php
 
-
-
 use Illuminate\Support\Facades\Route;
+
+// FSM compliance overlay routes
+Route::group(['middleware' => ['auth', 'company'], 'prefix' => 'fsm/providers'], function () {
+    Route::get('compliance/expiry', [\Modules\ProviderManagement\Http\Controllers\ComplianceController::class, 'expiryDashboard'])->name('provider.compliance.expiry');
+    Route::get('{employeeId}/compliance', [\Modules\ProviderManagement\Http\Controllers\ComplianceController::class, 'show'])->name('provider.compliance.show');
+    Route::post('{employeeId}/compliance', [\Modules\ProviderManagement\Http\Controllers\ComplianceController::class, 'update'])->name('provider.compliance.update');
+    Route::get('{employeeId}/zones', [\Modules\ProviderManagement\Http\Controllers\EmployeeZoneController::class, 'show'])->name('provider.zones.show');
+    Route::post('{employeeId}/zones', [\Modules\ProviderManagement\Http\Controllers\EmployeeZoneController::class, 'sync'])->name('provider.zones.sync');
+});
+
 use Modules\ProviderManagement\Http\Controllers\Web\Provider\LanguageController;
 use Modules\ProviderManagement\Http\Controllers\Web\Provider\Report\Business\OverviewReportController;
 use Modules\ProviderManagement\Http\Controllers\Web\Provider\Report\BookingReportController;

@@ -12,21 +12,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('performance_meeting_agenda')) {
-        Schema::table('performance_meeting_agenda', function (Blueprint $table) {
-            if (!Schema::hasColumn('performance_meeting_agenda', 'keep_private')) {
+        if (! Schema::hasTable('performance_meeting_agenda')) {
+            return;
+        }
+        if (!Schema::hasColumn('performance_meeting_agenda', 'keep_private')) {
+            Schema::table('performance_meeting_agenda', function (Blueprint $table) {
                 $table->enum('keep_private', ['yes', 'no'])->default('no')->after('is_discussed');
-            }
-        });
-    }
+            });
+        }
 
-        if (Schema::hasTable('key_results')) {
-        Schema::table('key_results', function (Blueprint $table) {
-            if (!Schema::hasColumn('key_results', 'next_check_in')) {
+        if (!Schema::hasColumn('key_results', 'next_check_in')) {
+            Schema::table('key_results', function (Blueprint $table) {
                 $table->date('next_check_in')->nullable()->after('last_check_in');
-            }
-        });
-    }
+            });
+        }
     }
 
     /**
@@ -34,21 +33,23 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (Schema::hasTable('performance_meeting_agenda')) {
+        if (! Schema::hasTable('performance_meeting_agenda')) {
+            return;
+        }
+        
         Schema::table('performance_meeting_agenda', function (Blueprint $table) {
-            if (Schema::hasColumn('performance_meeting_agenda', 'keep_private')) {
-                $table->dropColumn('keep_private');
-            }
+            $table->dropColumn('keep_private');
         });
-    }
 
-        if (Schema::hasTable('key_results')) {
+        if (! Schema::hasTable('key_results')) {
+            return;
+        }
+        
         Schema::table('key_results', function (Blueprint $table) {
-            if (!Schema::hasColumn('key_results', 'next_check_in')) {
+            if (! Schema::hasColumn('key_results', 'next_check_in')) {
                 $table->date('next_check_in')->nullable()->after('last_check_in');
             }
         });
-    }
     }
 
 };

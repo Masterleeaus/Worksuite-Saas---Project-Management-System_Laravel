@@ -13,6 +13,9 @@ class CreatePackageSubscriberFeaturesTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('package_subscriber_features')) {
+            return;
+        }
         Schema::create('package_subscriber_features', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();

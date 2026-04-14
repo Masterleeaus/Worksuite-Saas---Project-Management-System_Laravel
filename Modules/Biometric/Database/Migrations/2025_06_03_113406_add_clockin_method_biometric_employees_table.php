@@ -12,13 +12,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('biometric_employees')) {
-        Schema::table('biometric_employees', function (Blueprint $table) {
-            if (!Schema::hasColumn('biometric_employees', 'force_biometric_clockin')) {
+        if (! Schema::hasTable('biometric_employees')) {
+            return;
+        }
+        if (!Schema::hasColumn('biometric_employees', 'force_biometric_clockin')) {
+            Schema::table('biometric_employees', function (Blueprint $table) {
                 $table->boolean('force_biometric_clockin')->default(true)->after('company_id');
-            }
-        });
-    }
+            });
+        }
     }
 
     /**
@@ -26,12 +27,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (Schema::hasTable('biometric_employees')) {
         Schema::table('biometric_employees', function (Blueprint $table) {
-            if (Schema::hasColumn('biometric_employees', 'force_biometric_clockin')) {
-                $table->dropColumn('force_biometric_clockin');
-            }
+            $table->dropColumn('force_biometric_clockin');
         });
-    }
     }
 };

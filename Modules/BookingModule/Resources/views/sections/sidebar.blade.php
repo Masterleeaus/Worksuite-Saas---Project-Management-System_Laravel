@@ -39,3 +39,13 @@
         </div>
     </x-menu-item>
 @endif
+
+
+@if (in_array('bookingmodule', user_modules()))
+    <x-menu-item icon="calendar-check" :text="__('Booking Dashboard')" :link="route('appointment.dashboard')" />
+    <x-menu-item icon="calendar-check" :text="__('Appointments')" :link="route('appointments.index')" />
+    <x-menu-item icon="calendar-check" :text="__('Schedules')" :link="route('schedules.index')" />
+    <x-menu-item icon="calendar-check" :text="__('Dispatch')" :link="route('appointment.dispatch')" />
+    <x-menu-item icon="calendar-check" :text="__('Availability')" :link="route('appointment.settings.staff_capacity')" />
+    <x-menu-item icon="calendar-check" :text="__('Reminders')" :link="route('appointment.settings.notification_preferences')" />
+@endif

@@ -11,8 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('testimonials')) {
-
+        if (! Schema::hasTable('testimonials')) {
+            return;
+        }
+        
         Schema::table('testimonials', function (Blueprint $table) {
             // Multi-tenant scoping
             if (!Schema::hasColumn('testimonials', 'company_id')) {
@@ -77,8 +79,6 @@ return new class extends Migration
                     ->comment('Optional link to booking record');
             }
         });
-
-        }
     }
 
     /**
@@ -86,8 +86,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (Schema::hasTable('testimonials')) {
-
+        if (! Schema::hasTable('testimonials')) {
+            return;
+        }
+        
         Schema::table('testimonials', function (Blueprint $table) {
             $columns = [
                 'company_id', 'customer_name', 'suburb', 'service_type', 'content',
@@ -100,7 +102,5 @@ return new class extends Migration
                 }
             }
         });
-
-        }
     }
 };

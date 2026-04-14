@@ -4,6 +4,11 @@ return [
     // Human name for display (Packages label is handled in core lang files)
     'name' => 'Quality Control',
 
+    // Worksuite installer metadata
+    'parent_envato_id' => 23263417,
+    'parent_product_name' => 'worksuite-saas-new',
+    'parent_min_version' => '5.3.6',
+
     /*
     |--------------------------------------------------------------------------
     | Feature flags (module-local)

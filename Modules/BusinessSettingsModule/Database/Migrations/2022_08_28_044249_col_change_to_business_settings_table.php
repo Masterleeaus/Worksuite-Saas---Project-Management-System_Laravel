@@ -13,13 +13,14 @@ class ColChangeToBusinessSettingsTable extends Migration
      */
     public function up()
     {
-        if (Schema::hasTable('business_settings')) {
-
-        Schema::table('business_settings', function (Blueprint $table) {
-            $table->uuid('id')->index()->change();
-        });
-
+        if (! Schema::hasTable('business_settings')) {
+            return;
         }
+        Schema::table('business_settings', function (Blueprint $table) {
+            if (Schema::hasColumn('business_settings', 'id')) {
+                $table->uuid('id')->index()->change();
+            }
+        });
     }
 
     /**

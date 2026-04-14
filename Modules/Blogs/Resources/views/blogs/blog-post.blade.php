@@ -201,9 +201,14 @@
                             <div class="card rounded-0">
                                 <h4 class="p-2 lang_title">{{ __('available_translations') }}</h4>
                                 @php
+    $language = null;
+    try {
                                     $langCode = \App::getLocale();
                                     $language = \Modules\GlobalSetting\app\Models\Language::where('code', $langCode)->first();
-                                @endphp
+    } catch (\Illuminate\Database\QueryException $e) {
+        // Table may not exist yet
+    }
+@endphp
                                 <div class="d-flex align-items-center justify-content-between p-2">
                                     <div class="col-md-3">
                                         <select class="form-select" name="language_id" id="language_id">

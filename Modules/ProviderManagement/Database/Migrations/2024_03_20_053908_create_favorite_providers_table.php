@@ -13,6 +13,9 @@ class CreateFavoriteProvidersTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('favorite_providers')) {
+            return;
+        }
         Schema::create('favorite_providers', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();

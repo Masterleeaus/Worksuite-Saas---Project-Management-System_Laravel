@@ -1,7 +1,5 @@
 <?php
 
-
-
 use Illuminate\Support\Facades\Route;
 use Modules\EInvoice\Http\Controllers\EInvoiceController;
 
@@ -15,7 +13,6 @@ use Modules\EInvoice\Http\Controllers\EInvoiceController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
 
 // Admin routes
 Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
@@ -36,4 +33,24 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
             Route::put('einvoice-client-save/{id}', [EInvoiceController::class, 'clientSave'])->name('client_save');
         }
     );
+});
+
+// AI routes
+Route::middleware(['web', 'auth'])->group(function () {
+    Route::get('/einvoice/ai/health', [EInvoiceController::class, 'aiHealth'])->name('einvoice.ai.health');
+});
+
+Route::middleware(['web', 'auth'])->group(function () {
+    Route::get('/einvoice/settings/ai', [EInvoiceController::class, 'aiSettings'])->name('einvoice.settings.ai');
+    Route::post('/einvoice/settings/ai/test', [EInvoiceController::class, 'aiTest'])->name('einvoice.ai.test');
+    Route::post('/einvoice/ai/generate/{invoice}', [EInvoiceController::class, 'generateNote'])->name('einvoice.ai.generate');
+});
+
+Route::middleware(['web', 'auth'])->group(function () {
+    Route::get('/einvoice/notes/latest/{invoice}', [EInvoiceController::class, 'latestNote'])->name('einvoice.notes.latest');
+});
+
+Route::middleware(['web', 'auth'])->group(function () {
+    Route::post('/einvoice/ai/draft', [EInvoiceController::class, 'aiInvoiceDraft'])->name('einvoice.ai.draft');
+    Route::post('/einvoice/ai/create-from-draft/{draft}', [EInvoiceController::class, 'createInvoiceFromDraft'])->name('einvoice.ai.create_from_draft');
 });

@@ -6,30 +6,30 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
+
     public function up(): void
     {
-        if (! Schema::hasTable('recruit_global_settings') || Schema::hasColumn('recruit_global_settings', 'purchased_on')) {
-            return;
-        }
 
-        $afterColumn = Schema::hasColumn('recruit_global_settings', 'supported_until') ? 'supported_until' : null;
-
-        Schema::table('recruit_global_settings', function (Blueprint $table) use ($afterColumn) {
-            $column = $table->timestamp('purchased_on')->nullable();
-            if ($afterColumn) {
-                $column->after($afterColumn);
-            }
+        Schema::whenTableDoesntHaveColumn('recruit_global_settings', 'purchased_on', function (Blueprint $table) {
+            $table->timestamp('purchased_on')->nullable()->after('supported_until');
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
-        if (! Schema::hasTable('recruit_global_settings') || ! Schema::hasColumn('recruit_global_settings', 'purchased_on')) {
+        if (! Schema::hasTable('order_items')) {
             return;
         }
+        
+        Schema::table('order_items', function (Blueprint $table) {
 
-        Schema::table('recruit_global_settings', function (Blueprint $table) {
-            $table->dropColumn('purchased_on');
         });
     }
+
 };

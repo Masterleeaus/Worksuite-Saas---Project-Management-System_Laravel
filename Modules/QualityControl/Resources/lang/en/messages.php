@@ -16,4 +16,11 @@ return [
     'template_deleted' => 'Template deleted.',
     'template_item_added' => 'Checklist item added.',
     'template_item_removed' => 'Checklist item removed.',
+
+    // QC Record messages
+    'qc_record_created'        => 'QC record created successfully.',
+    'qc_record_deleted'        => 'QC record deleted successfully.',
+    'reclean_triggered'        => 'Re-clean has been triggered for this record.',
+    'reclean_already_triggered'=> 'Re-clean has already been triggered for this record.',
+    'reclean_marked_done'      => 'Re-clean marked as completed.',
 ];

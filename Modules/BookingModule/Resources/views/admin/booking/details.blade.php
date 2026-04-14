@@ -1057,6 +1057,14 @@
             </div>
         </div>
     </div>
+
+    @if(class_exists(\Modules\ChattingModule\Models\ChatRoom::class))
+        @push('booking-chat')
+            @include('chattingmodule::sections.booking-chat-panel')
+        @endpush
+    @endif
+
+    @stack('booking-chat')
 @endsection
 
 @push('script')

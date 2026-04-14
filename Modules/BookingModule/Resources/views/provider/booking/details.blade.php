@@ -798,8 +798,13 @@
 
     @include('bookingmodule::provider.booking.partials.details._update-customer-address-modal')
 
-    {{-- Complaint module injects linked complaint list here --}}
-    @stack('booking-complaints')
+    @if(class_exists(\Modules\ChattingModule\Models\ChatRoom::class))
+        @push('booking-chat')
+            @include('chattingmodule::sections.booking-chat-panel')
+        @endpush
+    @endif
+
+    @stack('booking-chat')
 
 @endsection
 

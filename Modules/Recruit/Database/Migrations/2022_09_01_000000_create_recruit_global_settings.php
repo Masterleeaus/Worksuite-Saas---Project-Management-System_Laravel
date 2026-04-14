@@ -12,6 +12,9 @@ return new class extends Migration
 {
     public function up()
     {
+        if (Schema::hasTable('recruit_global_settings')) {
+            return;
+        }
         Schema::create('recruit_global_settings', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -30,14 +33,15 @@ return new class extends Migration
         }
         $newSetting->saveQuietly();
 
-        if (Schema::hasTable('recruit_settings')) {
-
-
+        if (! Schema::hasTable('recruit_settings')) {
+            return;
+        }
+        
         Schema::table('recruit_settings', function (Blueprint $table) {
             $table->dropColumn(['purchase_code']);
         });
-
-
+        if (! Schema::hasTable('recruit_settings')) {
+            return;
         }
 
     }
@@ -49,13 +53,13 @@ return new class extends Migration
      */
     public function down()
     {
-        if (Schema::hasTable('zoom_setting')) {
-
+        if (! Schema::hasTable('zoom_setting')) {
+            return;
+        }
+        
         Schema::table('zoom_setting', function (Blueprint $table) {
             $table->dropColumn(['purchase_code']);
         });
-
-        }
     }
 
 };

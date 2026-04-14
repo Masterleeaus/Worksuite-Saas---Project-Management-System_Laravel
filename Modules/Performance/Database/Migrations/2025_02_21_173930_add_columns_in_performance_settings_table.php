@@ -12,23 +12,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('performance_settings')) {
-        Schema::table('performance_settings', function (Blueprint $table) {
-            if (!Schema::hasColumn('performance_settings', 'meeting_slack_notification')) {
+        if (! Schema::hasTable('performance_settings')) {
+            return;
+        }
+        if (!Schema::hasColumn('performance_settings', 'meeting_slack_notification')) {
+            Schema::table('performance_settings', function (Blueprint $table) {
                 $table->enum('meeting_slack_notification', ['yes', 'no'])->default('no')->after('send_email_notification');
-            }
-            if (!Schema::hasColumn('performance_settings', 'meeting_push_notification')) {
                 $table->enum('meeting_push_notification', ['yes', 'no'])->default('no')->after('meeting_slack_notification');
-            }
-            if (!Schema::hasColumn('performance_settings', 'meeting_email_notification')) {
                 $table->enum('meeting_email_notification', ['yes', 'no'])->default('no')->after('meeting_push_notification');
-            }
+            });
+        }
 
+        Schema::table('performance_settings', function (Blueprint $table) {
             $table->renameColumn('send_slack_notification', 'objective_slack_notification');
             $table->renameColumn('send_push_notification', 'objective_push_notification');
             $table->renameColumn('send_email_notification', 'objective_email_notification');
         });
-    }
     }
 
     /**
@@ -36,23 +35,15 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (Schema::hasTable('performance_settings')) {
         Schema::table('performance_settings', function (Blueprint $table) {
             $table->renameColumn('objective_slack_notification', 'send_slack_notification');
             $table->renameColumn('objective_push_notification', 'send_push_notification');
             $table->renameColumn('objective_email_notification', 'send_email_notification');
 
-            if (Schema::hasColumn('performance_settings', 'meeting_slack_notification')) {
-                $table->dropColumn('meeting_slack_notification');
-            }
-            if (Schema::hasColumn('performance_settings', 'meeting_push_notification')) {
-                $table->dropColumn('meeting_push_notification');
-            }
-            if (Schema::hasColumn('performance_settings', 'meeting_email_notification')) {
-                $table->dropColumn('meeting_email_notification');
-            }
+            $table->dropColumn('meeting_slack_notification');
+            $table->dropColumn('meeting_push_notification');
+            $table->dropColumn('meeting_email_notification');
         });
-    }
     }
 
 };

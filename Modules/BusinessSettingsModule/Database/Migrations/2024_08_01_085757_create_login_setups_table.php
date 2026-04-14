@@ -13,6 +13,9 @@ class CreateLoginSetupsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('login_setups')) {
+            return;
+        }
         Schema::create('login_setups', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();

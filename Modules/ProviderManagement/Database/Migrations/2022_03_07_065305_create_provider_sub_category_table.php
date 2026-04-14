@@ -13,6 +13,9 @@ class CreateProviderSubCategoryTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('provider_sub_category')) {
+            return;
+        }
         Schema::create('provider_sub_category', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();

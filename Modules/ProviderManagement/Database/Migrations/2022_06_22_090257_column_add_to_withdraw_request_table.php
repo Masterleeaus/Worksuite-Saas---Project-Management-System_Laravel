@@ -13,16 +13,15 @@ class ColumnAddToWithdrawRequestTable extends Migration
      */
     public function up()
     {
-        if (Schema::hasTable('withdraw_requests')) {
-        Schema::table('withdraw_requests', function (Blueprint $table) {
-            if (!Schema::hasColumn('withdraw_requests', 'is_paid')) {
+        if (! Schema::hasTable('withdraw_requests')) {
+            return;
+        }
+        if (!Schema::hasColumn('withdraw_requests', 'is_paid')) {
+            Schema::table('withdraw_requests', function (Blueprint $table) {
                 $table->boolean('is_paid')->default(0);
-            }
-            if (!Schema::hasColumn('withdraw_requests', 'note')) {
                 $table->string('note')->nullable();
-            }
-        });
-    }
+            });
+        }
     }
 
     /**
@@ -32,15 +31,9 @@ class ColumnAddToWithdrawRequestTable extends Migration
      */
     public function down()
     {
-        if (Schema::hasTable('withdraw_requests')) {
         Schema::table('withdraw_requests', function (Blueprint $table) {
-            if (Schema::hasColumn('withdraw_requests', 'is_paid')) {
-                $table->dropColumn('is_paid');
-            }
-            if (Schema::hasColumn('withdraw_requests', 'note')) {
-                $table->dropColumn('note');
-            }
+            $table->dropColumn('is_paid');
+            $table->dropColumn('note');
         });
-    }
     }
 }

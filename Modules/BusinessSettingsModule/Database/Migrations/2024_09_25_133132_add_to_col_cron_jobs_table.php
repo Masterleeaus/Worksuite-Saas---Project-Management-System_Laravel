@@ -13,13 +13,14 @@ class AddToColCronJobsTable extends Migration
      */
     public function up()
     {
-        if (Schema::hasTable('cron_jobs')) {
-        Schema::table('cron_jobs', function (Blueprint $table) {
-            if (!Schema::hasColumn('cron_jobs', 'type')) {
+        if (! Schema::hasTable('cron_jobs')) {
+            return;
+        }
+        if (!Schema::hasColumn('cron_jobs', 'type')) {
+            Schema::table('cron_jobs', function (Blueprint $table) {
                 $table->string('type')->nullable();
-            }
-        });
-    }
+            });
+        }
     }
 
     /**
@@ -29,12 +30,8 @@ class AddToColCronJobsTable extends Migration
      */
     public function down()
     {
-        if (Schema::hasTable('cron_jobs')) {
         Schema::table('cron_jobs', function (Blueprint $table) {
-            if (Schema::hasColumn('cron_jobs', 'type')) {
-                $table->dropColumn('type');
-            }
+            $table->dropColumn('type');
         });
-    }
     }
 }

@@ -6,30 +6,30 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
+
     public function up(): void
     {
-        if (! Schema::hasTable('project_roadmap_settings') || Schema::hasColumn('project_roadmap_settings', 'purchased_on')) {
-            return;
-        }
 
-        $afterColumn = Schema::hasColumn('project_roadmap_settings', 'supported_until') ? 'supported_until' : null;
-
-        Schema::table('project_roadmap_settings', function (Blueprint $table) use ($afterColumn) {
-            $column = $table->timestamp('purchased_on')->nullable();
-            if ($afterColumn) {
-                $column->after($afterColumn);
-            }
+        Schema::whenTableDoesntHaveColumn('project_roadmap_settings', 'purchased_on', function (Blueprint $table) {
+            $table->timestamp('purchased_on')->nullable()->after('supported_until');
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
-        if (! Schema::hasTable('project_roadmap_settings') || ! Schema::hasColumn('project_roadmap_settings', 'purchased_on')) {
+        if (! Schema::hasTable('order_items')) {
             return;
         }
+        
+        Schema::table('order_items', function (Blueprint $table) {
 
-        Schema::table('project_roadmap_settings', function (Blueprint $table) {
-            $table->dropColumn('purchased_on');
         });
     }
+
 };

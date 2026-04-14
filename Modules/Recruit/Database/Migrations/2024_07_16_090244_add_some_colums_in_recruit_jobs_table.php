@@ -11,16 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('recruit_jobs')) {
-        Schema::table('recruit_jobs', function (Blueprint $table) {
-            if (!Schema::hasColumn('recruit_jobs', 'is_currentctc_require')) {
+        if (! Schema::hasTable('recruit_jobs')) {
+            return;
+        }
+        if (!Schema::hasColumn('recruit_jobs', 'is_currentctc_require')) {
+            Schema::table('recruit_jobs', function (Blueprint $table) {
                 $table->boolean('is_currentctc_require')->default(false);
-            }
-            if (!Schema::hasColumn('recruit_jobs', 'is_expectedctc_require')) {
                 $table->boolean('is_expectedctc_require')->default(false);
-            }
-        });
-    }
+            });
+        }
     }
 
     /**
@@ -28,15 +27,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (Schema::hasTable('recruit_jobs')) {
         Schema::table('recruit_jobs', function (Blueprint $table) {
-            if (Schema::hasColumn('recruit_jobs', 'is_currentctc_require')) {
-                $table->dropColumn('is_currentctc_require');
-            }
-            if (Schema::hasColumn('recruit_jobs', 'is_expectedctc_require')) {
-                $table->dropColumn('is_expectedctc_require');
-            }
+            $table->dropColumn('is_currentctc_require');
+            $table->dropColumn('is_expectedctc_require');
+
         });
-    }
     }
 };

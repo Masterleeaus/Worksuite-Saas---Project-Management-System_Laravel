@@ -16,30 +16,28 @@ return new class extends Migration
     public function up(): void
     {
         if (!Schema::hasColumn('performance_settings', 'company_id')) {
-            if (Schema::hasTable('performance_settings')) {
-        Schema::table('performance_settings', function (Blueprint $table) {
-                if (!Schema::hasColumn('performance_settings', 'company_id')) {
+            if (! Schema::hasTable('performance_settings')) {
+                return;
+            }
+            
+            Schema::table('performance_settings', function (Blueprint $table) {
+                if (! Schema::hasColumn('performance_settings', 'company_id')) {
                     $table->integer('company_id')->unsigned()->nullable()->after('id');
                 }
                 $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade')->onUpdate('cascade');
-        });
-    }
+            });
         }
 
         if (Schema::hasColumn('performance_settings', 'purchase_code')) {
-            if (Schema::hasTable('performance_settings')) {
-        Schema::table('performance_settings', function (Blueprint $table) {
-                if (Schema::hasColumn('performance_settings', 'purchase_code')) {
-                    $table->dropColumn('purchase_code');
-                }
-                if (Schema::hasColumn('performance_settings', 'supported_until')) {
-                    $table->dropColumn('supported_until');
-                }
-                if (Schema::hasColumn('performance_settings', 'notify_update')) {
-                    $table->dropColumn('notify_update');
-                }
-        });
-    }
+            if (! Schema::hasTable('performance_settings')) {
+                return;
+            }
+            
+            Schema::table('performance_settings', function (Blueprint $table) {
+                $table->dropColumn('purchase_code');
+                $table->dropColumn('supported_until');
+                $table->dropColumn('notify_update');
+            });
         }
 
         $companies = Company::select('id', 'package_id')->get();

@@ -13,13 +13,14 @@ class AddKeyTypeColumnInNotificationSetupsTable extends Migration
      */
     public function up()
     {
-        if (Schema::hasTable('notification_setups')) {
-        Schema::table('notification_setups', function (Blueprint $table) {
-            if (!Schema::hasColumn('notification_setups', 'key_type')) {
+        if (! Schema::hasTable('notification_setups')) {
+            return;
+        }
+        if (!Schema::hasColumn('notification_setups', 'key_type')) {
+            Schema::table('notification_setups', function (Blueprint $table) {
                 $table->string('key_type')->nullable();
-            }
-        });
-    }
+            });
+        }
     }
 
     /**
@@ -29,12 +30,8 @@ class AddKeyTypeColumnInNotificationSetupsTable extends Migration
      */
     public function down()
     {
-        if (Schema::hasTable('notification_setups')) {
         Schema::table('notification_setups', function (Blueprint $table) {
-            if (Schema::hasColumn('notification_setups', 'key_type')) {
-                $table->dropColumn('key_type');
-            }
+            $table->dropColumn('key_type');
         });
-    }
     }
 }

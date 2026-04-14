@@ -17,13 +17,9 @@ return new class extends Migration {
     public function up()
     {
         if (!Schema::hasColumn('companies', 'sub_domain')) {
-            if (Schema::hasTable('companies')) {
-        Schema::table('companies', function (Blueprint $table) {
-                if (!Schema::hasColumn('companies', 'sub_domain')) {
-                    $table->string('sub_domain')->after('id')->nullable();
-                }
-        });
-    }
+            Schema::table('companies', function (Blueprint $table) {
+                $table->string('sub_domain')->after('id')->nullable();
+            });
 
             $companies = Company::withoutGlobalScope(ActiveScope::class)
                 ->select(['id', 'app_name'])
@@ -43,13 +39,13 @@ return new class extends Migration {
      */
     public function down()
     {
-        if (Schema::hasTable('companies')) {
+        if (! Schema::hasTable('companies')) {
+            return;
+        }
+        
         Schema::table('companies', function (Blueprint $table) {
-            if (Schema::hasColumn('companies', 'sub_domain')) {
-                $table->dropColumn('sub_domain');
-            }
+            $table->dropColumn('sub_domain');
         });
-    }
     }
 
 };

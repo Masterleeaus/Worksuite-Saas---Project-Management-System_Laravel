@@ -13,6 +13,9 @@ class CreateTranslationsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('translations')) {
+            return;
+        }
         Schema::create('translations', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();
