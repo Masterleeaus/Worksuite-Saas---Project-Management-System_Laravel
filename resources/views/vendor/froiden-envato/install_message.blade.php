@@ -16,7 +16,7 @@ $laravelVersion = '9.0';
 
 $reqList = [
     '9.0' => [
-        'php' => '8.2',
+        'php' => '8.3',
         'mcrypt' => false,
         'openssl' => true,
         'pdo' => true,
@@ -81,7 +81,7 @@ $requirements = [
                     <span class="text-sm flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-full">
                         <span class="font-medium">Current PHP Version:</span>
                         <span class="px-2 py-0.5 bg-white rounded text-blue-600 font-semibold">{{ phpversion() }}</span>
-                        @if (version_compare(PHP_VERSION, '8.2') > 0)
+                        @if (version_compare(PHP_VERSION, '8.3') >= 0)
                             <span class="flex items-center text-green-500">
                                 <i class="fas fa-check-circle mr-1"></i>
                                 <span class="text-xs font-medium">Compatible</span>
