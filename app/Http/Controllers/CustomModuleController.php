@@ -83,6 +83,7 @@ class CustomModuleController extends Controller
         ];
         $this->activeTab = 'custom';
         $this->plugins = collect(EnvatoUpdate::plugins());
+        $this->worksuitePlugins = worksuite_plugins();
         $this->moduleFiles = File::exists($this->updateFilePath) ? File::files($this->updateFilePath) : [];
         $this->doctorSummaryCards = $this->doctorSummaryCards ?? [];
 
@@ -106,6 +107,7 @@ class CustomModuleController extends Controller
         $this->type = 'custom';
         $this->updateFilePath = config('froiden_envato.tmp_path');
         $this->packageChoices = $this->getPackageChoices();
+        $this->worksuitePlugins = worksuite_plugins();
         $this->moduleFiles = File::exists($this->updateFilePath) ? File::files($this->updateFilePath) : [];
         $this->doctorSummaryCards = $this->doctorSummaryCards ?? [];
 
