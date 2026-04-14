@@ -171,7 +171,14 @@ class PromotionManagementServiceProvider extends ServiceProvider
 
     private function bindCmsRenderingSlots(): void
     {
-        Blade::includeIf('promotionmanagement::sections.sidebar', 'promotionmanagement_sidebar');
+        $bladeCompiler = Blade::getFacadeRoot();
+
+        if ($bladeCompiler && method_exists($bladeCompiler, 'includeIf')) {
+            Blade::includeIf('promotionmanagement::sections.sidebar', 'promotionmanagement_sidebar');
+        } elseif ($bladeCompiler && method_exists($bladeCompiler, 'include') && view()->exists('promotionmanagement::sections.sidebar')) {
+            Blade::include('promotionmanagement::sections.sidebar', 'promotionmanagement_sidebar');
+        }
+
         view()->share('promotionManagementSidebarView', 'promotionmanagement::sections.sidebar');
     }
 }
