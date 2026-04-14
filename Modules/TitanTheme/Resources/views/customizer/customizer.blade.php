@@ -25,6 +25,15 @@
         return;
     }
 
+    $superAdminThemeSetting = \App\Models\ThemeSetting::withoutGlobalScope(\App\Scopes\CompanyScope::class)
+        ->where('panel', 'superadmin')
+        ->whereNull('company_id')
+        ->first();
+
+    if (($superAdminThemeSetting->restrict_admin_theme_change ?? 0) && !(user()->is_superadmin ?? false)) {
+        return;
+    }
+
     $customizerOptions = [
         'colorMainForeground' => [
             'title' => __('Foreground'),
