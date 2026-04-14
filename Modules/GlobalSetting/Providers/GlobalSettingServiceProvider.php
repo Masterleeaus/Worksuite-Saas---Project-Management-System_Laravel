@@ -4,12 +4,9 @@ namespace Modules\GlobalSetting\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
-use Nwidart\Modules\Traits\PathNamespace;
 
 class GlobalSettingServiceProvider extends ServiceProvider
 {
-    use PathNamespace;
-
     protected string $name = 'GlobalSetting';
 
     protected string $nameLower = 'globalsetting';
@@ -119,5 +116,20 @@ class GlobalSettingServiceProvider extends ServiceProvider
         }
 
         return $paths;
+    }
+
+    private function app_path(string $path = ''): string
+    {
+        return trim($path, '/\\');
+    }
+
+    private function module_namespace(string $module, string $path = ''): string
+    {
+        $baseNamespace = trim((string) config('modules.namespace', 'Modules'), '\\');
+        $normalizedPath = str_replace(['/', '\\'], '\\', trim($path, '/\\'));
+
+        return $normalizedPath === ''
+            ? $baseNamespace.'\\'.$module
+            : $baseNamespace.'\\'.$module.'\\'.$normalizedPath;
     }
 }
