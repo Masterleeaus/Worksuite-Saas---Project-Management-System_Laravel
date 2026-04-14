@@ -174,7 +174,7 @@ class TitanTenantIsolationDatabaseTest extends TestCase
         $tenantMiddleware = app(ApplyTitanTenantScope::class);
         $next = fn () => response('ok', Response::HTTP_OK);
 
-        auth()->setUser(new TitanDbRuntimeUser(701, 3, ['admin'], false, false, false));
+        auth()->setUser(new TitanDbRuntimeUser(701, 3, ['admin'], titanPermission: false, isSuperadmin: false, withCompanyRelation: false));
         $tenantResponse = $tenantMiddleware->handle($request, $next);
 
         $this->assertSame(Response::HTTP_OK, $tenantResponse->status());
