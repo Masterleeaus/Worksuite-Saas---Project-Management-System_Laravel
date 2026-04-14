@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -24,15 +23,12 @@ return new class extends Migration
             return;
         }
 
-        Schema::table('salary_slips', function (Blueprint $table) {
-            try {
-                $table->dropForeign(['currency_id']);
-            } catch (QueryException $e) {
-                $message = $e->getMessage();
+        $hasCurrencyForeignKey = collect(Schema::getConnection()->getDoctrineSchemaManager()->listTableForeignKeys('salary_slips'))
+            ->contains(fn ($foreignKey) => in_array('currency_id', $foreignKey->getLocalColumns(), true));
 
-                if (! str_contains($message, 'check that column/key exists') && ! str_contains($message, 'Cannot drop index')) {
-                    throw $e;
-                }
+        Schema::table('salary_slips', function (Blueprint $table) use ($hasCurrencyForeignKey) {
+            if ($hasCurrencyForeignKey) {
+                $table->dropForeign(['currency_id']);
             }
 
             $table->foreign('currency_id')->references('id')->on('currencies')->onUpdate('cascade')->onDelete('cascade');
@@ -51,7 +47,10 @@ return new class extends Migration
         }
 
         Schema::table('salary_slips', function (Blueprint $table) {
-            $table->dropForeign(['currency_id']);
+            if (Schema::hasColumn('salary_slips', 'currency_id')) {
+                $table->dropForeign(['currency_id']);
+                $table->dropColumn('currency_id');
+            }
         });
     }
 };
