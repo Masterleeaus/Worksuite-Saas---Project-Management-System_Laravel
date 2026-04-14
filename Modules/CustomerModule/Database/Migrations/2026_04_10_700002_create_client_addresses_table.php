@@ -18,8 +18,8 @@ return new class extends Migration
 
         Schema::create('client_addresses', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('client_id')->index();
-            $table->unsignedBigInteger('company_id')->nullable()->index();
+            $table->unsignedInteger('client_id')->index();
+            $table->unsignedInteger('company_id')->nullable()->index();
             $table->string('label', 100)->nullable();         // e.g. "Home", "Investment Property"
             $table->string('address_line_1', 255)->nullable();
             $table->string('address_line_2', 255)->nullable();

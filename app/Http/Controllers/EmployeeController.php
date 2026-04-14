@@ -59,8 +59,6 @@ use App\Models\CompanyAddress;
 use App\Models\Promotion;
 use App\Models\PackageUpdateNotify;
 use App\Models\ShiftRotation;
-use Modules\Payroll\Entities\EmployeeMonthlySalary;
-use Modules\Payroll\Entities\PayrollSetting;
 
 class EmployeeController extends AccountBaseController
 {
@@ -967,11 +965,20 @@ class EmployeeController extends AccountBaseController
                 ];
             });
 
-        if (module_enabled('Payroll') && in_array('payroll', user_modules())) {
-            $increments = EmployeeMonthlySalary::employeeIncrements($id)
+        if (
+            module_enabled('Payroll')
+            && in_array('payroll', user_modules())
+            && class_exists(\Modules\Payroll\Entities\EmployeeMonthlySalary::class)
+            && class_exists(\Modules\Payroll\Entities\PayrollSetting::class)
+        ) {
+            $employeeMonthlySalaryModel = \Modules\Payroll\Entities\EmployeeMonthlySalary::class;
+            $payrollSettingModel = \Modules\Payroll\Entities\PayrollSetting::class;
+
+            $increments = $employeeMonthlySalaryModel::employeeIncrements($id)
                 ->map(function ($increment, $index) use ($id) {
 
-                    $netSalaryData = EmployeeMonthlySalary::employeeNetSalary($id, $increment->date);
+                    $employeeMonthlySalaryModel = \Modules\Payroll\Entities\EmployeeMonthlySalary::class;
+                    $netSalaryData = $employeeMonthlySalaryModel::employeeNetSalary($id, $increment->date);
                     $isFirst = ($index === 0);
                     $netSalary = $isFirst ? $netSalaryData['initialSalary'] : $netSalaryData['netSalary'];
                     $incrementAmount = $increment->amount;
@@ -986,7 +993,7 @@ class EmployeeController extends AccountBaseController
                     ];
                 });
 
-            $payrollCurrency = PayrollSetting::with('currency')->first();
+            $payrollCurrency = $payrollSettingModel::with('currency')->first();
             $this->currency = $payrollCurrency->currency ? $payrollCurrency->currency->id : '';
         }
         else {

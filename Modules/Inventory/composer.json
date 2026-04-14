@@ -1,9 +1,0 @@
-{
-  "name": "saassmart/worksuite-inventory",
-  "type": "library",
-  "autoload": {
-    "psr-4": {
-      "Modules\\Inventory\\": ""
-    }
-  }
-}

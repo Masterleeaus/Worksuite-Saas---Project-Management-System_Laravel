@@ -448,27 +448,4 @@
         </x-menu-item>
     @endif
 
-    {{-- ── TitanReach — OmniChannel Inbox & Campaigns ───────────────────────── --}}
-    @if(in_array('admin', user_roles())
-        && class_exists(\Modules\TitanReach\Providers\TitanReachServiceProvider::class))
-        <x-menu-item icon="chat" text="TitanReach">
-            <x-slot name="iconPath">
-                <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4.414A2 2 0 0 0 3 11.586l-2 2V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12.793a.5.5 0 0 0 .854.353l2.853-2.853A1 1 0 0 1 4.414 12H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-            </x-slot>
-            <div class="accordionItemContent">
-                <x-sub-menu-item :link="route('titanreach.dashboard')"        text="Dashboard" />
-                <x-sub-menu-item :link="route('titanreach.inbox.index')"      text="Inbox" />
-                <x-sub-menu-item :link="route('titanreach.campaigns.index')"  text="Campaigns" />
-                <x-sub-menu-item :link="route('titanreach.contacts.index')"   text="Contacts" />
-                <x-sub-menu-item :link="route('titanreach.lists.index')"      text="Contact Lists" />
-                <x-sub-menu-item :link="route('titanreach.segments.index')"   text="Segments" />
-                <x-sub-menu-item :link="route('titanreach.sms.index')"        text="SMS" />
-                <x-sub-menu-item :link="route('titanreach.whatsapp.index')"   text="WhatsApp" />
-                <x-sub-menu-item :link="route('titanreach.telegram.index')"   text="Telegram" />
-                <x-sub-menu-item :link="route('titanreach.calls.index')"      text="Call Campaigns" />
-                <x-sub-menu-item :link="route('titanreach.training.index')"   text="AI Training" />
-            </div>
-        </x-menu-item>
-    @endif
-
 </ul>
