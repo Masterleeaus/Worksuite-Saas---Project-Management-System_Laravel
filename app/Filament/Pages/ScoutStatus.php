@@ -2,7 +2,6 @@
 
 namespace App\Filament\Pages;
 
-use Filament\Pages\Page;
 
 /**
  * ScoutStatus
@@ -10,7 +9,7 @@ use Filament\Pages\Page;
  * Placeholder page – Titan Scout Status.
  * Will display the status of background scouting/monitoring jobs.
  */
-class ScoutStatus extends Page
+class ScoutStatus extends TitanPage
 {
     protected static ?string $navigationIcon = 'heroicon-o-magnifying-glass';
 

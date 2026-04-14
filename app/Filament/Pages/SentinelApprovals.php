@@ -2,7 +2,6 @@
 
 namespace App\Filament\Pages;
 
-use Filament\Pages\Page;
 
 /**
  * SentinelApprovals
@@ -10,7 +9,7 @@ use Filament\Pages\Page;
  * Placeholder page – Titan Sentinel Approvals.
  * Will display items that require human approval before Titan actions proceed.
  */
-class SentinelApprovals extends Page
+class SentinelApprovals extends TitanPage
 {
     protected static ?string $navigationIcon = 'heroicon-o-shield-check';
 

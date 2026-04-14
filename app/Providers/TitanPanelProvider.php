@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Filament\Pages\AutomationQueue;
 use App\Filament\Pages\CommandCentre;
+use App\Filament\Resources\DocumentTemplateResource;
 use App\Filament\Pages\ScoutStatus;
 use App\Filament\Pages\SentinelApprovals;
 use App\Filament\Pages\SignalLogs;
@@ -12,7 +13,7 @@ use App\Filament\Widgets\JobsTodayWidget;
 use App\Filament\Widgets\RevenueWidget;
 use App\Filament\Widgets\SystemSignalsWidget;
 use App\Filament\Widgets\TitanChatWidget;
-use Filament\Http\Middleware\Authenticate;
+use App\Http\Middleware\FilamentAuthenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\NavigationGroup;
@@ -96,6 +97,9 @@ class TitanPanelProvider extends PanelProvider
                 ActivityFeedWidget::class,
                 TitanChatWidget::class,
             ])
+            ->resources([
+                DocumentTemplateResource::class,
+            ])
 
             // ----------------------------------------------------------------
             // Middleware – standard Filament stack using the existing session
@@ -112,9 +116,30 @@ class TitanPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->authMiddleware([
-                Authenticate::class,
+                FilamentAuthenticate::class,
                 \App\Http\Middleware\ApplyTitanTenantScope::class,
+                \App\Http\Middleware\EnsureTitanPanelAccess::class,
             ]);
+    }
+
+    public static function canAccess(): bool
+    {
+        $user = auth()->user();
+
+        if (!$user || empty($user->company_id)) {
+            return false;
+        }
+
+        $isAdmin = method_exists($user, 'hasRole')
+            && ($user->hasRole('admin') || $user->hasRole('superadmin'));
+
+        $permission = method_exists($user, 'permission')
+            ? $user->permission('titan_access')
+            : false;
+
+        $hasTitanPermission = !in_array($permission, [false, null, 'none'], true);
+
+        return $isAdmin || $hasTitanPermission;
     }
 
     /**
