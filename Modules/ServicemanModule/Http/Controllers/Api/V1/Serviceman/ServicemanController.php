@@ -15,7 +15,7 @@ use Modules\BookingModule\Entities\Booking;
 use Modules\BookingModule\Entities\BookingScheduleHistory;
 use Modules\BookingModule\Entities\BookingStatusHistory;
 use Modules\PromotionManagement\Entities\PushNotification;
-use Modules\Sms\Lib\SMS_gateway;
+use Modules\SMSModule\Lib\SMS_gateway;
 use Modules\UserManagement\Entities\Serviceman;
 use Modules\UserManagement\Entities\User;
 use Modules\PaymentModule\Traits\SmsGateway;

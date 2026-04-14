@@ -7,7 +7,8 @@
     "active": true,
     "version": 3.0,
     "providers": [
-        "Modules\\TitanDocs\\Providers\\TitanDocsServiceProvider"
+        "Modules\\TitanDocs\\Providers\\TitanDocsServiceProvider",
+        "Modules\\TitanDocs\\Providers\\EventServiceProvider"
     ],
     "files": [],
     "displayName": "TitanDocs"

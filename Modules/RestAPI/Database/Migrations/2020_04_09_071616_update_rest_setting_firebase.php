@@ -1,0 +1,34 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        if (Schema::hasTable('rest_api_settings')) {
+        Schema::table('rest_api_settings', function (Blueprint $table) {
+            if (!Schema::hasColumn('rest_api_settings', 'fcm_key')) {
+                $table->string('fcm_key')->nullable();
+            }
+        });
+    }
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::table('', function (Blueprint $table) {
+        });
+    }
+};

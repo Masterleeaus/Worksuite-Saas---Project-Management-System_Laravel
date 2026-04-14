@@ -11,7 +11,7 @@ use Modules\BusinessSettingsModule\Entities\BusinessSettings;
 /**
  * SmsGatewayConfigApiController
  *
- * Merged from Sms API V1 Admin controller.
+ * Merged from SMSModule API V1 Admin controller.
  * Exposes gateway configuration endpoints for the Sms module.
  */
 class SmsGatewayConfigApiController extends Controller
