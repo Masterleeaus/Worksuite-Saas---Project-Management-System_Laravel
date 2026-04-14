@@ -17,6 +17,13 @@ trait StripeSettings
     public function setStripConfigs()
     {
         $settings = GlobalPaymentGatewayCredentials::first();
+        if (!$settings) {
+            Config::set('cashier.key', env('STRIPE_KEY'));
+            Config::set('cashier.secret', env('STRIPE_SECRET'));
+            Config::set('cashier.webhook.secret', env('STRIPE_WEBHOOK_SECRET'));
+
+            return;
+        }
 
         if ($settings->stripe_mode == 'test') {
             $stripeClientId = $settings->test_stripe_client_id;
@@ -38,6 +45,5 @@ trait StripeSettings
     }
 
 }
-
 
 

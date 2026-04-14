@@ -1175,14 +1175,19 @@ if (!function_exists('quickbooks_setting')) {
     // @codingStandardsIgnoreLine
     function quickbooks_setting()
     {
+        if (!\Illuminate\Support\Facades\Schema::hasTable('quick_books_settings')) {
+            return (object) ['status' => 0, 'access_token' => ''];
+        }
+
         if (!session()->has('quickbooks_setting')) {
             $qbSetting = QuickBooksSetting::first();
+            $qbSetting = $qbSetting ?: (object) ['status' => 0, 'access_token' => ''];
             session(['quickbooks_setting' => $qbSetting]);
 
             return $qbSetting;
         }
 
-        return session('quickbooks_setting');
+        return session('quickbooks_setting') ?: (object) ['status' => 0, 'access_token' => ''];
     }
 
     // @codingStandardsIgnoreLine

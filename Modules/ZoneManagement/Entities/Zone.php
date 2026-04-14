@@ -10,21 +10,17 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Modules\CategoryManagement\Entities\Category;
 use Modules\ProviderManagement\Entities\Provider;
 use Modules\BusinessSettingsModule\Entities\Translation;
-use MatanYadaev\EloquentSpatial\Objects\Point;
-use MatanYadaev\EloquentSpatial\Objects\Polygon;
-use MatanYadaev\EloquentSpatial\Traits\HasSpatial;
 use Modules\ZoneManagement\Traits\CompanyScoped;
 
 class Zone extends Model
 {
     use CompanyScoped;
     use HasFactory;
-    use HasSpatial;
     use HasUuid;
 
     protected $casts = [
         'is_active'  => 'integer',
-        'coordinates' => Polygon::class,
+        'coordinates' => 'array',
         'center_lat' => 'float',
         'center_lng' => 'float',
         'radius'     => 'integer',

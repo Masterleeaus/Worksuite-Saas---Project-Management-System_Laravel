@@ -73,6 +73,17 @@ class BillingController extends AccountBaseController
 
         $this->paymentGatewatActive = false;
         $this->stripeSettings = GlobalPaymentGatewayCredentials::first();
+        if (!$this->stripeSettings) {
+            $this->stripeSettings = (object) [
+                'paypal_status' => 'inactive',
+                'stripe_status' => 'inactive',
+                'razorpay_status' => 'inactive',
+                'paystack_status' => 'inactive',
+                'mollie_status' => 'inactive',
+                'payfast_status' => 'inactive',
+                'authorize_status' => 'inactive',
+            ];
+        }
 
         if (in_array('active', [
             $this->stripeSettings->paypal_status,

@@ -104,7 +104,7 @@ jobs:
         # Migrations must succeed so the install check validates a usable schema state.
 
       - name: Validate route list (app bootstrap check)
-        run: php artisan route:list --compact 2>&1 | tail -5
+        run: php artisan route:list 2>&1 | tail -5
 
       - name: Run artisan about (Laravel 9.21+)
         run: php artisan about
