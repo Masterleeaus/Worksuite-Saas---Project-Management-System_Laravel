@@ -11,7 +11,7 @@ return new class extends Migration {
         if (! Schema::hasTable('nps_surveys')) {
             Schema::create('nps_surveys', function (Blueprint $table) {
                 $table->id();
-                $table->unsignedBigInteger('client_id');
+                $table->unsignedInteger('client_id');
                 $table->unsignedBigInteger('booking_id')->nullable();
                 $table->integer('nps_score')->nullable();          // 0-10
                 $table->integer('service_rating')->nullable();     // 1-5 stars
@@ -35,7 +35,8 @@ return new class extends Migration {
         if (! Schema::hasTable('feedback_insights')) {
             Schema::create('feedback_insights', function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
+                $table->unsignedInteger('company_id');
+                $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
                 $table->foreignId('feedback_ticket_id')->constrained('feedback_tickets')->cascadeOnDelete();
 
                 $table->enum('insight_type', ['sentiment', 'category', 'priority', 'action', 'trend']);

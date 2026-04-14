@@ -12,9 +12,12 @@ return new class extends Migration {
         }
         Schema::create('feedback_tickets', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->foreignId('agent_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->unsignedInteger('company_id');
+            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
+            $table->unsignedInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->unsignedInteger('agent_id')->nullable();
+            $table->foreign('agent_id')->references('id')->on('users')->nullOnDelete();
             
             $table->string('title');
             $table->longText('description');
