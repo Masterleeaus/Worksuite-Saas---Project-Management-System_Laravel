@@ -204,19 +204,51 @@ return new class extends Migration
 
         if (Schema::hasTable('services') && Schema::hasColumn('services', 'company_id')) {
             if (Schema::hasTable('service_addons') && Schema::hasColumn('service_addons', 'company_id')) {
-                DB::table('service_addons as a')
-                    ->join('services as s', 's.id', '=', 'a.service_id')
-                    ->whereNull('a.company_id')
-                    ->whereNotNull('s.company_id')
-                    ->update(['company_id' => DB::raw('s.company_id')]);
+                DB::table('service_addons')
+                    ->whereNull('company_id')
+                    ->orderBy('id')
+                    ->chunkById(200, function ($addons) {
+                        $serviceIds = $addons->pluck('service_id')->filter()->unique()->values();
+                        if ($serviceIds->isEmpty()) {
+                            return;
+                        }
+
+                        $serviceCompanyMap = DB::table('services')
+                            ->whereIn('id', $serviceIds)
+                            ->whereNotNull('company_id')
+                            ->pluck('company_id', 'id');
+
+                        foreach ($addons as $addon) {
+                            $companyId = $serviceCompanyMap[$addon->service_id] ?? null;
+                            if ($companyId) {
+                                DB::table('service_addons')->where('id', $addon->id)->update(['company_id' => $companyId]);
+                            }
+                        }
+                    });
             }
 
             if (Schema::hasTable('service_pricing_rules') && Schema::hasColumn('service_pricing_rules', 'company_id')) {
-                DB::table('service_pricing_rules as r')
-                    ->join('services as s', 's.id', '=', 'r.service_id')
-                    ->whereNull('r.company_id')
-                    ->whereNotNull('s.company_id')
-                    ->update(['company_id' => DB::raw('s.company_id')]);
+                DB::table('service_pricing_rules')
+                    ->whereNull('company_id')
+                    ->orderBy('id')
+                    ->chunkById(200, function ($rules) {
+                        $serviceIds = $rules->pluck('service_id')->filter()->unique()->values();
+                        if ($serviceIds->isEmpty()) {
+                            return;
+                        }
+
+                        $serviceCompanyMap = DB::table('services')
+                            ->whereIn('id', $serviceIds)
+                            ->whereNotNull('company_id')
+                            ->pluck('company_id', 'id');
+
+                        foreach ($rules as $rule) {
+                            $companyId = $serviceCompanyMap[$rule->service_id] ?? null;
+                            if ($companyId) {
+                                DB::table('service_pricing_rules')->where('id', $rule->id)->update(['company_id' => $companyId]);
+                            }
+                        }
+                    });
             }
         }
     }
