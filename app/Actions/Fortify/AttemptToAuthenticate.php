@@ -403,12 +403,19 @@ class AttemptToAuthenticate
             ->where('date', now($company->timezone)->toDateString())
             ->first();
 
-        $backDayFromDefault = Carbon::parse(now($company->timezone)->subDay()->format('Y-m-d') . ' ' . $defaultAttendanceSettings->office_start_time);
+        $backDayFromDefault = null;
+        $backDayToDefault = null;
+        $hasDefaultAttendanceWindow = !is_null($defaultAttendanceSettings)
+            && !is_null($defaultAttendanceSettings->office_start_time)
+            && !is_null($defaultAttendanceSettings->office_end_time);
 
-        $backDayToDefault = Carbon::parse(now($company->timezone)->subDay()->format('Y-m-d') . ' ' . $defaultAttendanceSettings->office_end_time);
+        if ($hasDefaultAttendanceWindow) {
+            $backDayFromDefault = Carbon::parse(now($company->timezone)->subDay()->format('Y-m-d') . ' ' . $defaultAttendanceSettings->office_start_time);
+            $backDayToDefault = Carbon::parse(now($company->timezone)->subDay()->format('Y-m-d') . ' ' . $defaultAttendanceSettings->office_end_time);
 
-        if ($backDayFromDefault->gt($backDayToDefault)) {
-            $backDayToDefault->addDay();
+            if ($backDayFromDefault->gt($backDayToDefault)) {
+                $backDayToDefault->addDay();
+            }
         }
 
         $nowTime = Carbon::createFromFormat('Y-m-d H:i:s', now($company->timezone)->toDateTimeString(), 'UTC');
@@ -417,7 +424,7 @@ class AttemptToAuthenticate
             $attendanceSettings = $checkPreviousDayShift;
 
         }
-        else if ($nowTime->betweenIncluded($backDayFromDefault, $backDayToDefault)) {
+        else if ($hasDefaultAttendanceWindow && $nowTime->betweenIncluded($backDayFromDefault, $backDayToDefault)) {
             $attendanceSettings = $defaultAttendanceSettings;
 
         }
@@ -435,8 +442,7 @@ class AttemptToAuthenticate
             $attendanceSettings = $checkTodayShift;
         }
         else {
-
-            $attendanceSettings = $defaultAttendanceSettings;
+            $attendanceSettings = $defaultAttendanceSettings ?? $checkTodayShift ?? $checkPreviousDayShift;
         }
 
         if (isset($attendanceSettings->shift)) {
