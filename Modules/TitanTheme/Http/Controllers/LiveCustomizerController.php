@@ -5,6 +5,8 @@ namespace Modules\TitanTheme\Http\Controllers;
 use App\Helper\Reply;
 use App\Helpers\Classes\Helper;
 use App\Http\Controllers\AccountBaseController;
+use App\Models\ThemeSetting;
+use App\Scopes\CompanyScope;
 use Illuminate\Http\Request;
 use Modules\TitanTheme\Models\ThemePreset;
 use Modules\TitanTheme\Services\ThemeService;
@@ -22,7 +24,7 @@ class LiveCustomizerController extends AccountBaseController
      */
     public function index()
     {
-        abort_403(!$this->user->permission('manage_theme_settings'));
+        abort_403(!$this->canManageThemeSettings());
 
         $this->activePreset   = $this->themeService->activePreset();
         $this->availableFonts = $this->themeService->availableFonts();
@@ -38,7 +40,7 @@ class LiveCustomizerController extends AccountBaseController
      */
     public function preview(Request $request)
     {
-        abort_403(!$this->user->permission('manage_theme_settings'));
+        abort_403(!$this->canManageThemeSettings());
 
         // Build a temporary (unsaved) preset from the submitted values.
         $tempPreset = new ThemePreset($request->only([
@@ -59,7 +61,7 @@ class LiveCustomizerController extends AccountBaseController
      */
     public function save(Request $request)
     {
-        abort_403(!$this->user->permission('manage_theme_settings'));
+        abort_403(!$this->canManageThemeSettings());
 
         $data = $request->validate([
             'name'             => 'required|string|max:255',
@@ -74,7 +76,22 @@ class LiveCustomizerController extends AccountBaseController
             'header_height'    => 'nullable|integer|min:40|max:120',
             'border_radius'    => 'nullable|integer|min:0|max:50',
             'custom_css'       => 'nullable|string',
+            'sidebar_theme'    => 'nullable|in:dark,light',
+            'sidebar_color'    => 'nullable|string|max:20',
+            'sidebar_text_color' => 'nullable|string|max:20',
+            'link_color'       => 'nullable|string|max:20',
+            'enable_rounded_theme' => 'nullable|boolean',
+            'user_css'         => 'nullable|string',
         ]);
+
+        $data['extra_settings'] = [
+            'sidebar_theme' => $data['sidebar_theme'] ?? null,
+            'sidebar_color' => $data['sidebar_color'] ?? null,
+            'sidebar_text_color' => $data['sidebar_text_color'] ?? null,
+            'link_color' => $data['link_color'] ?? null,
+            'enable_rounded_theme' => (int) ($request->boolean('enable_rounded_theme')),
+            'user_css' => $data['user_css'] ?? null,
+        ];
 
         $preset = $this->themeService->createPreset($data, $this->user->id);
         $this->themeService->activatePreset($preset);
@@ -101,18 +118,43 @@ class LiveCustomizerController extends AccountBaseController
      */
     public function apply(Request $request)
     {
-        abort_403(!$this->user->permission('manage_theme_settings'));
+        abort_403(!$this->canManageThemeSettings());
 
         if (Helper::appIsNotDemo()) {
+            $data = $request->validate([
+                'style' => 'nullable|string|max:50000',
+                'fonts' => 'nullable|array',
+                'fonts.fontBody' => 'nullable|string|max:100',
+                'fonts.fontHeading' => 'nullable|string|max:100',
+                'clear' => 'nullable|boolean',
+                'header_color' => 'nullable|string|max:20',
+                'sidebar_theme' => 'nullable|in:dark,light',
+                'sidebar_color' => 'nullable|string|max:20',
+                'sidebar_text_color' => 'nullable|string|max:20',
+                'link_color' => 'nullable|string|max:20',
+                'enable_rounded_theme' => 'nullable|boolean',
+                'user_css' => 'nullable|string|max:50000',
+            ]);
+
             $dashTheme = setting('dash_theme') ?? 'default';
 
             setting([
-                $dashTheme . '_live_customizer'       => $request->get('style'),
-                $dashTheme . '_live_customizer_fonts' => $request->get('fonts'),
+                $dashTheme . '_live_customizer'       => $data['style'] ?? null,
+                $dashTheme . '_live_customizer_fonts' => $data['fonts'] ?? null,
                 'show_live_customizer'                => 0,
             ])->save();
 
-            $message = $request->get('clear')
+            $this->themeService->applyOfficialThemeSettings([
+                'header_color' => $data['header_color'] ?? null,
+                'sidebar_theme' => $data['sidebar_theme'] ?? null,
+                'sidebar_color' => $data['sidebar_color'] ?? null,
+                'sidebar_text_color' => $data['sidebar_text_color'] ?? null,
+                'link_color' => $data['link_color'] ?? null,
+                'enable_rounded_theme' => $request->boolean('enable_rounded_theme'),
+                'user_css' => $data['user_css'] ?? ($data['style'] ?? null),
+            ]);
+
+            $message = $request->boolean('clear')
                 ? __('titantheme::titantheme.changes_discarded')
                 : __('titantheme::titantheme.theme_updated');
 
@@ -126,5 +168,27 @@ class LiveCustomizerController extends AccountBaseController
             'message' => __('messages.demoRestrictedAction'),
             'status'  => 'error',
         ], 422);
+    }
+
+    protected function canManageThemeSettings(): bool
+    {
+        $hasPermission = in_array('titantheme', user_modules(), true)
+            && (in_array($this->user->permission('manage_theme_settings'), ['all', 'added', 'owned', 'both'], true)
+            || $this->user->permission('manage_theme_setting') === 'all');
+
+        if (!$hasPermission) {
+            return false;
+        }
+
+        $superAdminThemeSetting = ThemeSetting::withoutGlobalScope(CompanyScope::class)
+            ->where('panel', 'superadmin')
+            ->whereNull('company_id')
+            ->first();
+
+        if (!$superAdminThemeSetting || !$superAdminThemeSetting->restrict_admin_theme_change) {
+            return true;
+        }
+
+        return (bool) ($this->user->is_superadmin ?? false);
     }
 }

@@ -108,16 +108,7 @@ class WhiteLabelService
     protected function saveSetting(string $key, mixed $value): void
     {
         if (function_exists('setting')) {
-            // WorkSuite stores settings via the global setting() helper or
-            // the BusinessSetting model — use whichever is available.
-            try {
-                \App\Models\Setting::updateOrCreate(
-                    ['setting_name' => $key],
-                    ['setting_value' => $value]
-                );
-            } catch (\Throwable $e) {
-                // Silently ignore if model is unavailable.
-            }
+            setting([$key => $value])->save();
         }
     }
 }

@@ -1,9 +1,16 @@
 <style>
+    @php
+        $activeTheme = $appTheme ?? null;
+    @endphp
     :root {
         /* For Logged in user take header color a app theme*/
         /* For public pages use company specific header color example invoice,estimate public page*/
         /* For all other pages use like auth use global setting header*/
         --header_color: @if(isset($appTheme)) {{ $appTheme->header_color}} @elseif(isset($company)) {{$company->header_color}} @else {{ global_setting()->header_color}} @endif;
+        --sidebar_color: {{ $activeTheme->sidebar_color ?? '#1d82f5' }};
+        --sidebar_text_color: {{ $activeTheme->sidebar_text_color ?? '#ffffff' }};
+        --link_color: {{ $activeTheme->link_color ?? '#ffffff' }};
+        --content_border_radius: {{ isset($activeTheme->enable_rounded_theme) && (int)$activeTheme->enable_rounded_theme === 1 ? '10px' : '0px' }};
     }
 
     .btn-primary,
@@ -71,5 +78,33 @@
     .dropdown-item.active .text-dark-grey {
         color: #ffffff;
     }
+
+    .sidebar-dark,
+    .sidebar-light {
+        --sidebar-main-bg: var(--sidebar_color) !important;
+    }
+
+    .sidebar-dark .sidebar-menu li .nav-item,
+    .sidebar-light .sidebar-menu li .nav-item,
+    .sidebar-dark .sidebar-menu li .nav-item i,
+    .sidebar-light .sidebar-menu li .nav-item i {
+        color: var(--sidebar_text_color) !important;
+    }
+
+    .sidebar-dark .sidebar-menu li .nav-item.active,
+    .sidebar-light .sidebar-menu li .nav-item.active {
+        color: var(--link_color) !important;
+    }
+
+    .card,
+    .modal-content,
+    .btn,
+    .form-control {
+        border-radius: var(--content_border_radius) !important;
+    }
+
+    @if(!empty($activeTheme?->user_css))
+    {!! $activeTheme->user_css !!}
+    @endif
 
 </style>

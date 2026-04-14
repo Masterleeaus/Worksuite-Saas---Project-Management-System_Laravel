@@ -129,6 +129,21 @@
                                  :text="__('app.menu.themeSettings')"/>
         @endif
 
+        @if (Route::has('titantheme.customizer.index') && in_array('titantheme', user_modules()) && in_array(user()->permission('manage_theme_settings'), ['all', 'added', 'owned', 'both']))
+            <x-setting-menu-item :active="$activeMenu" menu="titan_theme_customizer" :href="route('titantheme.customizer.index')"
+                                 :text="__('titantheme::titantheme.live_customizer')"/>
+        @endif
+
+        @if (Route::has('titantheme.mega-menu.index') && in_array('titantheme', user_modules()) && in_array(user()->permission('view_mega_menu'), ['all', 'added', 'owned', 'both']))
+            <x-setting-menu-item :active="$activeMenu" menu="titan_theme_mega_menu" :href="route('titantheme.mega-menu.index')"
+                                 :text="__('titantheme::titantheme.mega_menu')"/>
+        @endif
+
+        @if (Route::has('titantheme.navigation.index') && in_array('titantheme', user_modules()) && in_array(user()->permission('view_navigation'), ['all', 'added', 'owned', 'both']))
+            <x-setting-menu-item :active="$activeMenu" menu="titan_theme_navigation" :href="route('titantheme.navigation.index')"
+                                 :text="__('titantheme::titantheme.navigation')"/>
+        @endif
+
         @if (user()->permission('manage_module_setting') == 'all')
             <x-setting-menu-item :active="$activeMenu" menu="module_settings" :href="route('module-settings.index')"
                                  :text="__('app.menu.moduleSettings')"/>

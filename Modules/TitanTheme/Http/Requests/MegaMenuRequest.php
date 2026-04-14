@@ -8,7 +8,9 @@ class MegaMenuRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user() && in_array($this->user()->permission('manage_mega_menu'), ['all', 'added']);
+        return user()
+            && in_array('titantheme', user_modules(), true)
+            && in_array(user()->permission('manage_mega_menu'), ['all', 'added', 'owned', 'both'], true);
     }
 
     public function rules(): array

@@ -4,6 +4,8 @@ namespace Modules\TitanTheme\Http\Controllers;
 
 use App\Helpers\Classes\Helper;
 use App\Http\Controllers\AccountBaseController;
+use App\Models\ThemeSetting;
+use App\Scopes\CompanyScope;
 use Illuminate\Http\Request;
 
 /**
@@ -22,14 +24,14 @@ class LiveCustomizerSettingController extends AccountBaseController
 
     public function index()
     {
-        abort_403(!$this->user->permission('manage_theme_settings'));
+        abort_403(!$this->canManageThemeSettings());
 
         return view('titantheme::customizer.setting', $this->data);
     }
 
     public function update(Request $request)
     {
-        abort_403(!$this->user->permission('manage_theme_settings'));
+        abort_403(!$this->canManageThemeSettings());
 
         if (Helper::appIsNotDemo()) {
             setting([
@@ -46,5 +48,29 @@ class LiveCustomizerSettingController extends AccountBaseController
             'message' => __('messages.demoRestrictedAction'),
             'type'    => 'error',
         ]);
+    }
+
+    protected function canManageThemeSettings(): bool
+    {
+        $hasPermission = in_array('titantheme', user_modules(), true)
+            && (
+                in_array($this->user->permission('manage_theme_settings'), ['all', 'added', 'owned', 'both'], true)
+                || $this->user->permission('manage_theme_setting') === 'all'
+            );
+
+        if (!$hasPermission) {
+            return false;
+        }
+
+        $superAdminThemeSetting = ThemeSetting::withoutGlobalScope(CompanyScope::class)
+            ->where('panel', 'superadmin')
+            ->whereNull('company_id')
+            ->first();
+
+        if (!$superAdminThemeSetting || !$superAdminThemeSetting->restrict_admin_theme_change) {
+            return true;
+        }
+
+        return (bool) ($this->user->is_superadmin ?? false);
     }
 }

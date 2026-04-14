@@ -31,6 +31,11 @@ class UpdateThemeSetting extends CoreRequest
                 'required',
                 'regex:/^#([a-f0-9]{6}|[a-f0-9]{3})$/i'
             ],
+            'sidebar_color' => ['nullable', 'regex:/^#([a-f0-9]{6}|[a-f0-9]{3})$/i'],
+            'sidebar_text_color' => ['nullable', 'regex:/^#([a-f0-9]{6}|[a-f0-9]{3})$/i'],
+            'link_color' => ['nullable', 'regex:/^#([a-f0-9]{6}|[a-f0-9]{3})$/i'],
+            'user_css' => ['nullable', 'string'],
+            'enable_rounded_theme' => ['nullable', 'boolean'],
             'app_name' => 'required'
         ];
     }

@@ -5,6 +5,7 @@ namespace Modules\TitanTheme\Http\Controllers;
 use App\Helper\Reply;
 use App\Http\Controllers\AccountBaseController;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Modules\TitanTheme\Models\NavItem;
 use Modules\TitanTheme\Services\NavigationService;
 
@@ -21,7 +22,7 @@ class NavigationController extends AccountBaseController
      */
     public function index()
     {
-        abort_403(!$this->user->permission('view_navigation'));
+        abort_403(!$this->canViewNavigation());
 
         $this->sidebarItems = $this->navigationService->flatList(NavItem::PANEL_SIDEBAR);
         $this->headerItems  = $this->navigationService->flatList(NavItem::PANEL_HEADER);
@@ -34,10 +35,17 @@ class NavigationController extends AccountBaseController
      */
     public function store(Request $request)
     {
-        abort_403(!$this->user->permission('manage_navigation'));
+        abort_403(!$this->canManageNavigation());
 
         $data = $request->validate([
-            'parent_id'       => 'nullable|integer|exists:titan_nav_items,id',
+            'parent_id'       => [
+                'nullable',
+                'integer',
+                Rule::exists('titan_nav_items', 'id')->where(function ($query) use ($request) {
+                    $query->where('company_id', $this->user->company_id)
+                        ->where('panel', $request->input('panel'));
+                }),
+            ],
             'label'           => 'required|string|max:255',
             'url'             => 'nullable|string|max:500',
             'route_name'      => 'nullable|string|max:200',
@@ -68,12 +76,19 @@ class NavigationController extends AccountBaseController
      */
     public function update(Request $request, int $id)
     {
-        abort_403(!$this->user->permission('manage_navigation'));
+        abort_403(!$this->canManageNavigation());
 
         $item = NavItem::findOrFail($id);
 
         $data = $request->validate([
-            'parent_id'       => 'nullable|integer|exists:titan_nav_items,id',
+            'parent_id'       => [
+                'nullable',
+                'integer',
+                Rule::exists('titan_nav_items', 'id')->where(function ($query) use ($request) {
+                    $query->where('company_id', $this->user->company_id)
+                        ->where('panel', $request->input('panel'));
+                }),
+            ],
             'label'           => 'required|string|max:255',
             'url'             => 'nullable|string|max:500',
             'route_name'      => 'nullable|string|max:200',
@@ -89,6 +104,7 @@ class NavigationController extends AccountBaseController
 
         $data['is_active']       = $request->boolean('is_active', true);
         $data['open_in_new_tab'] = $request->boolean('open_in_new_tab', false);
+        $data['parent_id'] = ($data['parent_id'] ?? null) == $item->id ? null : ($data['parent_id'] ?? null);
 
         $item->update($data);
 
@@ -103,7 +119,7 @@ class NavigationController extends AccountBaseController
      */
     public function destroy(int $id)
     {
-        abort_403(!$this->user->permission('manage_navigation'));
+        abort_403(!$this->canManageNavigation());
 
         NavItem::findOrFail($id)->delete();
 
@@ -115,12 +131,24 @@ class NavigationController extends AccountBaseController
      */
     public function reorder(Request $request)
     {
-        abort_403(!$this->user->permission('manage_navigation'));
+        abort_403(!$this->canManageNavigation());
 
         $ids = $request->validate(['ids' => 'required|array', 'ids.*' => 'integer'])['ids'];
 
         $this->navigationService->reorder($ids);
 
         return Reply::success(__('titantheme::titantheme.order_saved'));
+    }
+
+    protected function canViewNavigation(): bool
+    {
+        return in_array('titantheme', user_modules(), true)
+            && in_array($this->user->permission('view_navigation'), ['all', 'added', 'owned', 'both'], true);
+    }
+
+    protected function canManageNavigation(): bool
+    {
+        return in_array('titantheme', user_modules(), true)
+            && in_array($this->user->permission('manage_navigation'), ['all', 'added', 'owned', 'both'], true);
     }
 }

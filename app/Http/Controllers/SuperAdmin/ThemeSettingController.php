@@ -44,7 +44,13 @@ class ThemeSettingController extends AccountBaseController
 
         $restrictAdminThemeChange = ($request->has('set_customer_theme') ? 1 : 0);
 
-        $this->themeUpdate($superAdminTheme, $request->sidebar_theme, $request->primary_color, $restrictAdminThemeChange);
+        $this->themeUpdate($superAdminTheme, $request->sidebar_theme, $request->primary_color, $restrictAdminThemeChange, [
+            'sidebar_color' => $request->sidebar_color,
+            'sidebar_text_color' => $request->sidebar_text_color,
+            'link_color' => $request->link_color,
+            'user_css' => $request->user_css,
+            'enable_rounded_theme' => $request->boolean('enable_rounded_theme'),
+        ]);
 
         $globalSetting = GlobalSetting::first();
         $globalSetting->logo_background_color = $request->logo_background_color;
@@ -106,10 +112,15 @@ class ThemeSettingController extends AccountBaseController
         return Reply::redirect(route('superadmin.settings.super-admin-theme-settings.index'), __('messages.updateSuccess'));
     }
 
-    private function themeUpdate($updateObject, $sidebarTheme, $primaryColor, $restrictAdminThemeChange)
+    private function themeUpdate($updateObject, $sidebarTheme, $primaryColor, $restrictAdminThemeChange, array $extendedSettings = [])
     {
         $updateObject->header_color = $primaryColor;
         $updateObject->sidebar_theme = $sidebarTheme;
+        $updateObject->sidebar_color = $extendedSettings['sidebar_color'] ?? $updateObject->sidebar_color;
+        $updateObject->sidebar_text_color = $extendedSettings['sidebar_text_color'] ?? $updateObject->sidebar_text_color;
+        $updateObject->link_color = $extendedSettings['link_color'] ?? $updateObject->link_color;
+        $updateObject->user_css = $extendedSettings['user_css'] ?? $updateObject->user_css;
+        $updateObject->enable_rounded_theme = (int) ($extendedSettings['enable_rounded_theme'] ?? $updateObject->enable_rounded_theme ?? 0);
         $updateObject->save();
 
         ThemeSetting::withoutGlobalScope(CompanyScope::class)->update(['restrict_admin_theme_change' => $restrictAdminThemeChange]);

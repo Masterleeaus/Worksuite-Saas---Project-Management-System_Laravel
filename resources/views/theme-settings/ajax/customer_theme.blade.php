@@ -37,6 +37,61 @@
     </div>
 </div>
 
+<div class="col-lg-6">
+    <div class="form-group my-3">
+        <x-forms.label fieldId="sidebar_color" :fieldLabel="__('modules.themeSettings.sidebarColor')"/>
+        <x-forms.input-group class="color-picker">
+            <input type="text" class="form-control height-35 f-14"
+                   value="{{ $adminTheme->sidebar_color }}"
+                   placeholder="{{ __('placeholders.colorPicker') }}" name="sidebar_color">
+            <x-slot name="append">
+                <span class="input-group-text height-35 colorpicker-input-addon"><i></i></span>
+            </x-slot>
+        </x-forms.input-group>
+    </div>
+</div>
+
+<div class="col-lg-6">
+    <div class="form-group my-3">
+        <x-forms.label fieldId="sidebar_text_color" :fieldLabel="__('modules.themeSettings.sidebarTextColor')"/>
+        <x-forms.input-group class="color-picker">
+            <input type="text" class="form-control height-35 f-14"
+                   value="{{ $adminTheme->sidebar_text_color }}"
+                   placeholder="{{ __('placeholders.colorPicker') }}" name="sidebar_text_color">
+            <x-slot name="append">
+                <span class="input-group-text height-35 colorpicker-input-addon"><i></i></span>
+            </x-slot>
+        </x-forms.input-group>
+    </div>
+</div>
+
+<div class="col-lg-6">
+    <div class="form-group my-3">
+        <x-forms.label fieldId="link_color" :fieldLabel="__('modules.themeSettings.linkColor')"/>
+        <x-forms.input-group class="color-picker">
+            <input type="text" class="form-control height-35 f-14"
+                   value="{{ $adminTheme->link_color }}"
+                   placeholder="{{ __('placeholders.colorPicker') }}" name="link_color">
+            <x-slot name="append">
+                <span class="input-group-text height-35 colorpicker-input-addon"><i></i></span>
+            </x-slot>
+        </x-forms.input-group>
+    </div>
+</div>
+
+<div class="col-lg-6 mt-4">
+    <x-forms.checkbox fieldId="enable_rounded_theme"
+                      :fieldLabel="__('modules.themeSettings.enableRoundTheme')"
+                      fieldName="enable_rounded_theme"
+                      :checked="$adminTheme->enable_rounded_theme"/>
+</div>
+
+<div class="col-lg-12">
+    <x-forms.label fieldId="user_css" :fieldLabel="__('modules.themeSettings.customCss')"/>
+    <textarea class="form-control f-14" rows="4" name="user_css"
+              placeholder="/* custom css */">{{ $adminTheme->user_css }}</textarea>
+</div>
+
 
 <div class="col-lg-12 mt-3">
     <h4>@lang('modules.themeSettings.employeePanelTheme')</h4>
@@ -117,4 +172,3 @@
         </div>
     </div>
 </div>
-

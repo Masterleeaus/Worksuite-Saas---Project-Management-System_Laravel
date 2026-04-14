@@ -113,6 +113,7 @@
     @if (!user()->dark_theme)
         @include('sections.theme_css')
     @endif
+    @includeIf('titantheme::lqd-customizer-style-head')
 
     @if (file_exists(public_path() . '/css/app-custom.css'))
         <link href="{{ asset('css/app-custom.css') }}" rel="stylesheet">
@@ -181,6 +182,7 @@
 </div>
 <!-- BODY WRAPPER END -->
 @include('sections.modals')
+@includeIf('titantheme::customizer.customizer')
 
 <!-- Global Required Javascript -->
 <script src="{{ asset('js/main.js') }}"></script>

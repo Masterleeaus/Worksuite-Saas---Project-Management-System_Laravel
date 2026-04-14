@@ -2,6 +2,8 @@
 
 namespace Modules\TitanTheme\Services;
 
+use App\Models\ThemeSetting;
+use App\Scopes\CompanyScope;
 use Modules\TitanTheme\Models\ThemePreset;
 
 class ThemeService
@@ -77,6 +79,7 @@ class ThemeService
     {
         ThemePreset::where('id', '!=', $preset->id)->update(['is_active' => false]);
         $preset->update(['is_active' => true]);
+        $this->applyPresetToOfficialThemeSettings($preset);
     }
 
     /**
@@ -92,7 +95,10 @@ class ThemeService
      */
     public function createPreset(array $data, int $createdBy): ThemePreset
     {
-        return ThemePreset::create(array_merge($data, ['created_by' => $createdBy]));
+        return ThemePreset::create(array_merge($data, [
+            'created_by' => $createdBy,
+            'company_id' => user()?->company_id,
+        ]));
     }
 
     /**
@@ -129,5 +135,44 @@ class ThemeService
         }
 
         return $structuredCss;
+    }
+
+    public function applyPresetToOfficialThemeSettings(ThemePreset $preset): void
+    {
+        $extraSettings = is_array($preset->extra_settings) ? $preset->extra_settings : [];
+
+        $this->applyOfficialThemeSettings([
+            'header_color' => $preset->primary_color,
+            'sidebar_theme' => $extraSettings['sidebar_theme'] ?? 'dark',
+            'sidebar_color' => $extraSettings['sidebar_color'] ?? $preset->secondary_color,
+            'sidebar_text_color' => $extraSettings['sidebar_text_color'] ?? '#ffffff',
+            'link_color' => $extraSettings['link_color'] ?? '#ffffff',
+            'enable_rounded_theme' => $extraSettings['enable_rounded_theme'] ?? ((int) (($preset->border_radius ?? 0) > 0)),
+            'user_css' => $extraSettings['user_css'] ?? $preset->custom_css,
+        ]);
+    }
+
+    public function applyOfficialThemeSettings(array $settings, string $panel = 'admin'): void
+    {
+        $companyId = user()?->company_id;
+
+        if (!$companyId) {
+            return;
+        }
+
+        $themeSetting = ThemeSetting::withoutGlobalScope(CompanyScope::class)
+            ->firstOrNew([
+                'company_id' => $companyId,
+                'panel' => $panel,
+            ]);
+
+        $themeSetting->header_color = $settings['header_color'] ?? $themeSetting->header_color ?? '#1d82f5';
+        $themeSetting->sidebar_theme = $settings['sidebar_theme'] ?? $themeSetting->sidebar_theme ?? 'dark';
+        $themeSetting->sidebar_color = $settings['sidebar_color'] ?? $themeSetting->sidebar_color ?? '#1d82f5';
+        $themeSetting->sidebar_text_color = $settings['sidebar_text_color'] ?? $themeSetting->sidebar_text_color ?? '#ffffff';
+        $themeSetting->link_color = $settings['link_color'] ?? $themeSetting->link_color ?? '#ffffff';
+        $themeSetting->enable_rounded_theme = (int) ($settings['enable_rounded_theme'] ?? $themeSetting->enable_rounded_theme ?? 0);
+        $themeSetting->user_css = $settings['user_css'] ?? $themeSetting->user_css;
+        $themeSetting->save();
     }
 }

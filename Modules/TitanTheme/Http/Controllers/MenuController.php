@@ -20,7 +20,7 @@ class MenuController extends AccountBaseController
      */
     public function index()
     {
-        abort_403(!in_array($this->user->permission('manage_navigation'), ['all', 'added']));
+        abort_403(!(in_array('titantheme', user_modules(), true) && in_array($this->user->permission('manage_navigation'), ['all', 'added', 'owned', 'both'], true)));
 
         $this->menus = $this->menuService->generate(false);
 
@@ -33,7 +33,7 @@ class MenuController extends AccountBaseController
      */
     public function delete(Menu $menu)
     {
-        abort_403(!in_array($this->user->permission('manage_navigation'), ['all', 'added']));
+        abort_403(!(in_array('titantheme', user_modules(), true) && in_array($this->user->permission('manage_navigation'), ['all', 'added', 'owned', 'both'], true)));
 
         if (env('APP_ENV') === 'demo') {
             return Reply::error(__('messages.demoModeNotAllowed'));

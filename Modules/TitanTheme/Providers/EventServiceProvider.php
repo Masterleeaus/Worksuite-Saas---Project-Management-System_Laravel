@@ -6,5 +6,9 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvi
 
 class EventServiceProvider extends ServiceProvider
 {
-    protected $listen = [];
+    protected $listen = [
+        'eloquent.created: App\Models\Company' => [
+            \Modules\TitanTheme\Listeners\EnsureTitanThemeModuleSettings::class,
+        ],
+    ];
 }

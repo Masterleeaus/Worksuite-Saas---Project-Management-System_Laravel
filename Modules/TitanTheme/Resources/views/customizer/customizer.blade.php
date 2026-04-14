@@ -2,7 +2,7 @@
     $customizer_disabled = setting('show_live_customizer', '1') != '1';
     $currentUrl = url()->current();
 
-    if (\App\Helpers\Classes\MarketplaceHelper::isRegistered('ai-chat-pro')) {
+    if (\App\Helpers\Classes\MarketplaceHelper::isRegistered('ai-chat-pro') && \Illuminate\Support\Facades\Route::has('dashboard.user.openai.chat.pro.index') && \Illuminate\Support\Facades\Route::has('chat.pro')) {
         $customizer_disabled = $customizer_disabled || $currentUrl === route('dashboard.user.openai.chat.pro.index') || $currentUrl === route('chat.pro');
     }
 
@@ -15,6 +15,25 @@
     }
 
     if (Auth::user()->isUser()) {
+        return;
+    }
+
+    $canManageThemeSettings = in_array('titantheme', user_modules(), true)
+        && (
+            in_array(user()->permission('manage_theme_settings'), ['all', 'added', 'owned', 'both'], true)
+            || user()->permission('manage_theme_setting') === 'all'
+        );
+
+    if (!$canManageThemeSettings) {
+        return;
+    }
+
+    $superAdminThemeSetting = \App\Models\ThemeSetting::withoutGlobalScope(\App\Scopes\CompanyScope::class)
+        ->where('panel', 'superadmin')
+        ->whereNull('company_id')
+        ->first();
+
+    if (($superAdminThemeSetting->restrict_admin_theme_change ?? 0) && !(user()->is_superadmin ?? false)) {
         return;
     }
 
@@ -991,7 +1010,7 @@
     </div>
 </div>
 
-@push('script')
+@push('scripts')
     <script>
         window.lqdGoogleFontsList = @json($google_fonts_list);
         window.lqdCustomizerOptions = @json($customizerOptions);

@@ -56,7 +56,13 @@ class ThemeSettingController extends AccountBaseController
 
         if (!$superAdminThemeSetting->restrict_admin_theme_change){
             $adminTheme = ThemeSetting::where('panel', 'admin')->first();
-            $this->themeUpdate($adminTheme, $request->theme_settings[1], $request->primary_color[0]);
+            $this->themeUpdate($adminTheme, $request->theme_settings[1], $request->primary_color[0], [
+                'sidebar_color' => $request->sidebar_color,
+                'sidebar_text_color' => $request->sidebar_text_color,
+                'link_color' => $request->link_color,
+                'user_css' => $request->user_css,
+                'enable_rounded_theme' => $request->boolean('enable_rounded_theme'),
+            ]);
 
             $employeeTheme = ThemeSetting::where('panel', 'employee')->first();
             $this->themeUpdate($employeeTheme, $request->theme_settings[3], $request->primary_color[1]);
@@ -122,10 +128,15 @@ class ThemeSettingController extends AccountBaseController
         return Reply::redirect(route('theme-settings.index'), __('messages.updateSuccess'));
     }
 
-    private function themeUpdate($updateObject, $themeSetting, $primaryColor)
+    private function themeUpdate($updateObject, $themeSetting, $primaryColor, array $extendedSettings = [])
     {
         $updateObject->header_color = $primaryColor;
         $updateObject->sidebar_theme = $themeSetting['sidebar_theme'];
+        $updateObject->sidebar_color = $extendedSettings['sidebar_color'] ?? $updateObject->sidebar_color;
+        $updateObject->sidebar_text_color = $extendedSettings['sidebar_text_color'] ?? $updateObject->sidebar_text_color;
+        $updateObject->link_color = $extendedSettings['link_color'] ?? $updateObject->link_color;
+        $updateObject->user_css = $extendedSettings['user_css'] ?? $updateObject->user_css;
+        $updateObject->enable_rounded_theme = (int) ($extendedSettings['enable_rounded_theme'] ?? $updateObject->enable_rounded_theme ?? 0);
         $updateObject->save();
         session()->forget(['admin_theme', 'employee_theme', 'client_theme']);
     }
