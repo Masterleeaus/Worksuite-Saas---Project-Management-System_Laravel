@@ -1,9 +1,10 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\QueryException;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 
 return new class extends Migration
 {
@@ -26,8 +27,12 @@ return new class extends Migration
         Schema::table('salary_slips', function (Blueprint $table) {
             try {
                 $table->dropForeign(['currency_id']);
-            } catch (\Throwable $e) {
-                // Ignore missing/legacy constraint names and continue to ensure target FK exists.
+            } catch (QueryException $e) {
+                $message = $e->getMessage();
+
+                if (! str_contains($message, 'check that column/key exists') && ! str_contains($message, 'Cannot drop index')) {
+                    throw $e;
+                }
             }
 
             $table->foreign('currency_id')->references('id')->on('currencies')->onUpdate('cascade')->onDelete('cascade');
