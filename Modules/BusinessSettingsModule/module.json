@@ -47,7 +47,7 @@
     "menus": [
         {
             "panel": "user",
-            "label": "Business Settings",
+            "label": "Company Settings",
             "route": "admin.business-settings.get-business-information",
             "sort_order": 5
         }

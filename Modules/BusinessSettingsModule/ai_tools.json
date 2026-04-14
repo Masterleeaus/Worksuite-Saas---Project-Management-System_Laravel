@@ -1,0 +1,28 @@
+{
+  "module": "businesssettingsmodule",
+  "version": "1.0.0",
+  "tools": [
+    {
+      "name": "get_business_settings_checklist",
+      "method": "GET",
+      "endpoint": "/api/business-settings-module/checklist",
+      "route_name": "business-settings-module.checklist",
+      "description": "Return Worksuite-native onboarding checklist payload for business settings."
+    },
+    {
+      "name": "save_titan_onboarding_answers",
+      "method": "POST",
+      "endpoint": "/api/business-settings-module/onboarding/save",
+      "route_name": "business-settings-module.onboarding.save",
+      "description": "Save Titan Zero onboarding answers scoped to the authenticated company."
+    },
+    {
+      "name": "get_business_settings_cms_snapshot",
+      "method": "GET",
+      "endpoint": "/api/business-settings-module/cms/snapshot",
+      "route_name": "business-settings-module.cms.snapshot",
+      "description": "Fetch company profile, onboarding answers, booking preferences, and platform defaults for CMS."
+    }
+  ]
+}
+

@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Log;
-
 namespace Modules\BusinessSettingsModule\Http\Controllers\Web\Admin;
 
 use App\Traits\ActivationClass;
@@ -18,6 +16,7 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Modules\BusinessSettingsModule\Entities\BusinessSettings;
 use RecursiveDirectoryIterator;

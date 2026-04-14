@@ -1,0 +1,10 @@
+{
+  "module": "businesssettingsmodule",
+  "version": "1.0.0",
+  "signals": [
+    "business_settings.updated",
+    "business_settings.onboarding_saved",
+    "business_settings.package_changed"
+  ]
+}
+

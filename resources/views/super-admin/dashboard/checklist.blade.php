@@ -21,6 +21,18 @@
                                              :summary="__('modules.checklist.accountSetupInfo')" completed="true"/>
 
                     @php
+                        $companySettingsLink = \Illuminate\Support\Facades\Route::has('admin.business-settings.get-business-information')
+                            ? route('admin.business-settings.get-business-information')
+                            : route('superadmin.checklist');
+                        $companyProfileConfigured = function_exists('business_config')
+                            && (business_config('business_name', 'business_information') || business_config('company_name', 'business_information'));
+                    @endphp
+                    <x-cards.onboarding-item title="Company business profile"
+                                             summary="Configure company profile and onboarding preferences."
+                                             :completed="$companyProfileConfigured"
+                                             :link="$companySettingsLink"/>
+
+                    @php
                         $emailSetupTitle = __('modules.checklist.emailSetup') . ' <i class="fa fa-exclamation-circle text-danger ms-1" data-toggle="tooltip" data-placement="top" title="Very Important!"></i>';
                         $emailCompleted = smtp_setting()->mail_from_email != 'from@email.com' || (smtp_setting()->verified == 1 && smtp_setting()->mail_driver != 'mail');
                     @endphp

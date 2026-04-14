@@ -1,0 +1,23 @@
+{
+  "module": "businesssettingsmodule",
+  "version": "1.0.0",
+  "surfaces": {
+    "company_business_profile": {
+      "endpoint": "/api/business-settings-module/cms/snapshot",
+      "route_name": "business-settings-module.cms.snapshot"
+    },
+    "company_onboarding_answers": {
+      "endpoint": "/api/business-settings-module/cms/snapshot",
+      "route_name": "business-settings-module.cms.snapshot"
+    },
+    "company_booking_preferences": {
+      "endpoint": "/api/business-settings-module/cms/snapshot",
+      "route_name": "business-settings-module.cms.snapshot"
+    },
+    "platform_defaults": {
+      "endpoint": "/api/business-settings-module/cms/snapshot",
+      "route_name": "business-settings-module.cms.snapshot"
+    }
+  }
+}
+

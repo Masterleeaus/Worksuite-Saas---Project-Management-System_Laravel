@@ -1,0 +1,11 @@
+{
+  "module": "businesssettingsmodule",
+  "version": "1.0.0",
+  "channels": [
+    "web",
+    "api",
+    "titan_portal",
+    "titan_command"
+  ]
+}
+
