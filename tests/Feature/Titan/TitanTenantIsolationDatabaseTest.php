@@ -151,8 +151,34 @@ class TitanTenantIsolationDatabaseTest extends TestCase
         $accessResponse = $accessMiddleware->handle($request, $next);
         $this->assertSame(Response::HTTP_OK, $accessResponse->status());
 
+        auth()->setUser(new TitanDbRuntimeUser(901, null, [], false, true));
+        $superadminTenantResponse = $tenantMiddleware->handle($request, $next);
+        $this->assertSame(Response::HTTP_OK, $superadminTenantResponse->status());
+        $superadminAccessResponse = $accessMiddleware->handle($request, $next);
+        $this->assertSame(Response::HTTP_OK, $superadminAccessResponse->status());
+
         auth()->setUser(new TitanDbRuntimeUser(401, null, ['admin'], false));
         $this->assertSame(403, $this->statusFromHttpException(fn () => $tenantMiddleware->handle($request, $next)));
+    }
+
+    public function test_tenant_middleware_allows_valid_company_id_when_company_relation_is_null(): void
+    {
+        DB::table('companies')->insert([
+            'id' => 3,
+            'company_name' => 'Tenant C',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $request = Request::create('/titan/document-templates', 'GET');
+        $tenantMiddleware = app(ApplyTitanTenantScope::class);
+        $next = fn () => response('ok', Response::HTTP_OK);
+
+        auth()->setUser(new TitanDbRuntimeUser(701, 3, ['admin'], titanPermission: false, isSuperadmin: false, withCompanyRelation: false));
+        $tenantResponse = $tenantMiddleware->handle($request, $next);
+
+        $this->assertSame(Response::HTTP_OK, $tenantResponse->status());
+        $this->assertSame(3, $request->attributes->get('titan_company_id'));
     }
 
     public function test_titan_access_gate_matrix_is_correct_for_runtime_users(): void
@@ -166,10 +192,13 @@ class TitanTenantIsolationDatabaseTest extends TestCase
         auth()->setUser(new TitanDbRuntimeUser(502, 1, ['employee'], false));
         $this->assertFalse(TitanPanelProvider::canAccess());
 
+        auth()->setUser(new TitanDbRuntimeUser(507, 1, [], false));
+        $this->assertFalse(TitanPanelProvider::canAccess());
+
         auth()->setUser(new TitanDbRuntimeUser(503, 1, ['admin'], false));
         $this->assertTrue(TitanPanelProvider::canAccess());
 
-        auth()->setUser(new TitanDbRuntimeUser(504, 1, ['superadmin'], false));
+        auth()->setUser(new TitanDbRuntimeUser(504, null, [], false, true));
         $this->assertTrue(TitanPanelProvider::canAccess());
 
         auth()->setUser(new TitanDbRuntimeUser(505, 1, ['employee'], 'all'));
@@ -198,6 +227,7 @@ class TitanDbRuntimeUser extends AuthenticatableUser
 {
     public ?int $company_id = null;
     public ?object $company = null;
+    public int $is_superadmin = 0;
 
     /** @var array<int, string> */
     private array $roles = [];
@@ -207,14 +237,22 @@ class TitanDbRuntimeUser extends AuthenticatableUser
     /**
      * @param  array<int, string>  $roles
      */
-    public function __construct(?int $id = null, ?int $companyId = null, array $roles = [], string|bool $titanPermission = false)
+    public function __construct(
+        ?int $id = null,
+        ?int $companyId = null,
+        array $roles = [],
+        string|bool $titanPermission = false,
+        bool $isSuperadmin = false,
+        bool $withCompanyRelation = true
+    )
     {
         parent::__construct([]);
         $this->id = $id ?? 0;
         $this->company_id = $companyId;
-        $this->company = $companyId === null ? null : (object) ['id' => $companyId];
+        $this->company = ($companyId === null || !$withCompanyRelation) ? null : (object) ['id' => $companyId];
         $this->roles = $roles;
         $this->titanPermission = $titanPermission;
+        $this->is_superadmin = $isSuperadmin ? 1 : 0;
     }
 
     public function hasRole(string $role): bool

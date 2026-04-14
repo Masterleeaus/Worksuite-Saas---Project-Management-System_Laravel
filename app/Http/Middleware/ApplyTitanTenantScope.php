@@ -2,8 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Company;
+use App\Providers\TitanPanelProvider;
 use Closure;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -14,9 +16,9 @@ use Symfony\Component\HttpFoundation\Response;
  * Applied as persistent tenant middleware in TitanPanelProvider so that
  * every resource query is scoped to the authenticated user's company.
  *
- * This middleware is intentionally non-destructive: if there is no
- * authenticated user or the user has no company, the request proceeds
- * normally and relies on the existing CompanyScope global scope.
+ * Guests are handled by FilamentAuthenticate before this middleware.
+ * For authenticated users, tenant context is required unless the user
+ * is a superadmin.
  */
 class ApplyTitanTenantScope
 {
@@ -29,8 +31,29 @@ class ApplyTitanTenantScope
         // resource is served.
 
         if (auth()->hasUser()) {
-            $user    = auth()->user();
+            $user = TitanPanelProvider::resolveWorksuiteUser();
+
+            if (!$user) {
+                abort(403, 'Unable to resolve account context for Titan panel access.');
+            }
+
+            if ((int) ($user->is_superadmin ?? 0) === 1) {
+                return $next($request);
+            }
+
+            $companyId = (int) ($user->company_id ?? 0);
+
+            if ($companyId < 1) {
+                abort(403, 'No tenant company associated with this account.');
+            }
+
             $company = $user->company ?? null;
+
+            if ($company === null && !$user instanceof Model) {
+                // Fallback for runtime contexts where company_id is present but the
+                // relation is not hydrated on the resolved Worksuite user object.
+                $company = Company::withoutGlobalScopes()->find($companyId);
+            }
 
             if ($company === null) {
                 // User has no associated company – deny panel access.
@@ -39,7 +62,7 @@ class ApplyTitanTenantScope
 
             // Store the resolved company in the request so Filament resources
             // and widgets can read it without another DB round-trip.
-            $request->attributes->set('titan_company_id', $company->id);
+            $request->attributes->set('titan_company_id', $companyId);
         }
 
         return $next($request);
