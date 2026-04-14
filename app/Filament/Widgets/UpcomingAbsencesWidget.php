@@ -10,7 +10,10 @@ class UpcomingAbsencesWidget extends BaseWidget
 {
     protected function getStats(): array
     {
+        $companyId = auth()->user()?->company_id;
+
         $upcoming = Leave::query()
+            ->when($companyId, fn ($query) => $query->where('company_id', $companyId))
             ->where('status', 'approved')
             ->whereDate('leave_date', '>=', now()->toDateString())
             ->whereDate('leave_date', '<=', now()->addDays(7)->toDateString())

@@ -11,8 +11,10 @@ class MissingTimeLogsWidget extends BaseWidget
     protected function getStats(): array
     {
         $today = now()->toDateString();
+        $companyId = auth()->user()?->company_id;
 
         $employeesWithoutLogs = User::query()
+            ->when($companyId, fn ($query) => $query->where('users.company_id', $companyId))
             ->whereHas('roles', fn ($query) => $query->where('name', 'employee'))
             ->whereDoesntHave('timeLogs', fn ($query) => $query->whereDate('project_time_logs.start_time', $today))
             ->count();

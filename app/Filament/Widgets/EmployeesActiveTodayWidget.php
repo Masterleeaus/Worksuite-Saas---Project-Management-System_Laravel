@@ -12,13 +12,16 @@ class EmployeesActiveTodayWidget extends BaseWidget
     protected function getStats(): array
     {
         $today = now()->toDateString();
+        $companyId = auth()->user()?->company_id;
 
         $active = Attendance::query()
+            ->when($companyId, fn ($query) => $query->where('company_id', $companyId))
             ->whereDate('clock_in_time', $today)
             ->distinct('user_id')
             ->count('user_id');
 
         $employees = User::query()
+            ->when($companyId, fn ($query) => $query->where('users.company_id', $companyId))
             ->whereHas('roles', fn ($query) => $query->where('name', 'employee'))
             ->count();
 

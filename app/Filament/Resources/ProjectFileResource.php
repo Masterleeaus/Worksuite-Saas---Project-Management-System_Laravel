@@ -76,7 +76,15 @@ class ProjectFileResource extends BaseTenantResource
             return true;
         }
 
-        if (in_array($permission, ['added', 'owned', 'both'], true)) {
+        if ($permission === 'added') {
+            return (int) ($record->added_by ?? 0) === (int) $user->id;
+        }
+
+        if ($permission === 'owned') {
+            return (int) ($record->user_id ?? 0) === (int) $user->id;
+        }
+
+        if ($permission === 'both') {
             return (int) ($record->added_by ?? 0) === (int) $user->id || (int) ($record->user_id ?? 0) === (int) $user->id;
         }
 

@@ -10,7 +10,11 @@ class PendingLeaveRequestsWidget extends BaseWidget
 {
     protected function getStats(): array
     {
-        $pending = Leave::query()->where('status', 'pending')->count();
+        $companyId = auth()->user()?->company_id;
+        $pending = Leave::query()
+            ->when($companyId, fn ($query) => $query->where('company_id', $companyId))
+            ->where('status', 'pending')
+            ->count();
 
         return [
             Stat::make('Leave Requests Pending', (string) $pending)

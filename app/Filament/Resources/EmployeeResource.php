@@ -80,8 +80,16 @@ class EmployeeResource extends BaseTenantResource
             return true;
         }
 
-        if (in_array($permission, ['owned', 'both', 'added'], true)) {
+        if ($permission === 'owned') {
             return (int) $user->id === (int) $record->id;
+        }
+
+        if ($permission === 'added') {
+            return (int) ($record->added_by ?? 0) === (int) $user->id;
+        }
+
+        if ($permission === 'both') {
+            return (int) $user->id === (int) $record->id || (int) ($record->added_by ?? 0) === (int) $user->id;
         }
 
         return false;
