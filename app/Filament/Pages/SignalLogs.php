@@ -2,7 +2,6 @@
 
 namespace App\Filament\Pages;
 
-use Filament\Pages\Page;
 
 /**
  * SignalLogs
@@ -10,7 +9,7 @@ use Filament\Pages\Page;
  * Placeholder page – Titan Signal Logs.
  * Will display a chronological log of all system signals processed by Titan.
  */
-class SignalLogs extends Page
+class SignalLogs extends TitanPage
 {
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 

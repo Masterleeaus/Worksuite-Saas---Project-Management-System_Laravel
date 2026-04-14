@@ -7,7 +7,6 @@ use App\Filament\Widgets\JobsTodayWidget;
 use App\Filament\Widgets\RevenueWidget;
 use App\Filament\Widgets\SystemSignalsWidget;
 use App\Filament\Widgets\TitanChatWidget;
-use Filament\Pages\Page;
 
 /**
  * CommandCentre
@@ -17,7 +16,7 @@ use Filament\Pages\Page;
  *
  * Widget logic is pending Titan Zero implementation; skeletons are registered.
  */
-class CommandCentre extends Page
+class CommandCentre extends TitanPage
 {
     protected static ?string $navigationIcon = 'heroicon-o-command-line';
 
