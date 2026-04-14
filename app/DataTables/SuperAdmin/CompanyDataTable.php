@@ -113,7 +113,8 @@ class CompanyDataTable extends BaseDataTable
         });
 
         $datatables->editColumn('package', function ($row) {
-            $packageName = $row->package ? $row->package->name : '--';
+            $packageModel = $row->package;
+            $packageName = $packageModel?->name ?: '--';
             $packageType = $row->package_type;
             $change = '';
 
@@ -137,12 +138,12 @@ class CompanyDataTable extends BaseDataTable
 
 
             $package = $packageName;
-            if ($row->package->default != 'trial' && $row->package->default != 'lifetime') {
+            if ($packageModel && $packageModel->default != 'trial' && $packageModel->default != 'lifetime') {
                 $package .= ' (' . $packageType . ')<br>Ends On: ' . $time;
-            } elseif ($row->package->default == 'trial') {
+            } elseif ($packageModel && $packageModel->default == 'trial') {
                 $package .= '<br>Ends On: ' . $time;
-            }else {
-                $package .= ' (' . $row->package->package . ')';
+            } elseif ($packageModel) {
+                $package .= ' (' . $packageModel->package . ')';
             }
 
             return "<div class='w-100'>
@@ -171,7 +172,7 @@ class CompanyDataTable extends BaseDataTable
             $string .= __('superadmin.superadmin.registerDate') . ">: $time ";
 
             $totalEmployees = $row->totalEmployees;
-            $maxEmployees = $row->package->max_employees;
+            $maxEmployees = $row->package?->max_employees ?? '--';
             $totalClient = $row->totalClient;
             $totalUsers = $row->users_count;
 
@@ -193,7 +194,7 @@ class CompanyDataTable extends BaseDataTable
             $registrationDate = $row->created_at->timezone(global_setting()->timezone)->diffForHumans();
             $time = $row->created_at->timezone(global_setting()->timezone)->translatedFormat(global_setting()->date_format . ' ' . global_setting()->time_format);
             $string .= __('superadmin.superadmin.registerDate') . "<span data-toggle='tooltip' data-original-title='$time'>: $registrationDate</span> ";
-            $string .= '<li>' . __('app.menu.employees') . ': ' . $row->totalEmployees . '/' . $row->package->max_employees . '</li>';
+            $string .= '<li>' . __('app.menu.employees') . ': ' . $row->totalEmployees . '/' . ($row->package?->max_employees ?? '--') . '</li>';
             $string .= '<li>' . __('app.menu.clients') . ': ' . $row->totalClient . '</li>';
             $string .= '<li>' . __('superadmin.superadmin.totalUsers') . ': ' . $row->users_count . '</li>';
             $string .= '</ul>';
