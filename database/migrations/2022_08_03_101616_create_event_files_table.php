@@ -46,13 +46,39 @@ return new class extends Migration {
         }
 
 
-        Schema::table('proposal_templates', function (Blueprint $table) {
-            $table->dropForeign(['lead_id']);
-            $table->dropColumn('lead_id');
-            $table->dropColumn('note');
-            $table->dropColumn('calculate_tax');
-            $table->dropColumn('status');
-        });
+        if (Schema::hasTable('proposal_templates')) {
+            if (Schema::hasColumn('proposal_templates', 'lead_id')) {
+                try {
+                    Schema::table('proposal_templates', function (Blueprint $table) {
+                        $table->dropForeign(['lead_id']);
+                    });
+                } catch (\Throwable $e) {
+                    // Ignore when FK was never created in this environment.
+                }
+
+                Schema::table('proposal_templates', function (Blueprint $table) {
+                    $table->dropColumn('lead_id');
+                });
+            }
+
+            if (Schema::hasColumn('proposal_templates', 'note')) {
+                Schema::table('proposal_templates', function (Blueprint $table) {
+                    $table->dropColumn('note');
+                });
+            }
+
+            if (Schema::hasColumn('proposal_templates', 'calculate_tax')) {
+                Schema::table('proposal_templates', function (Blueprint $table) {
+                    $table->dropColumn('calculate_tax');
+                });
+            }
+
+            if (Schema::hasColumn('proposal_templates', 'status')) {
+                Schema::table('proposal_templates', function (Blueprint $table) {
+                    $table->dropColumn('status');
+                });
+            }
+        }
 
     }
 

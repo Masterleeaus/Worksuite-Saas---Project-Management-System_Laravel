@@ -126,22 +126,23 @@ Route::middleware(['web', 'auth', 'documents.tenant'])
             ->name('links.store');
         Route::delete('documents/{document}/links/{link}', [DocumentLinksController::class, 'destroy'])
             ->name('links.destroy');
-    });
-
 
         // Search + saved views
-        Route::get('/search', [DocumentSearchController::class, 'index'])->name('documents.search');
-        Route::post('documents/views', [DocumentSavedViewsController::class, 'store'])->name('documents.views.store');
-        Route::delete('documents/views/{view}', [DocumentSavedViewsController::class, 'destroy'])->name('documents.views.destroy');
+        Route::get('/search', [DocumentSearchController::class, 'index'])
+            ->name('search');
+        Route::post('/views', [DocumentSavedViewsController::class, 'store'])
+            ->name('views.store');
+        Route::delete('/views/{view}', [DocumentSavedViewsController::class, 'destroy'])
+            ->name('views.destroy');
 
         // Sections reorder
-        Route::post('documents/sections/reorder', [DocumentSectionsController::class, 'reorder'])->name('documents.sections.reorder');
-
+        Route::post('/sections/reorder', [DocumentSectionsController::class, 'reorder'])
+            ->name('sections.reorder');
 
         // PDF export (premium)
-        Route::get('documents/{id}/pdf', [\Modules\Documents\Http\Controllers\DocumentPdfController::class, 'export'])
+        Route::get('/{id}/pdf', [\Modules\Documents\Http\Controllers\DocumentPdfController::class, 'export'])
             ->name('pdf.export');
-        Route::get('documents/{id}/pdf/preview', [\Modules\Documents\Http\Controllers\DocumentPdfController::class, 'preview'])
+        Route::get('/{id}/pdf/preview', [\Modules\Documents\Http\Controllers\DocumentPdfController::class, 'preview'])
             ->name('pdf.preview');
 
         // Template governance (admin)
@@ -155,11 +156,7 @@ Route::middleware(['web', 'auth', 'documents.tenant'])
             ->name('templates.admin.publish');
         Route::post('/templates/admin/{id}/unpublish', [\Modules\Documents\Http\Controllers\DocumentTemplatePublishController::class, 'unpublish'])
             ->name('templates.admin.unpublish');
-
-        // Share links (authenticated management)
-        Route::post('documents/{document}/share-links', [\Modules\Documents\Http\Controllers\DocumentShareLinksController::class, 'store'])
-        
-
+    });
     // Legacy redirects (older links)
 Route::middleware(['web', 'auth', 'documents.tenant'])
     ->prefix('documents')

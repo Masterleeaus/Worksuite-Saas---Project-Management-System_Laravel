@@ -786,8 +786,15 @@ return new class extends Migration {
         if (!Schema::hasColumn('front_widgets', 'header_script')) {
             Schema::table('front_widgets', function (Blueprint $table) {
                 $table->longtext('header_script')->nullable();
-                DB::statement('ALTER TABLE `front_widgets` CHANGE `widget_code` `footer_script` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL;');
             });
+
+            if (\DB::getDriverName() === 'mysql') {
+                DB::statement('ALTER TABLE `front_widgets` CHANGE `widget_code` `footer_script` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL;');
+            } elseif (!Schema::hasColumn('front_widgets', 'footer_script')) {
+                Schema::table('front_widgets', function (Blueprint $table) {
+                    $table->longtext('footer_script')->nullable();
+                });
+            }
         }
 
         if (!Schema::hasColumn('footer_menu', 'private')) {
@@ -810,9 +817,11 @@ return new class extends Migration {
             });
         }
 
-        Schema::table('companies', function (Blueprint $table) {
-            $table->string('company_phone')->nullable()->default(null)->change();
-        });
+        if (\DB::getDriverName() !== 'sqlite') {
+            Schema::table('companies', function (Blueprint $table) {
+                $table->string('company_phone')->nullable()->default(null)->change();
+            });
+        }
 
         if (!Schema::hasTable('front_menu_buttons')) {
             Schema::create('front_menu_buttons', function (Blueprint $table) {
@@ -841,7 +850,9 @@ return new class extends Migration {
             $table->foreign('approved_by')->references('id')->on('users')->onDelete('SET NULL')->onUpdate('cascade');
         });
 
-        DB::statement("ALTER TABLE global_currencies CHANGE COLUMN currency_position currency_position ENUM('left', 'right', 'left_with_space', 'right_with_space') NOT NULL DEFAULT 'left'");
+        if (\DB::getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE global_currencies CHANGE COLUMN currency_position currency_position ENUM('left', 'right', 'left_with_space', 'right_with_space') NOT NULL DEFAULT 'left'");
+        }
 
         Schema::table('global_currencies', function (Blueprint $table) {
             $table->unsignedInteger('no_of_decimal')->default(2)->after('currency_position');

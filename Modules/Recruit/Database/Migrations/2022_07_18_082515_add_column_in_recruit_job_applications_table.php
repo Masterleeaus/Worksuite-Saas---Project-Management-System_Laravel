@@ -13,6 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
+        if (\DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
         if (! Schema::hasTable('recruit_job_applications')) {
             return;
         }

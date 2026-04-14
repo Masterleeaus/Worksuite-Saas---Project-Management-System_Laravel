@@ -69,21 +69,29 @@ return new class extends Migration {
             }
         }
 
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['password', 'remember_token']);
-
-            if (Schema::hasColumn('users', 'two_factor_secret')) {
-                $table->dropColumn([
-                    'two_factor_secret',
-                    'two_factor_recovery_codes',
-                    'two_factor_confirmed',
-                    'two_factor_email_confirmed',
-                    'two_fa_verify_via',
-                    'two_factor_code',
-                    'two_factor_expires_at'
-                ]);
+        foreach (['password', 'remember_token'] as $column) {
+            if (Schema::hasColumn('users', $column)) {
+                Schema::table('users', function (Blueprint $table) use ($column) {
+                    $table->dropColumn($column);
+                });
             }
-        });
+        }
+
+        foreach ([
+            'two_factor_secret',
+            'two_factor_recovery_codes',
+            'two_factor_confirmed',
+            'two_factor_email_confirmed',
+            'two_fa_verify_via',
+            'two_factor_code',
+            'two_factor_expires_at',
+        ] as $column) {
+            if (Schema::hasColumn('users', $column)) {
+                Schema::table('users', function (Blueprint $table) use ($column) {
+                    $table->dropColumn($column);
+                });
+            }
+        }
 
     }
 
