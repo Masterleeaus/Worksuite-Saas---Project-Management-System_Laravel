@@ -1,7 +1,5 @@
 <?php
 
-<?php
-
 return [
     'name'        => 'FSMRepairTemplate',
     'menu'        => 'FSM RepairTemplate',
@@ -10,4 +8,3 @@ return [
     'deleted'     => 'FSMRepairTemplate record deleted.',
     'not_found'   => 'FSMRepairTemplate record not found.',
 ];
-

@@ -72,7 +72,7 @@ public function record(string $actionUrl, array $options = []): self
 
     $attrStr = '';
     foreach ($attrs as $k => $v) {
-        $attrStr .= " {$k}="{$v}"";
+        $attrStr .= " {$k}=\"{$v}\"";
     }
 
     $this->lines[] = "<Record{$attrStr} />";

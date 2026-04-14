@@ -70,13 +70,13 @@ class JobApplicationsDataTable extends BaseDataTable
                             $status .= 'selected';
                         }
 
-                        $status .= '  data-content="<i class=\'fa fa-circle mr-2\' style=\'color: ' . $item->color . '\\'></i> ' . $item->status . '" value="' . $item->id . '">' . $item->status . '</option>';
+                        $status .= '  data-content="<i class=\'fa fa-circle mr-2\' style=\'color: ' . $item->color . '\'></i> ' . $item->status . '" value="' . $item->id . '">' . $item->status . '</option>';
                     }
 
                     $status .= '</select>';
                 }
                 else {
-                    return ' <i class="fa fa-circle mr-1 text-light-green f-10" style=\'color: ' . $row->color . '\\'></i>' . $row->status;
+                    return ' <i class="fa fa-circle mr-1 text-light-green f-10" style=\'color: ' . $row->color . '\'></i>' . $row->status;
                 }
 
                 return $status;

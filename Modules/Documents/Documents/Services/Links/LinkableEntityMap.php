@@ -1,8 +1,8 @@
 <?php
 
-namespace Modules\Documents\Support;
+namespace Modules\Documents\Services\Links;
 
-class Placeholder
+class LinkableEntityMap
 {
     // Placeholder for future premium features.
 }

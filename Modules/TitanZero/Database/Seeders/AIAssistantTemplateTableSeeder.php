@@ -6,7 +6,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
 use Nwidart\Modules\Facades\Module;
 
-class TitanZeroTemplateTableSeeder extends Seeder
+class AIAssistantTemplateTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -23,11 +23,11 @@ class TitanZeroTemplateTableSeeder extends Seeder
         if(module_is_active('TitanZero'))
         {
             foreach ($modules as $key => $value) {
-                $name = '\Modules\'.$value->getName();
+                $name = '\\Modules\\'.$value->getName();
                 $path =   $value->getPath();
                 if(file_exists($path.'/Database/Seeders/TitanZeroTemplateListTableSeeder.php'))
                 {
-                    $this->call($name.'\Database\Seeders\TitanZeroTemplateListTableSeeder');
+                    $this->call($name.'\\Database\\Seeders\\TitanZeroTemplateListTableSeeder');
                 }
             }
         }

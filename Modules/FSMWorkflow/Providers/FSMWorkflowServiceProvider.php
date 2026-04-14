@@ -12,10 +12,14 @@ class FSMWorkflowServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(__DIR__ . '/../Database/Migrations');
 
         // Register the FSMOrder observer only when FSMCore is present.
-        if (class_exists(\Modules\FSMCore\Models\FSMOrder::class)
-            && \Illuminate\Support\Facades\Schema::hasTable('fsm_orders')
-        ) {
-            \Modules\FSMCore\Models\FSMOrder::observe(FSMOrderObserver::class);
+        try {
+            if (class_exists(\Modules\FSMCore\Models\FSMOrder::class)
+                && \Illuminate\Support\Facades\Schema::hasTable('fsm_orders')
+            ) {
+                \Modules\FSMCore\Models\FSMOrder::observe(FSMOrderObserver::class);
+            }
+        } catch (\Throwable $e) {
+            // Skip observer binding when schema checks are unavailable during early boot.
         }
     }
 

@@ -5,7 +5,7 @@ namespace Modules\TitanZero\Entities;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TitanZeroUsage extends Model
+class TitanAssistUsage extends Model
 {
     use HasFactory;
 
