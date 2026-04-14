@@ -46,9 +46,15 @@ return new class extends Migration
             return;
         }
 
-        Schema::table('salary_slips', function (Blueprint $table) {
+        $hasCurrencyForeignKey = collect(Schema::getConnection()->getDoctrineSchemaManager()->listTableForeignKeys('salary_slips'))
+            ->contains(fn ($foreignKey) => in_array('currency_id', $foreignKey->getLocalColumns(), true));
+
+        Schema::table('salary_slips', function (Blueprint $table) use ($hasCurrencyForeignKey) {
             if (Schema::hasColumn('salary_slips', 'currency_id')) {
-                $table->dropForeign(['currency_id']);
+                if ($hasCurrencyForeignKey) {
+                    $table->dropForeign(['currency_id']);
+                }
+
                 $table->dropColumn('currency_id');
             }
         });
