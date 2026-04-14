@@ -36,8 +36,12 @@ return new class extends Migration {
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('fsm_location_id')->references('id')->on('fsm_locations')->nullOnDelete();
-            $table->foreign('service_type_id')->references('id')->on('fsm_templates')->nullOnDelete();
+            if (Schema::hasTable('fsm_locations')) {
+                $table->foreign('fsm_location_id')->references('id')->on('fsm_locations')->nullOnDelete();
+            }
+            if (Schema::hasTable('fsm_templates')) {
+                $table->foreign('service_type_id')->references('id')->on('fsm_templates')->nullOnDelete();
+            }
         });
     }
 

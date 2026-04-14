@@ -23,8 +23,12 @@ return new class extends Migration {
             $table->text('notes')->nullable();
             $table->timestamps();
 
-            $table->foreign('skill_id')->references('id')->on('fsm_skills')->cascadeOnDelete();
-            $table->foreign('skill_level_id')->references('id')->on('fsm_skill_levels')->nullOnDelete();
+            if (Schema::hasTable('fsm_skills')) {
+                $table->foreign('skill_id')->references('id')->on('fsm_skills')->cascadeOnDelete();
+            }
+            if (Schema::hasTable('fsm_skill_levels')) {
+                $table->foreign('skill_level_id')->references('id')->on('fsm_skill_levels')->nullOnDelete();
+            }
             // No FK on user_id — user table may vary; handled in application layer
             $table->unique(['user_id', 'skill_id'], 'fsm_employee_skill_unique');
         });

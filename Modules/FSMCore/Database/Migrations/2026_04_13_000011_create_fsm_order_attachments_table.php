@@ -28,9 +28,11 @@ return new class extends Migration {
             $table->string('description', 255)->nullable();
             $table->timestamps();
 
-            $table->foreign('fsm_order_id')
-                ->references('id')->on('fsm_orders')
-                ->cascadeOnDelete();
+            if (Schema::hasTable('fsm_orders')) {
+                $table->foreign('fsm_order_id')
+                    ->references('id')->on('fsm_orders')
+                    ->cascadeOnDelete();
+            }
         });
     }
 

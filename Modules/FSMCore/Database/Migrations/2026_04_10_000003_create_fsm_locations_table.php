@@ -28,7 +28,9 @@ return new class extends Migration {
             $table->boolean('active')->default(true);
             $table->timestamps();
 
-            $table->foreign('territory_id')->references('id')->on('fsm_territories')->nullOnDelete();
+            if (Schema::hasTable('fsm_territories')) {
+                $table->foreign('territory_id')->references('id')->on('fsm_territories')->nullOnDelete();
+            }
         });
     }
 

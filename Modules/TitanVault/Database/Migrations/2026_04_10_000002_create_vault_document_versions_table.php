@@ -13,9 +13,11 @@ return new class extends Migration
                 $table->id();
 
                 $table->unsignedBigInteger('document_id');
-                $table->foreign('document_id')
-                    ->references('id')->on('vault_documents')
-                    ->onDelete('cascade')->onUpdate('cascade');
+                if (Schema::hasTable('vault_documents')) {
+                    $table->foreign('document_id')
+                        ->references('id')->on('vault_documents')
+                        ->onDelete('cascade')->onUpdate('cascade');
+                }
 
                 $table->unsignedInteger('version_number');
                 $table->longText('content')->nullable();

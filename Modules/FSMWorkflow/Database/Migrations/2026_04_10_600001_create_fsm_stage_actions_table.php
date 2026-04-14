@@ -31,7 +31,9 @@ return new class extends Migration {
             $table->boolean('active')->default(true);
             $table->timestamps();
 
-            $table->foreign('stage_id')->references('id')->on('fsm_stages')->cascadeOnDelete();
+            if (Schema::hasTable('fsm_stages')) {
+                $table->foreign('stage_id')->references('id')->on('fsm_stages')->cascadeOnDelete();
+            }
         });
     }
 

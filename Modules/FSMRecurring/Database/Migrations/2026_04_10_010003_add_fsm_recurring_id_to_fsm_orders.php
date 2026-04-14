@@ -11,7 +11,9 @@ return new class extends Migration {
         if (!Schema::hasColumn('fsm_orders', 'fsm_recurring_id')) {
             Schema::table('fsm_orders', function (Blueprint $table) {
                 $table->unsignedBigInteger('fsm_recurring_id')->nullable()->after('agreement_id')->index();
-                $table->foreign('fsm_recurring_id')->references('id')->on('fsm_recurrings')->nullOnDelete();
+                if (Schema::hasTable('fsm_recurrings')) {
+                    $table->foreign('fsm_recurring_id')->references('id')->on('fsm_recurrings')->nullOnDelete();
+                }
             });
         }
     }

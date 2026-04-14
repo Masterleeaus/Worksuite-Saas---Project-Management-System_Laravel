@@ -23,8 +23,12 @@ return new class extends Migration {
             $table->text('notes')->nullable();
             $table->timestamps();
 
-            $table->foreign('vehicle_id')->references('id')->on('fsm_vehicles')->cascadeOnDelete();
-            $table->foreign('fsm_order_id')->references('id')->on('fsm_orders')->nullOnDelete();
+            if (Schema::hasTable('fsm_vehicles')) {
+                $table->foreign('vehicle_id')->references('id')->on('fsm_vehicles')->cascadeOnDelete();
+            }
+            if (Schema::hasTable('fsm_orders')) {
+                $table->foreign('fsm_order_id')->references('id')->on('fsm_orders')->nullOnDelete();
+            }
         });
     }
 
