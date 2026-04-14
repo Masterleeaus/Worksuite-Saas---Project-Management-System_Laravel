@@ -15,8 +15,6 @@ use Modules\EInvoice\Entities\EInvoiceDraft;
 use Modules\EInvoice\AI\ClientInterface;
 use Modules\EInvoice\Jobs\GenerateInvoiceNote;
 use Modules\EInvoice\Helper\InvoiceXmlGenerate;
-use Modules\EInvoice\Entities\Invoice as ModInvoice;
-use Modules\EInvoice\Entities\InvoiceItem as ModInvoiceItem;
 use Saloon\XmlWrangler\Data\RootElement;
 use Saloon\XmlWrangler\XmlWriter;
 

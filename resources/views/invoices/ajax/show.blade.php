@@ -115,6 +115,27 @@
                                     </td>
                                 </tr>
                             @endif
+
+                            @if ($invoice->auto_generated)
+                                @if (!empty($invoice->job_date))
+                                    <tr>
+                                        <td class="bg-light-grey border-right-0 f-w-500">Job Date</td>
+                                        <td class="border-left-0">{{ \Carbon\Carbon::parse($invoice->job_date)->translatedFormat(company()->date_format) }}</td>
+                                    </tr>
+                                @endif
+                                @if (!empty($invoice->service_type))
+                                    <tr>
+                                        <td class="bg-light-grey border-right-0 f-w-500">Service Type</td>
+                                        <td class="border-left-0">{{ ucwords(str_replace('_', ' ', $invoice->service_type)) }}</td>
+                                    </tr>
+                                @endif
+                                @if (!empty($invoice->service_address))
+                                    <tr>
+                                        <td class="bg-light-grey border-right-0 f-w-500">Service Address</td>
+                                        <td class="border-left-0">{{ $invoice->service_address }}</td>
+                                    </tr>
+                                @endif
+                            @endif
                         </table>
                     </td>
                 </tr>
