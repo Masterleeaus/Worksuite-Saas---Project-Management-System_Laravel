@@ -3,6 +3,8 @@
 namespace Modules\PromotionManagement\Providers;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Modules\PromotionManagement\Events\MarketingPromotionLifecycleSignal;
+use Modules\PromotionManagement\Listeners\EmitMarketingPromotionLifecycleSignalToTitanZero;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -12,7 +14,9 @@ class EventServiceProvider extends ServiceProvider
      * @var array<class-string, array<int, class-string>>
      */
     protected $listen = [
-        // Add module events => listeners here.
+        MarketingPromotionLifecycleSignal::class => [
+            EmitMarketingPromotionLifecycleSignalToTitanZero::class,
+        ],
     ];
 
     /**
