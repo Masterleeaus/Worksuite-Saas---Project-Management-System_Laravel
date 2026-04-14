@@ -159,6 +159,8 @@ class Invoice extends BaseModel
     protected $casts = [
         'issue_date' => 'datetime',
         'due_date' => 'datetime',
+        'job_date' => 'date',
+        'auto_generated' => 'boolean',
         'last_viewed' => 'datetime',
     ];
     protected $appends = ['total_amount', 'issue_on'];

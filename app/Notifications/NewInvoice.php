@@ -78,7 +78,23 @@ class NewInvoice extends BaseNotification
 
                 $url = url()->temporarySignedRoute('front.invoice', now()->addDays(GlobalSetting::SIGNED_ROUTE_EXPIRY), $this->invoice->hash);
                 $url = getDomainSpecificUrl($url, $this->company);
-                $content = __('email.invoice.text') . '<br>' . __('app.invoiceNumber') . ': ' .$this->invoice->invoice_number ;
+                $content = __('email.invoice.text') . '<br>' . __('app.invoiceNumber') . ': ' . $this->invoice->invoice_number;
+
+                if ($this->invoice->auto_generated) {
+                    $content .= '<br><br><strong>Cleaning Service Invoice</strong>';
+
+                    if (!empty($this->invoice->job_date)) {
+                        $content .= '<br>Job Date: ' . $this->invoice->job_date->translatedFormat($this->company->date_format);
+                    }
+
+                    if (!empty($this->invoice->service_type)) {
+                        $content .= '<br>Service Type: ' . ucwords(str_replace('_', ' ', $this->invoice->service_type));
+                    }
+
+                    if (!empty($this->invoice->service_address)) {
+                        $content .= '<br>Service Address: ' . e($this->invoice->service_address);
+                    }
+                }
 
                 $newInvoice->subject(__('email.invoice.subject') . ' (' . $this->invoice->invoice_number . ') - ' . config('app.name') . '.')
                     ->markdown('mail.email', [
