@@ -1,0 +1,14 @@
+{
+  "module": "businesssettingsmodule",
+  "version": "1.0.0",
+  "lifecycle": {
+    "stages": [
+      "company_created",
+      "company_onboarding",
+      "business_profile_complete",
+      "operational"
+    ],
+    "primary_signal": "business_settings.updated"
+  }
+}
+
