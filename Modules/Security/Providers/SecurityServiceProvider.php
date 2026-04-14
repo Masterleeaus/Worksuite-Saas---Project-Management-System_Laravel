@@ -77,7 +77,7 @@ class SecurityServiceProvider extends ServiceProvider
     private function getPublishableViewPaths(): array
     {
         $paths = [];
-        foreach (\Config::get('modules.paths.modules_assets_path') as $path) {
+        foreach ((array) \Config::get('modules.paths.modules_assets_path', []) as $path) {
             if (is_dir($path)) {
                 $paths[] = $path . DIRECTORY_SEPARATOR . $this->moduleNameLower;
             }
