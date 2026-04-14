@@ -21,7 +21,7 @@ class TitanAgentsServiceProvider extends ServiceProvider
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
-        $this->loadMigrationsFrom(module_path($this->moduleName, 'database/migrations'));
+        $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/migrations'));
         $this->registerMenu();
     }
 
