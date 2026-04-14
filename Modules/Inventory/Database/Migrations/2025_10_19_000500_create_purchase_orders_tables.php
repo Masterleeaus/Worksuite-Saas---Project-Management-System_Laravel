@@ -8,7 +8,7 @@ return new class extends Migration {
     public function up(): void
     {
         if (!Schema::hasTable('purchase_orders')) {
-            Schema::create('purchase_orders', function (Blueprint $table) {
+            if (!Schema::hasTable('purchase_orders')) Schema::create('purchase_orders', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('supplier_id')->nullable();
                 $table->string('status', 191)->default('draft');

@@ -14,7 +14,7 @@ class QcCreateScheduleRecurringItemsTable extends Migration
     public function up()
     {
         if (!Schema::hasTable('inspection_schedule_recurring_items')) {
-            Schema::create('inspection_schedule_recurring_items', function (Blueprint $table) {
+            if (!Schema::hasTable('inspection_schedule_recurring_items')) Schema::create('inspection_schedule_recurring_items', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
             $table->unsignedInteger('schedule_recurring_id');

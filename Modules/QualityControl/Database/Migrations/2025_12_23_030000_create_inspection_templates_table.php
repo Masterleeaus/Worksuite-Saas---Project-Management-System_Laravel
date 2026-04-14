@@ -11,7 +11,7 @@ return new class extends Migration {
             return;
         }
 
-        Schema::create('inspection_templates', function (Blueprint $table) {
+        if (!Schema::hasTable('inspection_templates')) Schema::create('inspection_templates', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
             $table->string('name', 191);

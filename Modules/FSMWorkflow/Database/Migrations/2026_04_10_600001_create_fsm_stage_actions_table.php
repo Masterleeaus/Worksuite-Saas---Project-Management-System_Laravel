@@ -16,7 +16,7 @@ return new class extends Migration {
             return;
         }
 
-        Schema::create('fsm_stage_actions', function (Blueprint $table) {
+        if (!Schema::hasTable('fsm_stage_actions')) Schema::create('fsm_stage_actions', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
             $table->unsignedBigInteger('stage_id')->index();

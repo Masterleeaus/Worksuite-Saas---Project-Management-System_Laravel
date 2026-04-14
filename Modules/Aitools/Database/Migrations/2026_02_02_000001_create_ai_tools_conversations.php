@@ -9,7 +9,7 @@ return new class extends Migration {
         if (Schema::hasTable('ai_tools_conversations')) {
             return;
         }
-        Schema::create('ai_tools_conversations', function(Blueprint $t){
+        if (!Schema::hasTable('ai_tools_conversations')) Schema::create('ai_tools_conversations', function(Blueprint $t){
             $t->id();
             $t->unsignedBigInteger('company_id')->nullable();
             $t->unsignedBigInteger('user_id')->nullable();

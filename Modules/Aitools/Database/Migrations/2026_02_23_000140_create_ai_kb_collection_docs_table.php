@@ -12,7 +12,7 @@ return new class extends Migration
             return;
         }
 
-        Schema::create('ai_kb_collection_docs', function (Blueprint $table) {
+        if (!Schema::hasTable('ai_kb_collection_docs')) Schema::create('ai_kb_collection_docs', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('collection_id')->index();
             $table->unsignedBigInteger('document_id')->index();

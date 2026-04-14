@@ -15,7 +15,7 @@ return new class extends Migration {
             return;
         }
 
-        Schema::create('fsm_sizes', function (Blueprint $table) {
+        if (!Schema::hasTable('fsm_sizes')) Schema::create('fsm_sizes', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
             $table->string('code', 8);  // e.g. XS, S, M, L, XL

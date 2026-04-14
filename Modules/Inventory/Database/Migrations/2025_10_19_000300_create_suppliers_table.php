@@ -12,7 +12,7 @@ class CreateSuppliersTable extends Migration
             return;
         }
 
-        Schema::create('suppliers', function (Blueprint $table) {
+        if (!Schema::hasTable('suppliers')) Schema::create('suppliers', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('email')->nullable();

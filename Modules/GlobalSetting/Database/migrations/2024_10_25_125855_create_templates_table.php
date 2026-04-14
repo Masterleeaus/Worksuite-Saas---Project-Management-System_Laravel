@@ -14,7 +14,7 @@ return new class extends Migration
         if (Schema::hasTable('email_settings')) {
             return;
         }
-        Schema::create('email_settings', function (Blueprint $table) {
+        if (!Schema::hasTable('email_settings')) Schema::create('email_settings', function (Blueprint $table) {
             $table->id();
             $table->string('title');
             $table->integer('type')->default(1)->comment("1 = Email and 2 = SMS and 3 = Pushnotification");

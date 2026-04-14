@@ -25,14 +25,16 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('titanzero_audit_logs', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('intent_run_id')->index();
-            $table->string('event', 80)->index();
-            $table->longText('payload_json')->nullable();
-            $table->unsignedBigInteger('user_id')->nullable()->index();
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('titanzero_audit_logs')) {
+            Schema::create('titanzero_audit_logs', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('intent_run_id')->index();
+                $table->string('event', 80)->index();
+                $table->longText('payload_json')->nullable();
+                $table->unsignedBigInteger('user_id')->nullable()->index();
+                $table->timestamps();
+            });
+        }
 
         Schema::create('titanzero_artifacts', function (Blueprint $table) {
             $table->id();

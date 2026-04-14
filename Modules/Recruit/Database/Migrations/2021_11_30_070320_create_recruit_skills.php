@@ -109,7 +109,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('recruit_application_status_categories', function (Blueprint $table) {
+        if (!Schema::hasTable('recruit_application_status_categories')) Schema::create('recruit_application_status_categories', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
             $table->string('name');
