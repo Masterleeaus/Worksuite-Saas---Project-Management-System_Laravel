@@ -46,7 +46,13 @@ $this->app->bind(\Modules\ManagedPremises\Integrations\Core\HrAdapterInterface::
         $this->app->singleton(Permissions::class, fn () => new Permissions());
 
         // Sidebar include (must never throw)
-        Blade::includeIf('managedpremises::sections.sidebar', 'managedpremises_sidebar');
+        $bladeCompiler = Blade::getFacadeRoot();
+
+        if ($bladeCompiler && method_exists($bladeCompiler, 'includeIf')) {
+            $bladeCompiler->includeIf('managedpremises::sections.sidebar', 'managedpremises_sidebar');
+        } elseif ($bladeCompiler && method_exists($bladeCompiler, 'include') && view()->exists('managedpremises::sections.sidebar')) {
+            $bladeCompiler->include('managedpremises::sections.sidebar', 'managedpremises_sidebar');
+        }
     }
 
     protected function registerConfig(): void

@@ -117,7 +117,15 @@ class PurchaseServiceProvider extends ServiceProvider
     public function registerFactories()
     {
         if (!app()->environment('production') && $this->app->runningInConsole()) {
-            app(Factory::class)->load(__DIR__ . '/../Database/factories');
+            $factoriesPath = __DIR__ . '/../Database/factories';
+
+            if (!is_dir($factoriesPath)) {
+                $factoriesPath = __DIR__ . '/../database/factories';
+            }
+
+            if (is_dir($factoriesPath)) {
+                app(Factory::class)->load($factoriesPath);
+            }
         }
     }
 

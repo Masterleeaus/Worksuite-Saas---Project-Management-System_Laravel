@@ -27,7 +27,15 @@ class SMSModuleServiceProvider extends ServiceProvider
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
-        $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
+        $migrationPaths = array_filter([
+            module_path($this->moduleName, 'Database/Migrations'),
+            module_path($this->moduleName, 'database/Migrations'),
+            module_path($this->moduleName, 'database/migrations'),
+        ], 'is_dir');
+
+        if (!empty($migrationPaths)) {
+            $this->loadMigrationsFrom($migrationPaths);
+        }
     }
 
     /**
@@ -89,7 +97,14 @@ class SMSModuleServiceProvider extends ServiceProvider
         if (is_dir($langPath)) {
             $this->loadTranslationsFrom($langPath, $this->moduleNameLower);
         } else {
-            $this->loadTranslationsFrom(module_path($this->moduleName, 'Resources/lang'), $this->moduleNameLower);
+            foreach (['Resources/lang', 'resources/lang', 'lang'] as $relativeLangPath) {
+                $moduleLangPath = module_path($this->moduleName, $relativeLangPath);
+
+                if (is_dir($moduleLangPath)) {
+                    $this->loadTranslationsFrom($moduleLangPath, $this->moduleNameLower);
+                    break;
+                }
+            }
         }
     }
 
