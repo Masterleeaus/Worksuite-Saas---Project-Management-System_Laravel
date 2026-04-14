@@ -16,7 +16,7 @@
                         class="page-title-wrap d-flex justify-content-between flex-wrap align-items-center gap-3 mb-3">
                         <h2 class="page-title">{{translate('service_list')}}</h2>
                         <div>
-                            @can('service_add')
+                            @can('add_service')
                                 <a href="{{route('admin.service.create')}}" class="btn btn--primary">
                                     <span class="material-icons">add</span>
                                     {{translate('add_service')}}
@@ -85,10 +85,10 @@
                                                 <th>{{translate('category')}}</th>
                                                 <th>{{translate('zones')}}</th>
                                                 <th>{{translate('Minimum Bidding Price')}}</th>
-                                                @can('service_manage_status')
+                                                @can('edit_service')
                                                     <th>{{translate('status')}}</th>
                                                 @endcan
-                                                @canany(['service_delete', 'service_update'])
+                                                @canany(['delete_service', 'edit_service'])
                                                     <th>{{translate('action')}}</th>
                                                 @endcan
                                             </tr>
@@ -137,7 +137,7 @@
                                                             >warning</i>
                                                         @endif
                                                     </td>
-                                                    @can('service_manage_status')
+                                                    @can('edit_service')
                                                         <td>
                                                             <label class="switcher" data-bs-toggle="modal"
                                                                    data-bs-target="#deactivateAlertModal">
@@ -149,17 +149,17 @@
                                                             </label>
                                                         </td>
                                                     @endcan
-                                                    @canany(['service_delete', 'service_update'])
+                                                    @canany(['delete_service', 'edit_service'])
                                                         <td>
                                                             <div class="d-flex gap-2">
-                                                                @can('service_update')
+                                                                @can('edit_service')
                                                                     <a href="{{route('admin.service.edit',[$service->id])}}"
                                                                        class="action-btn btn--light-primary demo_check"
                                                                        style="--size: 30px">
                                                                         <span class="material-icons">edit</span>
                                                                     </a>
                                                                 @endcan
-                                                                @can('service_delete')
+                                                                @can('delete_service')
                                                                     <button type="button"
                                                                             data-id="delete-{{$service->id}}"
                                                                             data-message="{{translate('want_to_delete_this_service')}}?"

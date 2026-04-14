@@ -38,7 +38,7 @@
                 </button>
                 <div class="btn-group d-flex gap-3 align-items-center">
                     <div>
-                        @can('service_manage_status')
+                        @can('edit_service')
                         <label class="switcher" data-bs-toggle="modal" data-bs-target="#deactivateAlertModal">
                             <input class="switcher_input service-ajax-status-update" type="checkbox" {{$faq->is_active?'checked':''}}
                             data-route="{{route('admin.faq.status-update',[$faq->id])}}"
@@ -47,14 +47,14 @@
                         </label>
                             @endcan
                     </div>
-                    @can('service_update')
+                    @can('edit_service')
                     <button type="button"
                             data-id="{{$faq->id}}"
                             class="accordion-edit-btn bg-transparent border-0 p-0 show-service-edit-section">
                         <span class="material-icons">border_color</span>
                     </button>
                     @endcan
-                    @can('service_delete')
+                    @can('delete_service')
                     <button type="button"
                             class="accordion-delete-btn bg-transparent border-0 p-0 faq-list-ajax-delete"
                             data-route="{{route('admin.faq.delete',[$faq->id,$faq->service_id])}}">

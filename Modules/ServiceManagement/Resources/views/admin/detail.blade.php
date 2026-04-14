@@ -81,7 +81,7 @@
                                 <div class="media-body ">
                                     <div class="d-flex flex-wrap gap-3 align-items-center justify-content-between mb-3">
                                         <h2 class="c1">{{$service->name}}</h2>
-                                        @can('service_update')
+                                        @can('edit_service')
                                             <a href="{{route('admin.service.edit',[$service->id])}}"
                                                class="btn btn--primary">
                                                 <span class="material-icons">border_color</span>
