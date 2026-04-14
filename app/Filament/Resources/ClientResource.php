@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ClientResource\RelationManagers\ClientContractsRelationManager;
+use App\Filament\Resources\ClientResource\RelationManagers\ClientDocumentsRelationManager;
 use App\Filament\Resources\ClientResource\RelationManagers\ClientInvoicesRelationManager;
 use App\Filament\Resources\ClientResource\Pages\CreateClient;
 use App\Filament\Resources\ClientResource\Pages\EditClient;
@@ -206,6 +207,7 @@ class ClientResource extends BaseTenantResource
         return [
             ClientInvoicesRelationManager::class,
             ClientContractsRelationManager::class,
+            ClientDocumentsRelationManager::class,
         ];
     }
 
