@@ -64,6 +64,26 @@ class TitanFilamentCheckCommand extends Command
                 ? 'filament/filament found in vendor/'
                 : 'Run: composer require filament/filament && php artisan filament:install --panels'
         );
+
+        $configPublished = file_exists(config_path('filament.php'));
+
+        $this->result(
+            'Filament config published',
+            $configPublished,
+            $configPublished
+                ? 'config/filament.php found'
+                : 'Run: php artisan vendor:publish --tag=filament-config'
+        );
+
+        $adminProviderScaffolded = file_exists(app_path('Providers/Filament/AdminPanelProvider.php'));
+
+        $this->result(
+            'Filament AdminPanelProvider scaffold exists',
+            $adminProviderScaffolded,
+            $adminProviderScaffolded
+                ? 'app/Providers/Filament/AdminPanelProvider.php found'
+                : 'Run: php artisan filament:install --panels (or php artisan make:filament-panel admin)'
+        );
     }
 
     private function checkPanelProviderRegistered(): void
