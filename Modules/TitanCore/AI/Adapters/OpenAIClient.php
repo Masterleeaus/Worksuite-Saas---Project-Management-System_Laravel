@@ -19,7 +19,7 @@ class OpenAIClient implements ClientInterface
             $apiKey = app('config')->get('ai.providers.openai.api_key');
         }
 
-        $this->apiKey = (string)($apiKey ?: env('OPENAI_API_KEY') ?: '');
+        $this->apiKey = (string)($apiKey ?? env('OPENAI_API_KEY') ?? '');
     }
 
     public function chat(array $messages, array $opts = []): array
