@@ -9,6 +9,8 @@ use App\Traits\HasCompany;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Notifications\Notifiable;
 
 /**
@@ -109,6 +111,8 @@ class Lead extends BaseModel
     use CustomFieldsTrait;
     use HasCompany;
 
+    protected static ?bool $estimateUsesLeadId = null;
+
     const CUSTOM_FIELD_MODEL = 'App\Models\Lead';
 
     protected $appends = ['image_url', 'client_name_salutation'];
@@ -171,6 +175,18 @@ class Lead extends BaseModel
     public function leadOwner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'lead_owner')->withoutGlobalScope(ActiveScope::class);
+    }
+
+    public function estimates(): HasMany
+    {
+        if (static::$estimateUsesLeadId === null) {
+            $estimate = new Estimate();
+            static::$estimateUsesLeadId = Schema::hasColumn($estimate->getTable(), 'lead_id');
+        }
+
+        return static::$estimateUsesLeadId
+            ? $this->hasMany(Estimate::class, 'lead_id', 'id')
+            : $this->hasMany(Estimate::class, 'client_id', 'client_id');
     }
 
     public static function allLeads($contactId = null)

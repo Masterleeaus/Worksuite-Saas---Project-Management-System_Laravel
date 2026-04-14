@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\ClientResource\RelationManagers\ClientContractsRelationManager;
+use App\Filament\Resources\ClientResource\RelationManagers\ClientInvoicesRelationManager;
 use App\Filament\Resources\ClientResource\Pages\CreateClient;
 use App\Filament\Resources\ClientResource\Pages\EditClient;
 use App\Filament\Resources\ClientResource\Pages\ListClients;
@@ -144,6 +146,7 @@ class ClientResource extends BaseTenantResource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query): Builder => static::applyTenantScope($query))
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
@@ -189,7 +192,21 @@ class ClientResource extends BaseTenantResource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\DeleteBulkAction::make(),
+                ...(class_exists(\Filament\Tables\Actions\ExportBulkAction::class)
+                    ? [\Filament\Tables\Actions\ExportBulkAction::make()]
+                    : []),
             ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            ClientInvoicesRelationManager::class,
+            ClientContractsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

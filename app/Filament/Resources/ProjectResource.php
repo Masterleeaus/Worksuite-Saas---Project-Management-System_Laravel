@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\ProjectResource\RelationManagers\ProjectTasksRelationManager;
 use App\Filament\Resources\ProjectResource\Pages\CreateProject;
 use App\Filament\Resources\ProjectResource\Pages\EditProject;
 use App\Filament\Resources\ProjectResource\Pages\ListProjects;
@@ -27,7 +28,7 @@ class ProjectResource extends BaseTenantResource
 
     protected static ?string $navigationIcon = 'heroicon-o-briefcase';
 
-    protected static ?string $navigationGroup = 'Operations';
+    protected static ?string $navigationGroup = 'Projects';
 
     protected static ?int $navigationSort = 1;
 
@@ -156,6 +157,7 @@ class ProjectResource extends BaseTenantResource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query): Builder => static::applyTenantScope($query))
             ->columns([
                 Tables\Columns\TextColumn::make('project_name')
                     ->searchable()
@@ -201,7 +203,20 @@ class ProjectResource extends BaseTenantResource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\DeleteBulkAction::make(),
+                ...(class_exists(\Filament\Tables\Actions\ExportBulkAction::class)
+                    ? [\Filament\Tables\Actions\ExportBulkAction::make()]
+                    : []),
             ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            ProjectTasksRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

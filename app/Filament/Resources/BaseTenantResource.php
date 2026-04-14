@@ -30,6 +30,31 @@ use Illuminate\Database\Eloquent\Builder;
  */
 abstract class BaseTenantResource extends Resource
 {
+    public static function currentCompanyId(): ?int
+    {
+        if (!auth()->hasUser()) {
+            return null;
+        }
+
+        $user = auth()->user();
+
+        return $user->company_id ?? optional($user->company)->id;
+    }
+
+    public static function applyTenantScope(Builder $query): Builder
+    {
+        $companyId = static::currentCompanyId();
+
+        if (!$companyId) {
+            return $query;
+        }
+
+        /** @var \Illuminate\Database\Eloquent\Model $model */
+        $model = new (static::getModel())();
+
+        return $query->where($model->getTable() . '.company_id', $companyId);
+    }
+
     /**
      * Apply tenant (company_id) scope to every query issued by this resource.
      *
@@ -38,20 +63,7 @@ abstract class BaseTenantResource extends Resource
      */
     public static function getEloquentQuery(): Builder
     {
-        $query = parent::getEloquentQuery();
-
-        if (auth()->hasUser()) {
-            $user      = auth()->user();
-            $companyId = $user->company_id ?? optional($user->company)->id;
-
-            if ($companyId) {
-                /** @var \Illuminate\Database\Eloquent\Model $model */
-                $model = new (static::getModel())();
-                $query->where($model->getTable() . '.company_id', $companyId);
-            }
-        }
-
-        return $query;
+        return static::applyTenantScope(parent::getEloquentQuery());
     }
 
     /**
