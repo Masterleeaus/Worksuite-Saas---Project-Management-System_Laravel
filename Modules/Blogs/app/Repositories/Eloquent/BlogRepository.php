@@ -201,7 +201,9 @@ class BlogRepository implements BlogRepositoryInterface
                 $category = BlogCategory::where(['parent_id' => $id, 'language_id' => $request->language_id])->first();
                 if (empty($category)) {
                     $categoryData = BlogCategory::select('parent_id')->where(['id' => $id])->first();
-                    $category = BlogCategory::where(['id' => $categoryData->parent_id, 'language_id' => $request->language_id])->first();
+                    if ($categoryData && !empty($categoryData->parent_id)) {
+                        $category = BlogCategory::where(['id' => $categoryData->parent_id, 'language_id' => $request->language_id])->first();
+                    }
                 }
                 if (empty($category)) {
                     $category = BlogCategory::where(['id' => $id, 'language_id' => $request->language_id])->first();
@@ -463,7 +465,9 @@ class BlogRepository implements BlogRepositoryInterface
                 $post = BlogPost::where(['parent_id' => $id, 'language_id' => $request->language_id])->first();
                 if (empty($post)) {
                     $postData = BlogPost::select('parent_id')->where(['id' => $id])->first();
-                    $post = BlogPost::where(['id' => $postData->parent_id, 'language_id' => $request->language_id])->first();
+                    if ($postData && !empty($postData->parent_id)) {
+                        $post = BlogPost::where(['id' => $postData->parent_id, 'language_id' => $request->language_id])->first();
+                    }
                 }
                 if (empty($post)) {
                     $post = BlogPost::where(['id' => $id, 'language_id' => $request->language_id])->first();
@@ -755,7 +759,7 @@ class BlogRepository implements BlogRepositoryInterface
             return [
                 'id' => $blog['id'],
                 'title' => $blog['title'],
-                'image' => url('storage/blogs/' . $blog['image']),
+                'image' => $blog['image'] ? url('storage/blogs/' . $blog['image']) : null,
                 'slug' => $blog['slug'],
                 'category_name' => $blog['category_name'],
                 'description' => $blog['description'],
@@ -818,14 +822,14 @@ class BlogRepository implements BlogRepositoryInterface
 
         if (!empty($blogDetail)) {
             $blogDetail = $blogDetail->toArray();
-            $blogDetail['image'] = url('storage/blogs/' . $blogDetail['image']);
+            $blogDetail['image'] = !empty($blogDetail['image']) ? url('storage/blogs/' . $blogDetail['image']) : null;
             $blogDetail['author_name'] = $blogDetail['author_name'] ? $blogDetail['author_name'] . ' ' . $blogDetail['author_last_name'] : 'Admin';
             $blogDetail['author_image'] = $blogDetail['author_image'] ? url('storage/profile/' . $blogDetail['author_image']) : url('/assets/img/user-default.jpg');
             $blogDetail['created_at'] = Carbon::parse($blogDetail['created_at'])->format($dateFormat);
         }
 
-        $comments = '';
-        if (!empty($blogDetail['id'])) {
+        $comments = collect();
+        if (is_array($blogDetail) && !empty($blogDetail['id'])) {
             $comments = BlogComment::where('post_id', $blogDetail['id'])->orderBy('id', 'DESC')->get()->map(function ($comment) {
                 /** @var \Modules\Blogs\app\Models\BlogComment $comment */
                 $comment->image = $comment->image ? url('storage/profile/' . $comment->image) : url('assets/img/profile-default.png');
@@ -884,25 +888,31 @@ class BlogRepository implements BlogRepositoryInterface
 
         try {
             $data = [];
+            $post = BlogPost::select('id', 'company_id')->where('id', $request->post_id)->first();
+            $commentCompanyId = $request->company_id ?? ($post->company_id ?? null);
 
             if (request()->has('user_id') && !empty($request->user_id) ) {
                 $user = User::select('email')->where('id', $userId)->first();
                 $userDetail = UserDetail::select('first_name', 'profile_image')->where('user_id', $userId)->first();
                 $data = [
+                    'company_id' => $commentCompanyId,
                     'post_id' => $request->post_id,
                     'name' => $userDetail ? $userDetail->first_name : '',
                     'email' => $user ? $user->email : '',
                     'image' => $userDetail ? $userDetail->profile_image : '',
                     'comment' => $request->comment,
                     'comment_date' => Carbon::now(),
+                    'user_id' => $userId,
                 ];
             } else {
                 $data = [
+                    'company_id' => $commentCompanyId,
                     'post_id' => $request->post_id,
                     'name' => $request->name,
                     'email' => $request->email,
                     'comment' => $request->comment,
                     'comment_date' => Carbon::now(),
+                    'user_id' => null,
                 ];
             }
 

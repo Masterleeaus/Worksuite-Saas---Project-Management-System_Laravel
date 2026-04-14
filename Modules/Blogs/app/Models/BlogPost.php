@@ -4,7 +4,9 @@ namespace Modules\Blogs\app\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\Blogs\Traits\CompanyScoped;
 
 /**
  * @property string|null $image
@@ -19,8 +21,25 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class BlogPost extends Model
 {
     use SoftDeletes;
+    use CompanyScoped;
 
-    protected $fillable = ['title', 'slug', 'image', 'category', 'description', 'popular', 'status', 'tags' ,'seo_title', 'seo_description', 'language_id', 'parent_id', 'created_at', 'updated_at', 'deleted_at', 'created_by', 'updated_by'];
+    protected $fillable = [
+        'company_id',
+        'title',
+        'slug',
+        'image',
+        'category',
+        'description',
+        'popular',
+        'status',
+        'tags',
+        'seo_title',
+        'seo_description',
+        'language_id',
+        'parent_id',
+        'created_by',
+        'updated_by',
+    ];
     
     /**
      * Generate the file URL for the client image.
@@ -41,6 +60,11 @@ class BlogPost extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(BlogCategory::class, 'category');
+    }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(BlogComment::class, 'post_id');
     }
 
 }
