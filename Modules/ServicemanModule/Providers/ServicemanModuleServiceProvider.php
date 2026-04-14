@@ -92,7 +92,14 @@ class ServicemanModuleServiceProvider extends ServiceProvider
         if (is_dir($langPath)) {
             $this->loadTranslationsFrom($langPath, $this->moduleNameLower);
         } else {
-            $this->loadTranslationsFrom(module_path($this->moduleName, 'Resources/lang'), $this->moduleNameLower);
+            foreach (['Resources/lang', 'resources/lang', 'lang'] as $relativeLangPath) {
+                $moduleLangPath = module_path($this->moduleName, $relativeLangPath);
+
+                if (is_dir($moduleLangPath)) {
+                    $this->loadTranslationsFrom($moduleLangPath, $this->moduleNameLower);
+                    break;
+                }
+            }
         }
     }
 

@@ -74,8 +74,15 @@ class TitanAgentsServiceProvider extends ServiceProvider
             $this->loadTranslationsFrom($langPath, $this->moduleNameLower);
             $this->loadJsonTranslationsFrom($langPath);
         } else {
-            $this->loadTranslationsFrom(module_path($this->moduleName, 'lang'), $this->moduleNameLower);
-            $this->loadJsonTranslationsFrom(module_path($this->moduleName, 'lang'));
+            foreach (['lang', 'Resources/lang', 'resources/lang'] as $relativeLangPath) {
+                $moduleLangPath = module_path($this->moduleName, $relativeLangPath);
+
+                if (is_dir($moduleLangPath)) {
+                    $this->loadTranslationsFrom($moduleLangPath, $this->moduleNameLower);
+                    $this->loadJsonTranslationsFrom($moduleLangPath);
+                    break;
+                }
+            }
         }
     }
 
