@@ -5,7 +5,7 @@ namespace Modules\TitanAgents\Providers;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 
-class TitanAgentsServiceProvider extends ServiceProvider
+class AiChatServiceProvider extends ServiceProvider
 {
     protected string $moduleName = 'TitanAgents';
 
