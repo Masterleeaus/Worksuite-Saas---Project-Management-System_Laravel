@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Models\Company;
 use App\Providers\TitanPanelProvider;
 use Closure;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -48,7 +49,7 @@ class ApplyTitanTenantScope
 
             $company = $user->company ?? null;
 
-            if ($company === null) {
+            if ($company === null && !$user instanceof Model) {
                 // Fallback for runtime contexts where company_id is present but the
                 // relation is not hydrated on the resolved Worksuite user object.
                 $company = Company::withoutGlobalScopes()->find($companyId);
