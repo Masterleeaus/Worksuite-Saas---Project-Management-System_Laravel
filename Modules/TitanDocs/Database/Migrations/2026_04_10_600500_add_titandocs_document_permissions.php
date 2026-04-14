@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 
 return new class extends Migration {
+    private const DEFAULT_ALL_PERMISSION_TYPE_ID = 4;
+
     public function up(): void
     {
         if (!Schema::hasTable('permissions')) {
@@ -95,13 +97,14 @@ return new class extends Migration {
         }
 
         if (Schema::hasTable('roles') && $pivotTable) {
-            $allPermissionTypeId = 4; // "all" access in WorkSuite permission_types.
+            $allPermissionTypeId = self::DEFAULT_ALL_PERMISSION_TYPE_ID;
             if (
                 $pivotTable === 'permission_role'
                 && Schema::hasTable('permission_types')
                 && Schema::hasColumn('permission_types', 'name')
             ) {
-                $allPermissionTypeId = DB::table('permission_types')->where('name', 'all')->value('id') ?? 4;
+                $allPermissionTypeId = DB::table('permission_types')->where('name', 'all')->value('id')
+                    ?? self::DEFAULT_ALL_PERMISSION_TYPE_ID;
             }
 
             $companyRole = DB::table('roles')->where('name', 'company')->first();
