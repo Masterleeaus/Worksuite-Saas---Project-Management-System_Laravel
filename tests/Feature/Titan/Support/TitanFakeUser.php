@@ -19,7 +19,7 @@ class TitanFakeUser extends AuthenticatableUser
      * @param  array<int, string>  $roles
      * @param  array<string, string|bool>  $permissions
      */
-    public function __construct(int $id, ?int $companyId, array $roles, array $permissions)
+    public function __construct(int $id = 0, ?int $companyId = null, array $roles = [], array $permissions = [])
     {
         parent::__construct([]);
         $this->id = $id;

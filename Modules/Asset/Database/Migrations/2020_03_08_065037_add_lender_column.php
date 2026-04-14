@@ -15,26 +15,27 @@ return new class extends Migration
     {
 
         if (! Schema::hasColumn('asset_lending_history', 'lender_id')) {
-
-            \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-
             if (! Schema::hasTable('asset_lending_history')) {
                 return;
             }
-            
-            Schema::table('asset_lending_history', function (Blueprint $table) {
-                if (! Schema::hasColumn('asset_lending_history', 'lender_id')) {
-                    $table->unsignedInteger('lender_id')->after('user_id')->nullable();
-                }
-                $table->foreign('lender_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
 
-                if (! Schema::hasColumn('asset_lending_history', 'returner_id')) {
-                    $table->unsignedInteger('returner_id')->after('lender_id')->nullable();
-                }
-                $table->foreign('returner_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
-            });
+            Schema::disableForeignKeyConstraints();
 
-            \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+            try {
+                Schema::table('asset_lending_history', function (Blueprint $table) {
+                    if (! Schema::hasColumn('asset_lending_history', 'lender_id')) {
+                        $table->unsignedInteger('lender_id')->after('user_id')->nullable();
+                    }
+                    $table->foreign('lender_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
+
+                    if (! Schema::hasColumn('asset_lending_history', 'returner_id')) {
+                        $table->unsignedInteger('returner_id')->after('lender_id')->nullable();
+                    }
+                    $table->foreign('returner_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
+                });
+            } finally {
+                Schema::enableForeignKeyConstraints();
+            }
         }
 
     }

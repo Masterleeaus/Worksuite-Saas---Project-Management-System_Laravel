@@ -42,10 +42,9 @@ class JobApplicantPipelineTest extends TestCase
     /** @test */
     public function is_hired_returns_false_when_status_is_not_hired(): void
     {
-        $applicant = new JobApplicant([
-            'status'               => 'applied',
-            'converted_employee_id' => null,
-        ]);
+        $applicant = new JobApplicant();
+        $applicant->status = 'applied';
+        $applicant->converted_employee_id = null;
 
         $this->assertFalse($applicant->isHired());
     }
@@ -53,10 +52,9 @@ class JobApplicantPipelineTest extends TestCase
     /** @test */
     public function is_hired_returns_false_when_status_hired_but_no_employee_id(): void
     {
-        $applicant = new JobApplicant([
-            'status'               => 'hired',
-            'converted_employee_id' => null,
-        ]);
+        $applicant = new JobApplicant();
+        $applicant->status = 'hired';
+        $applicant->converted_employee_id = null;
 
         $this->assertFalse(
             $applicant->isHired(),
