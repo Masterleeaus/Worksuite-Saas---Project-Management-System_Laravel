@@ -37,7 +37,6 @@ return new class extends Migration {
                 $table->foreign('requested_primary_worker_id')->references('id')->on('dispatch_workers')->nullOnDelete();
                 $table->foreign('scheduled_primary_worker_id')->references('id')->on('dispatch_workers')->nullOnDelete();
             });
-        }
 
         if (! Schema::hasTable('dispatch_job_secondary_workers')) {
             Schema::create('dispatch_job_secondary_workers', function (Blueprint $table) {

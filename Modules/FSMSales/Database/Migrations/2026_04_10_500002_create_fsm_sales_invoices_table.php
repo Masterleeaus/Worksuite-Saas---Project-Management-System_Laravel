@@ -53,7 +53,6 @@ return new class extends Migration {
                 $table->index(['company_id', 'client_id']);
                 $table->index(['company_id', 'status']);
             });
-        }
 
         // Pivot: invoices ↔ fsm orders (one invoice may cover several orders)
         if (! Schema::hasTable('fsm_sales_invoice_order')) {

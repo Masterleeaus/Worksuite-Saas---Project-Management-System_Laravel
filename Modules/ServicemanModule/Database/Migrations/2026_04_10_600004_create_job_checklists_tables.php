@@ -20,7 +20,6 @@ return new class extends Migration {
 
                 $table->foreign('task_id')->references('id')->on('tasks')->cascadeOnDelete();
             });
-        }
 
         if (! Schema::hasTable('job_checklist_items')) {
             Schema::create('job_checklist_items', function (Blueprint $table) {

@@ -34,7 +34,6 @@ return new class extends Migration {
                 $table->foreign('stage_id')->references('id')->on('fsm_stages')->nullOnDelete();
                 $table->foreign('template_id')->references('id')->on('fsm_templates')->nullOnDelete();
             });
-        }
 
         if (! Schema::hasTable('fsm_order_equipment')) {
             Schema::create('fsm_order_equipment', function (Blueprint $table) {
