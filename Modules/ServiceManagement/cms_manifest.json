@@ -3,12 +3,20 @@
   "version": "1.0.1",
   "surfaces": {
     "services_catalog": {
-      "endpoint": "/api/v1/customer/service",
-      "route_group": "customer.service"
+      "endpoint": "/api/v1/servicemanagement/cms/snapshot",
+      "route_name": "servicemanagement.cms.snapshot",
+      "uses": [
+        "customer.service.index",
+        "Modules\\ServiceManagement\\Http\\Controllers\\Api\\V1\\Customer\\ServiceController@index"
+      ]
     },
     "company_services_admin": {
       "endpoint": "/account/services",
-      "route_name": "services.index"
+      "route_name": "services.index",
+      "uses": [
+        "servicemanagement::sections.sidebar",
+        "servicemanagement::cleaning.index"
+      ]
     }
   }
 }

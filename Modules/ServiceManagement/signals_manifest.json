@@ -4,6 +4,9 @@
   "signals": [
     "service_management.service_created",
     "service_management.service_updated",
+    "service_management.service_deleted",
+    "service_management.pricing_changed",
+    "service_management.addon_changed",
     "service_management.service_request_created"
   ]
 }

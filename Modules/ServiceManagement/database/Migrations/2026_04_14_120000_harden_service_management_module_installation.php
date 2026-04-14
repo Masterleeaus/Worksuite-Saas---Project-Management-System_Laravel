@@ -121,6 +121,8 @@ return new class extends Migration
         }
 
         foreach ($companyIds as $companyId) {
+            [$status, $isAllowed] = $this->moduleAccessByCompany($companyId);
+
             foreach ($types as $type) {
                 $query = DB::table('module_settings')
                     ->where('module_name', $this->moduleName)
@@ -136,7 +138,7 @@ return new class extends Migration
 
                 $insert = [
                     'module_name' => $this->moduleName,
-                    'status' => 'active',
+                    'status' => $status,
                     'type' => $type,
                     'created_at' => now(),
                     'updated_at' => now(),
@@ -147,7 +149,7 @@ return new class extends Migration
                 }
 
                 if (in_array('is_allowed', $columns, true)) {
-                    $insert['is_allowed'] = 1;
+                    $insert['is_allowed'] = $isAllowed ? 1 : 0;
                 }
 
                 DB::table('module_settings')->insert($insert);
@@ -175,17 +177,47 @@ return new class extends Migration
                     $modules = [];
                 }
 
-                if (in_array($this->moduleName, $modules, true)) {
-                    continue;
+                $normalized = collect($modules)
+                    ->filter(fn ($module) => is_string($module) && $module !== '')
+                    ->map(fn (string $module) => strtolower($module))
+                    ->values()
+                    ->all();
+
+                if (!in_array($this->moduleName, $normalized, true)) {
+                    $normalized[] = $this->moduleName;
                 }
 
-                $modules[] = $this->moduleName;
-
                 DB::table('packages')->where('id', $package->id)->update([
-                    'module_in_package' => json_encode(array_values(array_unique($modules))),
+                    'module_in_package' => json_encode(array_values(array_unique($normalized))),
                 ]);
             }
         });
+    }
+
+    private function moduleAccessByCompany(?int $companyId): array
+    {
+        if (!$companyId || !Schema::hasTable('companies') || !Schema::hasTable('packages')) {
+            return ['active', true];
+        }
+
+        $company = DB::table('companies')->where('id', $companyId)->first(['package_id']);
+        if (!$company || empty($company->package_id)) {
+            return ['active', true];
+        }
+
+        $package = DB::table('packages')->where('id', $company->package_id)->first(['module_in_package']);
+        $modules = json_decode((string) data_get($package, 'module_in_package'), true);
+
+        if (!is_array($modules)) {
+            return ['active', true];
+        }
+
+        $isAllowed = collect($modules)
+            ->filter(fn ($value) => is_string($value) && $value !== '')
+            ->map(fn (string $value) => strtolower($value))
+            ->contains($this->moduleName);
+
+        return [$isAllowed ? 'active' : 'deactive', $isAllowed];
     }
 
     private function ensureCompanyBoundaryColumns(): void

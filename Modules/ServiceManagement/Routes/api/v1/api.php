@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\ServiceManagement\Http\Controllers\Api\V1\CmsSurfaceController;
 use Modules\ServiceManagement\Http\Controllers\Api\V1\Customer\FavoriteServiceController;
 use Modules\ServiceManagement\Http\Controllers\Api\V1\Customer\ServiceController as CustomerServiceController;
 use Modules\ServiceManagement\Http\Controllers\Api\V1\Provider\ServiceController as ProviderServiceController;
@@ -54,29 +55,33 @@ Route::group(['prefix' => 'customer', 'as' => 'customer.', 'namespace' => 'Api\V
         Route::post('service-delete/{service_id}', [FavoriteServiceController::class, 'destroy']);
     });
 
-    Route::group(['prefix' => 'service'], function () {
-        Route::get('/', [CustomerServiceController::class, 'index']);
-        Route::post('search', [CustomerServiceController::class, 'search']);
-        Route::get('search-suggestion', [CustomerServiceController::class, 'searchSuggestions']);
-        Route::get('search/recommended', [CustomerServiceController::class, 'searchRecommended']);
-        Route::get('popular', [CustomerServiceController::class, 'popular']);
-        Route::get('recommended', [CustomerServiceController::class, 'recommended']);
-        Route::get('trending', [CustomerServiceController::class, 'trending']);
-        Route::get('recently-viewed', [CustomerServiceController::class, 'recentlyViewed'])->middleware('auth:api');
-        Route::get('offers', [CustomerServiceController::class, 'offers']);
-        Route::get('detail/{slug}', [CustomerServiceController::class, 'show']);
-        Route::get('review/{service_id}', [CustomerServiceController::class, 'review']);
+    Route::group(['prefix' => 'service', 'as' => 'service.'], function () {
+        Route::get('/', [CustomerServiceController::class, 'index'])->name('index');
+        Route::post('search', [CustomerServiceController::class, 'search'])->name('search');
+        Route::get('search-suggestion', [CustomerServiceController::class, 'searchSuggestions'])->name('search-suggestion');
+        Route::get('search/recommended', [CustomerServiceController::class, 'searchRecommended'])->name('search.recommended');
+        Route::get('popular', [CustomerServiceController::class, 'popular'])->name('popular');
+        Route::get('recommended', [CustomerServiceController::class, 'recommended'])->name('recommended');
+        Route::get('trending', [CustomerServiceController::class, 'trending'])->name('trending');
+        Route::get('recently-viewed', [CustomerServiceController::class, 'recentlyViewed'])->middleware('auth:api')->name('recently-viewed');
+        Route::get('offers', [CustomerServiceController::class, 'offers'])->name('offers');
+        Route::get('detail/{slug}', [CustomerServiceController::class, 'show'])->name('detail');
+        Route::get('review/{service_id}', [CustomerServiceController::class, 'review'])->name('review');
         //Route::get('sub-category/{sub_category_id}', [CustomerServiceController::class, 'servicesBySubcategory']);
-        Route::get('sub-category/{slug}', [CustomerServiceController::class, 'servicesBySubcategory']);
+        Route::get('sub-category/{slug}', [CustomerServiceController::class, 'servicesBySubcategory'])->name('sub-category');
 
-        Route::post('area-availability', [CustomerServiceController::class, 'serviceAreaAvailability']);
+        Route::post('area-availability', [CustomerServiceController::class, 'serviceAreaAvailability'])->name('area-availability');
 
-        Route::group(['prefix' => 'request'], function () {
-            Route::post('make', [CustomerServiceController::class, 'makeRequest'])->middleware('auth:api');
-            Route::get('list', [CustomerServiceController::class, 'requestList'])->middleware('auth:api');
+        Route::group(['prefix' => 'request', 'as' => 'request.'], function () {
+            Route::post('make', [CustomerServiceController::class, 'makeRequest'])->middleware('auth:api')->name('make');
+            Route::get('list', [CustomerServiceController::class, 'requestList'])->middleware('auth:api')->name('list');
         });
     });
 
-    Route::get('recently-searched-keywords', [CustomerServiceController::class, 'recentlySearchedKeywords'])->middleware('auth:api');
-    Route::get('remove-searched-keywords', [CustomerServiceController::class, 'removeSearchedKeywords'])->middleware('auth:api');
+    Route::get('recently-searched-keywords', [CustomerServiceController::class, 'recentlySearchedKeywords'])->middleware('auth:api')->name('recently-searched-keywords');
+    Route::get('remove-searched-keywords', [CustomerServiceController::class, 'removeSearchedKeywords'])->middleware('auth:api')->name('remove-searched-keywords');
+});
+
+Route::group(['prefix' => 'servicemanagement/cms', 'as' => 'servicemanagement.cms.', 'middleware' => ['auth:api']], function () {
+    Route::get('snapshot', [CmsSurfaceController::class, 'snapshot'])->name('snapshot');
 });
