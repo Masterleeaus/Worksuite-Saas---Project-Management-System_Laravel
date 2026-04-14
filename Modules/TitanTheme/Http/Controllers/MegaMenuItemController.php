@@ -21,9 +21,9 @@ class MegaMenuItemController extends AccountBaseController
      */
     public function store(Request $request, int $menuId)
     {
-        abort_403(!$this->user->permission('manage_mega_menu'));
+        abort_403(!$this->canManageMegaMenu());
 
-        MegaMenu::findOrFail($menuId);
+        $menu = MegaMenu::findOrFail($menuId);
 
         $data = $request->validate([
             'parent_id'       => 'nullable|integer|exists:titan_mega_menu_items,id',
@@ -42,7 +42,7 @@ class MegaMenuItemController extends AccountBaseController
             'column_span'     => 'nullable|integer|min:1|max:4',
         ]);
 
-        $data['mega_menu_id']    = $menuId;
+        $data['mega_menu_id']    = $menu->id;
         $data['is_active']       = $request->boolean('is_active', true);
         $data['is_featured']     = $request->boolean('is_featured', false);
         $data['open_in_new_tab'] = $request->boolean('open_in_new_tab', false);
@@ -60,9 +60,10 @@ class MegaMenuItemController extends AccountBaseController
      */
     public function update(Request $request, int $menuId, int $itemId)
     {
-        abort_403(!$this->user->permission('manage_mega_menu'));
+        abort_403(!$this->canManageMegaMenu());
 
-        $item = MegaMenuItem::where('mega_menu_id', $menuId)->findOrFail($itemId);
+        $menu = MegaMenu::findOrFail($menuId);
+        $item = $menu->allItems()->findOrFail($itemId);
 
         $data = $request->validate([
             'parent_id'       => 'nullable|integer|exists:titan_mega_menu_items,id',
@@ -98,9 +99,10 @@ class MegaMenuItemController extends AccountBaseController
      */
     public function destroy(int $menuId, int $itemId)
     {
-        abort_403(!$this->user->permission('manage_mega_menu'));
+        abort_403(!$this->canManageMegaMenu());
 
-        MegaMenuItem::where('mega_menu_id', $menuId)->findOrFail($itemId)->delete();
+        $menu = MegaMenu::findOrFail($menuId);
+        $menu->allItems()->findOrFail($itemId)->delete();
 
         return Reply::success(__('titantheme::titantheme.menu_item_deleted'));
     }
@@ -110,16 +112,23 @@ class MegaMenuItemController extends AccountBaseController
      */
     public function reorder(Request $request, int $menuId)
     {
-        abort_403(!$this->user->permission('manage_mega_menu'));
+        abort_403(!$this->canManageMegaMenu());
+
+        $menu = MegaMenu::findOrFail($menuId);
 
         $ids = $request->validate(['ids' => 'required|array', 'ids.*' => 'integer'])['ids'];
 
         foreach ($ids as $position => $id) {
-            MegaMenuItem::where('mega_menu_id', $menuId)
+            MegaMenuItem::where('mega_menu_id', $menu->id)
                 ->where('id', $id)
                 ->update(['sort_order' => $position]);
         }
 
         return Reply::success(__('titantheme::titantheme.order_saved'));
+    }
+
+    protected function canManageMegaMenu(): bool
+    {
+        return in_array($this->user->permission('manage_mega_menu'), ['all', 'added', 'owned', 'both'], true);
     }
 }

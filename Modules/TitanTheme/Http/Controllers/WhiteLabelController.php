@@ -20,7 +20,7 @@ class WhiteLabelController extends AccountBaseController
      */
     public function index()
     {
-        abort_403(!$this->user->permission('manage_white_label'));
+        abort_403(!$this->canManageWhiteLabel());
 
         $this->logoUrl        = $this->whiteLabelService->assetUrl(
             $this->whiteLabelService->getSetting('logo_path', '')
@@ -43,7 +43,7 @@ class WhiteLabelController extends AccountBaseController
      */
     public function update(Request $request)
     {
-        abort_403(!$this->user->permission('manage_white_label'));
+        abort_403(!$this->canManageWhiteLabel());
 
         $settings = [];
 
@@ -79,5 +79,10 @@ class WhiteLabelController extends AccountBaseController
         }
 
         return Reply::success(__('titantheme::titantheme.white_label_saved'));
+    }
+
+    protected function canManageWhiteLabel(): bool
+    {
+        return in_array($this->user->permission('manage_white_label'), ['all', 'added', 'owned', 'both'], true);
     }
 }

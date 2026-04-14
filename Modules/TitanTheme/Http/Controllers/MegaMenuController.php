@@ -21,7 +21,7 @@ class MegaMenuController extends AccountBaseController
      */
     public function index()
     {
-        abort_403(!$this->user->permission('view_mega_menu'));
+        abort_403(!$this->canViewMegaMenu());
 
         $this->menus = MegaMenu::with('items')->orderBy('sort_order')->paginate(10);
 
@@ -33,7 +33,7 @@ class MegaMenuController extends AccountBaseController
      */
     public function create()
     {
-        abort_403(!$this->user->permission('manage_mega_menu'));
+        abort_403(!$this->canManageMegaMenu());
 
         return view('titantheme::mega-menu.create', $this->data);
     }
@@ -43,7 +43,7 @@ class MegaMenuController extends AccountBaseController
      */
     public function store(MegaMenuRequest $request)
     {
-        abort_403(!$this->user->permission('manage_mega_menu'));
+        abort_403(!$this->canManageMegaMenu());
 
         $data = $request->validated();
 
@@ -63,7 +63,7 @@ class MegaMenuController extends AccountBaseController
      */
     public function edit(int $id)
     {
-        abort_403(!$this->user->permission('manage_mega_menu'));
+        abort_403(!$this->canManageMegaMenu());
 
         $this->menu = MegaMenu::with('allItems')->findOrFail($id);
 
@@ -75,7 +75,7 @@ class MegaMenuController extends AccountBaseController
      */
     public function update(MegaMenuRequest $request, int $id)
     {
-        abort_403(!$this->user->permission('manage_mega_menu'));
+        abort_403(!$this->canManageMegaMenu());
 
         $menu = MegaMenu::findOrFail($id);
 
@@ -95,7 +95,7 @@ class MegaMenuController extends AccountBaseController
      */
     public function destroy(int $id)
     {
-        abort_403(!$this->user->permission('manage_mega_menu'));
+        abort_403(!$this->canManageMegaMenu());
 
         MegaMenu::findOrFail($id)->delete();
 
@@ -107,7 +107,7 @@ class MegaMenuController extends AccountBaseController
      */
     public function reorder(Request $request)
     {
-        abort_403(!$this->user->permission('manage_mega_menu'));
+        abort_403(!$this->canManageMegaMenu());
 
         $ids = $request->validate(['ids' => 'required|array', 'ids.*' => 'integer'])['ids'];
 
@@ -116,5 +116,15 @@ class MegaMenuController extends AccountBaseController
         }
 
         return Reply::success(__('titantheme::titantheme.order_saved'));
+    }
+
+    protected function canViewMegaMenu(): bool
+    {
+        return in_array($this->user->permission('view_mega_menu'), ['all', 'added', 'owned', 'both'], true);
+    }
+
+    protected function canManageMegaMenu(): bool
+    {
+        return in_array($this->user->permission('manage_mega_menu'), ['all', 'added', 'owned', 'both'], true);
     }
 }

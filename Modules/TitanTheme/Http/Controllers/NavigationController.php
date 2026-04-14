@@ -21,7 +21,7 @@ class NavigationController extends AccountBaseController
      */
     public function index()
     {
-        abort_403(!$this->user->permission('view_navigation'));
+        abort_403(!$this->canViewNavigation());
 
         $this->sidebarItems = $this->navigationService->flatList(NavItem::PANEL_SIDEBAR);
         $this->headerItems  = $this->navigationService->flatList(NavItem::PANEL_HEADER);
@@ -34,7 +34,7 @@ class NavigationController extends AccountBaseController
      */
     public function store(Request $request)
     {
-        abort_403(!$this->user->permission('manage_navigation'));
+        abort_403(!$this->canManageNavigation());
 
         $data = $request->validate([
             'parent_id'       => 'nullable|integer|exists:titan_nav_items,id',
@@ -68,7 +68,7 @@ class NavigationController extends AccountBaseController
      */
     public function update(Request $request, int $id)
     {
-        abort_403(!$this->user->permission('manage_navigation'));
+        abort_403(!$this->canManageNavigation());
 
         $item = NavItem::findOrFail($id);
 
@@ -103,7 +103,7 @@ class NavigationController extends AccountBaseController
      */
     public function destroy(int $id)
     {
-        abort_403(!$this->user->permission('manage_navigation'));
+        abort_403(!$this->canManageNavigation());
 
         NavItem::findOrFail($id)->delete();
 
@@ -115,12 +115,22 @@ class NavigationController extends AccountBaseController
      */
     public function reorder(Request $request)
     {
-        abort_403(!$this->user->permission('manage_navigation'));
+        abort_403(!$this->canManageNavigation());
 
         $ids = $request->validate(['ids' => 'required|array', 'ids.*' => 'integer'])['ids'];
 
         $this->navigationService->reorder($ids);
 
         return Reply::success(__('titantheme::titantheme.order_saved'));
+    }
+
+    protected function canViewNavigation(): bool
+    {
+        return in_array($this->user->permission('view_navigation'), ['all', 'added', 'owned', 'both'], true);
+    }
+
+    protected function canManageNavigation(): bool
+    {
+        return in_array($this->user->permission('manage_navigation'), ['all', 'added', 'owned', 'both'], true);
     }
 }

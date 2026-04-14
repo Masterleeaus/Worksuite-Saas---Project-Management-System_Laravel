@@ -21,7 +21,7 @@ class ThemeController extends AccountBaseController
      */
     public function index()
     {
-        abort_403(!$this->user->permission('view_theme_settings'));
+        abort_403(!$this->canViewThemeSettings());
 
         $this->presets       = ThemePreset::orderByDesc('created_at')->get();
         $this->activePreset  = $this->themeService->activePreset();
@@ -35,7 +35,7 @@ class ThemeController extends AccountBaseController
      */
     public function create()
     {
-        abort_403(!$this->user->permission('manage_theme_settings'));
+        abort_403(!$this->canManageThemeSettings());
 
         $this->availableFonts = $this->themeService->availableFonts();
         $this->defaults       = config('titantheme.defaults', []);
@@ -48,7 +48,7 @@ class ThemeController extends AccountBaseController
      */
     public function store(Request $request)
     {
-        abort_403(!$this->user->permission('manage_theme_settings'));
+        abort_403(!$this->canManageThemeSettings());
 
         $data = $request->validate([
             'name'             => 'required|string|max:255',
@@ -79,7 +79,7 @@ class ThemeController extends AccountBaseController
      */
     public function edit(int $id)
     {
-        abort_403(!$this->user->permission('manage_theme_settings'));
+        abort_403(!$this->canManageThemeSettings());
 
         $this->preset         = ThemePreset::findOrFail($id);
         $this->availableFonts = $this->themeService->availableFonts();
@@ -92,7 +92,7 @@ class ThemeController extends AccountBaseController
      */
     public function update(Request $request, int $id)
     {
-        abort_403(!$this->user->permission('manage_theme_settings'));
+        abort_403(!$this->canManageThemeSettings());
 
         $preset = ThemePreset::findOrFail($id);
 
@@ -125,7 +125,7 @@ class ThemeController extends AccountBaseController
      */
     public function destroy(int $id)
     {
-        abort_403(!$this->user->permission('manage_theme_settings'));
+        abort_403(!$this->canManageThemeSettings());
 
         ThemePreset::findOrFail($id)->delete();
 
@@ -137,7 +137,7 @@ class ThemeController extends AccountBaseController
      */
     public function activate(int $id)
     {
-        abort_403(!$this->user->permission('manage_theme_settings'));
+        abort_403(!$this->canManageThemeSettings());
 
         $preset = ThemePreset::findOrFail($id);
         $this->themeService->activatePreset($preset);
@@ -150,7 +150,7 @@ class ThemeController extends AccountBaseController
      */
     public function deactivate()
     {
-        abort_403(!$this->user->permission('manage_theme_settings'));
+        abort_403(!$this->canManageThemeSettings());
 
         $this->themeService->deactivateAll();
 
@@ -165,5 +165,17 @@ class ThemeController extends AccountBaseController
         $css = $this->themeService->generateCssVariables();
 
         return response($css, 200, ['Content-Type' => 'text/css']);
+    }
+
+    protected function canViewThemeSettings(): bool
+    {
+        return in_array($this->user->permission('view_theme_settings'), ['all', 'added', 'owned', 'both'], true)
+            || $this->user->permission('manage_theme_setting') === 'all';
+    }
+
+    protected function canManageThemeSettings(): bool
+    {
+        return in_array($this->user->permission('manage_theme_settings'), ['all', 'added', 'owned', 'both'], true)
+            || $this->user->permission('manage_theme_setting') === 'all';
     }
 }

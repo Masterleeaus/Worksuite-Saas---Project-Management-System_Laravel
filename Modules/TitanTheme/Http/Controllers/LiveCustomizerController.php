@@ -22,7 +22,7 @@ class LiveCustomizerController extends AccountBaseController
      */
     public function index()
     {
-        abort_403(!$this->user->permission('manage_theme_settings'));
+        abort_403(!$this->canManageThemeSettings());
 
         $this->activePreset   = $this->themeService->activePreset();
         $this->availableFonts = $this->themeService->availableFonts();
@@ -38,7 +38,7 @@ class LiveCustomizerController extends AccountBaseController
      */
     public function preview(Request $request)
     {
-        abort_403(!$this->user->permission('manage_theme_settings'));
+        abort_403(!$this->canManageThemeSettings());
 
         // Build a temporary (unsaved) preset from the submitted values.
         $tempPreset = new ThemePreset($request->only([
@@ -59,7 +59,7 @@ class LiveCustomizerController extends AccountBaseController
      */
     public function save(Request $request)
     {
-        abort_403(!$this->user->permission('manage_theme_settings'));
+        abort_403(!$this->canManageThemeSettings());
 
         $data = $request->validate([
             'name'             => 'required|string|max:255',
@@ -74,7 +74,22 @@ class LiveCustomizerController extends AccountBaseController
             'header_height'    => 'nullable|integer|min:40|max:120',
             'border_radius'    => 'nullable|integer|min:0|max:50',
             'custom_css'       => 'nullable|string',
+            'sidebar_theme'    => 'nullable|in:dark,light',
+            'sidebar_color'    => 'nullable|string|max:20',
+            'sidebar_text_color' => 'nullable|string|max:20',
+            'link_color'       => 'nullable|string|max:20',
+            'enable_rounded_theme' => 'nullable|boolean',
+            'user_css'         => 'nullable|string',
         ]);
+
+        $data['extra_settings'] = [
+            'sidebar_theme' => $data['sidebar_theme'] ?? null,
+            'sidebar_color' => $data['sidebar_color'] ?? null,
+            'sidebar_text_color' => $data['sidebar_text_color'] ?? null,
+            'link_color' => $data['link_color'] ?? null,
+            'enable_rounded_theme' => (int) ($request->boolean('enable_rounded_theme')),
+            'user_css' => $data['user_css'] ?? null,
+        ];
 
         $preset = $this->themeService->createPreset($data, $this->user->id);
         $this->themeService->activatePreset($preset);
@@ -101,7 +116,7 @@ class LiveCustomizerController extends AccountBaseController
      */
     public function apply(Request $request)
     {
-        abort_403(!$this->user->permission('manage_theme_settings'));
+        abort_403(!$this->canManageThemeSettings());
 
         if (Helper::appIsNotDemo()) {
             $dashTheme = setting('dash_theme') ?? 'default';
@@ -111,6 +126,16 @@ class LiveCustomizerController extends AccountBaseController
                 $dashTheme . '_live_customizer_fonts' => $request->get('fonts'),
                 'show_live_customizer'                => 0,
             ])->save();
+
+            $this->themeService->applyOfficialThemeSettings([
+                'header_color' => $request->get('header_color'),
+                'sidebar_theme' => $request->get('sidebar_theme'),
+                'sidebar_color' => $request->get('sidebar_color'),
+                'sidebar_text_color' => $request->get('sidebar_text_color'),
+                'link_color' => $request->get('link_color'),
+                'enable_rounded_theme' => $request->boolean('enable_rounded_theme'),
+                'user_css' => $request->get('user_css') ?: $request->get('style'),
+            ]);
 
             $message = $request->get('clear')
                 ? __('titantheme::titantheme.changes_discarded')
@@ -126,5 +151,11 @@ class LiveCustomizerController extends AccountBaseController
             'message' => __('messages.demoRestrictedAction'),
             'status'  => 'error',
         ], 422);
+    }
+
+    protected function canManageThemeSettings(): bool
+    {
+        return in_array($this->user->permission('manage_theme_settings'), ['all', 'added', 'owned', 'both'], true)
+            || $this->user->permission('manage_theme_setting') === 'all';
     }
 }

@@ -22,14 +22,14 @@ class LiveCustomizerSettingController extends AccountBaseController
 
     public function index()
     {
-        abort_403(!$this->user->permission('manage_theme_settings'));
+        abort_403(!$this->canManageThemeSettings());
 
         return view('titantheme::customizer.setting', $this->data);
     }
 
     public function update(Request $request)
     {
-        abort_403(!$this->user->permission('manage_theme_settings'));
+        abort_403(!$this->canManageThemeSettings());
 
         if (Helper::appIsNotDemo()) {
             setting([
@@ -46,5 +46,11 @@ class LiveCustomizerSettingController extends AccountBaseController
             'message' => __('messages.demoRestrictedAction'),
             'type'    => 'error',
         ]);
+    }
+
+    protected function canManageThemeSettings(): bool
+    {
+        return in_array($this->user->permission('manage_theme_settings'), ['all', 'added', 'owned', 'both'], true)
+            || $this->user->permission('manage_theme_setting') === 'all';
     }
 }
