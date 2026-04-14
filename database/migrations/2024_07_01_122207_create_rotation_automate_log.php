@@ -11,6 +11,10 @@ return new class extends Migration {
      */
     public function up(): void
     {
+        if (Schema::hasTable('rotation_automate_log')) {
+            return;
+        }
+
         Schema::create('rotation_automate_log', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('company_id')->nullable();

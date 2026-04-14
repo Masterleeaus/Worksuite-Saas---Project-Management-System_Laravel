@@ -1,8 +1,15 @@
 {
     "name": "QRCode",
     "alias": "qrcode",
-    "description": "QR code generation — job site check-in, asset tags, booking links and property access",
-    "keywords": ["qrcode", "qr", "check-in", "asset", "booking", "property"],
+    "description": "QR code generation \u2014 job site check-in, asset tags, booking links and property access",
+    "keywords": [
+        "qrcode",
+        "qr",
+        "check-in",
+        "asset",
+        "booking",
+        "property"
+    ],
     "active": 1,
     "order": 2,
     "providers": [
@@ -40,5 +47,6 @@
             "sort_order": 93
         }
     ],
-    "sidebar_menu": true
+    "sidebar_menu": true,
+    "priority": 0
 }

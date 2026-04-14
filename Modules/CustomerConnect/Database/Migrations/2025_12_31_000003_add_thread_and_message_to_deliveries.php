@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (! Schema::hasTable('customerconnect_deliveries')) {
+            return;
+        }
+        
         Schema::table('customerconnect_deliveries', function (Blueprint $table) {
             if (!Schema::hasColumn('customerconnect_deliveries', 'thread_id')) {
                 $table->unsignedBigInteger('thread_id')->nullable()->index()->after('contact_id');
@@ -19,6 +23,10 @@ return new class extends Migration {
 
     public function down(): void
     {
+        if (! Schema::hasTable('customerconnect_deliveries')) {
+            return;
+        }
+        
         Schema::table('customerconnect_deliveries', function (Blueprint $table) {
             if (Schema::hasColumn('customerconnect_deliveries', 'message_id')) {
                 $table->dropColumn('message_id');

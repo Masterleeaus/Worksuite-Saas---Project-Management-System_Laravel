@@ -1,8 +1,14 @@
 {
     "name": "TitanPay",
     "alias": "titanpay",
-    "description": "Unified payment gateway hub — crypto (Cryptomus), QR code payments and shareable payment links",
-    "keywords": ["payment", "crypto", "qrcode", "cryptomus", "payment-link"],
+    "description": "Unified payment gateway hub \u2014 crypto (Cryptomus), QR code payments and shareable payment links",
+    "keywords": [
+        "payment",
+        "crypto",
+        "qrcode",
+        "cryptomus",
+        "payment-link"
+    ],
     "active": 1,
     "order": 5,
     "providers": [
@@ -34,5 +40,6 @@
             "view_payment_links",
             "generate_payment_links"
         ]
-    }
+    },
+    "priority": 0
 }

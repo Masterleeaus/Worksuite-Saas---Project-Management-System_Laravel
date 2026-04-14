@@ -17,7 +17,9 @@ class AddCusColInReview extends Migration
             return;
         }
         Schema::table('reviews', function (Blueprint $table) {
-            $table->foreignUuid('customer_id')->nullable();
+            if (! Schema::hasColumn('reviews', 'customer_id')) {
+                $table->foreignUuid('customer_id')->nullable();
+            }
         });
     }
 

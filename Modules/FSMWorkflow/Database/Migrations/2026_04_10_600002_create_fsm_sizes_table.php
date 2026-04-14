@@ -11,7 +11,11 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('fsm_sizes', function (Blueprint $table) {
+        if (Schema::hasTable('fsm_sizes')) {
+            return;
+        }
+
+        if (!Schema::hasTable('fsm_sizes')) Schema::create('fsm_sizes', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
             $table->string('code', 8);  // e.g. XS, S, M, L, XL

@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('promotions', function (Blueprint $table) {
-            $table->tinyInteger('is_send')->default(1);
-        });
+        if (!Schema::hasColumn('promotions', 'is_send')) {
+            Schema::table('promotions', function (Blueprint $table) {
+                $table->tinyInteger('is_send')->default(1);
+            });
+        }
     }
 
     /**

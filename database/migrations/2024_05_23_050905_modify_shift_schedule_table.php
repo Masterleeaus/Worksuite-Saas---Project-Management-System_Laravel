@@ -11,13 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('employee_shifts', function (Blueprint $table) {
-            $table->integer('auto_clock_out_time')->default(1)->after('office_end_time');
-        });
+        if (!Schema::hasColumn('employee_shifts', 'auto_clock_out_time')) {
+            Schema::table('employee_shifts', function (Blueprint $table) {
+                $table->integer('auto_clock_out_time')->default(1)->after('office_end_time');
+            });
+        }
 
-        Schema::table('attendances', function (Blueprint $table) {
-            $table->boolean('auto_clock_out')->default(0)->after('clock_out_time');
-        });
+        if (!Schema::hasColumn('attendances', 'auto_clock_out')) {
+            Schema::table('attendances', function (Blueprint $table) {
+                $table->boolean('auto_clock_out')->default(0)->after('clock_out_time');
+            });
+        }
     }
 
     /**

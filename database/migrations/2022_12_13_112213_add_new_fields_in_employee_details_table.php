@@ -16,18 +16,20 @@ return new class extends Migration {
 
     public function up()
     {
-        Schema::table('employee_details', function (Blueprint $table) {
+        if (!Schema::hasColumn('employee_details', 'probation_end_date')) {
+            Schema::table('employee_details', function (Blueprint $table) {
 
-            $table->date('probation_end_date')->nullable()->after('reporting_to');
-            $table->date('notice_period_start_date')->nullable()->after('reporting_to');
-            $table->date('notice_period_end_date')->nullable()->after('reporting_to');
-            $table->string('marital_status')->nullable()->after('reporting_to');
-            $table->date('marriage_anniversary_date')->nullable()->after('reporting_to');
-            $table->string('employment_type')->nullable()->after('reporting_to');
-            $table->date('internship_end_date')->nullable()->after('reporting_to');
-            $table->date('contract_end_date')->nullable()->after('reporting_to');
+                $table->date('probation_end_date')->nullable()->after('reporting_to');
+                $table->date('notice_period_start_date')->nullable()->after('reporting_to');
+                $table->date('notice_period_end_date')->nullable()->after('reporting_to');
+                $table->string('marital_status')->nullable()->after('reporting_to');
+                $table->date('marriage_anniversary_date')->nullable()->after('reporting_to');
+                $table->string('employment_type')->nullable()->after('reporting_to');
+                $table->date('internship_end_date')->nullable()->after('reporting_to');
+                $table->date('contract_end_date')->nullable()->after('reporting_to');
 
-        });
+            });
+        }
 
         $companies = Company::select('id')->get();
 
@@ -70,14 +72,18 @@ return new class extends Migration {
         AND t1.module_name = t2.module_name
         AND t1.company_id = t2.company_id;');
 
-        Schema::table('attendance_settings', function (Blueprint $table) {
-            $table->boolean('monthly_report')->default(0);
-            $table->string('monthly_report_roles')->nullable();
-        });
+        if (!Schema::hasColumn('attendance_settings', 'monthly_report')) {
+            Schema::table('attendance_settings', function (Blueprint $table) {
+                $table->boolean('monthly_report')->default(0);
+                $table->string('monthly_report_roles')->nullable();
+            });
+        }
 
-        Schema::table('leaves', function (Blueprint $table) {
-            $table->string('unique_id')->nullable()->after('leave_type_id');
-        });
+        if (!Schema::hasColumn('leaves', 'unique_id')) {
+            Schema::table('leaves', function (Blueprint $table) {
+                $table->string('unique_id')->nullable()->after('leave_type_id');
+            });
+        }
     }
 
     /**

@@ -12,7 +12,7 @@ return new class extends Migration
             return;
         }
 
-        Schema::create('ai_kb_chunks', function (Blueprint $table) {
+        if (!Schema::hasTable('ai_kb_chunks')) Schema::create('ai_kb_chunks', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();
             $table->unsignedBigInteger('user_id')->nullable()->index();

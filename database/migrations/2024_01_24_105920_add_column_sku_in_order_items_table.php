@@ -12,9 +12,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('order_items', function (Blueprint $table) {
-            $table->string('sku')->nullable();
-        });
+        if (!Schema::hasColumn('order_items', 'sku')) {
+            Schema::table('order_items', function (Blueprint $table) {
+                $table->string('sku')->nullable();
+            });
+        }
     }
 
     /**

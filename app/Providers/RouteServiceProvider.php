@@ -140,8 +140,9 @@ class RouteServiceProvider extends ServiceProvider
     /**
      * Register Titan panel routes (Filament parallel UI layer).
      *
-     * Route files live in routes/Titan/ and are loaded here so that
-     * routes/web.php remains untouched.
+     * Route files live in routes/Titan/ and are loaded recursively so that
+     * future sub-directories (e.g. routes/Titan/Api/) are automatically picked
+     * up without changes to this provider.  routes/web.php is NOT modified.
      */
     protected function mapTitanRoutes(): void
     {
@@ -151,10 +152,17 @@ class RouteServiceProvider extends ServiceProvider
             return;
         }
 
-        foreach (glob($titanRoutesPath . '/*.php') as $routeFile) {
-            Route::middleware('web')
-                ->namespace($this->namespace)
-                ->group($routeFile);
+        /** @var \RecursiveIteratorIterator<\RecursiveDirectoryIterator> $iterator */
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($titanRoutesPath, \RecursiveDirectoryIterator::SKIP_DOTS)
+        );
+
+        foreach ($iterator as $file) {
+            if ($file->isFile() && $file->getExtension() === 'php') {
+                Route::middleware('web')
+                    ->namespace($this->namespace)
+                    ->group($file->getRealPath());
+            }
         }
     }
 

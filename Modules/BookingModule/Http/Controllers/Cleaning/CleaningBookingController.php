@@ -6,8 +6,8 @@ use App\Http\Controllers\AccountBaseController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Modules\BookingModule\Events\BookingCompleted;
 use Modules\BookingModule\Models\CleaningBooking;
-use Modules\BookingModule\Services\BookingAutoInvoiceService;
 use Modules\BookingModule\Services\BookingFSMService;
 
 /**
@@ -19,8 +19,7 @@ use Modules\BookingModule\Services\BookingFSMService;
 class CleaningBookingController extends AccountBaseController
 {
     public function __construct(
-        private readonly BookingFSMService         $fsmService,
-        private readonly BookingAutoInvoiceService $invoiceService,
+        private readonly BookingFSMService $fsmService,
     ) {
         parent::__construct();
     }
@@ -102,9 +101,9 @@ class CleaningBookingController extends AccountBaseController
             ], 422);
         }
 
-        // Auto-invoice on completion.
+        // Trigger event-driven invoice automation on completion.
         if ($booking->booking_status === 'completed') {
-            $this->invoiceService->generateForBooking($booking);
+            event(new BookingCompleted($booking->fresh()));
         }
 
         return response()->json([

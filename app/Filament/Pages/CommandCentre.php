@@ -3,11 +3,12 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Widgets\ActivityFeedWidget;
+use App\Filament\Widgets\ActiveProjectsWidget;
 use App\Filament\Widgets\JobsTodayWidget;
 use App\Filament\Widgets\RevenueWidget;
 use App\Filament\Widgets\SystemSignalsWidget;
 use App\Filament\Widgets\TitanChatWidget;
-use Filament\Pages\Page;
+use App\Filament\Widgets\TotalClientsWidget;
 
 /**
  * CommandCentre
@@ -17,7 +18,7 @@ use Filament\Pages\Page;
  *
  * Widget logic is pending Titan Zero implementation; skeletons are registered.
  */
-class CommandCentre extends Page
+class CommandCentre extends TitanPage
 {
     protected static ?string $navigationIcon = 'heroicon-o-command-line';
 
@@ -32,11 +33,11 @@ class CommandCentre extends Page
     protected static string $view = 'filament.pages.command-centre';
 
     /**
-     * Widgets rendered on this page.
+     * Widgets rendered in the header area of this page.
      *
      * @return array<class-string>
      */
-    public function getWidgets(): array
+    public function getHeaderWidgets(): array
     {
         return [
             SystemSignalsWidget::class,
@@ -44,6 +45,8 @@ class CommandCentre extends Page
             RevenueWidget::class,
             ActivityFeedWidget::class,
             TitanChatWidget::class,
+            TotalClientsWidget::class,
+            ActiveProjectsWidget::class,
         ];
     }
 }

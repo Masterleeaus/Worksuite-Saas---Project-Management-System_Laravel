@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('fsm_day_routes')) {
+            return;
+        }
+
         Schema::create('fsm_day_routes', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -21,7 +25,9 @@ return new class extends Migration
             $table->float('max_allow_time')->default(10.0);
             $table->timestamps();
 
-            $table->foreign('route_id')->references('id')->on('fsm_routes')->nullOnDelete();
+            if (Schema::hasTable('fsm_routes')) {
+                $table->foreign('route_id')->references('id')->on('fsm_routes')->nullOnDelete();
+            }
         });
     }
 

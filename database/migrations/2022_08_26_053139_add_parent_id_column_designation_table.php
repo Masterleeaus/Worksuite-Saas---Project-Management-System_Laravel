@@ -14,9 +14,11 @@ return new class extends Migration {
 
     public function up()
     {
-        Schema::table('designations', function (Blueprint $table) {
-            $table->integer('parent_id')->unsigned()->nullable()->after('name');
-        });
+        if (!Schema::hasColumn('designations', 'parent_id')) {
+            Schema::table('designations', function (Blueprint $table) {
+                $table->integer('parent_id')->unsigned()->nullable()->after('name');
+            });
+        }
     }
 
     /**

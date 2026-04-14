@@ -15,17 +15,25 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::table('fsm_orders', function (Blueprint $table) {
-            $table->unsignedBigInteger('size_id')->nullable()->after('stage_id')->index();
-            $table->unsignedInteger('estimated_sqm')->nullable()->after('size_id');
-            $table->unsignedInteger('room_count')->nullable()->after('estimated_sqm');
+        if (!Schema::hasColumn('fsm_orders', 'size_id')) {
+            Schema::table('fsm_orders', function (Blueprint $table) {
+                $table->unsignedBigInteger('size_id')->nullable()->after('stage_id')->index();
+                $table->unsignedInteger('estimated_sqm')->nullable()->after('size_id');
+                $table->unsignedInteger('room_count')->nullable()->after('estimated_sqm');
 
-            $table->foreign('size_id')->references('id')->on('fsm_sizes')->nullOnDelete();
-        });
+                if (Schema::hasTable('fsm_sizes')) {
+                    $table->foreign('size_id')->references('id')->on('fsm_sizes')->nullOnDelete();
+                }
+            });
+        }
     }
 
     public function down(): void
     {
+        if (! Schema::hasTable('fsm_orders')) {
+            return;
+        }
+        
         Schema::table('fsm_orders', function (Blueprint $table) {
             $table->dropForeign(['size_id']);
             $table->dropColumn(['size_id', 'estimated_sqm', 'room_count']);

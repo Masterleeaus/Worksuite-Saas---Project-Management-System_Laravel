@@ -45,6 +45,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (! Schema::hasTable('interview_schedule')) {
+            return;
+        }
+        
         Schema::table('interview_schedule', function (Blueprint $table) {
 
         });

@@ -16,6 +16,10 @@ return new class extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('quick_books_settings')) {
+            return;
+        }
+
         Schema::create('quick_books_settings', function (Blueprint $table) {
             $table->id();
             $table->integer('company_id')->unsigned()->nullable();
@@ -38,25 +42,35 @@ return new class extends Migration
         });
 
 
-        Schema::table('invoices', function (Blueprint $table) {
-            $table->integer('quickbooks_invoice_id')->nullable();
-        });
+        if (!Schema::hasColumn('invoices', 'quickbooks_invoice_id')) {
+            Schema::table('invoices', function (Blueprint $table) {
+                $table->integer('quickbooks_invoice_id')->nullable();
+            });
+        }
 
-        Schema::table('payments', function (Blueprint $table) {
-            $table->integer('quickbooks_payment_id')->nullable();
-        });
+        if (!Schema::hasColumn('payments', 'quickbooks_payment_id')) {
+            Schema::table('payments', function (Blueprint $table) {
+                $table->integer('quickbooks_payment_id')->nullable();
+            });
+        }
 
-        Schema::table('client_details', function (Blueprint $table) {
-            $table->integer('quickbooks_client_id')->nullable();
-        });
+        if (!Schema::hasColumn('client_details', 'quickbooks_client_id')) {
+            Schema::table('client_details', function (Blueprint $table) {
+                $table->integer('quickbooks_client_id')->nullable();
+            });
+        }
 
-        Schema::table('companies', function (Blueprint $table) {
-            $table->integer('datatable_row_limit')->default(10)->after('taskboard_length');
-        });
+        if (!Schema::hasColumn('companies', 'datatable_row_limit')) {
+            Schema::table('companies', function (Blueprint $table) {
+                $table->integer('datatable_row_limit')->default(10)->after('taskboard_length');
+            });
+        }
 
-        Schema::table('global_settings', function (Blueprint $table) {
-            $table->integer('datatable_row_limit')->default(10)->after('allowed_file_size');
-        });
+        if (!Schema::hasColumn('global_settings', 'datatable_row_limit')) {
+            Schema::table('global_settings', function (Blueprint $table) {
+                $table->integer('datatable_row_limit')->default(10)->after('allowed_file_size');
+            });
+        }
 
         $companies = Company::select('id')->get();
 

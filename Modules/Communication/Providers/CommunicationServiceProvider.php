@@ -83,7 +83,7 @@ protected function registerConfig(): void
 {
     $candidates = [
         module_path($this->name, 'Config/config.php'),
-        module_path($this->name, 'config/config.php'),
+        module_path($this->name, 'Config/config.php'),
     ];
 
     $source = null;

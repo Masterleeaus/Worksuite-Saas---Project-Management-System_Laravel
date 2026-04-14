@@ -17,6 +17,10 @@ use Illuminate\Support\ServiceProvider;
  *
  * This provider is intentionally kept as a thin orchestration layer.
  * It DOES NOT replace any existing Worksuite provider.
+ *
+ * NOTE: In Filament v3, panels are registered by listing PanelProviders
+ * in config/app.php (providers array).  There is no Filament::registerPanel()
+ * API.  This service provider handles only plugins and singleton binding.
  */
 class TitanFilamentServiceProvider extends ServiceProvider
 {
@@ -36,7 +40,8 @@ class TitanFilamentServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Bind the panel provider so it can be resolved from the container.
+        // Bind the panel provider so it can be resolved from the container
+        // for programmatic introspection (e.g. titan:filament-check command).
         $this->app->singleton(TitanPanelProvider::class);
     }
 
@@ -45,29 +50,14 @@ class TitanFilamentServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->registerPanelProvider();
         $this->registerPlugins();
     }
 
     /**
-     * Register the Titan panel provider with Filament's panel registry
-     * if the Filament facade is available (i.e. the package is installed).
-     */
-    protected function registerPanelProvider(): void
-    {
-        if (!class_exists(\Filament\Facades\Filament::class)) {
-            return;
-        }
-
-        \Filament\Facades\Filament::registerPanel(
-            $this->app->make(TitanPanelProvider::class)->panel(
-                \Filament\Panel::make()
-            )
-        );
-    }
-
-    /**
      * Register each plugin listed in $this->plugins.
+     *
+     * Plugins are registered via Filament::serving() so they are only applied
+     * after the panel registry has been fully booted.
      */
     protected function registerPlugins(): void
     {
@@ -75,10 +65,16 @@ class TitanFilamentServiceProvider extends ServiceProvider
             return;
         }
 
-        foreach ($this->plugins as $pluginClass) {
-            if (class_exists($pluginClass)) {
-                \Filament\Facades\Filament::registerPlugin(new $pluginClass());
-            }
+        if (empty($this->plugins)) {
+            return;
         }
+
+        \Filament\Facades\Filament::serving(function () {
+            foreach ($this->plugins as $pluginClass) {
+                if (class_exists($pluginClass)) {
+                    \Filament\Facades\Filament::getCurrentPanel()?->plugin(new $pluginClass());
+                }
+            }
+        });
     }
 }

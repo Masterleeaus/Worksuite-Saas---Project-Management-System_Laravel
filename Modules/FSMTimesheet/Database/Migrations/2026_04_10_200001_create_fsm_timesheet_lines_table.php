@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('fsm_timesheet_lines')) {
+            return;
+        }
+
         Schema::create('fsm_timesheet_lines', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -19,7 +23,9 @@ return new class extends Migration {
             $table->time('end_time')->nullable();
             $table->timestamps();
 
-            $table->foreign('fsm_order_id')->references('id')->on('fsm_orders')->cascadeOnDelete();
+            if (Schema::hasTable('fsm_orders')) {
+                $table->foreign('fsm_order_id')->references('id')->on('fsm_orders')->cascadeOnDelete();
+            }
         });
     }
 

@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ticket_replies', function (Blueprint $table) {
-            $table->boolean('is_description')->default(false)->after('type'); // adjust 'after' as per column order
-        });
+        if (!Schema::hasColumn('ticket_replies', 'is_description')) {
+            Schema::table('ticket_replies', function (Blueprint $table) {
+                $table->boolean('is_description')->default(false)->after('type'); // adjust 'after' as per column order
+            });
+        }
     }
 
     /**

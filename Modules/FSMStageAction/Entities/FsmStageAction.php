@@ -5,7 +5,7 @@ namespace Modules\FSMStageAction\Entities;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Modules\FSMCore\Entities\FsmStage;
+use Modules\FSMCore\Models\FSMStage;
 
 class FsmStageAction extends Model
 {

@@ -29,7 +29,7 @@ class FaqServiceProvider extends ServiceProvider
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
-        $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
+        $this->loadMigrationsFrom(module_path($this->name, 'Database/migrations'));
     }
 
     /**
@@ -84,7 +84,7 @@ protected function registerConfig(): void
 {
     $candidates = [
         module_path($this->name, 'Config/config.php'),
-        module_path($this->name, 'config/config.php'),
+        module_path($this->name, 'Config/config.php'),
     ];
 
     $source = null;
@@ -110,7 +110,7 @@ protected function registerConfig(): void
     public function registerViews(): void
     {
         $viewPath = resource_path('views/modules/'.$this->nameLower);
-        $sourcePath = module_path($this->name, 'resources/views');
+        $sourcePath = module_path($this->name, 'Resources/views');
 
         $this->publishes([$sourcePath => $viewPath], ['views', $this->nameLower.'-module-views']);
 

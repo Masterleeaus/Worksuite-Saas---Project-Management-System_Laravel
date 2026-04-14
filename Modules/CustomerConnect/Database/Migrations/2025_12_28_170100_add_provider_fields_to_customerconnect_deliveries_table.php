@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('customerconnect_deliveries')) {
+            return;
+        }
+        
         Schema::table('customerconnect_deliveries', function (Blueprint $table) {
             if (!Schema::hasColumn('customerconnect_deliveries', 'provider')) {
                 $table->string('provider')->nullable()->after('status');
@@ -20,6 +24,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (! Schema::hasTable('customerconnect_deliveries')) {
+            return;
+        }
+        
         Schema::table('customerconnect_deliveries', function (Blueprint $table) {
             if (Schema::hasColumn('customerconnect_deliveries', 'provider_message_id')) {
                 $table->dropColumn('provider_message_id');

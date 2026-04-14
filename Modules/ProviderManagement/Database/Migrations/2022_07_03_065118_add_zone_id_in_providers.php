@@ -17,7 +17,9 @@ class AddZoneIdInProviders extends Migration
             return;
         }
         Schema::table('providers', function (Blueprint $table) {
-            $table->foreignUuid('zone_id')->nullable();
+            if (! Schema::hasColumn('providers', 'zone_id')) {
+                $table->foreignUuid('zone_id')->nullable();
+            }
         });
     }
 

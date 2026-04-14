@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('fsm_order_photos')) {
+            return;
+        }
+
         Schema::create('fsm_order_photos', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('fsm_order_id')->index();
@@ -16,7 +20,9 @@ return new class extends Migration {
             $table->text('caption')->nullable();
             $table->timestamps();
 
-            $table->foreign('fsm_order_id')->references('id')->on('fsm_orders')->cascadeOnDelete();
+            if (Schema::hasTable('fsm_orders')) {
+                $table->foreign('fsm_order_id')->references('id')->on('fsm_orders')->cascadeOnDelete();
+            }
         });
     }
 

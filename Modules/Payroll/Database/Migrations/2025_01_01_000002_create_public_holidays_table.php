@@ -6,6 +6,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('public_holidays')) {
+            return;
+        }
+
         Schema::create('public_holidays', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('company_id')->unsigned()->nullable();

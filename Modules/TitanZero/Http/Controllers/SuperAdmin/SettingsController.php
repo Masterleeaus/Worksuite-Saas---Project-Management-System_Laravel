@@ -4,7 +4,7 @@
 namespace Modules\TitanZero\Http\Controllers\SuperAdmin;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Modules\TitanZero\Entities\TitanAssistUsage;
+use Modules\TitanZero\Entities\TitanZeroUsage;
 
 class SettingsController extends Controller
 {
@@ -15,7 +15,7 @@ class SettingsController extends Controller
     {
         $today = now()->startOfDay();
 
-        $usages = TitanAssistUsage::where('created_at', '>=', $today)
+        $usages = TitanZeroUsage::where('created_at', '>=', $today)
             ->orderBy('created_at', 'desc')
             ->limit(50)
             ->get();

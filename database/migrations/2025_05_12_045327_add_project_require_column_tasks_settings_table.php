@@ -16,10 +16,11 @@ return new class extends Migration {
 
     public function up()
     {
-        Schema::table('task_settings', function (Blueprint $table) {
-            $table->enum('project_required', ['yes', 'no'])->default('no');
-        });
-
+        if (!Schema::hasColumn('task_settings', 'project_required')) {
+            Schema::table('task_settings', function (Blueprint $table) {
+                $table->enum('project_required', ['yes', 'no'])->default('no');
+            });
+        }
     }
 
     /**

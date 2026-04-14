@@ -13,28 +13,26 @@ return new class extends Migration
      */
     public function up()
     {
-        if (Schema::hasTable('salary_payment_methods')) {
-            return;
+        if (! Schema::hasTable('salary_payment_methods')) {
+            Schema::create('salary_payment_methods', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('payment_method');
+                $table->boolean('default');
+                $table->timestamps();
+            });
         }
-        Schema::create('salary_payment_methods', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string('payment_method');
-            $table->boolean('default');
-            $table->timestamps();
-        });
 
-        Schema::table('salary_slips', function (Blueprint $table) {
-            $table->text('salary_json')->nullable();
-            $table->text('extra_json')->nullable();
-        if (! Schema::hasTable('salary_slips')) {
-            return;
+        if (Schema::hasTable('salary_slips') && !Schema::hasColumn('salary_slips', 'salary_json')) {
+            Schema::table('salary_slips', function (Blueprint $table) {
+                $table->text('salary_json')->nullable();
+                $table->text('extra_json')->nullable();
+                $table->string('expense_claims')->default('0');
+                $table->integer('pay_days');
+
+                $table->unsignedBigInteger('salary_payment_method_id')->nullable();
+                $table->foreign('salary_payment_method_id')->references('id')->on('salary_payment_methods')->onDelete('SET NULL');
+            });
         }
-            $table->string('expense_claims')->default('0');
-            $table->integer('pay_days');
-
-            $table->unsignedBigInteger('salary_payment_method_id')->nullable();
-            $table->foreign('salary_payment_method_id')->references('id')->on('salary_payment_methods')->onDelete('SET NULL');
-        });
     }
 
     /**

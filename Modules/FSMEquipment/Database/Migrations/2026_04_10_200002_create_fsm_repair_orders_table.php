@@ -7,7 +7,11 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('fsm_repair_orders', function (Blueprint $table) {
+        if (Schema::hasTable('fsm_repair_orders')) {
+            return;
+        }
+
+        if (!Schema::hasTable('fsm_repair_orders')) Schema::create('fsm_repair_orders', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
             $table->string('name', 256);
@@ -29,9 +33,15 @@ return new class extends Migration {
             $table->boolean('under_warranty')->default(false);
             $table->timestamps();
 
-            $table->foreign('equipment_id')->references('id')->on('fsm_equipment')->nullOnDelete();
-            $table->foreign('fsm_location_id')->references('id')->on('fsm_locations')->nullOnDelete();
-            $table->foreign('template_id')->references('id')->on('fsm_repair_order_templates')->nullOnDelete();
+            if (Schema::hasTable('fsm_equipment')) {
+                $table->foreign('equipment_id')->references('id')->on('fsm_equipment')->nullOnDelete();
+            }
+            if (Schema::hasTable('fsm_locations')) {
+                $table->foreign('fsm_location_id')->references('id')->on('fsm_locations')->nullOnDelete();
+            }
+            if (Schema::hasTable('fsm_repair_order_templates')) {
+                $table->foreign('template_id')->references('id')->on('fsm_repair_order_templates')->nullOnDelete();
+            }
         });
     }
 

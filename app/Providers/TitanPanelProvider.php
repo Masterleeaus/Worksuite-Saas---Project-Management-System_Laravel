@@ -4,6 +4,9 @@ namespace App\Providers;
 
 use App\Filament\Pages\AutomationQueue;
 use App\Filament\Pages\CommandCentre;
+use App\Filament\Resources\ClientResource;
+use App\Filament\Resources\DocumentTemplateResource;
+use App\Filament\Resources\ProjectResource;
 use App\Filament\Pages\ScoutStatus;
 use App\Filament\Pages\SentinelApprovals;
 use App\Filament\Pages\SignalLogs;
@@ -12,9 +15,10 @@ use App\Filament\Widgets\JobsTodayWidget;
 use App\Filament\Widgets\RevenueWidget;
 use App\Filament\Widgets\SystemSignalsWidget;
 use App\Filament\Widgets\TitanChatWidget;
-use Filament\Http\Middleware\Authenticate;
+use App\Http\Middleware\FilamentAuthenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -33,6 +37,11 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
  * alongside the existing Worksuite dashboards.  It deliberately avoids
  * /dashboard, /home, /admin, and /account/* routes.
  *
+ * Authentication: re-uses the existing Worksuite 'web' guard.  There is
+ * deliberately NO ->login() call so that unauthenticated users are
+ * redirected to the standard Worksuite login page rather than a
+ * Filament-specific login form that would bypass Fortify/2FA.
+ *
  * Tenant isolation is enforced via a global query scope that filters
  * all Filament resource queries by company_id = auth()->user()->company_id.
  */
@@ -45,11 +54,11 @@ class TitanPanelProvider extends PanelProvider
             ->path('titan')
 
             // ----------------------------------------------------------------
-            // Authentication – reuse Worksuite's existing web guard / User model
+            // Authentication – reuse Worksuite's existing web guard / User model.
+            // NO ->login() here: unauthenticated access is redirected to the
+            // standard Worksuite login (/login) by the Authenticate middleware.
             // ----------------------------------------------------------------
             ->authGuard('web')
-            ->authPasswordBroker('users')
-            ->login()
 
             // ----------------------------------------------------------------
             // Branding
@@ -58,6 +67,16 @@ class TitanPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Indigo,
             ])
+
+            // ----------------------------------------------------------------
+            // Navigation groups – auto-detected from Modules/* and Extensions/*
+            // ----------------------------------------------------------------
+            ->navigationGroups(
+                array_map(
+                    fn (string $name) => NavigationGroup::make($name),
+                    self::getModuleNavigationGroups()
+                )
+            )
 
             // ----------------------------------------------------------------
             // Pages
@@ -80,6 +99,11 @@ class TitanPanelProvider extends PanelProvider
                 ActivityFeedWidget::class,
                 TitanChatWidget::class,
             ])
+            ->resources([
+                DocumentTemplateResource::class,
+                ClientResource::class,
+                ProjectResource::class,
+            ])
 
             // ----------------------------------------------------------------
             // Middleware – standard Filament stack using the existing session
@@ -96,23 +120,70 @@ class TitanPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->authMiddleware([
-                Authenticate::class,
+                FilamentAuthenticate::class,
                 \App\Http\Middleware\ApplyTitanTenantScope::class,
+                \App\Http\Middleware\EnsureTitanPanelAccess::class,
             ]);
+    }
+
+    public static function canAccess(): bool
+    {
+        $user = self::resolveWorksuiteUser();
+
+        if (!$user) {
+            return false;
+        }
+
+        if ((int) ($user->is_superadmin ?? 0) === 1) {
+            return true;
+        }
+
+        if (empty($user->company_id)) {
+            return false;
+        }
+
+        $isAdmin = method_exists($user, 'hasRole') && $user->hasRole('admin');
+
+        $permission = method_exists($user, 'permission')
+            ? $user->permission('titan_access')
+            : false;
+
+        $hasTitanPermission = !in_array($permission, [false, null, 'none'], true);
+
+        return $isAdmin || $hasTitanPermission;
+    }
+
+    public static function resolveWorksuiteUser(): ?object
+    {
+        $authUser = auth()->user();
+
+        if (!$authUser) {
+            return null;
+        }
+
+        if (isset($authUser->company_id)) {
+            return $authUser;
+        }
+
+        if (isset($authUser->user) && is_object($authUser->user)) {
+            return $authUser->user;
+        }
+
+        return null;
     }
 
     /**
      * Auto-build navigation groups from detected Worksuite modules and extensions.
      *
      * Scans Modules/* and app/Extensions/* and returns a navigation group name
-     * for each directory found.  The actual resources are responsible for
-     * declaring which group they belong to via $navigationGroup.
+     * for each directory found.  The actual resources declare which group they
+     * belong to via $navigationGroup = 'ModuleName'.
      *
      * @return array<string>
      */
     public static function getModuleNavigationGroups(): array
     {
-        $groups = ['Titan'];
+        $groups = ['Titan', 'CRM', 'Operations'];
 
         $modulesPath    = base_path('Modules');
         $extensionsPath = app_path('Extensions');

@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('fsm_activities')) {
+            return;
+        }
+
         Schema::create('fsm_activities', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -22,8 +26,12 @@ return new class extends Migration
             $table->unsignedBigInteger('done_by')->nullable()->index();
             $table->timestamps();
 
-            $table->foreign('fsm_order_id')->references('id')->on('fsm_orders')->cascadeOnDelete();
-            $table->foreign('activity_type_id')->references('id')->on('fsm_activity_types')->nullOnDelete();
+            if (Schema::hasTable('fsm_orders')) {
+                $table->foreign('fsm_order_id')->references('id')->on('fsm_orders')->cascadeOnDelete();
+            }
+            if (Schema::hasTable('fsm_activity_types')) {
+                $table->foreign('activity_type_id')->references('id')->on('fsm_activity_types')->nullOnDelete();
+            }
         });
     }
 

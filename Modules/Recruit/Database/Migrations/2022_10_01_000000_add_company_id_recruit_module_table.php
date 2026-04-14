@@ -20,8 +20,17 @@ return new class extends Migration
     public function up()
     {
         if (!Schema::hasColumn('application_sources', 'is_predefined')) {
+            if (! Schema::hasTable('application_sources')) {
+                return;
+            }
+            
             Schema::table('application_sources', function (Blueprint $table) {
                 $table->boolean('is_predefined')->default(true);
+            });
+        }
+
+        if (!Schema::hasColumn('application_sources', 'company_id')) {
+            Schema::table('application_sources', function (Blueprint $table) {
                 $table->integer('company_id')->unsigned()->after('id')->nullable();
                 $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade')->onUpdate('cascade');
             });

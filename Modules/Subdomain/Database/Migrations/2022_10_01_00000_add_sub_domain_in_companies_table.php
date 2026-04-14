@@ -39,6 +39,10 @@ return new class extends Migration {
      */
     public function down()
     {
+        if (! Schema::hasTable('companies')) {
+            return;
+        }
+        
         Schema::table('companies', function (Blueprint $table) {
             $table->dropColumn('sub_domain');
         });

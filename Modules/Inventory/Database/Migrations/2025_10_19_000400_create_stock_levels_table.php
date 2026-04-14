@@ -6,6 +6,10 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
     public function up(): void {
+        if (Schema::hasTable('stock_levels')) {
+            return;
+        }
+
         Schema::create('stock_levels', function (Blueprint $t) {
             $t->id();
             $t->foreignId('item_id')->constrained('inventory_items')->cascadeOnDelete();

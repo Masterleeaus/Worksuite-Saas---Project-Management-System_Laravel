@@ -15,7 +15,6 @@ use Modules\Recruit\Entities\RecruitCustomQuestion;
 use Modules\Recruit\Entities\RecruitEmailNotificationSetting;
 use Modules\Recruit\Entities\Recruiter;
 use Modules\Recruit\Entities\RecruitFooterLink;
-use Modules\Recruit\Entities\RecruitJobCustomQuestion;
 use Modules\Recruit\Entities\RecruitApplicationStatus;
 use Modules\Recruit\Http\Requests\RecruitSetting\StoreSettingRequest;
 

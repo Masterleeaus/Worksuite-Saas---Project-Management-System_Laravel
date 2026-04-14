@@ -16,11 +16,12 @@ return new class extends Migration
         if (! Schema::hasTable('purchase_vendors')) {
             return;
         }
-        Schema::table('purchase_vendors', function (Blueprint $table) {
-            $table->integer('category_id')->unsigned()->nullable();
-            $table->foreign('category_id')->references('id')->on('purchase_vendor_categories')->onDelete('set null');
-
-        });
+        if (!Schema::hasColumn('purchase_vendors', 'category_id')) {
+            Schema::table('purchase_vendors', function (Blueprint $table) {
+                $table->integer('category_id')->unsigned()->nullable();
+                $table->foreign('category_id')->references('id')->on('purchase_vendor_categories')->onDelete('set null');
+            });
+        }
     }
 
     /**

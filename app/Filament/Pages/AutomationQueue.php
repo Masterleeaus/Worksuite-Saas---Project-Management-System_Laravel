@@ -2,7 +2,6 @@
 
 namespace App\Filament\Pages;
 
-use Filament\Pages\Page;
 
 /**
  * AutomationQueue
@@ -10,7 +9,7 @@ use Filament\Pages\Page;
  * Placeholder page – Titan Automation Queue.
  * Will display queued automations and their statuses once implemented.
  */
-class AutomationQueue extends Page
+class AutomationQueue extends TitanPage
 {
     protected static ?string $navigationIcon = 'heroicon-o-queue-list';
 

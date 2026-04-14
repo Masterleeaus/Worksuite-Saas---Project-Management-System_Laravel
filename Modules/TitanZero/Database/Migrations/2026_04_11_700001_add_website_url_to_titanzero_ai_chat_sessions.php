@@ -17,7 +17,9 @@ return new class extends Migration
         }
 
         Schema::table('titanzero_ai_chat_sessions', function (Blueprint $table) {
-            $table->string('website_url')->nullable()->after('is_chatbot');
+            if (! Schema::hasColumn('titanzero_ai_chat_sessions', 'website_url')) {
+                $table->string('website_url')->nullable()->after('is_chatbot');
+            }
         });
     }
 

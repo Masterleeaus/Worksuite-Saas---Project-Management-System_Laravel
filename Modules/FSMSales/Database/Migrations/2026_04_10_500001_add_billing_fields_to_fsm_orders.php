@@ -14,16 +14,22 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::table('fsm_orders', function (Blueprint $table) {
-            $table->string('billing_policy', 30)->default('manual')->after('description');
-            $table->decimal('billing_amount', 16, 2)->nullable()->after('billing_policy');
-            $table->decimal('hourly_rate', 10, 2)->nullable()->after('billing_amount');
-            $table->boolean('is_invoiced')->default(false)->after('hourly_rate');
-        });
+        if (!Schema::hasColumn('fsm_orders', 'billing_policy')) {
+            Schema::table('fsm_orders', function (Blueprint $table) {
+                $table->string('billing_policy', 30)->default('manual')->after('description');
+                $table->decimal('billing_amount', 16, 2)->nullable()->after('billing_policy');
+                $table->decimal('hourly_rate', 10, 2)->nullable()->after('billing_amount');
+                $table->boolean('is_invoiced')->default(false)->after('hourly_rate');
+            });
+        }
     }
 
     public function down(): void
     {
+        if (! Schema::hasTable('fsm_orders')) {
+            return;
+        }
+        
         Schema::table('fsm_orders', function (Blueprint $table) {
             $table->dropColumn(['billing_policy', 'billing_amount', 'hourly_rate', 'is_invoiced']);
         });

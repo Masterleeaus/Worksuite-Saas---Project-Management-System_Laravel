@@ -2,10 +2,13 @@
 
 namespace Modules\FSMCore\Models;
 
+use App\Traits\HasCompany;
 use Illuminate\Database\Eloquent\Model;
 
 class FSMTeam extends Model
 {
+    use HasCompany;
+
     protected $table = 'fsm_teams';
 
     protected $fillable = [

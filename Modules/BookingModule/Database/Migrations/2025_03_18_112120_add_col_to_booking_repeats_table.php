@@ -19,10 +19,12 @@ return new class extends Migration
         if (! Schema::hasTable('booking_repeats')) {
             return;
         }
-        Schema::table('booking_repeats', function (Blueprint $table) {
-            $table->string('service_location')->default('customer')->comment('customer,provider')->after('booking_otp');
-            $table->text('service_address_location')->nullable()->after('booking_otp');
-        });
+        if (!Schema::hasColumn('booking_repeats', 'service_location')) {
+            Schema::table('booking_repeats', function (Blueprint $table) {
+                $table->string('service_location')->default('customer')->comment('customer,provider')->after('booking_otp');
+                $table->text('service_address_location')->nullable()->after('booking_otp');
+            });
+        }
     }
 
     /**

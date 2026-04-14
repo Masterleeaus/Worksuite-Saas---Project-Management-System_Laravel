@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('fsm_orders')) {
+            return;
+        }
+
         Schema::create('fsm_orders', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -25,29 +29,49 @@ return new class extends Migration {
             $table->text('description')->nullable();
             $table->timestamps();
 
-            $table->foreign('location_id')->references('id')->on('fsm_locations')->nullOnDelete();
-            $table->foreign('team_id')->references('id')->on('fsm_teams')->nullOnDelete();
-            $table->foreign('stage_id')->references('id')->on('fsm_stages')->nullOnDelete();
-            $table->foreign('template_id')->references('id')->on('fsm_templates')->nullOnDelete();
+            if (Schema::hasTable('fsm_locations')) {
+                $table->foreign('location_id')->references('id')->on('fsm_locations')->nullOnDelete();
+            }
+            if (Schema::hasTable('fsm_teams')) {
+                $table->foreign('team_id')->references('id')->on('fsm_teams')->nullOnDelete();
+            }
+            if (Schema::hasTable('fsm_stages')) {
+                $table->foreign('stage_id')->references('id')->on('fsm_stages')->nullOnDelete();
+            }
+            if (Schema::hasTable('fsm_templates')) {
+                $table->foreign('template_id')->references('id')->on('fsm_templates')->nullOnDelete();
+            }
         });
 
-        Schema::create('fsm_order_equipment', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->unsignedBigInteger('fsm_order_id');
-            $table->unsignedBigInteger('fsm_equipment_id');
+        if (! Schema::hasTable('fsm_order_equipment')) {
+            Schema::create('fsm_order_equipment', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->unsignedBigInteger('fsm_order_id');
+                $table->unsignedBigInteger('fsm_equipment_id');
 
-            $table->foreign('fsm_order_id')->references('id')->on('fsm_orders')->cascadeOnDelete();
-            $table->foreign('fsm_equipment_id')->references('id')->on('fsm_equipment')->cascadeOnDelete();
-        });
+                if (Schema::hasTable('fsm_orders')) {
+                    $table->foreign('fsm_order_id')->references('id')->on('fsm_orders')->cascadeOnDelete();
+                }
+                if (Schema::hasTable('fsm_equipment')) {
+                    $table->foreign('fsm_equipment_id')->references('id')->on('fsm_equipment')->cascadeOnDelete();
+                }
+            });
+        }
 
-        Schema::create('fsm_order_tag', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->unsignedBigInteger('fsm_order_id');
-            $table->unsignedBigInteger('fsm_tag_id');
+        if (! Schema::hasTable('fsm_order_tag')) {
+            Schema::create('fsm_order_tag', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->unsignedBigInteger('fsm_order_id');
+                $table->unsignedBigInteger('fsm_tag_id');
 
-            $table->foreign('fsm_order_id')->references('id')->on('fsm_orders')->cascadeOnDelete();
-            $table->foreign('fsm_tag_id')->references('id')->on('fsm_tags')->cascadeOnDelete();
-        });
+                if (Schema::hasTable('fsm_orders')) {
+                    $table->foreign('fsm_order_id')->references('id')->on('fsm_orders')->cascadeOnDelete();
+                }
+                if (Schema::hasTable('fsm_tags')) {
+                    $table->foreign('fsm_tag_id')->references('id')->on('fsm_tags')->cascadeOnDelete();
+                }
+            });
+        }
     }
 
     public function down(): void

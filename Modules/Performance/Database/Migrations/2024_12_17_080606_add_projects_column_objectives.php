@@ -15,12 +15,14 @@ return new class extends Migration
         if (! Schema::hasTable('objectives')) {
             return;
         }
-        Schema::table('objectives', function (Blueprint $table) {
-            $table->unsignedInteger('project_id')->after('id')->nullable();
-            $table->foreign('project_id')->references('id')->on('projects')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
-        });
+        if (!Schema::hasColumn('objectives', 'project_id')) {
+            Schema::table('objectives', function (Blueprint $table) {
+                $table->unsignedInteger('project_id')->after('id')->nullable();
+                $table->foreign('project_id')->references('id')->on('projects')
+                    ->onDelete('cascade')
+                    ->onUpdate('cascade');
+            });
+        }
     }
 
     /**

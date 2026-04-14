@@ -33,12 +33,13 @@ class SlackIntegration
 
     public function sendBookingNotification(Integration $integration, array $booking): bool
     {
+        $provider = $booking['provider'] ?? 'Unassigned';
         return $this->send($integration, '', [
             [
                 'type' => 'section',
                 'text' => [
                     'type' => 'mrkdwn',
-                    'text' => "*New Booking* #{$booking['id']}\n*Client:* {$booking['client_name']}\n*Service:* {$booking['service']}\n*Date:* {$booking['date']}\n*Cleaner:* {$booking['provider'] ?? 'Unassigned'}",
+                    'text' => "*New Booking* #{$booking['id']}\n*Client:* {$booking['client_name']}\n*Service:* {$booking['service']}\n*Date:* {$booking['date']}\n*Cleaner:* {$provider}",
                 ],
             ],
         ]);

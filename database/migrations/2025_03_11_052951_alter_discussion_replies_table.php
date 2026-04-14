@@ -11,20 +11,26 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('discussion_replies', function (Blueprint $table) {
-            $table->unsignedInteger('added_by')->nullable()->index('discussion_replies_added_by_foreign');
-            $table->foreign(['added_by'])->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('SET NULL');
-        });
+        if (!Schema::hasColumn('discussion_replies', 'added_by')) {
+            Schema::table('discussion_replies', function (Blueprint $table) {
+                $table->unsignedInteger('added_by')->nullable()->index('discussion_replies_added_by_foreign');
+                $table->foreign(['added_by'])->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('SET NULL');
+            });
+        }
 
-        Schema::table('pinned', function (Blueprint $table) {
-            $table->unsignedInteger('added_by')->nullable()->index('pinned_added_by_foreign');
-            $table->foreign(['added_by'])->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('SET NULL');
-        });
+        if (!Schema::hasColumn('pinned', 'added_by')) {
+            Schema::table('pinned', function (Blueprint $table) {
+                $table->unsignedInteger('added_by')->nullable()->index('pinned_added_by_foreign');
+                $table->foreign(['added_by'])->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('SET NULL');
+            });
+        }
 
-        Schema::table('ticket_replies', function (Blueprint $table) {
-            $table->unsignedInteger('added_by')->nullable()->index('ticket_replies_added_by_foreign');
-            $table->foreign(['added_by'])->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('SET NULL');
-        });
+        if (!Schema::hasColumn('ticket_replies', 'added_by')) {
+            Schema::table('ticket_replies', function (Blueprint $table) {
+                $table->unsignedInteger('added_by')->nullable()->index('ticket_replies_added_by_foreign');
+                $table->foreign(['added_by'])->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('SET NULL');
+            });
+        }
     }
 
     /**

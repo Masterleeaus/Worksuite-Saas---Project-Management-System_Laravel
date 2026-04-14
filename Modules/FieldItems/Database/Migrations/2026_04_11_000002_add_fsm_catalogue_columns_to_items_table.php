@@ -13,6 +13,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('items')) {
+            return;
+        }
+        
         Schema::table('items', function (Blueprint $table) {
             if (!Schema::hasColumn('items', 'sku')) {
                 $table->string('sku', 100)->nullable()->unique()->after('name');
@@ -62,6 +66,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (! Schema::hasTable('items')) {
+            return;
+        }
+        
         Schema::table('items', function (Blueprint $table) {
             $cols = [
                 'sds_file_path', 'is_eco_friendly', 'is_hazardous', 'low_stock_threshold',

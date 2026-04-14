@@ -8,9 +8,13 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('integrations')) {
+            return;
+        }
+
         Schema::create('integrations', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('company_id')->index();
+            $table->unsignedInteger('company_id')->index();
             $table->string('provider', 50);                          // 'google_calendar', 'xero', etc.
             $table->enum('credential_type', ['oauth', 'api_key', 'webhook', 'none'])->default('api_key');
             $table->text('access_token')->nullable();                // AES-256 encrypted

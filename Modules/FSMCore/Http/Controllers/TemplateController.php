@@ -29,10 +29,45 @@ class TemplateController extends Controller
             'active'                     => 'nullable|boolean',
         ]);
 
-        // Parse checklist lines to JSON array
+        // Parse checklist to rich JSON step array
+        // Supports two input formats from the admin form:
+        //   1. Plain textarea (one instruction per line) → adds defaults
+        //   2. JSON array of rich objects (from the dynamic step builder)
         if (!empty($data['checklist'])) {
-            $lines = array_filter(array_map('trim', explode("\n", $data['checklist'])));
-            $data['checklist'] = json_encode(array_values($lines));
+            $decoded = json_decode($data['checklist'], true);
+            if (is_array($decoded)) {
+                // Already a JSON array (from step builder) — normalise each item
+                $rich = array_values(array_filter(array_map(function ($item): ?array {
+                    if (is_array($item)) {
+                        return [
+                            'instruction'        => trim($item['instruction'] ?? ''),
+                            'photo_required'     => (bool) ($item['photo_required'] ?? false),
+                            'signature_required' => (bool) ($item['signature_required'] ?? false),
+                            'is_required'        => (bool) ($item['is_required'] ?? true),
+                        ];
+                    }
+                    if (is_string($item) && trim($item) !== '') {
+                        return [
+                            'instruction'        => trim($item),
+                            'photo_required'     => false,
+                            'signature_required' => false,
+                            'is_required'        => true,
+                        ];
+                    }
+                    return null;
+                }, $decoded), fn($s) => $s !== null && $s['instruction'] !== ''));
+                $data['checklist'] = json_encode($rich);
+            } else {
+                // Plain textarea: one instruction per line
+                $lines = array_filter(array_map('trim', explode("\n", $data['checklist'])));
+                $rich  = array_values(array_map(fn(string $l): array => [
+                    'instruction'        => $l,
+                    'photo_required'     => false,
+                    'signature_required' => false,
+                    'is_required'        => true,
+                ], $lines));
+                $data['checklist'] = json_encode($rich);
+            }
         }
 
         FSMTemplate::create($data);
@@ -60,8 +95,38 @@ class TemplateController extends Controller
         ]);
 
         if (!empty($data['checklist'])) {
-            $lines = array_filter(array_map('trim', explode("\n", $data['checklist'])));
-            $data['checklist'] = json_encode(array_values($lines));
+            $decoded = json_decode($data['checklist'], true);
+            if (is_array($decoded)) {
+                $rich = array_values(array_filter(array_map(function ($item): ?array {
+                    if (is_array($item)) {
+                        return [
+                            'instruction'        => trim($item['instruction'] ?? ''),
+                            'photo_required'     => (bool) ($item['photo_required'] ?? false),
+                            'signature_required' => (bool) ($item['signature_required'] ?? false),
+                            'is_required'        => (bool) ($item['is_required'] ?? true),
+                        ];
+                    }
+                    if (is_string($item) && trim($item) !== '') {
+                        return [
+                            'instruction'        => trim($item),
+                            'photo_required'     => false,
+                            'signature_required' => false,
+                            'is_required'        => true,
+                        ];
+                    }
+                    return null;
+                }, $decoded), fn($s) => $s !== null && $s['instruction'] !== ''));
+                $data['checklist'] = json_encode($rich);
+            } else {
+                $lines = array_filter(array_map('trim', explode("\n", $data['checklist'])));
+                $rich  = array_values(array_map(fn(string $l): array => [
+                    'instruction'        => $l,
+                    'photo_required'     => false,
+                    'signature_required' => false,
+                    'is_required'        => true,
+                ], $lines));
+                $data['checklist'] = json_encode($rich);
+            }
         }
 
         $template->update($data);

@@ -12,7 +12,11 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('fsm_stage_actions', function (Blueprint $table) {
+        if (Schema::hasTable('fsm_stage_actions')) {
+            return;
+        }
+
+        if (!Schema::hasTable('fsm_stage_actions')) Schema::create('fsm_stage_actions', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
             $table->unsignedBigInteger('stage_id')->index();
@@ -27,7 +31,9 @@ return new class extends Migration {
             $table->boolean('active')->default(true);
             $table->timestamps();
 
-            $table->foreign('stage_id')->references('id')->on('fsm_stages')->cascadeOnDelete();
+            if (Schema::hasTable('fsm_stages')) {
+                $table->foreign('stage_id')->references('id')->on('fsm_stages')->cascadeOnDelete();
+            }
         });
     }
 

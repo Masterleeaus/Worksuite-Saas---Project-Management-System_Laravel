@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('fsm_portal_reclean_requests')) {
+            return;
+        }
+
         Schema::create('fsm_portal_reclean_requests', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -17,7 +21,9 @@ return new class extends Migration {
             $table->unsignedBigInteger('fsm_activity_id')->nullable(); // follow-up FSMActivity if created
             $table->timestamps();
 
-            $table->foreign('fsm_order_id')->references('id')->on('fsm_orders')->cascadeOnDelete();
+            if (Schema::hasTable('fsm_orders')) {
+                $table->foreign('fsm_order_id')->references('id')->on('fsm_orders')->cascadeOnDelete();
+            }
         });
     }
 

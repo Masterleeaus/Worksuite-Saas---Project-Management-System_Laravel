@@ -7,7 +7,15 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('fsm_agreement_lines')) {
+            return;
+        }
+
         // Per-site / per-service pricing lines under an agreement
+        if (Schema::hasTable('fsm_agreement_lines')) {
+            return;
+        }
+        
         Schema::create('fsm_agreement_lines', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('agreement_id')->index();
@@ -18,10 +26,14 @@ return new class extends Migration {
             $table->integer('sort_order')->default(0);
             $table->timestamps();
 
-            $table->foreign('agreement_id')
-                ->references('id')->on('fsm_service_agreements')->cascadeOnDelete();
-            $table->foreign('location_id')
-                ->references('id')->on('fsm_locations')->nullOnDelete();
+            if (Schema::hasTable('fsm_service_agreements')) {
+                $table->foreign('agreement_id')
+                    ->references('id')->on('fsm_service_agreements')->cascadeOnDelete();
+            }
+            if (Schema::hasTable('fsm_locations')) {
+                $table->foreign('location_id')
+                    ->references('id')->on('fsm_locations')->nullOnDelete();
+            }
         });
     }
 

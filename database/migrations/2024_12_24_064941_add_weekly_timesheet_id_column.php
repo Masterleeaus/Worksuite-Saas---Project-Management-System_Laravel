@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('project_time_logs', function (Blueprint $table) {
-            $table->unsignedBigInteger('weekly_timesheet_id')->nullable();
-            $table->foreign('weekly_timesheet_id')->references('id')->on('weekly_timesheets')->onDelete('cascade');
-        });
+        if (!Schema::hasColumn('project_time_logs', 'weekly_timesheet_id')) {
+            Schema::table('project_time_logs', function (Blueprint $table) {
+                $table->unsignedBigInteger('weekly_timesheet_id')->nullable();
+                $table->foreign('weekly_timesheet_id')->references('id')->on('weekly_timesheets')->onDelete('cascade');
+            });
+        }
     }
 
     /**

@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('attendances', function (Blueprint $table) {
-            $table->string('half_day_type')->nullable()->after('half_day');
-        });
+        if (!Schema::hasColumn('attendances', 'half_day_type')) {
+            Schema::table('attendances', function (Blueprint $table) {
+                $table->string('half_day_type')->nullable()->after('half_day');
+            });
+        }
     }
 
     /**

@@ -16,10 +16,16 @@ class AddColToChannelUserTable extends Migration
         if (! Schema::hasTable('channel_users')) {
             return;
         }
-        Schema::table('channel_users', function (Blueprint $table) {
-            $table->boolean('is_read')->default(0);
-        });
+        if (!Schema::hasColumn('channel_users', 'is_read')) {
+            Schema::table('channel_users', function (Blueprint $table) {
+                $table->boolean('is_read')->default(0);
+            });
+        }
 
+        if (! Schema::hasTable('channel_lists')) {
+            return;
+        }
+        
         Schema::table('channel_lists', function (Blueprint $table) {
             $table->dropColumn('is_read');
         });
@@ -32,6 +38,10 @@ class AddColToChannelUserTable extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('channel_users')) {
+            return;
+        }
+        
         Schema::table('channel_users', function (Blueprint $table) {
 
         });

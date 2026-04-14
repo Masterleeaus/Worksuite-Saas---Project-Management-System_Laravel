@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('fsm_sales_invoice_lines')) {
+            return;
+        }
+
         Schema::create('fsm_sales_invoice_lines', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -36,8 +40,10 @@ return new class extends Migration {
 
             $table->timestamps();
 
-            $table->foreign('fsm_sales_invoice_id')
-                ->references('id')->on('fsm_sales_invoices')->cascadeOnDelete();
+            if (Schema::hasTable('fsm_sales_invoices')) {
+                $table->foreign('fsm_sales_invoice_id')
+                    ->references('id')->on('fsm_sales_invoices')->cascadeOnDelete();
+            }
         });
     }
 

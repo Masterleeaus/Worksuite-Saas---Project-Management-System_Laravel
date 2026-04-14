@@ -14,12 +14,13 @@ return new class extends Migration
 
     public function up()
     {
-        Schema::table('invoice_settings', function (Blueprint $table) {
-            $table->string('invoice_number_separator')->default('#')->after('invoice_prefix');
-            $table->string('estimate_number_separator')->default('#')->after('estimate_prefix');
-            $table->string('credit_note_number_separator')->default('#')->after('credit_note_prefix');
-        });
-
+        if (!Schema::hasColumn('invoice_settings', 'invoice_number_separator')) {
+            Schema::table('invoice_settings', function (Blueprint $table) {
+                $table->string('invoice_number_separator')->default('#')->after('invoice_prefix');
+                $table->string('estimate_number_separator')->default('#')->after('estimate_prefix');
+                $table->string('credit_note_number_separator')->default('#')->after('credit_note_prefix');
+            });
+        }
     }
 
     /**

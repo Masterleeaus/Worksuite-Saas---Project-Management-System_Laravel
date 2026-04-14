@@ -68,9 +68,11 @@ return new class extends Migration {
 
         }
 
-        Schema::table('lead_follow_up', function (Blueprint $table) {
-            $table->string('status')->after('remind_type')->nullable();
-        });
+        if (!Schema::hasColumn('lead_follow_up', 'status')) {
+            Schema::table('lead_follow_up', function (Blueprint $table) {
+                $table->string('status')->after('remind_type')->nullable();
+            });
+        }
 
 
         foreach ($companies as $company) {

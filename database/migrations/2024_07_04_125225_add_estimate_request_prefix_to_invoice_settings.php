@@ -12,11 +12,13 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::table('invoice_settings', function (Blueprint $table) {
-            $table->string('estimate_request_prefix')->default('ESTRQ')->after('contract_number_separator');
-            $table->string('estimate_request_number_separator')->default('#')->after('estimate_request_prefix');
-            $table->integer('estimate_request_digit')->default(3)->after('estimate_request_number_separator');
-        });
+        if (!Schema::hasColumn('invoice_settings', 'estimate_request_prefix')) {
+            Schema::table('invoice_settings', function (Blueprint $table) {
+                $table->string('estimate_request_prefix')->default('ESTRQ')->after('contract_number_separator');
+                $table->string('estimate_request_number_separator')->default('#')->after('estimate_request_prefix');
+                $table->integer('estimate_request_digit')->default(3)->after('estimate_request_number_separator');
+            });
+        }
 
         $estimateRequests = EstimateRequest::whereNull('estimate_request_number')->orderBy('id')->get();
 

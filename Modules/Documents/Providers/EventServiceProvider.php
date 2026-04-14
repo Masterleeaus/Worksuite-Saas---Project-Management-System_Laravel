@@ -3,7 +3,7 @@
 namespace Modules\Documents\Providers;
 use App\Events\NewCompanyCreatedEvent;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Modules\Documents\Entities\Documents;
+use Modules\Documents\Entities\Document;
 use Modules\Documents\Entities\Template;
 use Modules\Documents\Listeners\CompanyCreatedListener;
 use Modules\Documents\Observers\LetterObserver;
@@ -16,7 +16,7 @@ class EventServiceProvider extends ServiceProvider
     ];
 
     protected $observers = [
-        Documents::class => [LetterObserver::class],
+        Document::class => [LetterObserver::class],
         Template::class => [TemplateObserver::class],
     ];
 }

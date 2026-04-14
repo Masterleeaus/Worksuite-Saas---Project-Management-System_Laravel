@@ -14,6 +14,10 @@ return new class extends Migration
 
     public function up()
     {
+        if (Schema::hasTable('lead_products')) {
+            return;
+        }
+
         Schema::create('lead_products', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('lead_id')->index('lead_products_lead_id_foreign');

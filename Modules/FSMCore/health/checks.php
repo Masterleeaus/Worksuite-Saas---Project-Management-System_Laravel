@@ -28,8 +28,8 @@ return [
         'id'       => 'fsmcore:migrations',
         'label'    => 'Migrations present',
         'severity' => 'warn',
-        'ok'       => count(glob(__DIR__ . '/../Database/Migrations/*.php')) >= 9,
-        'hint'     => 'Expected at least 9 migration files for FSMCore tables.',
+        'ok'       => count(glob(__DIR__ . '/../Database/Migrations/*.php')) >= 11,
+        'hint'     => 'Expected at least 11 migration files for FSMCore tables (incl. attachments + permissions).',
     ],
     [
         'id'       => 'fsmcore:seeders',
@@ -51,5 +51,12 @@ return [
         'severity' => 'warn',
         'ok'       => file_exists(__DIR__ . '/../Http/Controllers/Api/WorkerAuthController.php'),
         'hint'     => 'WorkerAuthController provides login/logout for field-worker mobile apps.',
+    ],
+    [
+        'id'       => 'fsmcore:attachment_controller',
+        'label'    => 'OrderAttachmentController present',
+        'severity' => 'warn',
+        'ok'       => file_exists(__DIR__ . '/../Http/Controllers/OrderAttachmentController.php'),
+        'hint'     => 'OrderAttachmentController provides file upload/download/delete for FSMOrder attachments.',
     ],
 ];

@@ -14,6 +14,10 @@ return new class extends Migration
 
     public function up()
     {
+        if (Schema::hasTable('leave_files')) {
+            return;
+        }
+
         Schema::create('leave_files', function (Blueprint $table) {
             $table->id();
             $table->integer('company_id')->unsigned()->nullable();

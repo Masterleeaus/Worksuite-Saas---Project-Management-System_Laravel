@@ -12,6 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('services')) {
+            return;
+        }
+        
         Schema::table('services', function (Blueprint $table) {
             if (! Schema::hasColumn('services', 'duration_minutes')) {
                 $table->unsignedInteger('duration_minutes')->nullable()->after('description');
@@ -36,6 +40,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (! Schema::hasTable('services')) {
+            return;
+        }
+        
         Schema::table('services', function (Blueprint $table) {
             $table->dropColumn(array_filter([
                 Schema::hasColumn('services', 'duration_minutes') ? 'duration_minutes' : null,

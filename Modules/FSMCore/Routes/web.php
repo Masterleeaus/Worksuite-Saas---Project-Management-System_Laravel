@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Modules\FSMCore\Http\Controllers\DashboardController;
 use Modules\FSMCore\Http\Controllers\OrderController;
+use Modules\FSMCore\Http\Controllers\OrderAttachmentController;
 use Modules\FSMCore\Http\Controllers\LocationController;
 use Modules\FSMCore\Http\Controllers\TeamController;
 use Modules\FSMCore\Http\Controllers\StageController;
@@ -27,6 +28,11 @@ Route::middleware(['web', 'auth'])
         Route::post('/orders/{id}',          [OrderController::class, 'update'])->name('fsmcore.orders.update');
         Route::post('/orders/{id}/delete',   [OrderController::class, 'destroy'])->name('fsmcore.orders.destroy');
         Route::post('/orders/{id}/stage',    [OrderController::class, 'updateStage'])->name('fsmcore.orders.stage');
+
+        // FSM Order Attachments (UploadAttachmentComponent pattern)
+        Route::post('/orders/{id}/attachments',                    [OrderAttachmentController::class, 'store'])->name('fsmcore.orders.attachments.store');
+        Route::get('/orders/{id}/attachments/{attachmentId}/download', [OrderAttachmentController::class, 'download'])->name('fsmcore.orders.attachments.download');
+        Route::post('/orders/{id}/attachments/{attachmentId}/delete',  [OrderAttachmentController::class, 'destroy'])->name('fsmcore.orders.attachments.destroy');
 
         // FSM Locations
         Route::get('/locations',             [LocationController::class, 'index'])->name('fsmcore.locations.index');

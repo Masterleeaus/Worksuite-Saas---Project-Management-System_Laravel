@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('fsm_equipment_warranties')) {
+            return;
+        }
+
         Schema::create('fsm_equipment_warranties', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -18,7 +22,9 @@ return new class extends Migration {
             $table->text('notes')->nullable();
             $table->timestamps();
 
-            $table->foreign('equipment_id')->references('id')->on('fsm_equipment')->cascadeOnDelete();
+            if (Schema::hasTable('fsm_equipment')) {
+                $table->foreign('equipment_id')->references('id')->on('fsm_equipment')->cascadeOnDelete();
+            }
         });
     }
 

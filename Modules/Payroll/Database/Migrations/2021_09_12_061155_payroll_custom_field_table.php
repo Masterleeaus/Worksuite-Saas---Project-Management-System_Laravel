@@ -18,8 +18,14 @@ return new class extends Migration
                 $table->text('extra_fields')->nullable();
             });
 
+            if (! Schema::hasTable('employee_monthly_salaries')) {
+                return;
+            }
+            
             Schema::table('employee_monthly_salaries', function (Blueprint $table) {
-                $table->enum('allow_generate_payroll', ['yes', 'no'])->default('yes');
+                if (! Schema::hasColumn('employee_monthly_salaries', 'allow_generate_payroll')) {
+                    $table->enum('allow_generate_payroll', ['yes', 'no'])->default('yes')->nullable();
+                }
             });
         }
     }
@@ -31,10 +37,18 @@ return new class extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('payroll_settings')) {
+            return;
+        }
+        
         Schema::table('payroll_settings', function (Blueprint $table) {
             $table->dropColumn('extra_fields');
         });
 
+        if (! Schema::hasTable('employee_monthly_salaries')) {
+            return;
+        }
+        
         Schema::table('employee_monthly_salaries', function (Blueprint $table) {
             $table->dropColumn('allow_generate_payroll');
         });

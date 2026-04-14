@@ -4,7 +4,7 @@ namespace Modules\FSMStageAction\Services;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Modules\FSMCore\Entities\FsmOrder;
+use Modules\FSMCore\Models\FSMOrder;
 use Modules\FSMStageAction\Entities\FsmStageAction;
 use Modules\FSMStageAction\Entities\FsmStageActionLog;
 

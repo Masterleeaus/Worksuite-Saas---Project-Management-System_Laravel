@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('fsm_equipment')) {
+            return;
+        }
+
         Schema::create('fsm_equipment', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -18,7 +22,9 @@ return new class extends Migration {
             $table->boolean('active')->default(true);
             $table->timestamps();
 
-            $table->foreign('location_id')->references('id')->on('fsm_locations')->nullOnDelete();
+            if (Schema::hasTable('fsm_locations')) {
+                $table->foreign('location_id')->references('id')->on('fsm_locations')->nullOnDelete();
+            }
         });
     }
 

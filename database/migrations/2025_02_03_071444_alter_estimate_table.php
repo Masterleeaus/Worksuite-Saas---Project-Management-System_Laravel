@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('estimates', function (Blueprint $table) {
-            $table->unsignedInteger('project_id')->nullable()->index('estimates_project_id_foreign');
-            $table->foreign(['project_id'])->references(['id'])->on('projects')->onUpdate('CASCADE')->onDelete('CASCADE');
-        });
+        if (!Schema::hasColumn('estimates', 'project_id')) {
+            Schema::table('estimates', function (Blueprint $table) {
+                $table->unsignedInteger('project_id')->nullable()->index('estimates_project_id_foreign');
+                $table->foreign(['project_id'])->references(['id'])->on('projects')->onUpdate('CASCADE')->onDelete('CASCADE');
+            });
+        }
     }
 
     /**

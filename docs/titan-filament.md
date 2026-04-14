@@ -48,19 +48,33 @@ All Filament resources **must extend** `App\Filament\Resources\BaseTenantResourc
 instead of `Filament\Resources\Resource`.
 
 `BaseTenantResource` automatically:
-- Filters every query by `company_id = auth()->user()->company_id`
-- Injects `company_id` and `created_by` on record creation
-- Binds the model's policy
+- Filters every `getEloquentQuery()` call by `company_id = auth()->user()->company_id`
+- Provides `BaseTenantResource::stampTenantData($data)` for Create pages
+
+**Important:** `mutateFormDataBeforeCreate()` is a method on `CreateRecord` pages in
+Filament v3, NOT on the Resource class.  To stamp tenant data on creation, override
+it in the resource's inner `Pages\CreateMyModel` class:
+
+```php
+use App\Filament\Resources\BaseTenantResource;
+
+protected function mutateFormDataBeforeCreate(array $data): array
+{
+    return BaseTenantResource::stampTenantData($data);
+}
+```
 
 Tenant middleware: `App\Http\Middleware\ApplyTitanTenantScope` — registered as a
-persistent tenant middleware in `TitanPanelProvider`.
+persistent auth middleware in `TitanPanelProvider`. It aborts with 403 if the
+authenticated user has no associated company.
 
 ---
 
 ## 4. Routes
 
-Titan routes live in `routes/Titan/`. They are loaded by
-`App\Providers\RouteServiceProvider::mapTitanRoutes()`.
+Titan routes live in `routes/Titan/`. They are loaded **recursively** by
+`App\Providers\RouteServiceProvider::mapTitanRoutes()`.  Sub-directories such as
+`routes/Titan/Api/` are automatically picked up.
 
 **Never modify `routes/web.php` for Titan features.**
 
@@ -97,11 +111,33 @@ implementation:
 
 ## 7. Permissions
 
-Filament respects existing Worksuite roles and policies. If `spatie/laravel-permission`
-is present it is used automatically. Otherwise the framework falls back to the
-existing Worksuite gate logic.
+**Every page must define a `canAccess()` gate.** The panel does NOT limit access by
+role by default — any authenticated Worksuite user can reach `/titan` unless gated.
 
-Do **not** create a new permission system.
+Minimum recommended implementation:
+
+```php
+use Filament\Pages\Page;
+
+class MyPage extends Page
+{
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasRole(['admin', 'superadmin']) ?? false;
+    }
+}
+```
+
+Integrate with Spatie permissions if present:
+
+```php
+public static function canAccess(): bool
+{
+    return auth()->user()?->can('access_titan_panel') ?? false;
+}
+```
+
+Do **not** create a new permission system — wire into the existing Worksuite gates.
 
 ---
 

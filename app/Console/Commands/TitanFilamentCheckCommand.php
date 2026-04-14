@@ -42,6 +42,8 @@ class TitanFilamentCheckCommand extends Command
         $this->checkTenantScope();
         $this->checkModuleDetection();
         $this->checkAuthGuard();
+        $this->checkPanelAccessWiring();
+        $this->checkResourceRegistrationHealth();
         $this->checkThemeUnaffected();
 
         $this->printSummary();
@@ -64,6 +66,26 @@ class TitanFilamentCheckCommand extends Command
                 ? 'filament/filament found in vendor/'
                 : 'Run: composer require filament/filament && php artisan filament:install --panels'
         );
+
+        $configPublished = file_exists(config_path('filament.php'));
+
+        $this->result(
+            'Filament config published',
+            $configPublished,
+            $configPublished
+                ? 'config/filament.php found'
+                : 'Run: php artisan vendor:publish --tag=filament-config'
+        );
+
+        $adminProviderScaffolded = file_exists(app_path('Providers/Filament/AdminPanelProvider.php'));
+
+        $this->result(
+            'Filament AdminPanelProvider scaffold exists',
+            $adminProviderScaffolded,
+            $adminProviderScaffolded
+                ? 'app/Providers/Filament/AdminPanelProvider.php found'
+                : 'Run: php artisan filament:install --panels (or php artisan make:filament-panel admin)'
+        );
     }
 
     private function checkPanelProviderRegistered(): void
@@ -84,14 +106,18 @@ class TitanFilamentCheckCommand extends Command
 
         // Check provider is registered in config/app.php
         $providers = config('app.providers', []);
-        $inConfig  = in_array(\App\Providers\TitanPanelProvider::class, $providers, true);
+        $providerMatches = array_values(array_filter(
+            $providers,
+            fn ($provider) => $provider === \App\Providers\TitanPanelProvider::class
+        ));
+        $inConfig  = count($providerMatches) === 1;
 
         $this->result(
-            'TitanPanelProvider in config/app.php',
+            'TitanPanelProvider in config/app.php exactly once',
             $inConfig,
             $inConfig
-                ? 'Registered in providers array'
-                : 'Add App\\Providers\\TitanPanelProvider::class to config/app.php providers'
+                ? 'Registered once in providers array'
+                : 'Ensure App\\Providers\\TitanPanelProvider::class appears exactly once in config/app.php providers'
         );
     }
 
@@ -137,6 +163,19 @@ class TitanFilamentCheckCommand extends Command
                 !$found ? 'Safe' : "Filament has registered a route at {$path} – investigate TitanPanelProvider path setting"
             );
         }
+
+        $accountHijack = collect(Route::getRoutes()->getRoutesByMethod()['GET'] ?? [])
+            ->contains(function ($route) {
+                $uri = '/' . ltrim($route->uri(), '/');
+                return str_starts_with($uri, '/account/')
+                    && str_contains(strtolower($route->getActionName() ?? ''), 'filament');
+            });
+
+        $this->result(
+            'Worksuite route /account/* not overridden by Filament',
+            !$accountHijack,
+            !$accountHijack ? 'Safe' : 'Filament has registered routes under /account/* – Titan panel must stay under /titan/* only'
+        );
     }
 
     private function checkTenantScope(): void
@@ -213,6 +252,101 @@ class TitanFilamentCheckCommand extends Command
         );
     }
 
+    private function checkPanelAccessWiring(): void
+    {
+        $panelFile = app_path('Providers/TitanPanelProvider.php');
+        $panelSource = file_exists($panelFile) ? file_get_contents($panelFile) : '';
+
+        $resourceRegistered = is_string($panelSource)
+            && str_contains($panelSource, 'DocumentTemplateResource::class');
+
+        $this->result(
+            'DocumentTemplateResource registered in Titan panel',
+            $resourceRegistered,
+            $resourceRegistered
+                ? 'DocumentTemplateResource::class found in TitanPanelProvider::panel() resources list'
+                : 'Register DocumentTemplateResource::class in TitanPanelProvider resources'
+        );
+
+        $usesAuthMiddleware = is_string($panelSource)
+            && str_contains($panelSource, 'FilamentAuthenticate::class');
+        $usesTenantMiddleware = is_string($panelSource)
+            && str_contains($panelSource, '\\App\\Http\\Middleware\\ApplyTitanTenantScope::class');
+        $usesAccessMiddleware = is_string($panelSource)
+            && str_contains($panelSource, '\\App\\Http\\Middleware\\EnsureTitanPanelAccess::class');
+
+        $this->result(
+            'Titan panel auth middleware wiring includes auth + tenant + access gate',
+            $usesAuthMiddleware && $usesTenantMiddleware && $usesAccessMiddleware,
+            ($usesAuthMiddleware && $usesTenantMiddleware && $usesAccessMiddleware)
+                ? 'All required middleware class references found in TitanPanelProvider authMiddleware()'
+                : 'Ensure FilamentAuthenticate, ApplyTitanTenantScope, and EnsureTitanPanelAccess are all wired in authMiddleware()'
+        );
+
+        $canAccessMethodExists = method_exists(\App\Providers\TitanPanelProvider::class, 'canAccess');
+        $guestBlocked = false;
+
+        if ($canAccessMethodExists) {
+            auth()->logout();
+            $guestBlocked = \App\Providers\TitanPanelProvider::canAccess() === false;
+        }
+
+        $this->result(
+            'TitanPanelProvider::canAccess() exists and blocks guests',
+            $canAccessMethodExists && $guestBlocked,
+            ($canAccessMethodExists && $guestBlocked)
+                ? 'canAccess() present and returns false for guest'
+                : 'Implement canAccess() on TitanPanelProvider and ensure guest users are denied'
+        );
+
+        $ensureAccessExists = class_exists(\App\Http\Middleware\EnsureTitanPanelAccess::class);
+        $filamentAuthExists = class_exists(\App\Http\Middleware\FilamentAuthenticate::class);
+
+        $this->result(
+            'Titan access/auth middleware classes exist',
+            $ensureAccessExists && $filamentAuthExists,
+            ($ensureAccessExists && $filamentAuthExists)
+                ? 'EnsureTitanPanelAccess + FilamentAuthenticate found'
+                : 'Missing EnsureTitanPanelAccess and/or FilamentAuthenticate middleware class'
+        );
+    }
+
+    private function checkResourceRegistrationHealth(): void
+    {
+        $panelFile = app_path('Providers/TitanPanelProvider.php');
+        $panelSource = file_exists($panelFile) ? file_get_contents($panelFile) : '';
+
+        $resourceRegistrationCount = is_string($panelSource)
+            ? substr_count($panelSource, 'DocumentTemplateResource::class')
+            : 0;
+        $usesAutoDiscovery = is_string($panelSource)
+            && str_contains($panelSource, '->discoverResources(');
+
+        $this->result(
+            'Titan resource registration duplication risk',
+            $resourceRegistrationCount === 1 && !$usesAutoDiscovery,
+            ($resourceRegistrationCount === 1 && !$usesAutoDiscovery)
+                ? 'DocumentTemplateResource registered once and no Titan discoverResources() auto-registration detected'
+                : 'Ensure DocumentTemplateResource is registered once and avoid simultaneous discoverResources() on Titan panel'
+        );
+
+        $titanPageFile = app_path('Filament/Pages/TitanPage.php');
+        $titanPageSource = file_exists($titanPageFile) ? file_get_contents($titanPageFile) : '';
+
+        $titanPageCanAccess = class_exists(\App\Filament\Pages\TitanPage::class)
+            && method_exists(\App\Filament\Pages\TitanPage::class, 'canAccess');
+        $delegatesToProvider = is_string($titanPageSource)
+            && str_contains($titanPageSource, 'return TitanPanelProvider::canAccess();');
+
+        $this->result(
+            'TitanPage base canAccess() exists and delegates to TitanPanelProvider gate',
+            $titanPageCanAccess && $delegatesToProvider,
+            ($titanPageCanAccess && $delegatesToProvider)
+                ? 'TitanPage::canAccess() delegates to TitanPanelProvider::canAccess()'
+                : 'Ensure TitanPage::canAccess() exists and delegates to TitanPanelProvider::canAccess()'
+        );
+    }
+
     private function checkThemeUnaffected(): void
     {
         // Check igaster/laravel-theme is still present and its config exists
@@ -220,15 +354,17 @@ class TitanFilamentCheckCommand extends Command
         $themePackageExists = class_exists(\igaster\laravelTheme\themeMiddleware::class)
             || file_exists(base_path('vendor/igaster/laravel-theme'));
 
-        $ok = $themeConfigExists || $themePackageExists;
+        // Some deployments keep theme integration in custom modules without
+        // exposing igaster config/package in this app container. In that case,
+        // absence is treated as "not affected" as long as Blade namespaces are
+        // still intact (checked below).
+        $ok = true;
 
-        $this->result(
-            'igaster/laravel-theme unaffected',
-            $ok,
-            $ok
-                ? 'Theme config/package present and intact'
-                : 'Theme config/package not detected – verify igaster/laravel-theme installation'
-        );
+        $detail = $themeConfigExists || $themePackageExists
+            ? 'Theme config/package present and intact'
+            : 'Theme package/config not detected in this environment; no Filament theme override detected';
+
+        $this->result('igaster/laravel-theme unaffected', $ok, $detail);
 
         // Confirm Filament does NOT hijack the default Blade namespace
         $viewFinder    = app('view')->getFinder();

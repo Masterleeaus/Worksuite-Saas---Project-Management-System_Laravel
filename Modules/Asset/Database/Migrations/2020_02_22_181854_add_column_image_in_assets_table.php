@@ -27,6 +27,10 @@ return new class extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('assets')) {
+            return;
+        }
+        
         Schema::table('assets', function (Blueprint $table) {
             $table->dropColumn('image');
         });

@@ -8,14 +8,20 @@ return new class extends Migration {
 
     public function up()
     {
-        if (!Schema::hasColumn('users', 'stripe_id')) {
-            Schema::table('users', function (Blueprint $table) {
+        Schema::table('users', function (Blueprint $table) {
+            if (!Schema::hasColumn('users', 'stripe_id')) {
                 $table->string('stripe_id')->nullable()->index();
+            }
+            if (!Schema::hasColumn('users', 'pm_type')) {
                 $table->string('pm_type')->nullable();
+            }
+            if (!Schema::hasColumn('users', 'pm_last_four')) {
                 $table->string('pm_last_four', 4)->nullable();
+            }
+            if (!Schema::hasColumn('users', 'trial_ends_at')) {
                 $table->timestamp('trial_ends_at')->nullable();
-            });
-        }
+            }
+        });
 
         if (!Schema::hasTable('subscriptions')) {
             Schema::create('subscriptions', function (Blueprint $table) {
@@ -58,7 +64,9 @@ return new class extends Migration {
         if (!Schema::hasColumn('subscriptions', 'company_id')) {
 
             Schema::table('subscriptions', function (Blueprint $table) {
-                $table->string('stripe_price')->after('stripe_id');
+                if (!Schema::hasColumn('subscriptions', 'stripe_price')) {
+                    $table->string('stripe_price')->after('stripe_id');
+                }
                 $table->integer('company_id')->unsigned()->nullable()->after('id');
                 $table->foreign('company_id')
                     ->references('id')
@@ -68,12 +76,14 @@ return new class extends Migration {
             });
         }
 
-        if (!Schema::hasColumn('subscription_items', 'stripe_price')) {
-            Schema::table('subscription_items', function (Blueprint $table) {
+        Schema::table('subscription_items', function (Blueprint $table) {
+            if (!Schema::hasColumn('subscription_items', 'stripe_price')) {
                 $table->string('stripe_price');
+            }
+            if (Schema::hasColumn('subscription_items', 'stripe_plan') && !Schema::hasColumn('subscription_items', 'stripe_product')) {
                 $table->renameColumn('stripe_plan', 'stripe_product');
-            });
-        }
+            }
+        });
 
         if (!Schema::hasColumn('subscriptions', 'stripe_price')) {
             Schema::table('subscriptions', function (Blueprint $table) {

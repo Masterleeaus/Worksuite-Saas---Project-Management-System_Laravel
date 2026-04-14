@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('reach_messages')) {
+            return;
+        }
+
         Schema::create('reach_messages', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('conversation_id')->index();
