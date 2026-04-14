@@ -10,8 +10,8 @@ trait ModuleNamespacePath
         $normalizedPath = $this->normalizeNamespacePath($path);
 
         return $normalizedPath === ''
-            ? $baseNamespace.'\\'.$module
-            : $baseNamespace.'\\'.$module.'\\'.$normalizedPath;
+            ? implode('\\', [$baseNamespace, $module])
+            : implode('\\', [$baseNamespace, $module, $normalizedPath]);
     }
 
     protected function normalizeNamespacePath(string $path): string

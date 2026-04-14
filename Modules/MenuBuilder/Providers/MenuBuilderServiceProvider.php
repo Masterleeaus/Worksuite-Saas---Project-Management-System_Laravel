@@ -92,7 +92,7 @@ class MenuBuilderServiceProvider extends ServiceProvider
 
         $this->loadViewsFrom(array_merge($this->getPublishableViewPaths(), [$sourcePath]), $this->nameLower);
 
-        $componentNamespace = $this->moduleNamespace($this->name, (string) config('modules.paths.generator.component-class.path', ''));
+        $componentNamespace = $this->moduleNamespace($this->name, config('modules.paths.generator.component-class.path', ''));
         Blade::componentNamespace($componentNamespace, $this->nameLower);
     }
 
