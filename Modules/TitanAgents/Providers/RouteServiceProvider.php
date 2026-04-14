@@ -34,7 +34,7 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapWebRoutes(): void
     {
-        Route::middleware('web')->group(module_path('TitanAgents', '/routes/web.php'));
+        Route::middleware('web')->group(module_path('TitanAgents', '/Routes/web.php'));
     }
 
     /**
@@ -44,6 +44,6 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapApiRoutes(): void
     {
-        Route::middleware('api')->prefix('api')->name('api.')->group(module_path('TitanAgents', '/routes/api.php'));
+        Route::middleware('api')->prefix('api')->name('api.')->group(module_path('TitanAgents', '/Routes/api.php'));
     }
 }

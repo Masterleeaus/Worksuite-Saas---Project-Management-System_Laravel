@@ -29,7 +29,7 @@ class TestimonialsServiceProvider extends ServiceProvider
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
-        $this->loadMigrationsFrom(module_path($this->name, 'Database/migrations'));
+        $this->loadMigrationsFrom(module_path($this->name, 'Database/Migrations'));
     }
 
     /**
@@ -110,7 +110,7 @@ protected function registerConfig(): void
     public function registerViews(): void
     {
         $viewPath = resource_path('views/modules/'.$this->nameLower);
-        $sourcePath = module_path($this->name, 'resources/views');
+        $sourcePath = module_path($this->name, 'Resources/views');
 
         $this->publishes([$sourcePath => $viewPath], ['views', $this->nameLower.'-module-views']);
 
