@@ -16,6 +16,6 @@ trait ModuleNamespacePath
 
     protected function normalizeNamespacePath(string $path): string
     {
-        return str_replace(['/', '\\'], '\\', trim($path, '/\\'));
+        return str_replace('/', '\\', trim($path, '/\\'));
     }
 }
