@@ -103,8 +103,6 @@ class TitanProjectsResourceTest extends TestCase
         auth()->setUser(new TitanProjectsFakeUser(7001, 1, ['admin'], [
             'titan_access' => 'all',
             'view_projects' => 'all',
-            'edit_projects' => 'all',
-            'add_projects' => 'all',
         ]));
 
         $ids = ProjectResource::getEloquentQuery()->pluck('projects.id')->all();
@@ -139,8 +137,6 @@ class TitanProjectsResourceTest extends TestCase
         auth()->setUser(new TitanProjectsFakeUser(7003, 1, ['admin'], [
             'titan_access' => 'all',
             'view_projects' => 'all',
-            'edit_projects' => 'all',
-            'add_projects' => 'all',
         ]));
         $this->assertTrue(ProjectResource::canViewAny());
         $this->assertTrue(ProjectResource::canView($project));
