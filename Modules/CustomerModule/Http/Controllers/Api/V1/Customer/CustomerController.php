@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Validator;
 use Kreait\Firebase\Factory;
 use Modules\BookingModule\Entities\Booking;
 use Modules\BusinessSettingsModule\Entities\ErrorLog;
-use Modules\SMSModule\Lib\SMS_gateway;
+use Modules\Sms\Lib\SMS_gateway;
 use Modules\TransactionModule\Entities\LoyaltyPointTransaction;
 use Modules\TransactionModule\Entities\Transaction;
 use Modules\UserManagement\Entities\Guest;

@@ -16,7 +16,7 @@ use Modules\BusinessSettingsModule\Entities\BusinessSettings;
 /**
  * SmsGatewayConfigController
  *
- * Merged from SMSModule Web Admin controller.
+ * Merged from Sms Web Admin controller.
  * Handles gateway config UI for the Sms module (Worksuite/WorksuiteSaaS hybrid).
  */
 class SmsGatewayConfigController extends Controller

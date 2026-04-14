@@ -11,7 +11,7 @@ use Modules\Sms\Http\Controllers\Cleaning\SmsOptOutController;
 
 /*
 |--------------------------------------------------------------------------
-| Web Routes — Sms Module (merged Sms + SMSModule)
+| Web Routes — Sms Module (merged Sms + Sms)
 |--------------------------------------------------------------------------
 |
 | Three route groups:
@@ -69,7 +69,7 @@ Route::post('sms/twilio/webhook', [SmsOptOutController::class, 'twilioWebhook'])
     ->withoutMiddleware(['web']);
 
 // -----------------------------------------------------------------------
-// Group 2: SaaS admin gateway configuration (merged from SMSModule)
+// Group 2: SaaS admin gateway configuration (merged from Sms)
 // -----------------------------------------------------------------------
 Route::group([
     'prefix'     => 'admin',
