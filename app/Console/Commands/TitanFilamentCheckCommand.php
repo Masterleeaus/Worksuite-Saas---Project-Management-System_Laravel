@@ -43,6 +43,7 @@ class TitanFilamentCheckCommand extends Command
         $this->checkModuleDetection();
         $this->checkAuthGuard();
         $this->checkPanelAccessWiring();
+        $this->checkResourceRegistrationHealth();
         $this->checkThemeUnaffected();
 
         $this->printSummary();
@@ -307,6 +308,42 @@ class TitanFilamentCheckCommand extends Command
             ($ensureAccessExists && $filamentAuthExists)
                 ? 'EnsureTitanPanelAccess + FilamentAuthenticate found'
                 : 'Missing EnsureTitanPanelAccess and/or FilamentAuthenticate middleware class'
+        );
+    }
+
+    private function checkResourceRegistrationHealth(): void
+    {
+        $panelFile = app_path('Providers/TitanPanelProvider.php');
+        $panelSource = file_exists($panelFile) ? file_get_contents($panelFile) : '';
+
+        $resourceRegistrationCount = is_string($panelSource)
+            ? substr_count($panelSource, 'DocumentTemplateResource::class')
+            : 0;
+        $usesAutoDiscovery = is_string($panelSource)
+            && str_contains($panelSource, '->discoverResources(');
+
+        $this->result(
+            'Titan resource registration duplication risk',
+            $resourceRegistrationCount === 1 && !$usesAutoDiscovery,
+            ($resourceRegistrationCount === 1 && !$usesAutoDiscovery)
+                ? 'DocumentTemplateResource registered once and no Titan discoverResources() auto-registration detected'
+                : 'Ensure DocumentTemplateResource is registered once and avoid simultaneous discoverResources() on Titan panel'
+        );
+
+        $titanPageFile = app_path('Filament/Pages/TitanPage.php');
+        $titanPageSource = file_exists($titanPageFile) ? file_get_contents($titanPageFile) : '';
+
+        $titanPageCanAccess = class_exists(\App\Filament\Pages\TitanPage::class)
+            && method_exists(\App\Filament\Pages\TitanPage::class, 'canAccess');
+        $delegatesToProvider = is_string($titanPageSource)
+            && str_contains($titanPageSource, 'return TitanPanelProvider::canAccess();');
+
+        $this->result(
+            'TitanPage base canAccess() exists and delegates to TitanPanelProvider gate',
+            $titanPageCanAccess && $delegatesToProvider,
+            ($titanPageCanAccess && $delegatesToProvider)
+                ? 'TitanPage::canAccess() delegates to TitanPanelProvider::canAccess()'
+                : 'Ensure TitanPage::canAccess() exists and delegates to TitanPanelProvider::canAccess()'
         );
     }
 
