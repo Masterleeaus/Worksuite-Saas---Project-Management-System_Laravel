@@ -7,6 +7,10 @@ use Modules\TitanDocs\Console\InstallTitanDocsCommand;
 use Modules\TitanDocs\Providers\RouteServiceProvider;
 class TitanDocsServiceProvider extends ServiceProvider
 {
+    private static bool $registered = false;
+
+    private static bool $booted = false;
+
     /**
      * @var string $moduleName
      */
@@ -26,6 +30,12 @@ class TitanDocsServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (self::$booted) {
+            return;
+        }
+
+        self::$booted = true;
+
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
@@ -37,8 +47,14 @@ class TitanDocsServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->register(RouteServiceProvider::class);
+        if (self::$registered) {
+            return;
         }
+
+        self::$registered = true;
+
+        $this->app->register(RouteServiceProvider::class);
+    }
 
     /**
      * Register config.
