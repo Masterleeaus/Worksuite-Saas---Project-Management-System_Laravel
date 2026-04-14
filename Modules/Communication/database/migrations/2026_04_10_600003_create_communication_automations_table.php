@@ -47,10 +47,12 @@ return new class extends Migration
             $table->index(['company_id', 'trigger_event']);
             $table->index(['company_id', 'status']);
 
-            $table->foreign('template_id')
-                ->references('id')
-                ->on('communication_templates')
-                ->nullOnDelete();
+            if (Schema::hasTable('communication_templates')) {
+                $table->foreign('template_id')
+                    ->references('id')
+                    ->on('communication_templates')
+                    ->nullOnDelete();
+            }
         });
     }
 

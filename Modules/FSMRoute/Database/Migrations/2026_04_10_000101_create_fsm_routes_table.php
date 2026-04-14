@@ -27,8 +27,12 @@ return new class extends Migration
                 $table->unsignedBigInteger('fsm_route_id');
                 $table->unsignedBigInteger('fsm_route_day_id');
 
-                $table->foreign('fsm_route_id')->references('id')->on('fsm_routes')->cascadeOnDelete();
-                $table->foreign('fsm_route_day_id')->references('id')->on('fsm_route_days')->cascadeOnDelete();
+                if (Schema::hasTable('fsm_routes')) {
+                    $table->foreign('fsm_route_id')->references('id')->on('fsm_routes')->cascadeOnDelete();
+                }
+                if (Schema::hasTable('fsm_route_days')) {
+                    $table->foreign('fsm_route_day_id')->references('id')->on('fsm_route_days')->cascadeOnDelete();
+                }
 
                 $table->primary(['fsm_route_id', 'fsm_route_day_id']);
             });
@@ -39,8 +43,12 @@ return new class extends Migration
                 $table->unsignedBigInteger('fsm_route_id');
                 $table->unsignedBigInteger('fsm_location_id');
 
-                $table->foreign('fsm_route_id')->references('id')->on('fsm_routes')->cascadeOnDelete();
-                $table->foreign('fsm_location_id')->references('id')->on('fsm_locations')->cascadeOnDelete();
+                if (Schema::hasTable('fsm_routes')) {
+                    $table->foreign('fsm_route_id')->references('id')->on('fsm_routes')->cascadeOnDelete();
+                }
+                if (Schema::hasTable('fsm_locations')) {
+                    $table->foreign('fsm_location_id')->references('id')->on('fsm_locations')->cascadeOnDelete();
+                }
 
                 $table->primary(['fsm_route_id', 'fsm_location_id']);
             });

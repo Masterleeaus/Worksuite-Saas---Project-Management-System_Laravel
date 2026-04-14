@@ -78,8 +78,12 @@ return new class extends Migration {
                 $table->unsignedBigInteger('frequency_set_id');
                 $table->unsignedBigInteger('frequency_id');
 
-                $table->foreign('frequency_set_id')->references('id')->on('fsm_frequency_sets')->cascadeOnDelete();
-                $table->foreign('frequency_id')->references('id')->on('fsm_frequencies')->cascadeOnDelete();
+                if (Schema::hasTable('fsm_frequency_sets')) {
+                    $table->foreign('frequency_set_id')->references('id')->on('fsm_frequency_sets')->cascadeOnDelete();
+                }
+                if (Schema::hasTable('fsm_frequencies')) {
+                    $table->foreign('frequency_id')->references('id')->on('fsm_frequencies')->cascadeOnDelete();
+                }
             });
         }
     }

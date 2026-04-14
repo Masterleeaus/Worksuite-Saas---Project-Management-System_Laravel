@@ -16,7 +16,9 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
             $table->unsignedBigInteger('category_id')->nullable()->index();
-            $table->foreign('category_id')->references('id')->on('fsm_stock_categories')->onDelete('set null');
+            if (Schema::hasTable('fsm_stock_categories')) {
+                $table->foreign('category_id')->references('id')->on('fsm_stock_categories')->nullOnDelete();
+            }
             $table->string('name', 128);
             $table->text('description')->nullable();
             $table->string('unit', 32)->default('units');

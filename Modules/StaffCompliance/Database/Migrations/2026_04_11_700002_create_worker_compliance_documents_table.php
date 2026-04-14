@@ -30,7 +30,9 @@ class CreateWorkerComplianceDocumentsTable extends Migration
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('document_type_id')->references('id')->on('compliance_document_types')->onDelete('cascade');
+            if (Schema::hasTable('compliance_document_types')) {
+                $table->foreign('document_type_id')->references('id')->on('compliance_document_types')->onDelete('cascade');
+            }
             $table->foreign('verified_by')->references('id')->on('users')->onDelete('set null');
         });
     }

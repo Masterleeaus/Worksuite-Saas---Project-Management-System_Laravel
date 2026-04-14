@@ -25,8 +25,12 @@ return new class extends Migration {
                     ->comment('FSM order template to use for generated orders');
                 $table->timestamps();
 
-                $table->foreign('frequency_set_id')->references('id')->on('fsm_frequency_sets')->nullOnDelete();
-                $table->foreign('fsm_template_id')->references('id')->on('fsm_templates')->nullOnDelete();
+                if (Schema::hasTable('fsm_frequency_sets')) {
+                    $table->foreign('frequency_set_id')->references('id')->on('fsm_frequency_sets')->nullOnDelete();
+                }
+                if (Schema::hasTable('fsm_templates')) {
+                    $table->foreign('fsm_template_id')->references('id')->on('fsm_templates')->nullOnDelete();
+                }
             });
         }
 
@@ -52,11 +56,21 @@ return new class extends Migration {
                 $table->unsignedBigInteger('person_id')->nullable()->index();
                 $table->timestamps();
 
-                $table->foreign('recurring_template_id')->references('id')->on('fsm_recurring_templates')->nullOnDelete();
-                $table->foreign('location_id')->references('id')->on('fsm_locations')->nullOnDelete();
-                $table->foreign('frequency_set_id')->references('id')->on('fsm_frequency_sets')->nullOnDelete();
-                $table->foreign('fsm_template_id')->references('id')->on('fsm_templates')->nullOnDelete();
-                $table->foreign('team_id')->references('id')->on('fsm_teams')->nullOnDelete();
+                if (Schema::hasTable('fsm_recurring_templates')) {
+                    $table->foreign('recurring_template_id')->references('id')->on('fsm_recurring_templates')->nullOnDelete();
+                }
+                if (Schema::hasTable('fsm_locations')) {
+                    $table->foreign('location_id')->references('id')->on('fsm_locations')->nullOnDelete();
+                }
+                if (Schema::hasTable('fsm_frequency_sets')) {
+                    $table->foreign('frequency_set_id')->references('id')->on('fsm_frequency_sets')->nullOnDelete();
+                }
+                if (Schema::hasTable('fsm_templates')) {
+                    $table->foreign('fsm_template_id')->references('id')->on('fsm_templates')->nullOnDelete();
+                }
+                if (Schema::hasTable('fsm_teams')) {
+                    $table->foreign('team_id')->references('id')->on('fsm_teams')->nullOnDelete();
+                }
             });
         }
 
@@ -67,8 +81,12 @@ return new class extends Migration {
                 $table->unsignedBigInteger('fsm_recurring_id');
                 $table->unsignedBigInteger('fsm_equipment_id');
 
-                $table->foreign('fsm_recurring_id')->references('id')->on('fsm_recurrings')->cascadeOnDelete();
-                $table->foreign('fsm_equipment_id')->references('id')->on('fsm_equipment')->cascadeOnDelete();
+                if (Schema::hasTable('fsm_recurrings')) {
+                    $table->foreign('fsm_recurring_id')->references('id')->on('fsm_recurrings')->cascadeOnDelete();
+                }
+                if (Schema::hasTable('fsm_equipment')) {
+                    $table->foreign('fsm_equipment_id')->references('id')->on('fsm_equipment')->cascadeOnDelete();
+                }
             });
         }
     }

@@ -26,10 +26,14 @@ return new class extends Migration {
             $table->integer('sort_order')->default(0);
             $table->timestamps();
 
-            $table->foreign('agreement_id')
-                ->references('id')->on('fsm_service_agreements')->cascadeOnDelete();
-            $table->foreign('location_id')
-                ->references('id')->on('fsm_locations')->nullOnDelete();
+            if (Schema::hasTable('fsm_service_agreements')) {
+                $table->foreign('agreement_id')
+                    ->references('id')->on('fsm_service_agreements')->cascadeOnDelete();
+            }
+            if (Schema::hasTable('fsm_locations')) {
+                $table->foreign('location_id')
+                    ->references('id')->on('fsm_locations')->nullOnDelete();
+            }
         });
     }
 

@@ -41,8 +41,10 @@ return new class extends Migration {
                     $table->foreign('location_id')->references('id')
                           ->on('fsm_locations')->cascadeOnDelete();
                 }
-                $table->foreign('size_id')->references('id')
-                      ->on('fsm_sizes')->cascadeOnDelete();
+                if (Schema::hasTable('fsm_sizes')) {
+                    $table->foreign('size_id')->references('id')
+                          ->on('fsm_sizes')->cascadeOnDelete();
+                }
             });
         }
 

@@ -10,7 +10,9 @@ return new class extends Migration {
         if (!Schema::hasColumn('fsm_orders', 'lead_id')) {
             Schema::table('fsm_orders', function (Blueprint $table) {
                 $table->unsignedBigInteger('lead_id')->nullable()->after('agreement_id')->index();
-                $table->foreign('lead_id')->references('id')->on('fsm_leads')->nullOnDelete();
+                if (Schema::hasTable('fsm_leads')) {
+                    $table->foreign('lead_id')->references('id')->on('fsm_leads')->nullOnDelete();
+                }
             });
         }
     }

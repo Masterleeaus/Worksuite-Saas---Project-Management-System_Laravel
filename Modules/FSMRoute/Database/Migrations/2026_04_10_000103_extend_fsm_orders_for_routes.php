@@ -13,7 +13,9 @@ return new class extends Migration
                 $table->unsignedBigInteger('dayroute_id')->nullable()->after('template_id')->index();
                 $table->unsignedInteger('route_sequence')->default(0)->after('dayroute_id');
 
-                $table->foreign('dayroute_id')->references('id')->on('fsm_day_routes')->nullOnDelete();
+                if (Schema::hasTable('fsm_day_routes')) {
+                    $table->foreign('dayroute_id')->references('id')->on('fsm_day_routes')->nullOnDelete();
+                }
             });
         }
     }

@@ -33,9 +33,15 @@ return new class extends Migration {
             $table->boolean('under_warranty')->default(false);
             $table->timestamps();
 
-            $table->foreign('equipment_id')->references('id')->on('fsm_equipment')->nullOnDelete();
-            $table->foreign('fsm_location_id')->references('id')->on('fsm_locations')->nullOnDelete();
-            $table->foreign('template_id')->references('id')->on('fsm_repair_order_templates')->nullOnDelete();
+            if (Schema::hasTable('fsm_equipment')) {
+                $table->foreign('equipment_id')->references('id')->on('fsm_equipment')->nullOnDelete();
+            }
+            if (Schema::hasTable('fsm_locations')) {
+                $table->foreign('fsm_location_id')->references('id')->on('fsm_locations')->nullOnDelete();
+            }
+            if (Schema::hasTable('fsm_repair_order_templates')) {
+                $table->foreign('template_id')->references('id')->on('fsm_repair_order_templates')->nullOnDelete();
+            }
         });
     }
 

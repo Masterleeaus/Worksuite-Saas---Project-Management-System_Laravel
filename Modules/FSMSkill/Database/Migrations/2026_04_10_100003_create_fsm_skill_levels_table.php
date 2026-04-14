@@ -20,7 +20,9 @@ return new class extends Migration {
             $table->boolean('default_level')->default(false);
             $table->timestamps();
 
-            $table->foreign('skill_id')->references('id')->on('fsm_skills')->cascadeOnDelete();
+            if (Schema::hasTable('fsm_skills')) {
+                $table->foreign('skill_id')->references('id')->on('fsm_skills')->cascadeOnDelete();
+            }
         });
     }
 

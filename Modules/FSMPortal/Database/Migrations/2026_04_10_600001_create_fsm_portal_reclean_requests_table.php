@@ -21,7 +21,9 @@ return new class extends Migration {
             $table->unsignedBigInteger('fsm_activity_id')->nullable(); // follow-up FSMActivity if created
             $table->timestamps();
 
-            $table->foreign('fsm_order_id')->references('id')->on('fsm_orders')->cascadeOnDelete();
+            if (Schema::hasTable('fsm_orders')) {
+                $table->foreign('fsm_order_id')->references('id')->on('fsm_orders')->cascadeOnDelete();
+            }
         });
     }
 

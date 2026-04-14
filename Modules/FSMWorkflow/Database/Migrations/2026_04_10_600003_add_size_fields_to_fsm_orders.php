@@ -21,7 +21,9 @@ return new class extends Migration {
                 $table->unsignedInteger('estimated_sqm')->nullable()->after('size_id');
                 $table->unsignedInteger('room_count')->nullable()->after('estimated_sqm');
 
-                $table->foreign('size_id')->references('id')->on('fsm_sizes')->nullOnDelete();
+                if (Schema::hasTable('fsm_sizes')) {
+                    $table->foreign('size_id')->references('id')->on('fsm_sizes')->nullOnDelete();
+                }
             });
         }
     }

@@ -32,10 +32,14 @@ return new class extends Migration {
                 $table->unsignedBigInteger('fsm_service_agreement_id');
                 $table->unsignedBigInteger('fsm_location_id');
 
-                $table->foreign('fsm_service_agreement_id')
-                    ->references('id')->on('fsm_service_agreements')->cascadeOnDelete();
-                $table->foreign('fsm_location_id')
-                    ->references('id')->on('fsm_locations')->cascadeOnDelete();
+                if (Schema::hasTable('fsm_service_agreements')) {
+                    $table->foreign('fsm_service_agreement_id')
+                        ->references('id')->on('fsm_service_agreements')->cascadeOnDelete();
+                }
+                if (Schema::hasTable('fsm_locations')) {
+                    $table->foreign('fsm_location_id')
+                        ->references('id')->on('fsm_locations')->cascadeOnDelete();
+                }
 
                 $table->unique(['fsm_service_agreement_id', 'fsm_location_id'], 'uniq_agreement_location');
             });
@@ -48,10 +52,14 @@ return new class extends Migration {
                 $table->unsignedBigInteger('fsm_service_agreement_id');
                 $table->unsignedBigInteger('fsm_template_id');
 
-                $table->foreign('fsm_service_agreement_id')
-                    ->references('id')->on('fsm_service_agreements')->cascadeOnDelete();
-                $table->foreign('fsm_template_id')
-                    ->references('id')->on('fsm_templates')->cascadeOnDelete();
+                if (Schema::hasTable('fsm_service_agreements')) {
+                    $table->foreign('fsm_service_agreement_id')
+                        ->references('id')->on('fsm_service_agreements')->cascadeOnDelete();
+                }
+                if (Schema::hasTable('fsm_templates')) {
+                    $table->foreign('fsm_template_id')
+                        ->references('id')->on('fsm_templates')->cascadeOnDelete();
+                }
 
                 $table->unique(['fsm_service_agreement_id', 'fsm_template_id'], 'uniq_agreement_template');
             });
