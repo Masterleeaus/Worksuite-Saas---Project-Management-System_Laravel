@@ -4,7 +4,7 @@ namespace Modules\FSMSize\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Modules\FSMCore\Entities\FsmLocation;
+use Modules\FSMCore\Models\FSMLocation;
 
 class FsmLocationSize extends Model
 {

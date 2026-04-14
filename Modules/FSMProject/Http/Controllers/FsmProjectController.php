@@ -5,7 +5,7 @@ namespace Modules\FSMProject\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
-use Modules\FSMCore\Entities\FsmOrder;
+use Modules\FSMCore\Models\FSMOrder;
 
 class FsmProjectController extends Controller
 {
