@@ -113,7 +113,6 @@ class ClientResource extends BaseTenantResource
                 ->options([
                     'active' => 'Active',
                     'deactive' => 'Inactive',
-                    'inactive' => 'Inactive',
                 ])
                 ->default('active')
                 ->required(),
@@ -175,7 +174,6 @@ class ClientResource extends BaseTenantResource
                     ->options([
                         'active' => 'Active',
                         'deactive' => 'Inactive',
-                        'inactive' => 'Inactive',
                     ]),
                 Filter::make('created_at')
                     ->form([
