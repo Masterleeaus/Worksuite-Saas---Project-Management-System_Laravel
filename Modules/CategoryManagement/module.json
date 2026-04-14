@@ -1,0 +1,23 @@
+{
+    "name": "CategoryManagement",
+    "alias": "categorymanagement",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\CategoryManagement\\Providers\\CategoryManagementServiceProvider",
+        "Modules\\CategoryManagement\\Providers\\EventServiceProvider"
+    ],
+    "aliases": {},
+    "files": [
+        "start.php"
+    ],
+    "requires": [],
+    "active": 1,
+    "order": 0,
+    "permissions": [],
+    "roles_permissions": {
+        "admin": [],
+        "manager": []
+    }
+}

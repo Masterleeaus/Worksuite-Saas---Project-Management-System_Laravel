@@ -1,0 +1,40 @@
+<?php
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class AddIsSuspendedColToProvidersTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        if (Schema::hasTable('providers')) {
+        Schema::table('providers', function (Blueprint $table) {
+            if (!Schema::hasColumn('providers', 'is_suspended')) {
+                $table->boolean('is_suspended')->default(0);
+            }
+        });
+    }
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        if (Schema::hasTable('providers')) {
+        Schema::table('providers', function (Blueprint $table) {
+            if (Schema::hasColumn('providers', 'is_suspended')) {
+                $table->dropColumn('is_suspended');
+            }
+        });
+    }
+    }
+}
