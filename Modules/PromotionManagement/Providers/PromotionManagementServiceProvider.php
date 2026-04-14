@@ -73,6 +73,20 @@ class PromotionManagementServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(
             module_path($this->moduleName, 'Config/config.php'), $this->moduleNameLower
         );
+
+        foreach (['ai', 'automation'] as $extraConfig) {
+            $source = module_path($this->moduleName, 'Config/' . $extraConfig . '.php');
+
+            if (!file_exists($source)) {
+                continue;
+            }
+
+            $this->publishes([
+                $source => config_path($this->moduleNameLower . '_' . $extraConfig . '.php'),
+            ], 'config');
+
+            $this->mergeConfigFrom($source, $this->moduleNameLower . '_' . $extraConfig);
+        }
     }
 
     /**

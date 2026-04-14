@@ -33,8 +33,7 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function map()
     {
-        $this->mapApiV1Routes();
-
+        $this->mapApiRoutes();
         $this->mapWebRoutes();
     }
 
@@ -47,9 +46,17 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapWebRoutes()
     {
-        Route::middleware('web')
-            ->namespace($this->moduleNamespace)
-            ->group(module_path('PromotionManagement', '/Routes/web.php'));
+        foreach ([
+            module_path('PromotionManagement', '/Routes/web.php'),
+            module_path('PromotionManagement', '/routes/web.php'),
+        ] as $webRoutes) {
+            if (file_exists($webRoutes)) {
+                Route::middleware('web')
+                    ->namespace($this->moduleNamespace)
+                    ->group($webRoutes);
+                break;
+            }
+        }
     }
 
     /**
@@ -59,11 +66,21 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function mapApiV1Routes()
+    protected function mapApiRoutes()
     {
-        Route::prefix('api/v1')
-            ->middleware('api')
-            ->namespace($this->moduleNamespace)
-            ->group(module_path('PromotionManagement', '/Routes/api/v1/api.php'));
+        foreach ([
+            module_path('PromotionManagement', '/Routes/api.php'),
+            module_path('PromotionManagement', '/routes/api.php'),
+            module_path('PromotionManagement', '/Routes/api/v1/api.php'),
+            module_path('PromotionManagement', '/routes/api/v1/api.php'),
+        ] as $apiRoutes) {
+            if (file_exists($apiRoutes)) {
+                Route::prefix('api')
+                    ->middleware('api')
+                    ->namespace($this->moduleNamespace)
+                    ->group($apiRoutes);
+                break;
+            }
+        }
     }
 }
