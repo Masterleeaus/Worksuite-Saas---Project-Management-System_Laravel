@@ -28,7 +28,7 @@ return new class extends Migration
                 continue;
             }
 
-            $modulesInPackage = json_decode((string) $package->module_in_package, true) ?: [];
+            $modulesInPackage = json_decode($package->module_in_package ?? '', true) ?? [];
 
             ModuleSetting::where('company_id', $company->id)
                 ->whereIn('module_name', $modulesInPackage)

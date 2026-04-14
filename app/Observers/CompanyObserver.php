@@ -1019,7 +1019,7 @@ class CompanyObserver
 
         $moduleSettings = ModuleSetting::where('company_id', $company->id)->get();
         $package = Package::where('id', $company->package_id)->first();
-        $moduleInPackage = collect(json_decode($package?->module_in_package ?? '[]', true));
+        $moduleInPackage = collect(json_decode($package?->module_in_package ?? '', true) ?? []);
         self::widgetUpdate($company, $moduleInPackage->toArray());
 
         $activeModuleSettings = [];

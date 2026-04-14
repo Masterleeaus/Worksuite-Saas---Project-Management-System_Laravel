@@ -107,7 +107,7 @@ class ModuleSetting extends BaseModel
 
         // WORKSUITESAAS
         $package = optional($company->package);
-        $moduleInPackage = collect(json_decode($package->module_in_package ?? '[]', true));
+        $moduleInPackage = collect(json_decode($package->module_in_package ?? '', true) ?? []);
 
         foreach ($roles as $role) {
             $data = ModuleSetting::withoutGlobalScope(CompanyScope::class)
