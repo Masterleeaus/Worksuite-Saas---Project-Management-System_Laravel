@@ -32,6 +32,12 @@ return new class extends Migration {
             }
         }
 
+        $canAssociatePermission = $hasModuleColumn || ($hasModuleIdColumn && $moduleId !== null);
+
+        if (!$canAssociatePermission) {
+            return;
+        }
+
         $permissions = [
             'view_documents',
             'create_documents',
@@ -76,9 +82,7 @@ return new class extends Migration {
                     $row['created_by'] = 0;
                 }
 
-                if (!$hasModuleIdColumn || $moduleId !== null) {
-                    DB::table('permissions')->insert($row);
-                }
+                DB::table('permissions')->insert($row);
             }
         }
 
@@ -109,6 +113,7 @@ return new class extends Migration {
                             ];
 
                             if ($pivotTable === 'permission_role' && Schema::hasColumn('permission_role', 'permission_type_id')) {
+                                // 4 maps to "all" access in WorkSuite permission types.
                                 $pivotData['permission_type_id'] = 4;
                             }
 
