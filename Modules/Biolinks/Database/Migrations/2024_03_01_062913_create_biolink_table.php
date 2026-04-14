@@ -27,7 +27,7 @@ return new class extends Migration {
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade')->onUpdate('cascade');
             $table->string('page_link')->nullable();
             $table->integer('total_page_views')->default(0);
-            $table->string('status')->default(Status::Active);
+            $table->string('status')->default(Status::Active->value);
             $table->timestamps();
         });
 
@@ -35,21 +35,21 @@ return new class extends Migration {
             $table->increments('id');
             $table->integer('biolink_id')->unsigned()->nullable();
             $table->foreign('biolink_id')->references('id')->on('biolinks')->onDelete('cascade')->onUpdate('cascade');
-            $table->string('theme')->default(Theme::GRADIENTA);
+            $table->string('theme')->default(Theme::GRADIENTA->value);
             $table->string('theme_color')->nullable();
             $table->string('custom_color_one')->nullable();
             $table->string('custom_color_two')->nullable();
             $table->string('favicon')->nullable();
-            $table->string('font')->default(Font::ARIAL);
-            $table->string('block_space')->default(BlockSpacing::MEDIUM);
-            $table->string('block_hover_animation')->default(BlockHoverAnimation::NONE);
-            $table->string('verified_badge')->default(VerifiedBadge::NONE);
-            $table->string('display_branding')->default(YesNo::No);
+            $table->string('font')->default(Font::ARIAL->value);
+            $table->string('block_space')->default(BlockSpacing::MEDIUM->value);
+            $table->string('block_hover_animation')->default(BlockHoverAnimation::NONE->value);
+            $table->string('verified_badge')->default(VerifiedBadge::NONE->value);
+            $table->string('display_branding')->default(YesNo::No->value);
             $table->string('branding_name')->nullable();
             $table->string('branding_url')->nullable();
             $table->string('branding_text_color');
             $table->string('protection_password');
-            $table->string('is_sensitive')->default(YesNo::No);
+            $table->string('is_sensitive')->default(YesNo::No->value);
             $table->string('page_title');
             $table->string('meta_description');
             $table->string('meta_keywords');
