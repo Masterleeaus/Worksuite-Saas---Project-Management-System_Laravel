@@ -87,9 +87,12 @@ return new class extends Migration {
         }
 
         // Give company role basic document permissions
-        $pivotTable = Schema::hasTable('permission_role')
-            ? 'permission_role'
-            : (Schema::hasTable('role_has_permissions') ? 'role_has_permissions' : null);
+        $pivotTable = null;
+        if (Schema::hasTable('permission_role')) {
+            $pivotTable = 'permission_role';
+        } elseif (Schema::hasTable('role_has_permissions')) {
+            $pivotTable = 'role_has_permissions';
+        }
 
         if (Schema::hasTable('roles') && $pivotTable) {
             $companyRole = DB::table('roles')->where('name', 'company')->first();
