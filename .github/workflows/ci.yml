@@ -34,8 +34,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # composer.lock requires PHP >=8.2 (symfony 7.x, pint 1.25, lcobucci/jwt 5.5 etc.)
-        php: ["8.2", "8.3"]
+        # composer.lock currently resolves openspout/openspout 4.32.x, which requires PHP 8.3+.
+        php: ["8.3"]
 
     steps:
       - name: Checkout
