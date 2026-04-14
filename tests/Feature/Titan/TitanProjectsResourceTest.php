@@ -4,10 +4,10 @@ namespace Tests\Feature\Titan;
 
 use App\Filament\Resources\ProjectResource;
 use App\Models\Project;
-use Illuminate\Foundation\Auth\User as AuthenticatableUser;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Tests\Feature\Titan\Support\TitanFakeUser;
 use Tests\TestCase;
 
 class TitanProjectsResourceTest extends TestCase
@@ -100,7 +100,7 @@ class TitanProjectsResourceTest extends TestCase
             ['id' => 2002, 'company_id' => 2, 'project_name' => 'Tenant B Project', 'project_admin' => 21, 'client_id' => 21, 'start_date' => now()->toDateString(), 'status' => 'in progress', 'completion_percent' => 40, 'added_by' => 21, 'created_at' => now(), 'updated_at' => now()],
         ]);
 
-        auth()->setUser(new TitanProjectsFakeUser(7001, 1, ['admin'], [
+        auth()->setUser(new TitanFakeUser(7001, 1, ['admin'], [
             'titan_access' => 'all',
             'view_projects' => 'all',
         ]));
@@ -125,7 +125,7 @@ class TitanProjectsResourceTest extends TestCase
         auth()->logout();
         $this->assertFalse(ProjectResource::canViewAny());
 
-        auth()->setUser(new TitanProjectsFakeUser(7002, 1, ['employee'], [
+        auth()->setUser(new TitanFakeUser(7002, 1, ['employee'], [
             'titan_access' => false,
             'view_projects' => 'none',
             'edit_projects' => 'none',
@@ -134,47 +134,11 @@ class TitanProjectsResourceTest extends TestCase
         $this->assertFalse(ProjectResource::canViewAny());
         $this->assertFalse(ProjectResource::canView($project));
 
-        auth()->setUser(new TitanProjectsFakeUser(7003, 1, ['admin'], [
+        auth()->setUser(new TitanFakeUser(7003, 1, ['admin'], [
             'titan_access' => 'all',
             'view_projects' => 'all',
         ]));
         $this->assertTrue(ProjectResource::canViewAny());
         $this->assertTrue(ProjectResource::canView($project));
-    }
-}
-
-class TitanProjectsFakeUser extends AuthenticatableUser
-{
-    public ?int $company_id = null;
-    public ?object $company = null;
-
-    /** @var array<int, string> */
-    private array $roles = [];
-
-    /** @var array<string, string|bool> */
-    private array $permissions = [];
-
-    /**
-     * @param  array<int, string>  $roles
-     * @param  array<string, string|bool>  $permissions
-     */
-    public function __construct(int $id, ?int $companyId, array $roles, array $permissions)
-    {
-        parent::__construct([]);
-        $this->id = $id;
-        $this->company_id = $companyId;
-        $this->company = $companyId === null ? null : (object) ['id' => $companyId];
-        $this->roles = $roles;
-        $this->permissions = $permissions;
-    }
-
-    public function hasRole(string $role): bool
-    {
-        return in_array($role, $this->roles, true);
-    }
-
-    public function permission(string $permission): string|bool
-    {
-        return $this->permissions[$permission] ?? false;
     }
 }

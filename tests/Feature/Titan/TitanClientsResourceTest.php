@@ -3,10 +3,10 @@
 namespace Tests\Feature\Titan;
 
 use App\Filament\Resources\ClientResource;
-use Illuminate\Foundation\Auth\User as AuthenticatableUser;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Tests\Feature\Titan\Support\TitanFakeUser;
 use Tests\TestCase;
 
 class TitanClientsResourceTest extends TestCase
@@ -90,7 +90,7 @@ class TitanClientsResourceTest extends TestCase
             ['user_id' => 202, 'company_id' => 2, 'company_name' => 'B Co', 'added_by' => 502, 'last_updated_by' => 502, 'created_at' => now(), 'updated_at' => now()],
         ]);
 
-        auth()->setUser(new TitanClientsFakeUser(9001, 1, ['admin'], [
+        auth()->setUser(new TitanFakeUser(9001, 1, ['admin'], [
             'titan_access' => 'all',
             'view_clients' => 'all',
         ]));
@@ -106,52 +106,16 @@ class TitanClientsResourceTest extends TestCase
         auth()->logout();
         $this->assertFalse(ClientResource::canViewAny());
 
-        auth()->setUser(new TitanClientsFakeUser(9002, 1, ['employee'], [
+        auth()->setUser(new TitanFakeUser(9002, 1, ['employee'], [
             'titan_access' => false,
             'view_clients' => 'none',
         ]));
         $this->assertFalse(ClientResource::canViewAny());
 
-        auth()->setUser(new TitanClientsFakeUser(9003, 1, ['admin'], [
+        auth()->setUser(new TitanFakeUser(9003, 1, ['admin'], [
             'titan_access' => 'all',
             'view_clients' => 'all',
         ]));
         $this->assertTrue(ClientResource::canViewAny());
-    }
-}
-
-class TitanClientsFakeUser extends AuthenticatableUser
-{
-    public ?int $company_id = null;
-    public ?object $company = null;
-
-    /** @var array<int, string> */
-    private array $roles = [];
-
-    /** @var array<string, string|bool> */
-    private array $permissions = [];
-
-    /**
-     * @param  array<int, string>  $roles
-     * @param  array<string, string|bool>  $permissions
-     */
-    public function __construct(int $id, ?int $companyId, array $roles, array $permissions)
-    {
-        parent::__construct([]);
-        $this->id = $id;
-        $this->company_id = $companyId;
-        $this->company = $companyId === null ? null : (object) ['id' => $companyId];
-        $this->roles = $roles;
-        $this->permissions = $permissions;
-    }
-
-    public function hasRole(string $role): bool
-    {
-        return in_array($role, $this->roles, true);
-    }
-
-    public function permission(string $permission): string|bool
-    {
-        return $this->permissions[$permission] ?? false;
     }
 }
