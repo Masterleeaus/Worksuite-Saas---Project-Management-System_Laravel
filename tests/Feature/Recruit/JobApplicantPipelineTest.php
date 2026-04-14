@@ -3,15 +3,14 @@
 namespace Tests\Feature\Recruit;
 
 use Modules\Recruit\Entities\JobApplicant;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 /**
  * Feature-level tests for the JobApplicant pipeline that run without
  * a database connection, verifying pipeline-stage transitions and the
  * isHired() helper.
  *
- * Extends PHPUnit\Framework\TestCase (not Laravel's) — consistent with
- * other feature tests in this repository (e.g. GeofenceFeatureTest).
+ * Uses Laravel's base TestCase so model-level config lookups resolve via container.
  */
 class JobApplicantPipelineTest extends TestCase
 {
@@ -42,10 +41,9 @@ class JobApplicantPipelineTest extends TestCase
     /** @test */
     public function is_hired_returns_false_when_status_is_not_hired(): void
     {
-        $applicant = new JobApplicant([
-            'status'               => 'applied',
-            'converted_employee_id' => null,
-        ]);
+        $applicant = new JobApplicant();
+        $applicant->status = 'applied';
+        $applicant->converted_employee_id = null;
 
         $this->assertFalse($applicant->isHired());
     }
@@ -53,10 +51,9 @@ class JobApplicantPipelineTest extends TestCase
     /** @test */
     public function is_hired_returns_false_when_status_hired_but_no_employee_id(): void
     {
-        $applicant = new JobApplicant([
-            'status'               => 'hired',
-            'converted_employee_id' => null,
-        ]);
+        $applicant = new JobApplicant();
+        $applicant->status = 'hired';
+        $applicant->converted_employee_id = null;
 
         $this->assertFalse(
             $applicant->isHired(),

@@ -15,6 +15,10 @@ return new class extends Migration
      */
     public function up()
     {
+        if (\DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
         if (! Schema::hasTable('recruit_application_status_categories')) {
             Schema::create('recruit_application_status_categories', function (Blueprint $table) {
                 $table->bigIncrements('id');
