@@ -21,7 +21,7 @@ class AiChatServiceProvider extends ServiceProvider
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
-        $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/migrations'));
+        $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
         $this->registerMenu();
     }
 
@@ -132,7 +132,7 @@ class AiChatServiceProvider extends ServiceProvider
     private function registerMenu(): void
     {
         // Register the module's menu
-        $menuPath = module_path($this->moduleName, 'resources/menu/verticalMenu.json');
+        $menuPath = module_path($this->moduleName, 'Resources/menu/verticalMenu.json');
         if (file_exists($menuPath)) {
             $this->loadMenu($menuPath);
         }
