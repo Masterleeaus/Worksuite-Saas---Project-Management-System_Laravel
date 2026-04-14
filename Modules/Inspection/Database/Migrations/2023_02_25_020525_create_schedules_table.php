@@ -21,10 +21,14 @@ class CreateSchedulesTable extends Migration
             $table->unsignedInteger('schedule_recurring_id')->nullable();
             $table->foreign('schedule_recurring_id')->references('id')->on('inspection_schedule_recurring')->onDelete('set null')->onUpdate('cascade');
             $table->string('subject')->nullable();
-            $table->integer('floor_id')->unsigned()->nullable();
-            $table->foreign('floor_id')->references('id')->on('floors')->onDelete('set null')->onUpdate('cascade');
-            $table->integer('tower_id')->unsigned()->nullable();
-            $table->foreign('tower_id')->references('id')->on('towers')->onDelete('set null')->onUpdate('cascade');
+            $table->unsignedBigInteger('floor_id')->nullable();
+            if (Schema::hasTable('floors')) {
+                $table->foreign('floor_id')->references('id')->on('floors')->onDelete('set null')->onUpdate('cascade');
+            }
+            $table->unsignedBigInteger('tower_id')->nullable();
+            if (Schema::hasTable('towers')) {
+                $table->foreign('tower_id')->references('id')->on('towers')->onDelete('set null')->onUpdate('cascade');
+            }
             $table->string('lokasi')->nullable();
             $table->string('shift')->nullable();
             $table->time('awal')->nullable();
