@@ -2,7 +2,7 @@
 
 namespace Modules\Documents\Support;
 
-class Placeholder
+class TemplateVariables
 {
     // Placeholder for future premium features.
 }

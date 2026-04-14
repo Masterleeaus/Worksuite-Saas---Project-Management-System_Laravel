@@ -4,7 +4,7 @@ namespace Modules\Documents\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class WorkflowNoteRequest extends FormRequest
+class RestoreVersionRequest extends FormRequest
 {
     public function authorize(): bool
     {

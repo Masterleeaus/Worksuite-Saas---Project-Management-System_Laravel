@@ -14,7 +14,7 @@ use Modules\TitanAgents\Services\GptService;
  * Pass 3: specialist agent execution is mediated by TitanZero.
  * This controller is a thin UI/API wrapper only.
  */
-class TitanAgentsController extends Controller
+class AiChatController extends Controller
 {
     public function __construct(protected GptService $gpt) {}
 

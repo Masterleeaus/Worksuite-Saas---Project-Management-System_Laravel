@@ -13,7 +13,7 @@ use Rawilk\Settings\Support\Context;
 
 
 
-class TitanDocsUtility extends Model
+class AIDocumentUtility extends Model
 {
     use HasFactory;
 

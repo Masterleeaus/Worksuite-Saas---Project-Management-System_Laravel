@@ -5,7 +5,7 @@ namespace Modules\TitanDocs\Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
 
-class TitanDocsDatabaseSeeder extends Seeder
+class AIDocumentDatabaseSeeder extends Seeder
 {
     /**
      * Run the database seeds.

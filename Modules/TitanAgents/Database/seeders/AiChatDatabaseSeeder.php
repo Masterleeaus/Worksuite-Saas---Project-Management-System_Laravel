@@ -4,7 +4,7 @@ namespace Modules\TitanAgents\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 
-class TitanAgentsDatabaseSeeder extends Seeder
+class AiChatDatabaseSeeder extends Seeder
 {
     /**
      * Run the database seeds.

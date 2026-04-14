@@ -2,7 +2,7 @@
 
 namespace Modules\Documents\Support;
 
-class Placeholder
+class DocumentNumber
 {
     // Placeholder for future premium features.
 }

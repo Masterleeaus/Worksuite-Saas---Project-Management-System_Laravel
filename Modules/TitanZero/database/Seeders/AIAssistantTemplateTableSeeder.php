@@ -6,7 +6,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
 use Nwidart\Modules\Facades\Module;
 
-class TitanZeroTemplateTableSeeder extends Seeder
+class AIAssistantTemplateTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.

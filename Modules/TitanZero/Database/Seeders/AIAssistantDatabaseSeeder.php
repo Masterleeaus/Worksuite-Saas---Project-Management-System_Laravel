@@ -5,7 +5,7 @@ namespace Modules\TitanZero\Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
 
-class TitanZeroDatabaseSeeder extends Seeder
+class AIAssistantDatabaseSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -16,7 +16,7 @@ class TitanZeroDatabaseSeeder extends Seeder
     {
         Model::unguard();
 
-        $this->call(TitanZeroTemplateTableSeeder::class);
+        $this->call(AIAssistantTemplateTableSeeder::class);
         if(module_is_active('LandingPage'))
         {
             $this->call(MarketPlaceSeederTableSeeder::class);
