@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 
 return new class extends Migration
@@ -15,8 +17,19 @@ return new class extends Migration
         if (! Schema::hasTable('salary_slips')) {
             return;
         }
+
+        // SQLite cannot drop foreign keys during table alteration.
+        if (DB::getDriverName() === 'sqlite' || ! Schema::hasColumn('salary_slips', 'currency_id')) {
+            return;
+        }
+
         Schema::table('salary_slips', function (Blueprint $table) {
-            $table->dropForeign(['currency_id']);
+            try {
+                $table->dropForeign(['currency_id']);
+            } catch (\Throwable $e) {
+                // Ignore missing/legacy constraint names and continue to ensure target FK exists.
+            }
+
             $table->foreign('currency_id')->references('id')->on('currencies')->onUpdate('cascade')->onDelete('cascade');
         });
     }
@@ -28,9 +41,12 @@ return new class extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('salary_slips') || DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
         Schema::table('salary_slips', function (Blueprint $table) {
-            $table->dropForeign('salary_slips_currency_id_foreign');
-            $table->dropColumn('currency_id');
+            $table->dropForeign(['currency_id']);
         });
     }
 };
