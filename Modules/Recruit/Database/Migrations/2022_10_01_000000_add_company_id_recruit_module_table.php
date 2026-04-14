@@ -25,12 +25,13 @@ return new class extends Migration
             }
             
             Schema::table('application_sources', function (Blueprint $table) {
-                if (! Schema::hasColumn('application_sources', 'is_predefined')) {
-                    $table->boolean('is_predefined')->default(true)->nullable();
-                }
-                if (! Schema::hasColumn('application_sources', 'company_id')) {
-                    $table->integer('company_id')->unsigned()->after('id')->nullable();
-                }
+                $table->boolean('is_predefined')->default(true);
+            });
+        }
+
+        if (!Schema::hasColumn('application_sources', 'company_id')) {
+            Schema::table('application_sources', function (Blueprint $table) {
+                $table->integer('company_id')->unsigned()->after('id')->nullable();
                 $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade')->onUpdate('cascade');
             });
         }

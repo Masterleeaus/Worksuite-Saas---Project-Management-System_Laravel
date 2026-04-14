@@ -14,16 +14,19 @@ return new class extends Migration
 
     public function up()
     {
-        Schema::table('contracts', function (Blueprint $table) {
-            $table->string('company_sign')->nullable();
-            $table->date('sign_date')->nullable();
-        });
+        if (!Schema::hasColumn('contracts', 'company_sign')) {
+            Schema::table('contracts', function (Blueprint $table) {
+                $table->string('company_sign')->nullable();
+                $table->date('sign_date')->nullable();
+            });
+        }
 
-        Schema::table('contract_signs', function (Blueprint $table) {
-            $table->string('place')->nullable();
-            $table->string('date')->nullable();
-        });
-
+        if (!Schema::hasColumn('contract_signs', 'place')) {
+            Schema::table('contract_signs', function (Blueprint $table) {
+                $table->string('place')->nullable();
+                $table->string('date')->nullable();
+            });
+        }
     }
 
     /**

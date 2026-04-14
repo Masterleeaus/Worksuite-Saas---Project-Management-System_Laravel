@@ -10,7 +10,7 @@ return new class extends Migration {
         if (Schema::hasTable('titanzero_job_access_notes')) {
             return;
         }
-        
+
         Schema::create('titanzero_job_access_notes', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();

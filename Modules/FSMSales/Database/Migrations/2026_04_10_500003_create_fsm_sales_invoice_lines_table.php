@@ -14,7 +14,7 @@ return new class extends Migration {
         if (Schema::hasTable('fsm_sales_invoice_lines')) {
             return;
         }
-        
+
         Schema::create('fsm_sales_invoice_lines', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();

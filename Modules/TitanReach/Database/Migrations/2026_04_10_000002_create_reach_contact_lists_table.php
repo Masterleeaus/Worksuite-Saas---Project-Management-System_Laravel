@@ -7,17 +7,19 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        if (! Schema::hasTable('reach_contact_lists')) {
-            Schema::create('reach_contact_lists', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('company_id')->nullable()->index();
-                $table->string('name');
-                $table->text('description')->nullable();
-                $table->json('meta')->nullable();
-                $table->timestamps();
-                $table->softDeletes();
-            });
+        if (Schema::hasTable('reach_contact_lists')) {
+            return;
         }
+
+        Schema::create('reach_contact_lists', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('company_id')->nullable()->index();
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->json('meta')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+        });
 
         if (! Schema::hasTable('reach_contact_list_contact')) {
             Schema::create('reach_contact_list_contact', function (Blueprint $table) {

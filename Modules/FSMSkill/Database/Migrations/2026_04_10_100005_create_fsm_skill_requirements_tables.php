@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('fsm_order_skill_requirements')) {
+            return;
+        }
+
         // Skill requirements attached to FSM Orders
         if (! Schema::hasTable('fsm_order_skill_requirements')) {
             Schema::create('fsm_order_skill_requirements', function (Blueprint $table) {

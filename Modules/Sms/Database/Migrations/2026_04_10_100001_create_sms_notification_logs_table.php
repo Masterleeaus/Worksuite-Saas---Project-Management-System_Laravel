@@ -11,7 +11,7 @@ return new class extends Migration
         if (Schema::hasTable('sms_notification_logs')) {
             return;
         }
-        
+
         Schema::create('sms_notification_logs', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();

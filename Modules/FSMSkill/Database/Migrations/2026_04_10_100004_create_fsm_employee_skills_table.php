@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('fsm_employee_skills')) {
+            return;
+        }
+
         // Skills assigned to individual workers/cleaners
         if (Schema::hasTable('fsm_employee_skills')) {
             return;

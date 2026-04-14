@@ -12,12 +12,14 @@ return new class extends Migration
 
     public function up(): void
     {
-        Schema::table('mention_users', function (Blueprint $table) {
-            $table->integer('user_chat_id')->unsigned()->nullable()->after('event_id');
-            $table->foreign('user_chat_id')->references('id')->on('users_chat')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
-        });
+        if (!Schema::hasColumn('mention_users', 'user_chat_id')) {
+            Schema::table('mention_users', function (Blueprint $table) {
+                $table->integer('user_chat_id')->unsigned()->nullable()->after('event_id');
+                $table->foreign('user_chat_id')->references('id')->on('users_chat')
+                    ->onDelete('cascade')
+                    ->onUpdate('cascade');
+            });
+        }
 
         DB::statement("ALTER TABLE file_storage CHANGE COLUMN storage_location storage_location ENUM('local', 'aws_s3', 'digitalocean', 'wasabi', 'minio') NOT NULL DEFAULT 'local'");
     }

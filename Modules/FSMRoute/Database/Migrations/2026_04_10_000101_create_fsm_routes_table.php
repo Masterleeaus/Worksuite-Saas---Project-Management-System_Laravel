@@ -8,17 +8,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (! Schema::hasTable('fsm_routes')) {
-            Schema::create('fsm_routes', function (Blueprint $table) {
-                $table->bigIncrements('id');
-                $table->unsignedBigInteger('company_id')->nullable()->index();
-                $table->string('name', 256);
-                $table->unsignedBigInteger('person_id')->nullable()->index();
-                $table->unsignedInteger('max_order')->default(0);
-                $table->boolean('active')->default(true);
-                $table->timestamps();
-            });
+        if (Schema::hasTable('fsm_routes')) {
+            return;
         }
+
+        Schema::create('fsm_routes', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('company_id')->nullable()->index();
+            $table->string('name', 256);
+            $table->unsignedBigInteger('person_id')->nullable()->index();
+            $table->unsignedInteger('max_order')->default(0);
+            $table->boolean('active')->default(true);
+            $table->timestamps();
+        });
 
         if (! Schema::hasTable('fsm_route_day_pivot')) {
             Schema::create('fsm_route_day_pivot', function (Blueprint $table) {

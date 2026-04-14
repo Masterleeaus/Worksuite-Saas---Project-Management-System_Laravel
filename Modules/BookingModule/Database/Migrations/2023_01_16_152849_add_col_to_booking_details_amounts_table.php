@@ -19,17 +19,13 @@ return new class extends Migration
         if (! Schema::hasTable('booking_details_amounts')) {
             return;
         }
-        Schema::table('booking_details_amounts', function (Blueprint $table) {
-            if (! Schema::hasColumn('booking_details_amounts', 'service_quantity')) {
-                $table->integer('service_quantity')->default(0)->after('service_unit_cost')->nullable();
-            }
-            if (! Schema::hasColumn('booking_details_amounts', 'service_tax')) {
-                $table->decimal('service_tax',24,2)->default(0)->after('service_quantity')->nullable();
-            }
-            if (! Schema::hasColumn('booking_details_amounts', 'provider_earning')) {
-                $table->decimal('provider_earning',24,2)->default(0)->after('admin_commission')->nullable();
-            }
-        });
+        if (!Schema::hasColumn('booking_details_amounts', 'service_quantity')) {
+            Schema::table('booking_details_amounts', function (Blueprint $table) {
+                $table->integer('service_quantity')->default(0)->after('service_unit_cost');
+                $table->decimal('service_tax',24,2)->default(0)->after('service_quantity');
+                $table->decimal('provider_earning',24,2)->default(0)->after('admin_commission');
+            });
+        }
     }
 
     /**

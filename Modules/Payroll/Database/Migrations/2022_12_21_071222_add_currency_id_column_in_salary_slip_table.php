@@ -18,12 +18,12 @@ return new class extends Migration
         if (! Schema::hasTable('salary_slips')) {
             return;
         }
-        Schema::table('salary_slips', function (Blueprint $table) {
-            if (! Schema::hasColumn('salary_slips', 'currency_id')) {
+        if (!Schema::hasColumn('salary_slips', 'currency_id')) {
+            Schema::table('salary_slips', function (Blueprint $table) {
                 $table->unsignedInteger('currency_id')->nullable()->after('company_id');
-            }
-            $table->foreign('currency_id')->references('id')->on('currencies')->onUpdate('cascade')->onDelete('cascade');
-        });
+                $table->foreign('currency_id')->references('id')->on('currencies')->onUpdate('cascade')->onDelete('cascade');
+            });
+        }
 
         $companies = Company::all();
 

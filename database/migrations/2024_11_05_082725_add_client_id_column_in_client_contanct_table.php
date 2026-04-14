@@ -11,15 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->unsignedInteger('is_client_contact')->nullable()->index('users_is_client_contact_index');
-            $table->foreign('is_client_contact')->references('id')->on('client_contacts')->onUpdate('CASCADE')->onDelete('CASCADE');
-        });
+        if (!Schema::hasColumn('users', 'is_client_contact')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->unsignedInteger('is_client_contact')->nullable()->index('users_is_client_contact_index');
+                $table->foreign('is_client_contact')->references('id')->on('client_contacts')->onUpdate('CASCADE')->onDelete('CASCADE');
+            });
+        }
 
-        Schema::table('client_contacts', function (Blueprint $table) {
-            $table->unsignedInteger('client_id')->nullable()->index('client_contacts_client_id_index');
-            $table->foreign('client_id')->references('id')->on('users')->onUpdate('CASCADE')->onDelete('CASCADE');
-        });
+        if (!Schema::hasColumn('client_contacts', 'client_id')) {
+            Schema::table('client_contacts', function (Blueprint $table) {
+                $table->unsignedInteger('client_id')->nullable()->index('client_contacts_client_id_index');
+                $table->foreign('client_id')->references('id')->on('users')->onUpdate('CASCADE')->onDelete('CASCADE');
+            });
+        }
     }
 
 

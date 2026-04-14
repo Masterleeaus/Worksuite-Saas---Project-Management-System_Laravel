@@ -19,11 +19,11 @@ return new class extends Migration
         if (! Schema::hasTable('bookings')) {
             return;
         }
-        Schema::table('bookings', function (Blueprint $table) {
-            if (! Schema::hasColumn('bookings', 'extra_fee')) {
-                $table->decimal('extra_fee',24,3)->default(0)->nullable();
-            }
-        });
+        if (!Schema::hasColumn('bookings', 'extra_fee')) {
+            Schema::table('bookings', function (Blueprint $table) {
+                $table->decimal('extra_fee',24,3)->default(0);
+            });
+        }
     }
 
     /**

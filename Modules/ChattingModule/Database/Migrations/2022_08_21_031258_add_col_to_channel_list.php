@@ -16,11 +16,11 @@ class AddColToChannelList extends Migration
         if (! Schema::hasTable('channel_lists')) {
             return;
         }
-        Schema::table('channel_lists', function (Blueprint $table) {
-            if (! Schema::hasColumn('channel_lists', 'is_read')) {
-                $table->boolean('is_read')->default(0)->nullable();
-            }
-        });
+        if (!Schema::hasColumn('channel_lists', 'is_read')) {
+            Schema::table('channel_lists', function (Blueprint $table) {
+                $table->boolean('is_read')->default(0);
+            });
+        }
     }
 
     /**

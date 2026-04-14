@@ -14,7 +14,7 @@ return new class extends Migration {
         if (Schema::hasTable('fsm_recurring_invoices')) {
             return;
         }
-        
+
         Schema::create('fsm_recurring_invoices', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();

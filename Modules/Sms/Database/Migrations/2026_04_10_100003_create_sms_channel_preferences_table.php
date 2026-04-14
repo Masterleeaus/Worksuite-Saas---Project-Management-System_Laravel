@@ -11,7 +11,7 @@ return new class extends Migration
         if (Schema::hasTable('sms_channel_preferences')) {
             return;
         }
-        
+
         Schema::create('sms_channel_preferences', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();

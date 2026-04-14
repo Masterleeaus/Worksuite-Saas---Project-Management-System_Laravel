@@ -11,7 +11,7 @@ return new class extends Migration
         if (Schema::hasTable('zone_check_ins')) {
             return;
         }
-        
+
         Schema::create('zone_check_ins', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();

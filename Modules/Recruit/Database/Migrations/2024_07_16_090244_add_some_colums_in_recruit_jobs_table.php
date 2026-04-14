@@ -14,15 +14,12 @@ return new class extends Migration
         if (! Schema::hasTable('recruit_jobs')) {
             return;
         }
-        Schema::table('recruit_jobs', function (Blueprint $table) {
-            if (! Schema::hasColumn('recruit_jobs', 'is_currentctc_require')) {
-                $table->boolean('is_currentctc_require')->default(false)->nullable();
-            }
-            if (! Schema::hasColumn('recruit_jobs', 'is_expectedctc_require')) {
-                $table->boolean('is_expectedctc_require')->default(false)->nullable();
-            }
-
-        });
+        if (!Schema::hasColumn('recruit_jobs', 'is_currentctc_require')) {
+            Schema::table('recruit_jobs', function (Blueprint $table) {
+                $table->boolean('is_currentctc_require')->default(false);
+                $table->boolean('is_expectedctc_require')->default(false);
+            });
+        }
     }
 
     /**

@@ -15,11 +15,11 @@ return new class extends Migration
         if (! Schema::hasTable('rest_api_settings')) {
             return;
         }
-        Schema::table('rest_api_settings', function (Blueprint $table) {
-            if (! Schema::hasColumn('rest_api_settings', 'fcm_key')) {
+        if (!Schema::hasColumn('rest_api_settings', 'fcm_key')) {
+            Schema::table('rest_api_settings', function (Blueprint $table) {
                 $table->string('fcm_key')->nullable();
-            }
-        });
+            });
+        }
     }
 
     /**

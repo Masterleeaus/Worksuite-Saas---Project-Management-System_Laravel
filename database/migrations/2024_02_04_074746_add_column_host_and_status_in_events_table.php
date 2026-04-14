@@ -12,12 +12,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('events', function (Blueprint $table) {
-            $table->integer('host')->unsigned()->nullable()->after('end_date_time');
-            $table->foreign(['host'])->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('CASCADE');
-            $table->enum('status', ['pending', 'completed', 'cancelled'])->default('pending')->after('host');
-            $table->string('note')->after('status');
-        });
+        if (!Schema::hasColumn('events', 'host')) {
+            Schema::table('events', function (Blueprint $table) {
+                $table->integer('host')->unsigned()->nullable()->after('end_date_time');
+                $table->foreign(['host'])->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('CASCADE');
+                $table->enum('status', ['pending', 'completed', 'cancelled'])->default('pending')->after('host');
+                $table->string('note')->after('status');
+            });
+        }
     }
 
     /**

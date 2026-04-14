@@ -12,6 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('package_update_notifies')) {
+            return;
+        }
+
         Schema::create('package_update_notifies', function (Blueprint $table) {
             $table->id();
             $table->integer('company_id')->unsigned();

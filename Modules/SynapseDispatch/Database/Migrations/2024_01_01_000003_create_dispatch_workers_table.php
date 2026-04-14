@@ -10,7 +10,7 @@ return new class extends Migration {
         if (Schema::hasTable('dispatch_workers')) {
             return;
         }
-        
+
         Schema::create('dispatch_workers', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('code', 64)->unique();

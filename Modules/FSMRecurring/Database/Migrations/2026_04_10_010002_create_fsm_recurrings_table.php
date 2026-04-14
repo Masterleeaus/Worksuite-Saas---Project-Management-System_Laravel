@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('fsm_recurring_templates')) {
+            return;
+        }
+
         // Recurring Order Templates (named presets for recurring configs)
         if (! Schema::hasTable('fsm_recurring_templates')) {
             Schema::create('fsm_recurring_templates', function (Blueprint $table) {

@@ -14,6 +14,9 @@ return new class extends Migration
 
     public function up()
     {
+        if (Schema::hasTable('order_carts')) {
+            return;
+        }
 
         Schema::create(
             'order_carts', function (Blueprint $table) {

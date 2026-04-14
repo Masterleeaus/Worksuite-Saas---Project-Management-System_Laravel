@@ -16,12 +16,12 @@ class DiscountTableColModify extends Migration
         if (! Schema::hasTable('discounts')) {
             return;
         }
-        Schema::table('discounts', function($table) {
-            if (! Schema::hasColumn('discounts', 'discount_title')) {
+        if (!Schema::hasColumn('discounts', 'discount_title')) {
+            Schema::table('discounts', function($table) {
                 $table->string('discount_title',191)->after('id')->nullable();
-            }
-            $table->dropColumn('zone_id');
-        });
+                $table->dropColumn('zone_id');
+            });
+        }
     }
 
     /**

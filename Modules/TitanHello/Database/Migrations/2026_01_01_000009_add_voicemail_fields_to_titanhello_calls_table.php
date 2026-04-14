@@ -10,23 +10,15 @@ return new class extends Migration {
         if (! Schema::hasTable('titanhello_calls')) {
             return;
         }
-        Schema::table('titanhello_calls', function (Blueprint $table) {
-            if (! Schema::hasColumn('titanhello_calls', 'voicemail_flag')) {
-                $table->boolean('voicemail_flag')->default(false)->index()->nullable();
-            }
-            if (! Schema::hasColumn('titanhello_calls', 'voicemail_received_at')) {
+        if (!Schema::hasColumn('titanhello_calls', 'voicemail_flag')) {
+            Schema::table('titanhello_calls', function (Blueprint $table) {
+                $table->boolean('voicemail_flag')->default(false)->index();
                 $table->timestamp('voicemail_received_at')->nullable()->index();
-            }
-            if (! Schema::hasColumn('titanhello_calls', 'voicemail_recording_id')) {
                 $table->unsignedBigInteger('voicemail_recording_id')->nullable()->index();
-            }
-            if (! Schema::hasColumn('titanhello_calls', 'voicemail_transcript_artifact_id')) {
                 $table->unsignedBigInteger('voicemail_transcript_artifact_id')->nullable();
-            }
-            if (! Schema::hasColumn('titanhello_calls', 'voicemail_summary_artifact_id')) {
                 $table->unsignedBigInteger('voicemail_summary_artifact_id')->nullable();
-            }
-        });
+            });
+        }
     }
 
     public function down(): void

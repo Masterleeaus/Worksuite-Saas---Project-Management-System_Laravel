@@ -17,10 +17,12 @@ return new class extends Migration {
     public function up()
     {
 
-        Schema::table('tickets', function (Blueprint $table) {
-            $table->unsignedInteger('group_id')->after('type_id')->nullable();
-            $table->foreign(['group_id'])->references(['id'])->on('ticket_groups')->onUpdate('CASCADE')->onDelete('CASCADE');
-        });
+        if (!Schema::hasColumn('tickets', 'group_id')) {
+            Schema::table('tickets', function (Blueprint $table) {
+                $table->unsignedInteger('group_id')->after('type_id')->nullable();
+                $table->foreign(['group_id'])->references(['id'])->on('ticket_groups')->onUpdate('CASCADE')->onDelete('CASCADE');
+            });
+        }
 
         $companies = Company::get();
 

@@ -11,7 +11,7 @@ return new class extends Migration
         if (Schema::hasTable('pwa_sync_queue')) {
             return;
         }
-        
+
         Schema::create('pwa_sync_queue', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->index();

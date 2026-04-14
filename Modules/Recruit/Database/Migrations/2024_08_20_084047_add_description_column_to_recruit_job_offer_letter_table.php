@@ -14,11 +14,11 @@ return new class extends Migration
         if (! Schema::hasTable('recruit_job_offer_letter')) {
             return;
         }
-        Schema::table('recruit_job_offer_letter', function (Blueprint $table) {
-            if (! Schema::hasColumn('recruit_job_offer_letter', 'description')) {
+        if (!Schema::hasColumn('recruit_job_offer_letter', 'description')) {
+            Schema::table('recruit_job_offer_letter', function (Blueprint $table) {
                 $table->longText('description')->nullable();
-            }
-        });
+            });
+        }
     }
 
     /**

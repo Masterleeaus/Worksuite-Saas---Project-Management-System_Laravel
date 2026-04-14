@@ -11,7 +11,7 @@ return new class extends Migration
         if (Schema::hasTable('customerconnect_portal_preferences')) {
             return;
         }
-        
+
         Schema::create('customerconnect_portal_preferences', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->unique();

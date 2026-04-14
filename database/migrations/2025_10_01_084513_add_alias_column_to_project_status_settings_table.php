@@ -12,9 +12,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('project_status_settings', function (Blueprint $table) {
-            $table->string('alias')->nullable()->after('status_name');
-        });
+        if (!Schema::hasColumn('project_status_settings', 'alias')) {
+            Schema::table('project_status_settings', function (Blueprint $table) {
+                $table->string('alias')->nullable()->after('status_name');
+            });
+        }
 
         // Populate alias with status_name values for existing records
         DB::statement('UPDATE project_status_settings SET alias = status_name WHERE alias IS NULL');

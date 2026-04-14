@@ -11,7 +11,7 @@ return new class extends Migration
         if (Schema::hasTable('fsm_equipment_check_events')) {
             return;
         }
-        
+
         Schema::create('fsm_equipment_check_events', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();

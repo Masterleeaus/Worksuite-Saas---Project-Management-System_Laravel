@@ -16,11 +16,11 @@ return new class extends Migration
         if (! Schema::hasTable('email_notification_settings')) {
             return;
         }
-        Schema::table('email_notification_settings', function (Blueprint $table) {
-            if (! Schema::hasColumn('email_notification_settings', 'send_twilio')) {
-                $table->enum('send_twilio', ['yes', 'no'])->default('no')->nullable();
-            }
-        });
+        if (!Schema::hasColumn('email_notification_settings', 'send_twilio')) {
+            Schema::table('email_notification_settings', function (Blueprint $table) {
+                $table->enum('send_twilio', ['yes', 'no'])->default('no');
+            });
+        }
     }
 
     /**

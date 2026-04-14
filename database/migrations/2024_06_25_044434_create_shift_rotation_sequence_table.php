@@ -12,6 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('shift_rotation_sequences')) {
+            return;
+        }
+
         Schema::create('shift_rotation_sequences', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('employee_shift_rotation_id')->nullable();

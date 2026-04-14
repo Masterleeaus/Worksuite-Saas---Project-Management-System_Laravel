@@ -14,9 +14,14 @@ return new class extends Migration
     {
         Schema::table('deal_histories', function (Blueprint $table) {
             $table->renameColumn('deal_stage_id', 'deal_stage_from_id');
-            $table->unsignedInteger('deal_stage_to_id')->nullable();
-            $table->foreign('deal_stage_to_id')->references('id')->on('pipeline_stages')->onDelete('set null');
         });
+
+        if (!Schema::hasColumn('deal_histories', 'deal_stage_to_id')) {
+            Schema::table('deal_histories', function (Blueprint $table) {
+                $table->unsignedInteger('deal_stage_to_id')->nullable();
+                $table->foreign('deal_stage_to_id')->references('id')->on('pipeline_stages')->onDelete('set null');
+            });
+        }
     }
 
     /**

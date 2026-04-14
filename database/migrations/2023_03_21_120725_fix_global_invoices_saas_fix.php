@@ -25,11 +25,13 @@ return new class extends Migration
             $table->double('total')->nullable()->change();
         });
 
-        Schema::table('front_details', function (Blueprint $table) {
-            $table->enum('homepage_background', ['default', 'color', 'image', 'image_and_color'])->default('default');
-            $table->string('background_color')->nullable()->default('#CDDCDC');
-            $table->string('background_image')->nullable();
-        });
+        if (!Schema::hasColumn('front_details', 'homepage_background')) {
+            Schema::table('front_details', function (Blueprint $table) {
+                $table->enum('homepage_background', ['default', 'color', 'image', 'image_and_color'])->default('default');
+                $table->string('background_color')->nullable()->default('#CDDCDC');
+                $table->string('background_image')->nullable();
+            });
+        }
 
 
         Schema::table('packages', function (Blueprint $table) {

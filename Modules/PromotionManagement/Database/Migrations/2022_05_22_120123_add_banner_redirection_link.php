@@ -16,11 +16,11 @@ class AddBannerRedirectionLink extends Migration
         if (! Schema::hasTable('banners')) {
             return;
         }
-        Schema::table('banners', function ($table) {
-            if (! Schema::hasColumn('banners', 'redirect_link')) {
+        if (!Schema::hasColumn('banners', 'redirect_link')) {
+            Schema::table('banners', function ($table) {
                 $table->string('redirect_link', 191)->after('resource_id')->nullable();
-            }
-        });
+            });
+        }
     }
 
     /**

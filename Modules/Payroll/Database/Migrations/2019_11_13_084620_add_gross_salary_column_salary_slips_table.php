@@ -16,14 +16,12 @@ return new class extends Migration
         if (! Schema::hasTable('salary_slips')) {
             return;
         }
-        Schema::table('salary_slips', function (Blueprint $table) {
-            if (! Schema::hasColumn('salary_slips', 'gross_salary')) {
-                $table->double('gross_salary', 16, 2)->nullable();
-            }
-            if (! Schema::hasColumn('salary_slips', 'total_deductions')) {
-                $table->double('total_deductions', 16, 2)->nullable();
-            }
-        });
+        if (!Schema::hasColumn('salary_slips', 'gross_salary')) {
+            Schema::table('salary_slips', function (Blueprint $table) {
+                $table->double('gross_salary', 16, 2);
+                $table->double('total_deductions', 16, 2);
+            });
+        }
     }
 
     /**

@@ -19,11 +19,11 @@ return new class extends Migration
         if (! Schema::hasTable('booking_details')) {
             return;
         }
-        Schema::table('booking_details', function (Blueprint $table) {
-            if (! Schema::hasColumn('booking_details', 'service_name')) {
+        if (!Schema::hasColumn('booking_details', 'service_name')) {
+            Schema::table('booking_details', function (Blueprint $table) {
                 $table->string('service_name')->nullable()->after('service_id');
-            }
-        });
+            });
+        }
     }
 
     /**

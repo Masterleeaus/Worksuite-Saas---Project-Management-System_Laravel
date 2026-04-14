@@ -9,7 +9,7 @@ return new class extends Migration {
         if (Schema::hasTable('cleaner_rate_configs')) {
             return;
         }
-        
+
         Schema::create('cleaner_rate_configs', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('company_id')->unsigned()->nullable();

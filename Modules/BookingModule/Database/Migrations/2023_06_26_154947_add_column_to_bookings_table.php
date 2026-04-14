@@ -19,14 +19,12 @@ return new class extends Migration
         if (! Schema::hasTable('bookings')) {
             return;
         }
-        Schema::table('bookings', function (Blueprint $table) {
-            if (! Schema::hasColumn('bookings', 'evidence_photos')) {
+        if (!Schema::hasColumn('bookings', 'evidence_photos')) {
+            Schema::table('bookings', function (Blueprint $table) {
                 $table->json('evidence_photos')->nullable();
-            }
-            if (! Schema::hasColumn('bookings', 'booking_otp')) {
                 $table->string('booking_otp')->nullable();
-            }
-        });
+            });
+        }
     }
 
     /**

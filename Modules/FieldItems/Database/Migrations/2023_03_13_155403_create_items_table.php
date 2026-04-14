@@ -16,7 +16,7 @@ return new class extends Migration
         if (Schema::hasTable('items')) {
             return;
         }
-        
+
         Schema::create('items', function (Blueprint $table) {
             $table->id();
             $table->integer('company_id')->unsigned()->nullable();

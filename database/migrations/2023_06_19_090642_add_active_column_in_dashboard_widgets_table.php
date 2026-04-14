@@ -12,10 +12,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('dashboard_widgets', function (Blueprint $table) {
-            $table->boolean('active')->default(true);
+        if (!Schema::hasColumn('dashboard_widgets', 'active')) {
+            Schema::table('dashboard_widgets', function (Blueprint $table) {
+                $table->boolean('active')->default(true);
 
-        });
+            });
+        }
     }
 
     /**

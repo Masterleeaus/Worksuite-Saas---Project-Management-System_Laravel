@@ -16,11 +16,11 @@ class AddCouponType extends Migration
         if (! Schema::hasTable('coupons')) {
             return;
         }
-        Schema::table('coupons', function($table) {
-            if (! Schema::hasColumn('coupons', 'coupon_type')) {
+        if (!Schema::hasColumn('coupons', 'coupon_type')) {
+            Schema::table('coupons', function($table) {
                 $table->string('coupon_type',191)->after('id')->nullable();
-            }
-        });
+            });
+        }
     }
 
     /**

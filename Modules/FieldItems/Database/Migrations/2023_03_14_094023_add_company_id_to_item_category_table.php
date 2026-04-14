@@ -13,16 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        if (! Schema::hasTable('item_category')) {
-            return;
-        }
-        
-        Schema::table('item_category', function (Blueprint $table) {
-            if (! Schema::hasColumn('item_category', 'company_id')) {
+        if (!Schema::hasColumn('item_category', 'company_id')) {
+            Schema::table('item_category', function (Blueprint $table) {
                 $table->integer('company_id')->unsigned()->nullable();
-            }
-            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade')->onUpdate('cascade');
-        });
+                $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade')->onUpdate('cascade');
+            });
+        }
     }
 
     /**

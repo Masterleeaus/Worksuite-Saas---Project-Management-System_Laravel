@@ -10,7 +10,7 @@ return new class extends Migration {
         if (Schema::hasTable('fsm_availability_rules')) {
             return;
         }
-        
+
         Schema::create('fsm_availability_rules', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();

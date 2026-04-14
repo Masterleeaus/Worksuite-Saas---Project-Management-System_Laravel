@@ -9,7 +9,7 @@ return new class extends Migration {
         if (Schema::hasTable('inventory_items')) {
             return;
         }
-        
+
         Schema::create('inventory_items', function (Blueprint $table) {
             $table->id();
             $table->string('name');

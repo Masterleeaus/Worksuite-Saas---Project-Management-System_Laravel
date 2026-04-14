@@ -10,6 +10,10 @@ return new class extends Migration {
      */
     public function up(): void
     {
+        if (Schema::hasTable('pay_codes')) {
+            return;
+        }
+
         if (!Schema::hasColumn('employee_details', 'overtime_hourly_rate')) {
             if (! Schema::hasTable('employee_details')) {
                 return;

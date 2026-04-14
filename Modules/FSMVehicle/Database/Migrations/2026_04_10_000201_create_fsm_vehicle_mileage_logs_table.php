@@ -10,7 +10,7 @@ return new class extends Migration {
         if (Schema::hasTable('fsm_vehicle_mileage_logs')) {
             return;
         }
-        
+
         Schema::create('fsm_vehicle_mileage_logs', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('vehicle_id')->index();

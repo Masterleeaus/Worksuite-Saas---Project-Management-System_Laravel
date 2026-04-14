@@ -16,12 +16,12 @@ return new class extends Migration
         if (! Schema::hasTable('zoom_meetings')) {
             return;
         }
-        Schema::table('zoom_meetings', function (Blueprint $table) {
-            if (! Schema::hasColumn('zoom_meetings', 'category_id')) {
+        if (!Schema::hasColumn('zoom_meetings', 'category_id')) {
+            Schema::table('zoom_meetings', function (Blueprint $table) {
                 $table->unsignedBigInteger('category_id')->nullable();
-            }
-            $table->foreign('category_id')->references('id')->on('zoom_categories')->onDelete('cascade')->onUpdate('cascade');
-        });
+                $table->foreign('category_id')->references('id')->on('zoom_categories')->onDelete('cascade')->onUpdate('cascade');
+            });
+        }
     }
 
     /**

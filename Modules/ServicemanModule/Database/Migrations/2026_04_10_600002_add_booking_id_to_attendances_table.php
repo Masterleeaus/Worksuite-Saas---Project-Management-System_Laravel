@@ -7,15 +7,11 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        if (! Schema::hasTable('attendances')) {
-            return;
-        }
-        
-        Schema::table('attendances', function (Blueprint $table) {
-            if (! Schema::hasColumn('attendances', 'booking_id')) {
+        if (!Schema::hasColumn('attendances', 'booking_id')) {
+            Schema::table('attendances', function (Blueprint $table) {
                 $table->unsignedBigInteger('booking_id')->nullable()->after('longitude');
-            }
-        });
+            });
+        }
     }
 
     public function down(): void

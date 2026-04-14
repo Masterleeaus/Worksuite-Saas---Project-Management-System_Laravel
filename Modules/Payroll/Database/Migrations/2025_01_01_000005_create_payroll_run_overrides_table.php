@@ -9,7 +9,7 @@ return new class extends Migration {
         if (Schema::hasTable('payroll_run_overrides')) {
             return;
         }
-        
+
         Schema::create('payroll_run_overrides', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('line_item_id');

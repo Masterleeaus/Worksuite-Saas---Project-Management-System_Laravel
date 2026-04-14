@@ -14,13 +14,17 @@ return new class extends Migration {
 
     public function up()
     {
-        Schema::table('global_settings', function (Blueprint $table) {
-            $table->enum('auth_theme_text', ['dark', 'light'])->after('auth_theme')->default('dark');
-        });
+        if (!Schema::hasColumn('global_settings', 'auth_theme_text')) {
+            Schema::table('global_settings', function (Blueprint $table) {
+                $table->enum('auth_theme_text', ['dark', 'light'])->after('auth_theme')->default('dark');
+            });
+        }
 
-        Schema::table('companies', function (Blueprint $table) {
-            $table->enum('auth_theme_text', ['dark', 'light'])->after('auth_theme')->default('dark');
-        });
+        if (!Schema::hasColumn('companies', 'auth_theme_text')) {
+            Schema::table('companies', function (Blueprint $table) {
+                $table->enum('auth_theme_text', ['dark', 'light'])->after('auth_theme')->default('dark');
+            });
+        }
 
         cache()->forget('global_settings');
     }

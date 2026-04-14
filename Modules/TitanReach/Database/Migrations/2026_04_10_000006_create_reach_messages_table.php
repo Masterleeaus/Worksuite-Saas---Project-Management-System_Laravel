@@ -10,7 +10,7 @@ return new class extends Migration {
         if (Schema::hasTable('reach_messages')) {
             return;
         }
-        
+
         Schema::create('reach_messages', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('conversation_id')->index();

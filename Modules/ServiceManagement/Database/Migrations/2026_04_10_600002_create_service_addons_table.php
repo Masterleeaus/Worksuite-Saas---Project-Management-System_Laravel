@@ -15,7 +15,7 @@ return new class extends Migration
         if (Schema::hasTable('service_addons')) {
             return;
         }
-        
+
         Schema::create('service_addons', function (Blueprint $table) {
             $table->id();
             $table->string('name', 191);

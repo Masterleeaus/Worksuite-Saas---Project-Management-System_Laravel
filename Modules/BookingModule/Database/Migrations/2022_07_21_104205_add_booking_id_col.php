@@ -19,11 +19,11 @@ return new class extends Migration
         if (! Schema::hasTable('bookings')) {
             return;
         }
-        Schema::table('bookings', function (Blueprint $table) {
-            if (! Schema::hasColumn('bookings', 'readable_id')) {
-                $table->bigInteger('readable_id')->after('id')->nullable();
-            }
-        });
+        if (!Schema::hasColumn('bookings', 'readable_id')) {
+            Schema::table('bookings', function (Blueprint $table) {
+                $table->bigInteger('readable_id')->after('id');
+            });
+        }
     }
 
     /**

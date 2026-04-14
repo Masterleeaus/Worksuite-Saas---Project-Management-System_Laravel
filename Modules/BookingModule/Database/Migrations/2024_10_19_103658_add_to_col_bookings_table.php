@@ -19,14 +19,12 @@ return new class extends Migration
         if (! Schema::hasTable('bookings')) {
             return;
         }
-        Schema::table('bookings', function (Blueprint $table) {
-            if (! Schema::hasColumn('bookings', 'is_repeated')) {
-                $table->tinyInteger('is_repeated')->default(0)->nullable();
-            }
-            if (! Schema::hasColumn('bookings', 'assigned_by')) {
+        if (!Schema::hasColumn('bookings', 'is_repeated')) {
+            Schema::table('bookings', function (Blueprint $table) {
+                $table->tinyInteger('is_repeated')->default(0);
                 $table->string('assigned_by')->nullable();
-            }
-        });
+            });
+        }
     }
 
     /**

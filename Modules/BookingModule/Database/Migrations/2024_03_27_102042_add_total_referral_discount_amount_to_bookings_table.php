@@ -19,11 +19,11 @@ return new class extends Migration
         if (! Schema::hasTable('bookings')) {
             return;
         }
-        Schema::table('bookings', function (Blueprint $table) {
-            if (! Schema::hasColumn('bookings', 'total_referral_discount_amount')) {
-                $table->decimal('total_referral_discount_amount',24,2)->default(0)->nullable();
-            }
-        });
+        if (!Schema::hasColumn('bookings', 'total_referral_discount_amount')) {
+            Schema::table('bookings', function (Blueprint $table) {
+                $table->decimal('total_referral_discount_amount',24,2)->default(0);
+            });
+        }
     }
 
     /**

@@ -27,13 +27,17 @@ return new class extends Migration
         }
         TaskboardColumn::insert($values);
 
-        Schema::table('tasks', function (Blueprint $table) {
-            $table->enum('approval_send', ['0', '1'])->default('0');
-        });
+        if (!Schema::hasColumn('tasks', 'approval_send')) {
+            Schema::table('tasks', function (Blueprint $table) {
+                $table->enum('approval_send', ['0', '1'])->default('0');
+            });
+        }
 
-        Schema::table('projects', function (Blueprint $table) {
-            $table->enum('need_approval_by_admin', ['0', '1'])->default('0');
-        });
+        if (!Schema::hasColumn('projects', 'need_approval_by_admin')) {
+            Schema::table('projects', function (Blueprint $table) {
+                $table->enum('need_approval_by_admin', ['0', '1'])->default('0');
+            });
+        }
     }
 
     /**

@@ -11,7 +11,7 @@ return new class extends Migration
         if (Schema::hasTable('gps_settings')) {
             return;
         }
-        
+
         Schema::create('gps_settings', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->unique()->index();

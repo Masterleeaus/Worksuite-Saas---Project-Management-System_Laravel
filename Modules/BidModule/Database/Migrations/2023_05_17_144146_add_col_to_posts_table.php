@@ -16,14 +16,12 @@ class AddColToPostsTable extends Migration
         if (! Schema::hasTable('posts')) {
             return;
         }
-        Schema::table('posts', function (Blueprint $table) {
-            if (! Schema::hasColumn('posts', 'is_checked')) {
-                $table->boolean('is_checked')->default(0)->after('is_booked')->nullable();
-            }
-            if (! Schema::hasColumn('posts', 'zone_id')) {
+        if (!Schema::hasColumn('posts', 'is_checked')) {
+            Schema::table('posts', function (Blueprint $table) {
+                $table->boolean('is_checked')->default(0)->after('is_booked');
                 $table->foreignUuid('zone_id')->after('service_address_id')->nullable();
-            }
-        });
+            });
+        }
     }
 
     /**

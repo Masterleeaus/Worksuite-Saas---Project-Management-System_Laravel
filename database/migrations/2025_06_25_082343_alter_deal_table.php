@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('deals', function (Blueprint $table) {
-            $table->enum('create_client', [0, 1])->default(0);
-        });
+        if (!Schema::hasColumn('deals', 'create_client')) {
+            Schema::table('deals', function (Blueprint $table) {
+                $table->enum('create_client', [0, 1])->default(0);
+            });
+        }
     }
 
     /**

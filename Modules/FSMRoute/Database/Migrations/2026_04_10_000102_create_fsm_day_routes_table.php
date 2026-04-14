@@ -11,7 +11,7 @@ return new class extends Migration
         if (Schema::hasTable('fsm_day_routes')) {
             return;
         }
-        
+
         Schema::create('fsm_day_routes', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();

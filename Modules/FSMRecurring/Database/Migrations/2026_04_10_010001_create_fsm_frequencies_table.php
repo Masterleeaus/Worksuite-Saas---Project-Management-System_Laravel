@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('fsm_frequencies')) {
+            return;
+        }
+
         // Frequency Rules
         if (! Schema::hasTable('fsm_frequencies')) {
             Schema::create('fsm_frequencies', function (Blueprint $table) {

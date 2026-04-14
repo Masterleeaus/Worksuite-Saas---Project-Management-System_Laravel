@@ -14,9 +14,11 @@ return new class extends Migration
 
     public function up()
     {
-        Schema::table('leaves', function (Blueprint $table) {
-            $table->text('approve_reason')->nullable();
-        });
+        if (!Schema::hasColumn('leaves', 'approve_reason')) {
+            Schema::table('leaves', function (Blueprint $table) {
+                $table->text('approve_reason')->nullable();
+            });
+        }
     }
 
     /**

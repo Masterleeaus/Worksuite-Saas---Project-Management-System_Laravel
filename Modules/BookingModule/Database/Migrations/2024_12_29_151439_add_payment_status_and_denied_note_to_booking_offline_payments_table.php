@@ -19,18 +19,13 @@ return new class extends Migration
         if (! Schema::hasTable('booking_offline_payments')) {
             return;
         }
-        Schema::table('booking_offline_payments', function (Blueprint $table) {
-            if (! Schema::hasColumn('booking_offline_payments', 'offline_payment_id')) {
+        if (!Schema::hasColumn('booking_offline_payments', 'offline_payment_id')) {
+            Schema::table('booking_offline_payments', function (Blueprint $table) {
                 $table->foreignUuid('offline_payment_id')->nullable()->after('booking_id');
-            }
-            if (! Schema::hasColumn('booking_offline_payments', 'payment_status')) {
-                $table->enum('payment_status', ['pending', 'denied', 'approved'])->default('approved')->after('customer_information')->nullable();
-            }
-            if (! Schema::hasColumn('booking_offline_payments', 'denied_note')) {
+                $table->enum('payment_status', ['pending', 'denied', 'approved'])->default('approved')->after('customer_information');
                 $table->text('denied_note')->nullable()->after('payment_status');
-            }
-
-        });
+            });
+        }
     }
 
     /**

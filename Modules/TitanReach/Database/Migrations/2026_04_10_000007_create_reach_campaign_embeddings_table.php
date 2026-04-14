@@ -10,7 +10,7 @@ return new class extends Migration {
         if (Schema::hasTable('reach_campaign_embeddings')) {
             return;
         }
-        
+
         Schema::create('reach_campaign_embeddings', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();

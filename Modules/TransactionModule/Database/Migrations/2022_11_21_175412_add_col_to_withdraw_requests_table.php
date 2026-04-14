@@ -16,14 +16,12 @@ class AddColToWithdrawRequestsTable extends Migration
         if (! Schema::hasTable('withdraw_requests')) {
             return;
         }
-        Schema::table('withdraw_requests', function (Blueprint $table) {
-            if (! Schema::hasColumn('withdraw_requests', 'withdrawal_method_id')) {
+        if (!Schema::hasColumn('withdraw_requests', 'withdrawal_method_id')) {
+            Schema::table('withdraw_requests', function (Blueprint $table) {
                 $table->foreignUuid('withdrawal_method_id')->nullable();
-            }
-            if (! Schema::hasColumn('withdraw_requests', 'withdrawal_method_fields')) {
                 $table->text('withdrawal_method_fields')->nullable();
-            }
-        });
+            });
+        }
     }
 
     /**

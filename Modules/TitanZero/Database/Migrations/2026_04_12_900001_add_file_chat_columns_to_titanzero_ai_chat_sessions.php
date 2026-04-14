@@ -14,24 +14,14 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (! Schema::hasTable('titanzero_ai_chat_sessions')) {
-            return;
-        }
-        
-        Schema::table('titanzero_ai_chat_sessions', function (Blueprint $table) {
-            if (! Schema::hasColumn('titanzero_ai_chat_sessions', 'openai_vector_id')) {
+        if (!Schema::hasColumn('titanzero_ai_chat_sessions', 'openai_vector_id')) {
+            Schema::table('titanzero_ai_chat_sessions', function (Blueprint $table) {
                 $table->string('openai_vector_id')->nullable()->after('is_chatbot');
-            }
-            if (! Schema::hasColumn('titanzero_ai_chat_sessions', 'openai_file_id')) {
                 $table->string('openai_file_id')->nullable()->after('openai_vector_id');
-            }
-            if (! Schema::hasColumn('titanzero_ai_chat_sessions', 'doc_name')) {
                 $table->string('doc_name')->nullable()->after('openai_file_id');
-            }
-            if (! Schema::hasColumn('titanzero_ai_chat_sessions', 'reference_url')) {
                 $table->string('reference_url')->nullable()->after('doc_name');
-            }
-        });
+            });
+        }
     }
 
     public function down(): void

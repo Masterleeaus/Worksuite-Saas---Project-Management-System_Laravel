@@ -17,17 +17,15 @@ return new class extends Migration
         if (! Schema::hasTable('sms_settings')) {
             return;
         }
-        Schema::table('sms_settings', function (Blueprint $table) {
-            if (! Schema::hasColumn('sms_settings', 'added_by')) {
+        if (!Schema::hasColumn('sms_settings', 'added_by')) {
+            Schema::table('sms_settings', function (Blueprint $table) {
                 $table->integer('added_by')->unsigned()->nullable();
-            }
-            $table->foreign('added_by')->references('id')->on('users')->onDelete('SET NULL')->onUpdate('cascade');
+                $table->foreign('added_by')->references('id')->on('users')->onDelete('SET NULL')->onUpdate('cascade');
 
-            if (! Schema::hasColumn('sms_settings', 'last_updated_by')) {
                 $table->integer('last_updated_by')->unsigned()->nullable();
-            }
-            $table->foreign('last_updated_by')->references('id')->on('users')->onDelete('SET NULL')->onUpdate('cascade');
-        });
+                $table->foreign('last_updated_by')->references('id')->on('users')->onDelete('SET NULL')->onUpdate('cascade');
+            });
+        }
 
     }
 

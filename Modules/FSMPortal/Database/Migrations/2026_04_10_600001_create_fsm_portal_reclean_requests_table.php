@@ -10,7 +10,7 @@ return new class extends Migration {
         if (Schema::hasTable('fsm_portal_reclean_requests')) {
             return;
         }
-        
+
         Schema::create('fsm_portal_reclean_requests', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();

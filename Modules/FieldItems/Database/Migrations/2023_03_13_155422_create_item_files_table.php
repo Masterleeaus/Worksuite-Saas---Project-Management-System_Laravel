@@ -16,7 +16,7 @@ return new class extends Migration
         if (Schema::hasTable('item_files')) {
             return;
         }
-        
+
         Schema::create('item_files', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('item_id')->index('item_files_item_id_foreign');

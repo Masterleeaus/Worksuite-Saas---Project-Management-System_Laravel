@@ -15,23 +15,15 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        if (! Schema::hasTable('fsm_orders')) {
-            return;
-        }
-        
-        Schema::table('fsm_orders', function (Blueprint $table) {
-            if (! Schema::hasColumn('fsm_orders', 'size_id')) {
+        if (!Schema::hasColumn('fsm_orders', 'size_id')) {
+            Schema::table('fsm_orders', function (Blueprint $table) {
                 $table->unsignedBigInteger('size_id')->nullable()->after('stage_id')->index();
-            }
-            if (! Schema::hasColumn('fsm_orders', 'estimated_sqm')) {
                 $table->unsignedInteger('estimated_sqm')->nullable()->after('size_id');
-            }
-            if (! Schema::hasColumn('fsm_orders', 'room_count')) {
                 $table->unsignedInteger('room_count')->nullable()->after('estimated_sqm');
-            }
 
-            $table->foreign('size_id')->references('id')->on('fsm_sizes')->nullOnDelete();
-        });
+                $table->foreign('size_id')->references('id')->on('fsm_sizes')->nullOnDelete();
+            });
+        }
     }
 
     public function down(): void

@@ -10,7 +10,7 @@ return new class extends Migration {
         if (Schema::hasTable('client_pulse_extras_items')) {
             return;
         }
-        
+
         Schema::create('client_pulse_extras_items', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();

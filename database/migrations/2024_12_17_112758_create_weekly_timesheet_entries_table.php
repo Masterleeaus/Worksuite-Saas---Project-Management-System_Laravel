@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('weekly_timesheet_entries')) {
+            return;
+        }
+
         Schema::create('weekly_timesheet_entries', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('company_id');

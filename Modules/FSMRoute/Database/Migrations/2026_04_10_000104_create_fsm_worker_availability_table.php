@@ -11,7 +11,7 @@ return new class extends Migration
         if (Schema::hasTable('fsm_worker_availability')) {
             return;
         }
-        
+
         Schema::create('fsm_worker_availability', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('person_id')->index();

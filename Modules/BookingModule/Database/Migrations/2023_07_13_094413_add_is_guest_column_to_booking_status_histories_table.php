@@ -19,11 +19,11 @@ return new class extends Migration
         if (! Schema::hasTable('booking_status_histories')) {
             return;
         }
-        Schema::table('booking_status_histories', function (Blueprint $table) {
-            if (! Schema::hasColumn('booking_status_histories', 'is_guest')) {
-                $table->boolean('is_guest')->default(0)->nullable();
-            }
-        });
+        if (!Schema::hasColumn('booking_status_histories', 'is_guest')) {
+            Schema::table('booking_status_histories', function (Blueprint $table) {
+                $table->boolean('is_guest')->default(0);
+            });
+        }
     }
 
     /**

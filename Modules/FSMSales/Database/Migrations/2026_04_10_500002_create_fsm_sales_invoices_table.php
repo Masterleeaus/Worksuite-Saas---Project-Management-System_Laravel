@@ -12,10 +12,13 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        if (! Schema::hasTable('fsm_sales_invoices')) {
-            Schema::create('fsm_sales_invoices', function (Blueprint $table) {
-                $table->bigIncrements('id');
-                $table->unsignedBigInteger('company_id')->nullable()->index();
+        if (Schema::hasTable('fsm_sales_invoices')) {
+            return;
+        }
+
+        Schema::create('fsm_sales_invoices', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('company_id')->nullable()->index();
 
                 // Human-readable reference: INV-00001
                 $table->string('number', 64)->unique();

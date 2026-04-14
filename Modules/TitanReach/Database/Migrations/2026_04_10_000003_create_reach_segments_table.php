@@ -10,7 +10,7 @@ return new class extends Migration {
         if (Schema::hasTable('reach_segments')) {
             return;
         }
-        
+
         Schema::create('reach_segments', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();

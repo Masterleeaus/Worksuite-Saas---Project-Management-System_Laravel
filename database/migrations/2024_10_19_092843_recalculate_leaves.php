@@ -17,19 +17,23 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('employee_leave_quotas', function ($table){
-            $table->double('overutilised_leaves')->default(0);
-            $table->double('unused_leaves')->default(0);
-            $table->double('carry_forward_leaves')->default(0);
-            $table->double('carry_forward_applied')->default(0);
-        });
+        if (!Schema::hasColumn('employee_leave_quotas', 'overutilised_leaves')) {
+            Schema::table('employee_leave_quotas', function ($table){
+                $table->double('overutilised_leaves')->default(0);
+                $table->double('unused_leaves')->default(0);
+                $table->double('carry_forward_leaves')->default(0);
+                $table->double('carry_forward_applied')->default(0);
+            });
+        }
 
-        Schema::table('employee_leave_quota_histories', function ($table){
-            $table->double('overutilised_leaves')->default(0);
-            $table->double('unused_leaves')->default(0);
-            $table->double('carry_forward_leaves')->default(0);
-            $table->boolean('carry_forward_applied')->default(0);
-        });
+        if (!Schema::hasColumn('employee_leave_quota_histories', 'overutilised_leaves')) {
+            Schema::table('employee_leave_quota_histories', function ($table){
+                $table->double('overutilised_leaves')->default(0);
+                $table->double('unused_leaves')->default(0);
+                $table->double('carry_forward_leaves')->default(0);
+                $table->boolean('carry_forward_applied')->default(0);
+            });
+        }
 
         Schema::table('leave_types', function ($table){
             $table->double('no_of_leaves')->change();

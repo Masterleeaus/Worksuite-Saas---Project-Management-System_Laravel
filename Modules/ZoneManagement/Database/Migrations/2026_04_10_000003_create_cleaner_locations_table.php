@@ -11,7 +11,7 @@ return new class extends Migration
         if (Schema::hasTable('cleaner_locations')) {
             return;
         }
-        
+
         Schema::create('cleaner_locations', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();

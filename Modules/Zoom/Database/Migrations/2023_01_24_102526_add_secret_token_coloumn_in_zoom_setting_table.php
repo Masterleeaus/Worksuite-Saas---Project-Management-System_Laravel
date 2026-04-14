@@ -16,12 +16,11 @@ return new class extends Migration
         if (! Schema::hasTable('zoom_setting')) {
             return;
         }
-        Schema::table('zoom_setting', function (Blueprint $table) {
-            if (! Schema::hasColumn('zoom_setting', 'secret_token')) {
+        if (!Schema::hasColumn('zoom_setting', 'secret_token')) {
+            Schema::table('zoom_setting', function (Blueprint $table) {
                 $table->string('secret_token')->nullable();
-            }
-
-        });
+            });
+        }
     }
 
     /**

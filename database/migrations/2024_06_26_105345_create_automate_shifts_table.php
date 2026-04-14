@@ -12,6 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('automate_shifts')) {
+            return;
+        }
+
         Schema::create('automate_shifts', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedInteger('user_id')->index('employee_shift_schedules_user_id_foreign');

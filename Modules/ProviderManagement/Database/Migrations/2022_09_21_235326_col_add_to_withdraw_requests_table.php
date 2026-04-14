@@ -16,11 +16,11 @@ class ColAddToWithdrawRequestsTable extends Migration
         if (! Schema::hasTable('withdraw_requests')) {
             return;
         }
-        Schema::table('withdraw_requests', function (Blueprint $table) {
-            if (! Schema::hasColumn('withdraw_requests', 'admin_note')) {
+        if (!Schema::hasColumn('withdraw_requests', 'admin_note')) {
+            Schema::table('withdraw_requests', function (Blueprint $table) {
                 $table->string('admin_note')->nullable();
-            }
-        });
+            });
+        }
     }
 
     /**

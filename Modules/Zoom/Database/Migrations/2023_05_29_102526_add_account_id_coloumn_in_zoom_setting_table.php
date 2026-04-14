@@ -17,17 +17,13 @@ return new class extends Migration
         if (! Schema::hasTable('zoom_setting')) {
             return;
         }
-        Schema::table('zoom_setting', function (Blueprint $table) {
-            if (! Schema::hasColumn('zoom_setting', 'account_id')) {
+        if (!Schema::hasColumn('zoom_setting', 'account_id')) {
+            Schema::table('zoom_setting', function (Blueprint $table) {
                 $table->string('account_id')->nullable();
-            }
-            if (! Schema::hasColumn('zoom_setting', 'meeting_client_id')) {
                 $table->string('meeting_client_id')->nullable();
-            }
-            if (! Schema::hasColumn('zoom_setting', 'meeting_client_secret')) {
                 $table->string('meeting_client_secret')->nullable();
-            }
-        });
+            });
+        }
     }
 
     /**

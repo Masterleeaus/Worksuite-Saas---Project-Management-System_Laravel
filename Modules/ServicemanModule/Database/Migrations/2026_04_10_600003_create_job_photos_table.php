@@ -10,7 +10,7 @@ return new class extends Migration {
         if (Schema::hasTable('job_photos')) {
             return;
         }
-        
+
         Schema::create('job_photos', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedInteger('task_id')->index();

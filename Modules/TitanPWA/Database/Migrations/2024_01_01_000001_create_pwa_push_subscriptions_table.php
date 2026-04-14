@@ -11,7 +11,7 @@ return new class extends Migration
         if (Schema::hasTable('pwa_push_subscriptions')) {
             return;
         }
-        
+
         Schema::create('pwa_push_subscriptions', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->index();

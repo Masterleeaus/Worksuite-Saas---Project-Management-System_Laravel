@@ -17,11 +17,11 @@ return new class extends Migration
         if (! Schema::hasTable('product_files')) {
             return;
         }
-        Schema::table('product_files', function(Blueprint $table){
-            if (! Schema::hasColumn('product_files', 'default_status')) {
-                $table->boolean('default_status')->default(false)->nullable();
-            }
-        });
+        if (!Schema::hasColumn('product_files', 'default_status')) {
+            Schema::table('product_files', function(Blueprint $table){
+                $table->boolean('default_status')->default(false);
+            });
+        }
     }
 
     /**

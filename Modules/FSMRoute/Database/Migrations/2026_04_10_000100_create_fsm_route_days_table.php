@@ -12,7 +12,7 @@ return new class extends Migration
         if (Schema::hasTable('fsm_route_days')) {
             return;
         }
-        
+
         Schema::create('fsm_route_days', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name', 16);

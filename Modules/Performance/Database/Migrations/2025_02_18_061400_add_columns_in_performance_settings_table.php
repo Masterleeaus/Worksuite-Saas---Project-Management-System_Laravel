@@ -16,17 +16,13 @@ return new class extends Migration
         if (! Schema::hasTable('performance_settings')) {
             return;
         }
-        Schema::table('performance_settings', function (Blueprint $table) {
-            if (! Schema::hasColumn('performance_settings', 'send_slack_notification')) {
-                $table->enum('send_slack_notification', ['yes', 'no'])->default('no')->after('view_meeting_participant')->nullable();
-            }
-            if (! Schema::hasColumn('performance_settings', 'send_push_notification')) {
-                $table->enum('send_push_notification', ['yes', 'no'])->default('no')->after('send_slack_notification')->nullable();
-            }
-            if (! Schema::hasColumn('performance_settings', 'send_email_notification')) {
-                $table->enum('send_email_notification', ['yes', 'no'])->default('no')->after('send_push_notification')->nullable();
-            }
-        });
+        if (!Schema::hasColumn('performance_settings', 'send_slack_notification')) {
+            Schema::table('performance_settings', function (Blueprint $table) {
+                $table->enum('send_slack_notification', ['yes', 'no'])->default('no')->after('view_meeting_participant');
+                $table->enum('send_push_notification', ['yes', 'no'])->default('no')->after('send_slack_notification');
+                $table->enum('send_email_notification', ['yes', 'no'])->default('no')->after('send_push_notification');
+            });
+        }
 
         $performanceSettings = PerformanceSetting::all();
 

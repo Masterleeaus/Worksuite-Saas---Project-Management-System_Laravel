@@ -10,7 +10,7 @@ return new class extends Migration {
         if (Schema::hasTable('fsm_timesheet_lines')) {
             return;
         }
-        
+
         Schema::create('fsm_timesheet_lines', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();

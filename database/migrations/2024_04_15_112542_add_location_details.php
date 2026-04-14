@@ -11,13 +11,17 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->text('location_details')->nullable()->after('register_ip');
-        });
+        if (!Schema::hasColumn('users', 'location_details')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->text('location_details')->nullable()->after('register_ip');
+            });
+        }
 
-        Schema::table('companies', function (Blueprint $table) {
-            $table->text('location_details')->nullable()->after('register_ip');
-        });
+        if (!Schema::hasColumn('companies', 'location_details')) {
+            Schema::table('companies', function (Blueprint $table) {
+                $table->text('location_details')->nullable()->after('register_ip');
+            });
+        }
     }
 
     /**

@@ -16,11 +16,11 @@ class AddKeyTypeColumnInNotificationSetupsTable extends Migration
         if (! Schema::hasTable('notification_setups')) {
             return;
         }
-        Schema::table('notification_setups', function (Blueprint $table) {
-            if (! Schema::hasColumn('notification_setups', 'key_type')) {
+        if (!Schema::hasColumn('notification_setups', 'key_type')) {
+            Schema::table('notification_setups', function (Blueprint $table) {
                 $table->string('key_type')->nullable();
-            }
-        });
+            });
+        }
     }
 
     /**

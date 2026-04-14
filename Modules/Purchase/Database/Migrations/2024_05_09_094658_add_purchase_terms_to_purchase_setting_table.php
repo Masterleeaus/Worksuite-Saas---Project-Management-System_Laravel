@@ -14,12 +14,11 @@ return new class extends Migration
         if (! Schema::hasTable('purchase_settings')) {
             return;
         }
-        Schema::table('purchase_settings', function (Blueprint $table) {
-            if (! Schema::hasColumn('purchase_settings', 'purchase_terms')) {
+        if (!Schema::hasColumn('purchase_settings', 'purchase_terms')) {
+            Schema::table('purchase_settings', function (Blueprint $table) {
                 $table->text('purchase_terms')->nullable();
-            }
-
-        });
+            });
+        }
     }
 
     /**

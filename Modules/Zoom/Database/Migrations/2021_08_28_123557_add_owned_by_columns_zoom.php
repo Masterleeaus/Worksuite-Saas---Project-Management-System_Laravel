@@ -32,17 +32,15 @@ return new class extends Migration
         if (! Schema::hasTable('zoom_meetings')) {
             return;
         }
-        Schema::table('zoom_meetings', function (Blueprint $table) {
-            if (! Schema::hasColumn('zoom_meetings', 'added_by')) {
+        if (!Schema::hasColumn('zoom_meetings', 'added_by')) {
+            Schema::table('zoom_meetings', function (Blueprint $table) {
                 $table->integer('added_by')->unsigned()->nullable();
-            }
-            $table->foreign('added_by')->references('id')->on('users')->onDelete('SET NULL')->onUpdate('cascade');
+                $table->foreign('added_by')->references('id')->on('users')->onDelete('SET NULL')->onUpdate('cascade');
 
-            if (! Schema::hasColumn('zoom_meetings', 'last_updated_by')) {
                 $table->integer('last_updated_by')->unsigned()->nullable();
-            }
-            $table->foreign('last_updated_by')->references('id')->on('users')->onDelete('SET NULL')->onUpdate('cascade');
-        });
+                $table->foreign('last_updated_by')->references('id')->on('users')->onDelete('SET NULL')->onUpdate('cascade');
+            });
+        }
 
         $admin = User::allAdmins()->first();
 

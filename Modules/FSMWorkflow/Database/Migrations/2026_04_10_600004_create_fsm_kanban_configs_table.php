@@ -14,7 +14,7 @@ return new class extends Migration {
         if (Schema::hasTable('fsm_kanban_configs')) {
             return;
         }
-        
+
         Schema::create('fsm_kanban_configs', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();

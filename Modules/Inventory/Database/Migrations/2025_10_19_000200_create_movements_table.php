@@ -9,7 +9,7 @@ return new class extends Migration {
         if (Schema::hasTable('movements')) {
             return;
         }
-        
+
         Schema::create('movements', function (Blueprint $t) {
             $t->id();
             $t->foreignId('item_id')->constrained('inventory_items')->cascadeOnDelete();

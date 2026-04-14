@@ -12,23 +12,27 @@ return new class extends Migration
 
     public function up(): void
     {
-        Schema::table('invoice_recurring', function (Blueprint $table) {
-            $table->integer('bank_account_id')->unsigned()->nullable();
-            $table->foreign('bank_account_id')
-                ->references('id')
-                ->on('bank_accounts')
-                ->onDelete('set null')
-                ->onUpdate('cascade');
-        });
+        if (!Schema::hasColumn('invoice_recurring', 'bank_account_id')) {
+            Schema::table('invoice_recurring', function (Blueprint $table) {
+                $table->integer('bank_account_id')->unsigned()->nullable();
+                $table->foreign('bank_account_id')
+                    ->references('id')
+                    ->on('bank_accounts')
+                    ->onDelete('set null')
+                    ->onUpdate('cascade');
+            });
+        }
 
-        Schema::table('expenses_recurring', function (Blueprint $table) {
-            $table->integer('bank_account_id')->unsigned()->nullable();
-            $table->foreign('bank_account_id')
-                ->references('id')
-                ->on('bank_accounts')
-                ->onDelete('set null')
-                ->onUpdate('cascade');
-        });
+        if (!Schema::hasColumn('expenses_recurring', 'bank_account_id')) {
+            Schema::table('expenses_recurring', function (Blueprint $table) {
+                $table->integer('bank_account_id')->unsigned()->nullable();
+                $table->foreign('bank_account_id')
+                    ->references('id')
+                    ->on('bank_accounts')
+                    ->onDelete('set null')
+                    ->onUpdate('cascade');
+            });
+        }
     }
 
     /**

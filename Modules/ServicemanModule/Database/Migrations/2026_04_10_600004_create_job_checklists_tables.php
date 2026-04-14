@@ -7,13 +7,16 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        if (! Schema::hasTable('job_checklists')) {
-            Schema::create('job_checklists', function (Blueprint $table) {
-                $table->bigIncrements('id');
-                $table->unsignedInteger('task_id')->index();
-                $table->string('title');
-                $table->unsignedBigInteger('created_by')->nullable()->index();
-                $table->timestamps();
+        if (Schema::hasTable('job_checklists')) {
+            return;
+        }
+
+        Schema::create('job_checklists', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->unsignedInteger('task_id')->index();
+            $table->string('title');
+            $table->unsignedBigInteger('created_by')->nullable()->index();
+            $table->timestamps();
 
                 $table->foreign('task_id')->references('id')->on('tasks')->cascadeOnDelete();
             });

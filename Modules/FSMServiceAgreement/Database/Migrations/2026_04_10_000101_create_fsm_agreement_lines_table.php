@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('fsm_agreement_lines')) {
+            return;
+        }
+
         // Per-site / per-service pricing lines under an agreement
         if (Schema::hasTable('fsm_agreement_lines')) {
             return;

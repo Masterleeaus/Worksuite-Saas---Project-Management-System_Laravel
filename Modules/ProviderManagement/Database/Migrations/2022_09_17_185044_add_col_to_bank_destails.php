@@ -16,11 +16,11 @@ class AddColToBankDestails extends Migration
         if (! Schema::hasTable('bank_details')) {
             return;
         }
-        Schema::table('bank_details', function (Blueprint $table) {
-            if (! Schema::hasColumn('bank_details', 'routing_number')) {
+        if (!Schema::hasColumn('bank_details', 'routing_number')) {
+            Schema::table('bank_details', function (Blueprint $table) {
                 $table->string('routing_number',191)->nullable();
-            }
-        });
+            });
+        }
     }
 
     /**

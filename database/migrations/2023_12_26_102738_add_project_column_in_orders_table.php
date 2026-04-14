@@ -12,10 +12,12 @@ return new class extends Migration
 
     public function up(): void
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->unsignedInteger('project_id')->nullable()->after('client_id');
-            $table->foreign(['project_id'])->references(['id'])->on('projects')->onUpdate('CASCADE')->onDelete('CASCADE');
-        });
+        if (!Schema::hasColumn('orders', 'project_id')) {
+            Schema::table('orders', function (Blueprint $table) {
+                $table->unsignedInteger('project_id')->nullable()->after('client_id');
+                $table->foreign(['project_id'])->references(['id'])->on('projects')->onUpdate('CASCADE')->onDelete('CASCADE');
+            });
+        }
     }
 
     /**

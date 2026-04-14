@@ -10,7 +10,7 @@ return new class extends Migration {
         if (Schema::hasTable('reach_whatsapp_channels')) {
             return;
         }
-        
+
         Schema::create('reach_whatsapp_channels', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();

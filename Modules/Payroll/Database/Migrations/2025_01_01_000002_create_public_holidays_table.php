@@ -9,7 +9,7 @@ return new class extends Migration {
         if (Schema::hasTable('public_holidays')) {
             return;
         }
-        
+
         Schema::create('public_holidays', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('company_id')->unsigned()->nullable();
