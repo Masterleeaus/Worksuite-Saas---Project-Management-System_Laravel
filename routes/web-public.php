@@ -68,7 +68,7 @@ Route::get('/proposal/download/{id}', [HomeController::class, 'downloadProposal'
 
 
 Route::get('/consent/l/{hash}', [PublicLeadGdprController::class, 'consent'])->name('front.gdpr.consent');
-Route::post('/consent/remove-lead-request', [PublicLeadGdprController::class, 'learemoveLeadRequestd'])->name('front.gdpr.remove_lead_request');
+Route::post('/consent/remove-lead-request', [PublicLeadGdprController::class, 'removeLeadRequest'])->name('front.gdpr.remove_lead_request');
 Route::post('/consent/l/update/{lead}', [PublicLeadGdprController::class, 'updateConsent'])->name('front.gdpr.consent.update');
 
 // Socialite routes
@@ -110,7 +110,7 @@ Route::post('square-webhook/{hash}', [SquareController::class, 'handleGatewayWeb
 
 Route::post('pay-with-razorpay/{hash}', [RazorPayController::class, 'payWithRazorPay'])->name('pay_with_razorpay');
 Route::post('razorpay-webhook/{hash}', [RazorPayController::class, 'handleGatewayWebhook'])->name('razorpay.webhook');
-Route::get('razorpay-webhook/{hash}', [PaypalController::class, 'getWebhook'])->name('get_razorpay.webhook');
+Route::get('razorpay-webhook/{hash}', [RazorPayController::class, 'handleGatewayWebhook'])->name('get_razorpay.webhook');
 
 Route::get('paypal-public/{invoiceId}', [PaypalController::class, 'paymentWithpaypalPublic'])->name('paypal_public');
 Route::get('paypal/{invoiceId}', [PaypalController::class, 'paymentWithpaypal'])->name('paypal');

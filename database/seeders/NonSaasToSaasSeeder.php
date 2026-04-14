@@ -50,14 +50,26 @@ class NonSaasToSaasSeeder extends Seeder
     protected function updateCompanyPackage()
     {
         $company = Company::first();
-        $company->package_id = Package::first()->id;
+        $package = Package::first();
+
+        if (!$company || !$package) {
+            return;
+        }
+
+        $company->package_id = $package->id;
         $company->save();
     }
 
     protected function updateGlobalSettingCurrency()
     {
         $globalSetting = \App\Models\GlobalSetting::first();
-        $globalSetting->currency_id = GlobalCurrency::first()->id;
+        $currency = GlobalCurrency::first();
+
+        if (!$globalSetting || !$currency) {
+            return;
+        }
+
+        $globalSetting->currency_id = $currency->id;
         $globalSetting->save();
     }
 

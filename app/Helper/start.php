@@ -980,17 +980,24 @@ if (!function_exists('can_upload')) {
     // @codingStandardsIgnoreLine
     function can_upload($size = 0)
     {
+        $company = company();
+        $package = $company?->package;
+
+        if (!$company || !$package) {
+            return false;
+        }
+
         if (!session()->has('client_company')) {
             session()->forget(['company_setting', 'company']);
         }
 
         // Return true for unlimited file storage
-        if (company()->package->max_storage_size == -1) {
+        if ($package->max_storage_size == -1) {
             return true;
         }
 
         // Total Space in package in MB
-        $totalSpace = (company()->package->storage_unit == 'mb') ? company()->package->max_storage_size : company()->package->max_storage_size * 1024;
+        $totalSpace = ($package->storage_unit == 'mb') ? $package->max_storage_size : $package->max_storage_size * 1024;
 
         // Used space in mb
         $fileStorage = \App\Models\FileStorage::all();

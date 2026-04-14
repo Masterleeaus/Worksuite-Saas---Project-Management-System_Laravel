@@ -29,38 +29,35 @@ class CustomConfigProvider extends ServiceProvider
     public function register()
     {
         try {
-            // Fetch all settings in a single query
-            $setting = DB::table('smtp_settings')
-                ->join('global_settings', function ($join) {
-                    $join->on('global_settings.id', '=', DB::raw('global_settings.id'));
-                })
-                ->leftJoin('push_notification_settings', function ($join) {
-                    $join->on('push_notification_settings.id', '=', DB::raw('push_notification_settings.id'));
-                })
-                ->leftJoin('translate_settings', function ($join) {
-                    $join->on('translate_settings.id', '=', DB::raw('translate_settings.id'));
-                })
-                ->leftJoin('global_payment_gateway_credentials', function ($join) {
-                    $join->on('global_payment_gateway_credentials.id', '=', DB::raw('global_payment_gateway_credentials.id'));
-                })
-                ->select(
-                    'smtp_settings.*',
-                    'global_settings.global_app_name',
-                    'global_settings.session_driver',
-                    'global_settings.timezone',
-                    'global_settings.light_logo',
-                    'push_notification_settings.onesignal_app_id',
-                    'push_notification_settings.onesignal_rest_api_key',
-                    'translate_settings.google_key',
-                    'global_payment_gateway_credentials.stripe_mode',
-                    'global_payment_gateway_credentials.test_stripe_client_id',
-                    'global_payment_gateway_credentials.test_stripe_secret',
-                    'global_payment_gateway_credentials.test_stripe_webhook_secret',
-                    'global_payment_gateway_credentials.live_stripe_client_id',
-                    'global_payment_gateway_credentials.live_stripe_secret',
-                    'global_payment_gateway_credentials.live_stripe_webhook_secret'
-                )
-                ->first();
+            $smtpSetting = DB::table('smtp_settings')->first();
+            $globalSetting = DB::table('global_settings')->first();
+            $pushSetting = DB::table('push_notification_settings')->first();
+            $translateSetting = DB::table('translate_settings')->first();
+            $stripeSetting = DB::table('global_payment_gateway_credentials')->first();
+
+            $setting = null;
+
+            if ($smtpSetting && $globalSetting) {
+                $setting = (object) array_merge(
+                    (array) $smtpSetting,
+                    [
+                        'global_app_name' => $globalSetting->global_app_name ?? null,
+                        'session_driver' => $globalSetting->session_driver ?? null,
+                        'timezone' => $globalSetting->timezone ?? null,
+                        'light_logo' => $globalSetting->light_logo ?? null,
+                        'onesignal_app_id' => $pushSetting->onesignal_app_id ?? null,
+                        'onesignal_rest_api_key' => $pushSetting->onesignal_rest_api_key ?? null,
+                        'google_key' => $translateSetting->google_key ?? null,
+                        'stripe_mode' => $stripeSetting->stripe_mode ?? null,
+                        'test_stripe_client_id' => $stripeSetting->test_stripe_client_id ?? null,
+                        'test_stripe_secret' => $stripeSetting->test_stripe_secret ?? null,
+                        'test_stripe_webhook_secret' => $stripeSetting->test_stripe_webhook_secret ?? null,
+                        'live_stripe_client_id' => $stripeSetting->live_stripe_client_id ?? null,
+                        'live_stripe_secret' => $stripeSetting->live_stripe_secret ?? null,
+                        'live_stripe_webhook_secret' => $stripeSetting->live_stripe_webhook_secret ?? null,
+                    ]
+                );
+            }
 
 
             if ($setting) {

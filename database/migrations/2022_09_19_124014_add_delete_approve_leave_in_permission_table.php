@@ -41,9 +41,14 @@ return new class extends Migration {
                     ->where('company_id', $company->id)
                     ->first();
 
-                $permissionRole = new PermissionRole();
-                $permissionRole->permission_id = $permission->id;
-                $permissionRole->role_id = $role->id;
+                if (!$role) {
+                    continue;
+                }
+
+                $permissionRole = PermissionRole::firstOrNew([
+                    'permission_id' => $permission->id,
+                    'role_id' => $role->id,
+                ]);
                 $permissionRole->permission_type_id = 4; // All
                 $permissionRole->save();
             }
@@ -52,9 +57,10 @@ return new class extends Migration {
             $adminUser = User::allAdmins();
 
             foreach ($adminUser as $adminUsers) {
-                $userPermission = new UserPermission();
-                $userPermission->user_id = $adminUsers->id;
-                $userPermission->permission_id = $permission->id;
+                $userPermission = UserPermission::firstOrNew([
+                    'user_id' => $adminUsers->id,
+                    'permission_id' => $permission->id,
+                ]);
                 $userPermission->permission_type_id = 4; // All
                 $userPermission->save();
             }

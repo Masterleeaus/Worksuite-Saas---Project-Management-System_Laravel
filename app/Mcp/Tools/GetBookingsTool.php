@@ -7,6 +7,19 @@ use Illuminate\Support\Facades\DB;
 
 class GetBookingsTool implements McpTool
 {
+    private function tenantContext(): array
+    {
+        $authUser = auth()->user();
+        $worksuiteUser = $authUser && isset($authUser->company_id)
+            ? $authUser
+            : ($authUser->user ?? null);
+
+        return [
+            'company_id' => (int) ($worksuiteUser->company_id ?? 0),
+            'is_superadmin' => (int) ($worksuiteUser->is_superadmin ?? 0) === 1,
+        ];
+    }
+
     public function name(): string
     {
         return 'get_bookings';
@@ -55,6 +68,15 @@ class GetBookingsTool implements McpTool
 
     public function handle(array $arguments): array
     {
+        $context = $this->tenantContext();
+
+        if ($context['company_id'] < 1 && !$context['is_superadmin']) {
+            return [[
+                'type' => 'text',
+                'text' => json_encode(['error' => 'Unable to resolve tenant company context for this request.']),
+            ]];
+        }
+
         $query = DB::table('tasks')
             ->where('task_type', 'booking')
             ->select([
@@ -62,6 +84,10 @@ class GetBookingsTool implements McpTool
                 'due_date', 'due_time', 'service_type', 'service_address',
                 'assigned_to', 'project_id as client_id',
             ]);
+
+        if ($context['company_id'] > 0) {
+            $query->where('company_id', $context['company_id']);
+        }
 
         if (!empty($arguments['status'])) {
             $query->where('booking_status', $arguments['status']);
@@ -77,6 +103,10 @@ class GetBookingsTool implements McpTool
 
         if (!empty($arguments['employee_id'])) {
             $query->where('assigned_to', $arguments['employee_id']);
+        }
+
+        if (!empty($arguments['client_id'])) {
+            $query->where('project_id', $arguments['client_id']);
         }
 
         $limit = min((int) ($arguments['limit'] ?? 20), 100);
