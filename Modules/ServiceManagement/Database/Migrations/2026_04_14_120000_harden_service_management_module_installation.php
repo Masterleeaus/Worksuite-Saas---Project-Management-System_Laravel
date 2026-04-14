@@ -208,7 +208,7 @@ return new class extends Migration
                     ->join('services as s', 's.id', '=', 'a.service_id')
                     ->whereNull('a.company_id')
                     ->whereNotNull('s.company_id')
-                    ->update(['a.company_id' => DB::raw('s.company_id')]);
+                    ->update(['company_id' => DB::raw('s.company_id')]);
             }
 
             if (Schema::hasTable('service_pricing_rules') && Schema::hasColumn('service_pricing_rules', 'company_id')) {
@@ -216,7 +216,7 @@ return new class extends Migration
                     ->join('services as s', 's.id', '=', 'r.service_id')
                     ->whereNull('r.company_id')
                     ->whereNotNull('s.company_id')
-                    ->update(['r.company_id' => DB::raw('s.company_id')]);
+                    ->update(['company_id' => DB::raw('s.company_id')]);
             }
         }
     }
