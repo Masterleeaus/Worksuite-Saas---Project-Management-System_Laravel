@@ -96,6 +96,14 @@ return new class extends Migration {
 
         if (Schema::hasTable('roles') && $pivotTable) {
             $allPermissionTypeId = 4; // "all" access in WorkSuite permission_types.
+            if (
+                $pivotTable === 'permission_role'
+                && Schema::hasTable('permission_types')
+                && Schema::hasColumn('permission_types', 'name')
+            ) {
+                $allPermissionTypeId = DB::table('permission_types')->where('name', 'all')->value('id') ?? 4;
+            }
+
             $companyRole = DB::table('roles')->where('name', 'company')->first();
             if ($companyRole) {
                 $basicPerms = ['view_documents', 'create_documents', 'generate_documents', 'delete_documents', 'manage_templates'];
