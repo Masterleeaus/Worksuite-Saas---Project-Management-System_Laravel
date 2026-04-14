@@ -168,6 +168,10 @@ class AttemptToAuthenticate
 
         $attendanceSettings = $this->attendanceShift($showClockIn, $authUser->id, $authUser->company);
 
+        if (is_null($attendanceSettings)) {
+            return false;
+        }
+
         $startTimestamp = now()->format('Y-m-d') . ' ' . $attendanceSettings->office_start_time;
         $endTimestamp = now()->format('Y-m-d') . ' ' . $attendanceSettings->office_end_time;
         $officeStartTime = Carbon::createFromFormat('Y-m-d H:i:s', $startTimestamp, $globalSetting->timezone);
@@ -241,6 +245,11 @@ class AttemptToAuthenticate
         $showClockIn = AttendanceSetting::where('company_id', $company->company_id)->first();
         $globalSetting = GlobalSetting::first();
         $attendanceSettings = $this->attendanceShift($showClockIn, $authUser, $authUserCompany->company);
+
+        if (is_null($attendanceSettings)) {
+            return Reply::error(__('messages.permissionDenied'));
+        }
+
         $attendanceUser = User::find($authUser);
 
         $startTimestamp = now()->format('Y-m-d') . ' ' . $attendanceSettings->office_start_time;
