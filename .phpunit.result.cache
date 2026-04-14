@@ -1,1 +1,0 @@
-{"version":2,"defects":[],"times":{"Modules\\TitanCore\\Tests\\Unit\\AdapterTest::test_openai_health_without_key_is_not_ok":0.004}}
