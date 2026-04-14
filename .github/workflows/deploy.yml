@@ -2,7 +2,7 @@ name: Deploy with Drift Guard
 
 on:
   push:
-    branches: [main, master]
+    branches: [production]
   workflow_dispatch:
     inputs:
       skip_migrations:
@@ -33,8 +33,8 @@ jobs:
       drift_branch: ${{ steps.drift.outputs.drift_branch }}
 
     env:
-      DEPLOY_PATH: ${{ vars.DEPLOY_PATH || '/home/saassmar/domains/cleansm.art/public_html' }}
-      DEPLOY_BRANCH: ${{ vars.DEPLOY_BRANCH || 'main' }}
+      DEPLOY_PATH: /home/saassmar/domains/cleansm.art/public_html
+      DEPLOY_BRANCH: production
       GH_TOKEN: ${{ github.token }}
 
     steps:
@@ -110,6 +110,7 @@ jobs:
             package.json \
             package-lock.json \
             webpack.mix.js \
+            vite.config.* \
             .env.example || true)"
 
           UNTRACKED_DRIFT="$(git ls-files --others --exclude-standard -- \
@@ -127,6 +128,7 @@ jobs:
             package.json \
             package-lock.json \
             webpack.mix.js \
+            vite.config.* \
             .env.example || true)"
 
           echo "==> Tracked drift:"
@@ -168,7 +170,8 @@ jobs:
             package.json \
             package-lock.json \
             webpack.mix.js \
-            .env.example
+            vite.config.* \
+            .env.example || true
 
           if git diff --cached --quiet; then
             echo "==> Nothing staged after filtering."
@@ -212,8 +215,8 @@ jobs:
       contents: read
 
     env:
-      DEPLOY_PATH: ${{ vars.DEPLOY_PATH || '/home/saassmar/domains/cleansm.art/public_html' }}
-      DEPLOY_BRANCH: ${{ vars.DEPLOY_BRANCH || 'main' }}
+      DEPLOY_PATH: /home/saassmar/domains/cleansm.art/public_html
+      DEPLOY_BRANCH: production
 
     steps:
       - name: Verify runner context
@@ -256,7 +259,7 @@ jobs:
             rm -f .git/index.lock
           fi
 
-      - name: Reset server to canonical branch
+      - name: Update server branch without deleting server changes
         shell: bash
         run: |
           set -e
@@ -265,7 +268,8 @@ jobs:
           cp .env /tmp/.deploy_env_backup
 
           git fetch origin "$DEPLOY_BRANCH"
-          git reset --hard "origin/$DEPLOY_BRANCH"
+          git checkout "$DEPLOY_BRANCH" || git checkout -b "$DEPLOY_BRANCH" "origin/$DEPLOY_BRANCH"
+          git pull --no-rebase origin "$DEPLOY_BRANCH"
 
           mv /tmp/.deploy_env_backup .env
 
