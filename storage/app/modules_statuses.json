@@ -15,7 +15,7 @@
     "Biolinks": true,
     "Biometric": true,
     "Blogs": true,
-    "BookingModule": false,
+    "BookingModule": true,
     "BusinessSettingsModule": true,
     "CampaignCanvas": true,
     "ClientPulse": true,
