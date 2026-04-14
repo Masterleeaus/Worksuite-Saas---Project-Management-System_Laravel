@@ -3,6 +3,9 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProjectResource\RelationManagers\ProjectTasksRelationManager;
+use App\Filament\Resources\ProjectResource\RelationManagers\ProjectFilesRelationManager;
+use App\Filament\Resources\ProjectResource\RelationManagers\ProjectNotesRelationManager;
+use App\Filament\Resources\ProjectResource\RelationManagers\ProjectTimeLogsRelationManager;
 use App\Filament\Resources\ProjectResource\Pages\CreateProject;
 use App\Filament\Resources\ProjectResource\Pages\EditProject;
 use App\Filament\Resources\ProjectResource\Pages\ListProjects;
@@ -216,6 +219,9 @@ class ProjectResource extends BaseTenantResource
     {
         return [
             ProjectTasksRelationManager::class,
+            ProjectFilesRelationManager::class,
+            ProjectNotesRelationManager::class,
+            ProjectTimeLogsRelationManager::class,
         ];
     }
 

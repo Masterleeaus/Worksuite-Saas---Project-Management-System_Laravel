@@ -5,15 +5,22 @@ namespace App\Filament\Pages;
 use App\Filament\Widgets\ActivityFeedWidget;
 use App\Filament\Widgets\ActiveProjectsWidget;
 use App\Filament\Widgets\ActiveContractsWidget;
+use App\Filament\Widgets\ClockedInTodayWidget;
+use App\Filament\Widgets\EmployeesActiveTodayWidget;
 use App\Filament\Widgets\JobsTodayWidget;
+use App\Filament\Widgets\MissingTimeLogsWidget;
 use App\Filament\Widgets\OpenLeadsWidget;
 use App\Filament\Widgets\OverdueTasksWidget;
 use App\Filament\Widgets\PendingEstimatesWidget;
+use App\Filament\Widgets\PendingLeaveRequestsWidget;
 use App\Filament\Widgets\RecentPaymentsWidget;
+use App\Filament\Widgets\RecentProjectFilesWidget;
+use App\Filament\Widgets\RecentProjectNotesWidget;
 use App\Filament\Widgets\RevenueWidget;
 use App\Filament\Widgets\SystemSignalsWidget;
 use App\Filament\Widgets\TitanChatWidget;
 use App\Filament\Widgets\TotalClientsWidget;
+use App\Filament\Widgets\UpcomingAbsencesWidget;
 use App\Filament\Widgets\UnpaidInvoicesWidget;
 
 /**
@@ -59,6 +66,13 @@ class CommandCentre extends TitanPage
             UnpaidInvoicesWidget::class,
             RecentPaymentsWidget::class,
             ActiveContractsWidget::class,
+            EmployeesActiveTodayWidget::class,
+            ClockedInTodayWidget::class,
+            PendingLeaveRequestsWidget::class,
+            RecentProjectNotesWidget::class,
+            RecentProjectFilesWidget::class,
+            MissingTimeLogsWidget::class,
+            UpcomingAbsencesWidget::class,
         ];
     }
 }

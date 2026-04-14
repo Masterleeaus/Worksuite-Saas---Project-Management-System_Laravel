@@ -6,6 +6,7 @@ use App\Filament\Resources\InvoiceResource\Pages\CreateInvoice;
 use App\Filament\Resources\InvoiceResource\Pages\EditInvoice;
 use App\Filament\Resources\InvoiceResource\Pages\ListInvoices;
 use App\Filament\Resources\InvoiceResource\RelationManagers\InvoiceItemsRelationManager;
+use App\Filament\Resources\InvoiceResource\RelationManagers\InvoiceFilesRelationManager;
 use App\Filament\Resources\InvoiceResource\RelationManagers\InvoicePaymentsRelationManager;
 use App\Models\Invoice;
 use Filament\Forms;
@@ -120,6 +121,7 @@ class InvoiceResource extends BaseTenantResource
         return [
             InvoicePaymentsRelationManager::class,
             InvoiceItemsRelationManager::class,
+            InvoiceFilesRelationManager::class,
         ];
     }
 

@@ -7,25 +7,38 @@ use App\Filament\Pages\CommandCentre;
 use App\Filament\Resources\ClientResource;
 use App\Filament\Resources\ContractResource;
 use App\Filament\Resources\DocumentTemplateResource;
+use App\Filament\Resources\EmployeeResource;
 use App\Filament\Resources\EstimateResource;
 use App\Filament\Resources\InvoiceResource;
 use App\Filament\Resources\LeadResource;
+use App\Filament\Resources\LeaveResource;
 use App\Filament\Resources\PaymentResource;
 use App\Filament\Resources\ProjectResource;
+use App\Filament\Resources\ProjectFileResource;
+use App\Filament\Resources\ProjectNoteResource;
 use App\Filament\Resources\TaskResource;
+use App\Filament\Resources\AttendanceResource;
+use App\Filament\Resources\TimeLogResource;
 use App\Filament\Pages\ScoutStatus;
 use App\Filament\Pages\SentinelApprovals;
 use App\Filament\Pages\SignalLogs;
 use App\Filament\Widgets\ActiveContractsWidget;
 use App\Filament\Widgets\ActivityFeedWidget;
+use App\Filament\Widgets\ClockedInTodayWidget;
+use App\Filament\Widgets\EmployeesActiveTodayWidget;
 use App\Filament\Widgets\JobsTodayWidget;
+use App\Filament\Widgets\MissingTimeLogsWidget;
 use App\Filament\Widgets\OpenLeadsWidget;
 use App\Filament\Widgets\OverdueTasksWidget;
 use App\Filament\Widgets\PendingEstimatesWidget;
+use App\Filament\Widgets\PendingLeaveRequestsWidget;
 use App\Filament\Widgets\RecentPaymentsWidget;
+use App\Filament\Widgets\RecentProjectFilesWidget;
+use App\Filament\Widgets\RecentProjectNotesWidget;
 use App\Filament\Widgets\RevenueWidget;
 use App\Filament\Widgets\SystemSignalsWidget;
 use App\Filament\Widgets\TitanChatWidget;
+use App\Filament\Widgets\UpcomingAbsencesWidget;
 use App\Filament\Widgets\UnpaidInvoicesWidget;
 use App\Http\Middleware\FilamentAuthenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -116,10 +129,18 @@ class TitanPanelProvider extends PanelProvider
                 UnpaidInvoicesWidget::class,
                 RecentPaymentsWidget::class,
                 ActiveContractsWidget::class,
+                EmployeesActiveTodayWidget::class,
+                ClockedInTodayWidget::class,
+                PendingLeaveRequestsWidget::class,
+                RecentProjectNotesWidget::class,
+                RecentProjectFilesWidget::class,
+                MissingTimeLogsWidget::class,
+                UpcomingAbsencesWidget::class,
             ])
             ->resources([
                 DocumentTemplateResource::class,
                 ClientResource::class,
+                EmployeeResource::class,
                 ProjectResource::class,
                 LeadResource::class,
                 EstimateResource::class,
@@ -127,6 +148,11 @@ class TitanPanelProvider extends PanelProvider
                 TaskResource::class,
                 InvoiceResource::class,
                 PaymentResource::class,
+                AttendanceResource::class,
+                TimeLogResource::class,
+                LeaveResource::class,
+                ProjectNoteResource::class,
+                ProjectFileResource::class,
             ])
 
             // ----------------------------------------------------------------
@@ -207,7 +233,7 @@ class TitanPanelProvider extends PanelProvider
      */
     public static function getModuleNavigationGroups(): array
     {
-        $groups = ['Command Centre', 'CRM', 'Sales', 'Projects', 'Finance'];
+        $groups = ['Command Centre', 'CRM', 'Sales', 'Projects', 'Finance', 'Team', 'Operations', 'Activity', 'Documents'];
 
         $modulesPath    = base_path('Modules');
         $extensionsPath = app_path('Extensions');
