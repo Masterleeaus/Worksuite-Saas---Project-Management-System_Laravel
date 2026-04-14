@@ -75,7 +75,7 @@ class WebhookDataTable extends BaseDataTable
             foreach ($selectOptions as $key => $option) {
                 $selected = ($row->status == $key) ? 'selected' : '';
 
-                $status .= '<option value="' . $key . '" ' . $selected . ' data-content="<i class=\'' . $option['class'] . '\\'></i> ' . $option['label'] . '">' . $option['label'] . '</option>';
+                $status .= '<option value="' . $key . '" ' . $selected . ' data-content="<i class=\\\'' . $option['class'] . '\\\'></i> ' . $option['label'] . '">' . $option['label'] . '</option>';
             }
 
             $status .= '</select>';

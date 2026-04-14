@@ -47,12 +47,13 @@ return [
         'hint' => 'Optional: add translations if module has user-facing strings.',
     ],
 
-[
-    'key' => 'automation_config',
-    'label' => 'Automation manifest present',
-    'ok' => (is_file(__DIR__ . '/../Config/automation.php') || is_file(__DIR__ . '/../config/automation.php')),
-    'hint' => 'Add Config/automation.php (or config/automation.php) to declare signals/actions for AI & automation.',
-],
+    [
+        'id' => 'communication:automation_config',
+        'label' => 'Automation manifest present',
+        'severity' => 'info',
+        'ok' => (is_file(__DIR__ . '/../Config/automation.php') || is_file(__DIR__ . '/../config/automation.php')),
+        'hint' => 'Add Config/automation.php (or config/automation.php) to declare signals/actions for AI & automation.',
+    ],
     [
         'id' => 'titan_zero_available',
         'label' => 'TitanZero available',
@@ -60,10 +61,11 @@ return [
         'severity' => 'warning',
         'help' => 'Install/enable TitanZero to use AI bridge features.',
     ],
-
-    ,
-    'communication_action_handler' => [
-        'ok' => class_exists(\\Modules\\Communication\\Services\\Ai\\CommunicationActionHandler::class),
-        'hint' => 'Expected Modules\\Communication\\Services\\Ai\\CommunicationActionHandler for AI action execution (log-only by default).'
-    ]
+    [
+        'id' => 'communication:action_handler',
+        'label' => 'Communication action handler available',
+        'severity' => 'info',
+        'ok' => class_exists(\Modules\Communication\Services\Ai\CommunicationActionHandler::class),
+        'hint' => 'Expected Modules\\Communication\\Services\\Ai\\CommunicationActionHandler for AI action execution (log-only by default).',
+    ],
 ];

@@ -1,6 +1,6 @@
 <?php
 
 return [
-    'name' => 'TitanAgents',,
+    'name' => 'TitanAgents',
     'agents' => require __DIR__.'/agents.php',
 ];
