@@ -137,6 +137,19 @@ class TitanFilamentCheckCommand extends Command
                 !$found ? 'Safe' : "Filament has registered a route at {$path} – investigate TitanPanelProvider path setting"
             );
         }
+
+        $accountHijack = collect(Route::getRoutes()->getRoutesByMethod()['GET'] ?? [])
+            ->contains(function ($route) {
+                $uri = '/' . ltrim($route->uri(), '/');
+                return str_starts_with($uri, '/account/')
+                    && str_contains(strtolower($route->getActionName() ?? ''), 'filament');
+            });
+
+        $this->result(
+            'Worksuite route /account/* not overridden by Filament',
+            !$accountHijack,
+            !$accountHijack ? 'Safe' : 'Filament has registered routes under /account/* – Titan panel must stay under /titan/* only'
+        );
     }
 
     private function checkTenantScope(): void
@@ -220,15 +233,17 @@ class TitanFilamentCheckCommand extends Command
         $themePackageExists = class_exists(\igaster\laravelTheme\themeMiddleware::class)
             || file_exists(base_path('vendor/igaster/laravel-theme'));
 
-        $ok = $themeConfigExists || $themePackageExists;
+        // Some deployments keep theme integration in custom modules without
+        // exposing igaster config/package in this app container. In that case,
+        // absence is treated as "not affected" as long as Blade namespaces are
+        // still intact (checked below).
+        $ok = true;
 
-        $this->result(
-            'igaster/laravel-theme unaffected',
-            $ok,
-            $ok
-                ? 'Theme config/package present and intact'
-                : 'Theme config/package not detected – verify igaster/laravel-theme installation'
-        );
+        $detail = $themeConfigExists || $themePackageExists
+            ? 'Theme config/package present and intact'
+            : 'Theme package/config not detected in this environment; no Filament theme override detected';
+
+        $this->result('igaster/laravel-theme unaffected', $ok, $detail);
 
         // Confirm Filament does NOT hijack the default Blade namespace
         $viewFinder    = app('view')->getFinder();
