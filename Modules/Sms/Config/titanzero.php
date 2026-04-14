@@ -12,8 +12,8 @@ return [
             'voice_phrases' => [
                 'what is this page',
                 'explain this',
-                'help me'
-            ]
+                'help me',
+            ],
         ],
         [
             'key' => 'sms.sms-setting.send_test_message',
@@ -22,8 +22,8 @@ return [
             'requires' => [],
             'handler' => 'sms-setting.send_test_message',
             'voice_phrases' => [
-                'send test message'
-            ]
+                'send test message',
+            ],
         ],
         [
             'key' => 'sms.sms-setting.test_message',
@@ -32,10 +32,10 @@ return [
             'requires' => [],
             'handler' => 'sms-setting.test_message',
             'voice_phrases' => [
-                'test message'
-            ]
-        ]
+                'test message',
+            ],
+        ],
     ],
     'go_enabled' => true,
-    'zero_enabled' => true
+    'zero_enabled' => true,
 ];

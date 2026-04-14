@@ -1,8 +1,8 @@
 <?php
 
-namespace Modules\Documents\Support;
+namespace Modules\Documents\Services\Workflow;
 
-class Placeholder
+class WorkflowRules
 {
     // Placeholder for future premium features.
 }

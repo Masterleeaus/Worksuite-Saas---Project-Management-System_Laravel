@@ -1,8 +1,8 @@
 <?php
 
-namespace Modules\Documents\Support;
+namespace Modules\Documents\Tests\Feature;
 
-class Placeholder
+class DocumentsVersionsTest
 {
     // Placeholder for future premium features.
 }

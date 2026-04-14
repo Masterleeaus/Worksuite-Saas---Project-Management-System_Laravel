@@ -108,7 +108,7 @@ class ActionRouter
             'payload_json' => json_encode($payload),
             'user_id' => Auth::id(),
         ]);
-    
+    }
 
     /**
      * Confirm a previously resolved intent run and execute it (if a handler exists).

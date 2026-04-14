@@ -1,8 +1,8 @@
 <?php
 
-namespace Modules\Documents\Support;
+namespace Modules\Documents\Services\Versioning;
 
-class Placeholder
+class VersionDiffService
 {
     // Placeholder for future premium features.
 }

@@ -6,7 +6,7 @@ use Modules\AICore\Contracts\AI\ClientInterface as TitanClient;
 use Modules\TitanZero\Entities\TitanZeroUsage;
 use Modules\TitanCore\Services\UsageCostLogger;
 
-class TitanZeroService
+class TitanAssistService
 {
     /**
      * Titan Zero service talks to Titan Core on behalf of the module.
