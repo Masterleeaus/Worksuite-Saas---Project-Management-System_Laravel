@@ -1,7 +1,5 @@
 <?php
 
-<?php
-
 return [
     'name'        => 'FSMSize',
     'menu'        => 'FSM Size',
