@@ -2,15 +2,6 @@
 
 namespace Modules\TitanAgents\Database\Seeders;
 
-use Illuminate\Database\Seeder;
-
-class TitanAgentsDatabaseSeeder extends Seeder
+class AiChatDatabaseSeeder extends TitanAgentsDatabaseSeeder
 {
-    /**
-     * Run the database seeds.
-     */
-    public function run(): void
-    {
-        // $this->call([]);
-    }
 }

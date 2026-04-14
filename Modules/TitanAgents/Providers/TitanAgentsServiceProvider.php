@@ -7,6 +7,10 @@ use Illuminate\Support\ServiceProvider;
 
 class TitanAgentsServiceProvider extends ServiceProvider
 {
+    private static bool $registered = false;
+
+    private static bool $booted = false;
+
     protected string $moduleName = 'TitanAgents';
 
     protected string $moduleNameLower = 'titanagents';
@@ -16,6 +20,12 @@ class TitanAgentsServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (self::$booted) {
+            return;
+        }
+
+        self::$booted = true;
+
         $this->registerCommands();
         $this->registerCommandSchedules();
         $this->registerTranslations();
@@ -33,6 +43,12 @@ class TitanAgentsServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        if (self::$registered) {
+            return;
+        }
+
+        self::$registered = true;
+
         $this->app->register(EventServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
 
