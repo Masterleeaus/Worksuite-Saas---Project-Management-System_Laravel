@@ -454,6 +454,10 @@ class AttemptToAuthenticate
             $attendanceSettings = $defaultAttendanceSettings ?? $checkTodayShift ?? $checkPreviousDayShift;
         }
 
+        if (is_null($attendanceSettings)) {
+            return null;
+        }
+
         if (isset($attendanceSettings->shift)) {
             return $attendanceSettings->shift;
         }
