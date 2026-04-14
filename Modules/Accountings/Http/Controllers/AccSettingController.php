@@ -3,7 +3,7 @@
 namespace Modules\Accountings\Http\Controllers;
 
 use App\Helper\Reply;
-use Modules\Accountings\Entities\PNL;
+use Modules\Accountings\Entities\Pnl;
 use Modules\Accountings\Entities\BalanceSheet;
 use App\Http\Controllers\AccountBaseController;
 use Modules\Accountings\Entities\JournalType;
@@ -28,7 +28,7 @@ class AccSettingController extends AccountBaseController
      */
     public function index()
     {
-        $this->pnl         = PNL::all();
+        $this->pnl         = Pnl::all();
         $this->bs          = BalanceSheet::all();
         $this->journaltype = JournalType::all();
         $this->view        = 'accountings::accounting-settings.ajax.bs';

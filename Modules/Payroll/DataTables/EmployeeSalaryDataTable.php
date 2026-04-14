@@ -10,7 +10,6 @@ use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
 use Modules\Payroll\Entities\PayrollCycle;
 use Modules\Payroll\Entities\EmployeeMonthlySalary;
-use Modules\Payroll\Entities\PayrollCurrencySetting;
 use Modules\Payroll\Entities\PayrollSetting;
 
 class EmployeeSalaryDataTable extends BaseDataTable

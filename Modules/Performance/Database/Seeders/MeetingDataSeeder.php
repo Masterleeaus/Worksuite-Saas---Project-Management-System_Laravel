@@ -8,9 +8,6 @@ use Illuminate\Database\Seeder;
 use Modules\Performance\Entities\Action;
 use Modules\Performance\Entities\Agenda;
 use Modules\Performance\Entities\Meeting;
-use Modules\Performance\Entities\PerformanceMeeting;
-use Modules\Performance\Entities\PerformanceMeetingAgenda;
-use Modules\Performance\Entities\PerformanceMeetingActions;
 
 class MeetingDataSeeder extends Seeder
 {

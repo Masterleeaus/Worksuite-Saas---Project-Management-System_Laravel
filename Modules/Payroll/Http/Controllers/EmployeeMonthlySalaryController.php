@@ -15,7 +15,6 @@ use Carbon\Carbon;
 use Modules\Payroll\Entities\EmployeeSalaryGroup;
 use Modules\Payroll\Entities\EmployeePayrollCycle;
 use Modules\Payroll\Entities\EmployeeMonthlySalary;
-use Modules\Payroll\Entities\PayrollCurrencySetting;
 use Modules\Payroll\DataTables\EmployeeSalaryDataTable;
 use Modules\Payroll\Entities\EmployeeVariableComponent;
 use Modules\Payroll\Entities\PayrollSetting;
