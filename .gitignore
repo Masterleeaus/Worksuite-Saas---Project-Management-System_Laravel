@@ -1,6 +1,7 @@
 /.idea
 /.vscode
 /bootstrap/cache/*
+!/bootstrap/cache/.gitignore
 storage/reviewed
 
 # Environment & secrets — never commit these

@@ -263,7 +263,7 @@ return [
         App\Providers\McpServiceProvider::class,
 
         // Titan Filament panel – parallel UI layer (does NOT replace Worksuite UI)
-        App\Providers\TitanPanelProvider::class,
+        ...(class_exists(\Filament\PanelProvider::class) ? [App\Providers\TitanPanelProvider::class] : []),
         App\Providers\TitanFilamentServiceProvider::class,
     ],
 
