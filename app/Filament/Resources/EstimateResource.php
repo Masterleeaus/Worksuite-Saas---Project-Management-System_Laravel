@@ -56,8 +56,8 @@ class EstimateResource extends BaseTenantResource
                         ->numeric()
                         ->readOnly()
                         ->dehydrated()
-                        ->afterStateHydrated(fn (Set $set, Get $get) => $set('amount', ((float) ($get('quantity') ?: 0)) * ((float) ($get('unit_price') ?: 0))))
-                        ->afterStateUpdated(fn (Set $set, Get $get) => $set('amount', ((float) ($get('quantity') ?: 0)) * ((float) ($get('unit_price') ?: 0)))),
+                        ->afterStateHydrated(fn (Set $set, Get $get) => static::syncLineItemAmount($set, $get))
+                        ->afterStateUpdated(fn (Set $set, Get $get) => static::syncLineItemAmount($set, $get)),
                 ])
                 ->columnSpanFull(),
             Forms\Components\Placeholder::make('subtotal_preview')
@@ -120,5 +120,10 @@ class EstimateResource extends BaseTenantResource
             'create' => CreateEstimate::route('/create'),
             'edit' => EditEstimate::route('/{record}/edit'),
         ];
+    }
+
+    protected static function syncLineItemAmount(Set $set, Get $get): void
+    {
+        $set('amount', ((float) ($get('quantity') ?: 0)) * ((float) ($get('unit_price') ?: 0)));
     }
 }

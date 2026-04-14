@@ -67,10 +67,11 @@ class TaskResource extends BaseTenantResource
                     'completed' => 'Completed',
                 ]),
                 SelectFilter::make('project_id')->relationship('project', 'project_name')->label('Project')->searchable()->preload(),
-                SelectFilter::make('client_id')
+                SelectFilter::make('project.client_id')
+                    ->relationship('project.client', 'name')
                     ->label('Client')
-                    ->options(fn (): array => \App\Models\User::query()->orderBy('name')->pluck('name', 'id')->all())
-                    ->query(fn (Builder $query, array $data): Builder => $query->when($data['value'] ?? null, fn (Builder $q, $clientId) => $q->whereHas('project', fn (Builder $projectQuery) => $projectQuery->where('client_id', $clientId)))),
+                    ->searchable()
+                    ->preload(),
                 Filter::make('due_date')
                     ->form([
                         Forms\Components\DatePicker::make('from'),

@@ -62,10 +62,11 @@ class PaymentResource extends BaseTenantResource
                     'failed' => 'Failed',
                 ]),
                 SelectFilter::make('project_id')->relationship('project', 'project_name')->label('Project')->searchable()->preload(),
-                SelectFilter::make('client_id')
+                SelectFilter::make('invoice.client_id')
+                    ->relationship('invoice.client', 'name')
                     ->label('Client')
-                    ->options(fn (): array => \App\Models\User::query()->orderBy('name')->pluck('name', 'id')->all())
-                    ->query(fn (Builder $query, array $data): Builder => $query->when($data['value'] ?? null, fn (Builder $q, $clientId) => $q->whereHas('invoice', fn (Builder $invoiceQuery) => $invoiceQuery->where('client_id', $clientId)))),
+                    ->searchable()
+                    ->preload(),
                 Filter::make('paid_on')
                     ->form([
                         Forms\Components\DatePicker::make('from'),

@@ -77,7 +77,7 @@ class TitanTierOneResourcesTest extends TestCase
     {
         $policy = new LeadPolicy();
 
-        $superadmin = new TitanFakeUser(1, null, ['employee'], ['view_lead' => false]);
+        $superadmin = new TitanFakeUser(1, null, ['superadmin'], ['view_lead' => false]);
         $superadmin->is_superadmin = 1;
         $this->assertTrue($policy->viewAny($superadmin));
 

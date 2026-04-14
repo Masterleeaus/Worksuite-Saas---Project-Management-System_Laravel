@@ -19,7 +19,6 @@ class CreateInvoice extends CreateRecord
         $data['sub_total'] = $subTotal;
         $data['total'] = $total;
         $data['due_amount'] = $total;
-        $data['amount'] = $total;
 
         return BaseTenantResource::stampTenantData($data);
     }
