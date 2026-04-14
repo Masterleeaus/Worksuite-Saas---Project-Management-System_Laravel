@@ -13,8 +13,13 @@ class OpenAIClient implements ClientInterface
 
     public function __construct()
     {
-        // Expect config/ai.php merged under 'ai'
-        $this->apiKey = config('ai.providers.openai.api_key') ?? env('OPENAI_API_KEY');
+        $apiKey = null;
+
+        if (app()->bound('config')) {
+            $apiKey = app('config')->get('ai.providers.openai.api_key');
+        }
+
+        $this->apiKey = (string)($apiKey ?? env('OPENAI_API_KEY') ?? '');
     }
 
     public function chat(array $messages, array $opts = []): array

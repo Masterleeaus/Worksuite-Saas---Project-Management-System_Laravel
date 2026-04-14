@@ -152,7 +152,7 @@ class PromotionManagementServiceProvider extends ServiceProvider
     private function getPublishableViewPaths(): array
     {
         $paths = [];
-        foreach (\Config::get('view.paths') as $path) {
+        foreach ((array) \Config::get('view.paths', []) as $path) {
             if (is_dir($path . '/modules/' . $this->moduleNameLower)) {
                 $paths[] = $path . '/modules/' . $this->moduleNameLower;
             }
@@ -171,7 +171,14 @@ class PromotionManagementServiceProvider extends ServiceProvider
 
     private function bindCmsRenderingSlots(): void
     {
-        Blade::includeIf('promotionmanagement::sections.sidebar', 'promotionmanagement_sidebar');
+        $bladeCompiler = Blade::getFacadeRoot();
+
+        if ($bladeCompiler && method_exists($bladeCompiler, 'includeIf')) {
+            $bladeCompiler->includeIf('promotionmanagement::sections.sidebar', 'promotionmanagement_sidebar');
+        } elseif ($bladeCompiler && method_exists($bladeCompiler, 'include') && view()->exists('promotionmanagement::sections.sidebar')) {
+            $bladeCompiler->include('promotionmanagement::sections.sidebar', 'promotionmanagement_sidebar');
+        }
+
         view()->share('promotionManagementSidebarView', 'promotionmanagement::sections.sidebar');
     }
 }
