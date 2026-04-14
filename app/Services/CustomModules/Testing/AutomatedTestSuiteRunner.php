@@ -185,7 +185,7 @@ class AutomatedTestSuiteRunner
 
     protected function testDiskSpace(string $filePath): array
     {
-        $fileSize = max((int) (file_exists($filePath) ? filesize($filePath) : 0), 0);
+        $fileSize = file_exists($filePath) ? (int) filesize($filePath) : 0;
         $availableSpace = (float) disk_free_space(base_path());
         return ['success' => $availableSpace > ($fileSize * 3), 'message' => 'Available: ' . round($availableSpace / 1048576) . 'MB, Needed: ' . round(($fileSize * 3) / 1048576) . 'MB'];
     }

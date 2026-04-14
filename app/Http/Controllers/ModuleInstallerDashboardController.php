@@ -74,7 +74,7 @@ class ModuleInstallerDashboardController extends Controller
 
         return view('custom-modules.dashboard.logs', [
             'logs' => $this->logRepository->search($filters, 50),
-            'statistics' => $this->normaliseLogStatistics($this->logRepository->getStatistics(7)),
+            'statistics' => $this->normalizeLogStatistics($this->logRepository->getStatistics(7)),
             'modules' => ModuleInstallLog::query()->distinct()->pluck('module_name'),
             'filters' => $filters,
         ]);
@@ -263,7 +263,7 @@ class ModuleInstallerDashboardController extends Controller
         return ModuleTestResult::where('install_id', $installId)->orderBy('test_category')->orderBy('test_name')->get();
     }
 
-    protected function normaliseLogStatistics(array $statistics): array
+    protected function normalizeLogStatistics(array $statistics): array
     {
         return [
             'total_events' => $statistics['total_events'] ?? $statistics['total_logs'] ?? 0,

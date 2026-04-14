@@ -107,8 +107,9 @@ class SecurityScanValidator
             'stream_filter' => 'Stream manipulation',
         ];
         
-        // Find all PHP files
-        $phpFiles = File::allFiles($basePath, ['*.php']);
+        // Find all PHP files (filter by extension manually)
+        $phpFiles = collect(File::allFiles($basePath))
+            ->filter(fn ($f) => $f->getExtension() === 'php');
         
         foreach ($phpFiles as $file) {
             try {
@@ -185,7 +186,7 @@ class SecurityScanValidator
         $content = preg_replace('/\/\/.*$/m', '', $content);
         $content = preg_replace('%/\*.*?\*/%s', '', $content);
         
-        // Look for function calls or direct usage
-        return preg_match('/\b' . preg_quote($pattern, '/') . '\s*[\(\[]/', $content) === 1;
+        // Look for function calls or direct usage (only parenthesis as PHP function call delimiter)
+        return preg_match('/\b' . preg_quote($pattern, '/') . '\s*\(/', $content) === 1;
     }
 }

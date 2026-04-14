@@ -51,7 +51,7 @@ class CleanupModuleUploads extends Command
             
             $this->withProgressBar($files, function ($file) use (&$deleted, &$errors, $cutoffTime) {
                 try {
-                    $fileTime = $file->getATime();
+                    $fileTime = $file->getMTime();
                     
                     if ($fileTime < $cutoffTime) {
                         File::delete($file->getPathname());

@@ -1231,6 +1231,7 @@ class CustomModuleController extends Controller
         }
 
         usort($candidates, function (array $left, array $right) {
+            // Sort by: highest score first, then shallowest depth first, then alphabetically by path.
             return [$right['score'], $left['depth'], $left['path']] <=> [$left['score'], $right['depth'], $right['path']];
         });
 
@@ -1344,17 +1345,11 @@ class CustomModuleController extends Controller
 
     private function inspectPackageBridgeSignals(string $modulePath): array
     {
+        // Use only the reliable File::allFiles() iterator — glob ** may not recurse everywhere.
         $signalFiles = [];
-        foreach (File::glob($modulePath . '/**/*.php') ?: [] as $phpFile) {
-            // glob ** may not recurse everywhere on all hosts; fall through to iterator below if empty.
-            $signalFiles[] = $phpFile;
-        }
-        if (!count($signalFiles)) {
-            $signalFiles = [];
-            foreach (File::allFiles($modulePath) as $file) {
-                if ($file->getExtension() === 'php') {
-                    $signalFiles[] = $file->getPathname();
-                }
+        foreach (File::allFiles($modulePath) as $file) {
+            if ($file->getExtension() === 'php') {
+                $signalFiles[] = $file->getPathname();
             }
         }
 

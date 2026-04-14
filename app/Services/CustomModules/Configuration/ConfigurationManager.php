@@ -26,7 +26,7 @@ class ConfigurationManager
                     ->get();
 
                 foreach ($records as $record) {
-                    data_set($config, $record->key, self::normaliseValue($record->value), true);
+                    data_set($config, $record->key, self::normalizeValue($record->value), true);
                 }
             }
 
@@ -148,7 +148,7 @@ class ConfigurationManager
         Cache::forget(self::CACHE_KEY . ':' . $environment);
     }
 
-    protected static function normaliseValue($value)
+    protected static function normalizeValue($value)
     {
         if (!is_string($value)) {
             return $value;

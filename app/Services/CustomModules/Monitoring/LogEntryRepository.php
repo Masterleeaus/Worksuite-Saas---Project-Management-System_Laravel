@@ -20,7 +20,7 @@ class LogEntryRepository
         return ModuleInstallationLog::create([
             'module_name' => $moduleName,
             'event_type' => $eventType,
-            'level' => $this->normaliseLevel($level),
+            'level' => $this->normalizeLevel($level),
             'data' => $data,
             'user_id' => $userId ?? auth()->id(),
             'logged_at' => now(),
@@ -151,7 +151,7 @@ class LogEntryRepository
         ];
     }
 
-    protected function normaliseLevel(string $level): string
+    protected function normalizeLevel(string $level): string
     {
         return in_array($level, ['debug', 'info', 'warning', 'error'], true) ? $level : 'info';
     }
