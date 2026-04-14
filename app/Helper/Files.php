@@ -189,7 +189,7 @@ class Files
         }
 
         // WORKSUITESAAS
-        if (company() && company()->package->max_storage_size > 0) {
+        if (company() && company()?->package && company()->package->max_storage_size > 0) {
             // Check if company has exceeded the storage limit
             $companyFilesSize = FileStorage::where('company_id', company()->id)->sum('size');
             $companyPackageMaxStorageSize = company()->package->max_storage_size;

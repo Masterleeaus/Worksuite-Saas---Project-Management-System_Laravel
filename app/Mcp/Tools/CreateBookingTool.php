@@ -8,6 +8,19 @@ use Illuminate\Support\Facades\Validator;
 
 class CreateBookingTool implements McpTool
 {
+    private function tenantContext(): array
+    {
+        $authUser = auth()->user();
+        $worksuiteUser = $authUser && isset($authUser->company_id)
+            ? $authUser
+            : ($authUser->user ?? null);
+
+        return [
+            'company_id' => (int) ($worksuiteUser->company_id ?? 0),
+            'is_superadmin' => (int) ($worksuiteUser->is_superadmin ?? 0) === 1,
+        ];
+    }
+
     public function name(): string
     {
         return 'create_booking';
@@ -63,6 +76,15 @@ class CreateBookingTool implements McpTool
 
     public function handle(array $arguments): array
     {
+        $context = $this->tenantContext();
+
+        if ($context['company_id'] < 1 && !$context['is_superadmin']) {
+            return [[
+                'type' => 'text',
+                'text' => json_encode(['error' => 'Unable to resolve tenant company context for this request.']),
+            ]];
+        }
+
         $validator = Validator::make($arguments, [
             'client_id'    => 'required|integer|exists:users,id',
             'service_type' => 'required|string|max:100',
@@ -78,6 +100,19 @@ class CreateBookingTool implements McpTool
             ];
         }
 
+        $clientQuery = DB::table('users')->where('id', $arguments['client_id']);
+
+        if ($context['company_id'] > 0) {
+            $clientQuery->where('company_id', $context['company_id']);
+        }
+
+        if (!$clientQuery->exists()) {
+            return [[
+                'type' => 'text',
+                'text' => json_encode(['error' => 'Client is not accessible within the current tenant context.']),
+            ]];
+        }
+
         $bookingId = DB::table('tasks')->insertGetId([
             'task_type'                => 'booking',
             'booking_status'           => 'pending',
@@ -90,6 +125,7 @@ class CreateBookingTool implements McpTool
             'due_time'                 => $arguments['due_time'] ?? null,
             'description'              => $arguments['notes'] ?? null,
             'estimated_duration_hours' => $arguments['estimated_duration_hours'] ?? null,
+            'company_id'               => $context['company_id'] > 0 ? $context['company_id'] : null,
             'created_at'               => now(),
             'updated_at'               => now(),
         ]);

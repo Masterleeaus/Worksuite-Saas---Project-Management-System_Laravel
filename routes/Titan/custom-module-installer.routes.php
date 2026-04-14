@@ -15,10 +15,14 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware(['auth'])->prefix('account/settings')->group(function () {
-    Route::resource('module-settings', ModuleSettingController::class);
+    if (!Route::has('module-settings.index')) {
+        Route::resource('module-settings', ModuleSettingController::class);
+    }
 
-    Route::post('custom-modules/verify-purchase', [CustomModuleController::class, 'verifyingModulePurchase'])
-        ->name('custom-modules.verify_purchase');
+    if (!Route::has('custom-modules.verify_purchase')) {
+        Route::post('custom-modules/verify-purchase', [CustomModuleController::class, 'verifyingModulePurchase'])
+            ->name('custom-modules.verify_purchase');
+    }
 
     Route::post('custom-modules/upload-temp', [CustomModuleController::class, 'uploadTemp'])
         ->name('custom-modules.upload-temp');
@@ -40,12 +44,14 @@ Route::middleware(['auth'])->prefix('account/settings')->group(function () {
 
     Route::post('custom-modules/{install}/rollback', [CustomModuleController::class, 'rollback'])
         ->name('custom-modules.rollback')
-        ->middleware('superadmin');
+        ->middleware('super-admin');
 
-    Route::resource('custom-modules', CustomModuleController::class);
+    if (!Route::has('custom-modules.index')) {
+        Route::resource('custom-modules', CustomModuleController::class);
+    }
 });
 
-Route::middleware(['auth', 'superadmin'])->prefix('admin/modules')->group(function () {
+Route::middleware(['auth', 'super-admin'])->prefix('admin/modules')->group(function () {
     Route::get('/dashboard', [ModuleInstallerDashboardController::class, 'index'])->name('modules.dashboard');
     Route::get('/history', [ModuleInstallerDashboardController::class, 'history'])->name('modules.history');
     Route::get('/logs', [ModuleInstallerDashboardController::class, 'logs'])->name('modules.logs');
@@ -55,7 +61,7 @@ Route::middleware(['auth', 'superadmin'])->prefix('admin/modules')->group(functi
 });
 
 // Alias routes required by the Module Registry dashboard validation
-Route::middleware(['auth', 'superadmin'])->prefix('account/settings')->group(function () {
+Route::middleware(['auth', 'super-admin'])->prefix('account/settings')->group(function () {
     Route::get('/custom-modules/dashboard', [ModuleInstallerDashboardController::class, 'index'])
         ->name('custom-modules.dashboard');
     Route::get('/custom-modules/install', [CustomModuleController::class, 'create'])

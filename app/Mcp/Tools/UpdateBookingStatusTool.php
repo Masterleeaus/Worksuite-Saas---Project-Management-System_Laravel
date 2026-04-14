@@ -15,6 +15,19 @@ class UpdateBookingStatusTool implements McpTool
         'reclean'     => ['in_progress', 'completed'],
     ];
 
+    private function tenantContext(): array
+    {
+        $authUser = auth()->user();
+        $worksuiteUser = $authUser && isset($authUser->company_id)
+            ? $authUser
+            : ($authUser->user ?? null);
+
+        return [
+            'company_id' => (int) ($worksuiteUser->company_id ?? 0),
+            'is_superadmin' => (int) ($worksuiteUser->is_superadmin ?? 0) === 1,
+        ];
+    }
+
     public function name(): string
     {
         return 'update_booking_status';
@@ -50,10 +63,24 @@ class UpdateBookingStatusTool implements McpTool
 
     public function handle(array $arguments): array
     {
-        $booking = DB::table('tasks')
+        $context = $this->tenantContext();
+
+        if ($context['company_id'] < 1 && !$context['is_superadmin']) {
+            return [[
+                'type' => 'text',
+                'text' => json_encode(['error' => 'Unable to resolve tenant company context for this request.']),
+            ]];
+        }
+
+        $bookingQuery = DB::table('tasks')
             ->where('id', $arguments['booking_id'])
-            ->where('task_type', 'booking')
-            ->first();
+            ->where('task_type', 'booking');
+
+        if ($context['company_id'] > 0) {
+            $bookingQuery->where('company_id', $context['company_id']);
+        }
+
+        $booking = $bookingQuery->first();
 
         if (!$booking) {
             return [[
@@ -86,7 +113,13 @@ class UpdateBookingStatusTool implements McpTool
             $updateData['completed_on'] = now()->toDateString();
         }
 
-        DB::table('tasks')->where('id', $arguments['booking_id'])->update($updateData);
+        $updateQuery = DB::table('tasks')->where('id', $arguments['booking_id'])->where('task_type', 'booking');
+
+        if ($context['company_id'] > 0) {
+            $updateQuery->where('company_id', $context['company_id']);
+        }
+
+        $updateQuery->update($updateData);
 
         return [[
             'type' => 'text',
