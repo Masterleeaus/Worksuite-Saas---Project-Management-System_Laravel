@@ -1,134 +1,77 @@
 STATUS:
 MOSTLY COMPLETE — MINOR FOLLOW-UP NEEDED
 
-ROUTES:
-- Required commands:
-  - `php artisan route:list | grep -i titan` → exit 1 (no output in this environment).
-  - `php artisan route:list --path=titan` → failed with `SQLSTATE[HY000] [2002] Connection refused` (global_settings lookup).
-- Runtime fallback evidence (DB-independent bootstrap introspection):
-  - Script `/tmp/titan_route_evidence.php` confirms Titan routes are registered:
-    - `/titan`
-    - `/titan/command-centre`
-    - `/titan/automation-queue`
-    - `/titan/scout-status`
-    - `/titan/sentinel-approvals`
-    - `/titan/signal-logs`
-    - `/titan/document-templates`
-    - `/titan/logout`
-  - `TITAN_DUPLICATE_ROUTE_NAMES=0`
-  - `TITAN_ROUTE_COUNT=24` (includes non-panel account titan-integrations routes containing "titan" in URI)
+DB-BACKED FINAL PASS (2026-04-14):
+- Objective of this pass: close the last gap by validating runtime tenant isolation with database-backed tests.
+- Result: tenant-isolation runtime tests now exist and pass, but one environment/runtime blocker still prevents full-closeout classification.
 
-AUTH:
-- Guest redirect check (Playwright):
-  - Open `http://127.0.0.1:8000/titan`
-  - Redirect target: `http://127.0.0.1:8000/login`
-  - No `/titan/login` route detected (`HAS_TITAN_LOGIN_ROUTE=no` from `/tmp/titan_closeout_checks.php`)
-  - Screenshot: `/tmp/playwright-logs/page-2026-04-14T06-27-22-155Z.png`
-- Gate matrix (script `/tmp/titan_can_access_matrix.php`):
-  - Guest = blocked
-  - Employee = blocked
-  - TenantNoPermission = blocked
-  - Admin = allowed
-  - Superadmin = allowed
-  - TitanAccessPermission = allowed
-  - NoTenantAdmin = blocked
-- Middleware path verified:
-  - `FilamentAuthenticate` (redirects to `route('login')`)
-  - `ApplyTitanTenantScope`
-  - `EnsureTitanPanelAccess`
+TENANT RUNTIME VALIDATION:
+- Added DB-backed runtime suite:
+  - `tests/Feature/Titan/TitanTenantIsolationDatabaseTest.php`
+- Verified against real database rows (`companies`, `users`, `document_templates`) that:
+  - tenant A admin sees/mutates only tenant A records
+  - tenant B admin sees/mutates only tenant B records
+  - cross-tenant update/delete attempts through the tenant-scoped resource query return `0`
+  - tenant stamping sets `company_id` + `created_by`
+- Command evidence:
+  - `vendor/bin/phpunit --filter TitanTenantIsolationDatabaseTest`
+  - Result: `OK` (4 tests, 26 assertions)
 
-TENANCY:
-- Verified in code:
-  - `BaseTenantResource::getEloquentQuery()` adds tenant predicate on model table `company_id`.
-  - `BaseTenantResource::stampTenantData()` auto-stamps `company_id` + `created_by`.
-  - `ManageDocumentTemplates::mutateFormDataBeforeCreate()` calls `stampTenantData()`.
-  - `ApplyTitanTenantScope` denies users with no tenant company association.
+RESOURCE ENFORCEMENT CHAIN:
+- Runtime enforcement re-verified:
+  - `BaseTenantResource::getEloquentQuery()` enforces `company_id` scope
+  - `BaseTenantResource::stampTenantData()` enforces tenant/create stamp
+  - `ApplyTitanTenantScope` blocks users without tenant company
+  - `EnsureTitanPanelAccess` applies panel gate and blocks unauthorized users
+  - `TitanPanelProvider::canAccess()` gate matrix works for guest/employee/admin/superadmin/titan_access/no-company-admin
+- `DocumentTemplateResource` still uses `BaseTenantResource` and `ManageDocumentTemplates` create mutation stamping.
 
-RESOURCE CRUD:
-- `DocumentTemplateResource` uses `BaseTenantResource` and includes:
-  - list route (`ManageDocumentTemplates::route('/')`)
-  - create (`mutateFormDataBeforeCreate`)
-  - edit action (`Tables\Actions\EditAction::make()`)
-  - searchable table column (`->searchable()`)
-  - bulk delete action (`Tables\Actions\DeleteBulkAction::make()`)
-- Security interpretation:
-  - Record resolution for table actions is scoped by `BaseTenantResource::getEloquentQuery()`, so foreign-tenant IDs are excluded from resource query context.
-  - This resource currently exposes ManageRecords/index route only (no separate public view route path), reducing view/edit direct-route exposure.
-- Environment limitation:
-  - Full UI CRUD mutation tests across tenant A/B with real DB users were blocked by non-installed/local DB-unavailable state.
+AUTH MATRIX:
+- Runtime matrix confirmed in DB-backed test suite:
+  - guest: blocked
+  - employee: blocked
+  - tenant user without permission: blocked
+  - admin: allowed
+  - superadmin: allowed
+  - titan_access permission user: allowed
+  - admin without company_id: blocked
 
-NAVIGATION:
-- Titan page/resource definitions confirmed:
-  - `Command Centre`
-  - `Automation Queue`
-  - `Scout Status`
-  - `Sentinel Approvals`
-  - `Signal Logs`
-  - `Document Templates` in `TitanDocs`
-- Icons are present on Titan pages/resource.
-- No duplicate Titan page class declarations found in `app/Filament/Pages`.
+ROUTE VERIFICATION:
+- Required command:
+  - `php artisan route:list --path=titan`
+- Result in this environment:
+  - blocked by external DB dependency (`SQLSTATE[HY000] [2002] Connection refused` on `global_settings`)
+- DB fallback attempt:
+  - `APP_ENV=testing DB_CONNECTION=sqlite DB_DATABASE=/tmp/worksuite.sqlite php artisan route:list --path=titan`
+  - blocked by encrypted payload bootstrap dependency (`The payload is invalid.`)
+- Route safety still re-verified by existing command coverage:
+  - `php artisan titan:filament-check` confirms Titan route presence, non-collision, and registration checks.
 
-WIDGETS:
-- `CommandCentre` renders widgets via `getHeaderWidgets()`.
-- No `@livewire(...)` found under `resources/views/filament`.
+TEST EXECUTION:
+- Required:
+  - `php artisan test --filter=Titan` -> runs but includes unrelated TitanCore failures.
+  - `vendor/bin/phpunit --filter Titan` -> same unrelated TitanCore failures.
+- Exact failing non-Filament tests:
+  - `Modules\TitanCore\Tests\Unit\AdapterTest` (`Target class [config] does not exist`)
+  - `Modules\TitanCore\Tests\Feature\MetricsApiTest`
+  - `Modules\TitanCore\Tests\Feature\PromptsApiTest`
+  - `Modules\TitanCore\Tests\Feature\RoutesTest`
+- Targeted Titan Filament runtime subset:
+  - `Tests\Feature\Titan\TitanPanelRuntimeTest` -> PASS
+  - `Tests\Feature\Titan\TitanTenantIsolationDatabaseTest` -> PASS
 
-WORKSUITE COMPATIBILITY:
-- Collision evidence script `/tmp/titan_collision_evidence.php`:
-  - `FILAMENT_OVERRIDE_dashboard=0`
-  - `FILAMENT_OVERRIDE_home=0`
-  - `FILAMENT_OVERRIDE_admin=0`
-  - `FILAMENT_ACCOUNT_PREFIX_HITS=0`
-- `config/app.php` contains a single `TitanPanelProvider::class` registration.
-- Recursive `routes/Titan` loader re-verified:
-  - temporary `routes/Titan/test.php` added and detected (`titan_test_route_registered`)
-  - temporary file removed immediately afterward.
+CHECK COMMAND:
+- `php artisan titan:filament-check`
+- Result: **24/24 PASS**
 
-VALIDATION COMMAND:
-- `php artisan titan:filament-check` now passes with **24 checks**.
-- Final closeout hardening added in this pass:
-  - `Titan resource registration duplication risk`
-    - validates single `DocumentTemplateResource::class` registration and no Titan `discoverResources()` auto-discovery mix.
-  - `TitanPage base canAccess() exists and delegates to TitanPanelProvider gate`
-- Previously-added checks remain:
-  - provider uniqueness in `config/app.php`
-  - resource registration presence
-  - middleware wiring (auth + tenant + access gate)
-  - guest-block behavior in `TitanPanelProvider::canAccess()`
-
-TEST RESULTS:
-- Required command run:
-  - `php artisan test --filter=Titan`
-- Current result:
-  - `ERROR  Command "test" is not defined` (dev test dependencies unavailable in this sandbox runtime state).
-- Maximum additional targeted verification executed:
-  - `php artisan titan:filament-check` (24/24 pass)
-  - browser auth redirect check for `/titan`
-  - route duplication/collision scripts
-  - role gate matrix script for guest/employee/admin/superadmin/titan_access/no-tenant-admin
-- Remaining environment-limited items:
-  - Full PHPUnit Titan suite execution
-  - Full tenant A/B CRUD UI exercise against a live, installed DB-backed app
+FIXES ADDED IN THIS PASS:
+- Added DB-backed tenant/runtime validation suite:
+  - `tests/Feature/Titan/TitanTenantIsolationDatabaseTest.php`
+- No architecture changes, no new panel/resource scaffolding, no broad refactors.
 
 FINAL VERDICT:
 MOSTLY COMPLETE — MINOR FOLLOW-UP NEEDED
 
-Commands executed in this closeout pass:
-- `composer validate --no-check-publish`
-- `composer install --no-dev --no-interaction --prefer-dist`
-- `php artisan optimize:clear`
-- `php artisan route:list | grep -i titan`
-- `php artisan route:list --path=titan`
-- `php artisan titan:filament-check`
-- `php artisan test --filter=Titan`
-- Playwright open `/titan` + screenshot
-- Temporary `routes/Titan/test.php` route-loader probe + removal
-- Bootstrap route/auth/gate scripts:
-  - `/tmp/titan_route_evidence.php`
-  - `/tmp/titan_collision_evidence.php`
-  - `/tmp/titan_closeout_checks.php`
-  - `/tmp/titan_can_access_matrix.php`
-
-Fixes applied in this final pass:
-- `app/Console/Commands/TitanFilamentCheckCommand.php`:
-  - added duplicate-resource-registration risk check
-  - added TitanPage base `canAccess()` delegation check
+WHY NOT FULL INSTALL COMPLETE:
+- The remaining blocker is environment/runtime command completeness for DB-backed route-list verification and clean full `--filter=Titan` pass, due unrelated TitanCore failures and bootstrap DB/decryption constraints in this sandbox.
+- Titan Filament-specific runtime isolation checks are now implemented and passing.
