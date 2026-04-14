@@ -74,7 +74,7 @@ ApiRoute::group(['namespace' => 'Modules\RestAPI\Http\Controllers', 'middleware'
 
     ApiRoute::resource('notice', 'NoticeController');
     ApiRoute::resource('event', 'EventController');
-    ApiRoute::get('/me/calendar', 'EventController@me');
+    ApiRoute::get('/me/calendar', ['as' => 'api.calendar.me', 'uses' => 'EventController@me']);
 
     ApiRoute::get('/estimate/send/{id}', ['as' => 'estimate.send', 'uses' => 'EstimateController@sendEstimate']);
     ApiRoute::resource('estimate', 'EstimateController');

@@ -15,7 +15,7 @@ Route::prefix('survey')->name('survey.')->group(function () {
 });
 
 // ─── Authenticated routes ─────────────────────────────────────────────────────
-Route::middleware(['auth'])->prefix('customer-feedback')->group(function () {
+Route::middleware(['auth'])->prefix('customer-feedback')->name('customer-feedback.')->group(function () {
 
     // Main feedback tickets
     Route::resource('tickets', FeedbackTicketController::class);
@@ -57,11 +57,11 @@ Route::middleware(['auth'])->prefix('customer-feedback')->group(function () {
 
 // ─── Legacy Complaint routes (backward compatibility) ─────────────────────────
 Route::middleware(['auth'])->prefix('complaint')->group(function () {
-    Route::get('/',          [FeedbackTicketController::class, 'index'])->name('complaint.index');
-    Route::get('create',     [FeedbackTicketController::class, 'create'])->name('complaint.create');
-    Route::post('/',         [FeedbackTicketController::class, 'store'])->name('complaint.store');
-    Route::get('{ticket}',   [FeedbackTicketController::class, 'show'])->name('complaint.show');
-    Route::get('{ticket}/edit', [FeedbackTicketController::class, 'edit'])->name('complaint.edit');
-    Route::put('{ticket}',   [FeedbackTicketController::class, 'update'])->name('complaint.update');
-    Route::delete('{ticket}', [FeedbackTicketController::class, 'destroy'])->name('complaint.destroy');
+    Route::get('/',          [FeedbackTicketController::class, 'index'])->name('customer-feedback.complaint.index');
+    Route::get('create',     [FeedbackTicketController::class, 'create'])->name('customer-feedback.complaint.create');
+    Route::post('/',         [FeedbackTicketController::class, 'store'])->name('customer-feedback.complaint.store');
+    Route::get('{ticket}',   [FeedbackTicketController::class, 'show'])->name('customer-feedback.complaint.show');
+    Route::get('{ticket}/edit', [FeedbackTicketController::class, 'edit'])->name('customer-feedback.complaint.edit');
+    Route::put('{ticket}',   [FeedbackTicketController::class, 'update'])->name('customer-feedback.complaint.update');
+    Route::delete('{ticket}', [FeedbackTicketController::class, 'destroy'])->name('customer-feedback.complaint.destroy');
 });

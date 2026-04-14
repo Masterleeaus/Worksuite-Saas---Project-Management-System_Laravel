@@ -19,8 +19,16 @@ return new class extends Migration
 
         foreach($companies as $company){
 
-            $package = Package::findOrFail($company->package_id);
-            $modulesInPackage = json_decode($package->module_in_package, true);
+            if (empty($company->package_id)) {
+                continue;
+            }
+
+            $package = Package::find($company->package_id);
+            if (!$package) {
+                continue;
+            }
+
+            $modulesInPackage = json_decode($package->module_in_package ?? '', true) ?? [];
 
             ModuleSetting::where('company_id', $company->id)
                 ->whereIn('module_name', $modulesInPackage)
