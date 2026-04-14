@@ -13,7 +13,6 @@ use Illuminate\Notifications\Notifiable;
 use Modules\Inspection\Entities\Schedule;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Modules\Inspection\Entities\InspectionTemplateStandar;
 
 class RecurringSchedule extends BaseModel
 {
