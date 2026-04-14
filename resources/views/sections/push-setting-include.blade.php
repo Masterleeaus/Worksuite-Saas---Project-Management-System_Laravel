@@ -3,7 +3,7 @@
     $pusherSettings = $pusherSettings ?? pusher_settings();
 @endphp
 
-@if (($pushSetting?->status ?? null) == 'active')
+@if (($pushSetting?->status) == 'active')
     <link rel="manifest" href="{{ asset('manifest.json') }}"/>
     <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
     <script>
@@ -99,7 +99,7 @@
     </script>
 @endif
 
-@if (($pushSetting?->beams_push_status ?? null) == 'active')
+@if (($pushSetting?->beams_push_status) == 'active')
     <script src="https://js.pusher.com/beams/1.0/push-notifications-cdn.js" async></script>
 
     <script>
