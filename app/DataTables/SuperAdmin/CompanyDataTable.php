@@ -115,7 +115,7 @@ class CompanyDataTable extends BaseDataTable
         $datatables->editColumn('package', function ($row) {
             $packageModel = $row->package;
             $packageName = $packageModel?->name ?: '--';
-            $packageType = $row->package_type;
+            $packageType = $row->package_type ?: '--';
             $change = '';
 
             if ($this->updatePackagesPermission == 'all') {
@@ -143,7 +143,7 @@ class CompanyDataTable extends BaseDataTable
             } elseif ($packageModel && $packageModel->default == 'trial') {
                 $package .= '<br>Ends On: ' . $time;
             } elseif ($packageModel) {
-                $package .= ' (' . $packageModel->package . ')';
+                $package .= ' (' . ($packageModel?->package ?: '--') . ')';
             }
 
             return "<div class='w-100'>
