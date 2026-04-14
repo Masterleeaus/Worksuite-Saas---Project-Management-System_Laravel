@@ -14,12 +14,13 @@ return new class extends Migration
 
     public function up()
     {
-        if (! Schema::hasTable('product_files')) {
-            return;
-        }
+        if (Schema::hasTable('product_files')) {
+
         Schema::table('product_files', function (Blueprint $table) {
             $table->timestamps();
         });
+
+        }
 
     }
 

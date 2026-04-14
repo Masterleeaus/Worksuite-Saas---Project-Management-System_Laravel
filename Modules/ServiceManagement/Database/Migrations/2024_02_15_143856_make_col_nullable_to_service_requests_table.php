@@ -13,14 +13,13 @@ class MakeColNullableToServiceRequestsTable extends Migration
      */
     public function up()
     {
-        if (! Schema::hasTable('service_requests')) {
-            return;
-        }
+        if (Schema::hasTable('service_requests')) {
+
         Schema::table('service_requests', function (Blueprint $table) {
-            if (Schema::hasColumn('service_requests', 'category_id')) {
-                $table->uuid('category_id')->nullable()->change();
-            }
+            $table->uuid('category_id')->nullable()->change();
         });
+
+        }
     }
 
     /**
@@ -30,10 +29,12 @@ class MakeColNullableToServiceRequestsTable extends Migration
      */
     public function down()
     {
+        if (Schema::hasTable('service_requests')) {
+
         Schema::table('service_requests', function (Blueprint $table) {
-            if (Schema::hasColumn('service_requests', 'category_id')) {
-                $table->string('category_id')->nullable(false)->change();
-            }
+            $table->string('category_id')->nullable(false)->change();
         });
+
+        }
     }
 }

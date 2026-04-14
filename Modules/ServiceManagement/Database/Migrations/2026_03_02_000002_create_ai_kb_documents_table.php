@@ -12,7 +12,7 @@ return new class extends Migration
             return;
         }
 
-        if (!Schema::hasTable('ai_kb_documents')) Schema::create('ai_kb_documents', function (Blueprint $table) {
+        Schema::create('ai_kb_documents', function (Blueprint $table) {
             $table->uuid('id')->primary();
 
             // Tenant scoping (nullable allows global/shared KB docs)

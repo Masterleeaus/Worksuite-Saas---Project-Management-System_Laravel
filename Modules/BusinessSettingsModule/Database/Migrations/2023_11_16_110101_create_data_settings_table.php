@@ -13,9 +13,6 @@ class CreateDataSettingsTable extends Migration
      */
     public function up()
     {
-        if (Schema::hasTable('data_settings')) {
-            return;
-        }
         Schema::create('data_settings', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();

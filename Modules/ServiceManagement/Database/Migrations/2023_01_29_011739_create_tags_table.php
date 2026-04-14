@@ -13,9 +13,6 @@ class CreateTagsTable extends Migration
      */
     public function up()
     {
-        if (Schema::hasTable('tags')) {
-            return;
-        }
         Schema::create('tags', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();

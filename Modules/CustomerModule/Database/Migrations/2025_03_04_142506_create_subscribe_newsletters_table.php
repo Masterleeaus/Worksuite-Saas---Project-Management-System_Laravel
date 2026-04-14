@@ -13,9 +13,6 @@ class CreateSubscribeNewslettersTable extends Migration
      */
     public function up()
     {
-        if (Schema::hasTable('subscribe_newsletters')) {
-            return;
-        }
         Schema::create('subscribe_newsletters', function (Blueprint $table) {
             $table->uuid('id')->index()->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();

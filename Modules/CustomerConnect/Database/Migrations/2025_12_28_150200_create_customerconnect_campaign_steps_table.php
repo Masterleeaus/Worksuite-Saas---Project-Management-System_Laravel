@@ -8,9 +8,6 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (Schema::hasTable('customerconnect_campaign_steps')) {
-            return;
-        }
         Schema::create('customerconnect_campaign_steps', function (Blueprint $table) {
     $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();

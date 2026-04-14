@@ -13,9 +13,6 @@ class CreateTableServiceTag extends Migration
      */
     public function up()
     {
-        if (Schema::hasTable('service_tag')) {
-            return;
-        }
         Schema::create('service_tag', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();

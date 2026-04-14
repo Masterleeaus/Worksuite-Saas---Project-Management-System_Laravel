@@ -13,12 +13,13 @@ class AddSoftDeletesToProvidersTable extends Migration
      */
     public function up()
     {
-        if (! Schema::hasTable('providers')) {
-            return;
-        }
+        if (Schema::hasTable('providers')) {
+
         Schema::table('providers', function (Blueprint $table) {
             $table->softDeletes();
         });
+
+        }
     }
 
     /**
@@ -28,8 +29,12 @@ class AddSoftDeletesToProvidersTable extends Migration
      */
     public function down()
     {
+        if (Schema::hasTable('providers')) {
+
         Schema::table('providers', function (Blueprint $table) {
             $table->dropSoftDeletes();
         });
+
+        }
     }
 }

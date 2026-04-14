@@ -13,12 +13,13 @@ class RenameColPackageSubscriberFeaturesTabel extends Migration
      */
     public function up()
     {
-        if (! Schema::hasTable('package_subscriber_features')) {
-            return;
-        }
+        if (Schema::hasTable('package_subscriber_features')) {
+
         Schema::table('package_subscriber_features', function(Blueprint $table) {
             $table->renameColumn('subscription_package_id', 'package_subscriber_log_id');
         });
+
+        }
     }
 
     /**
@@ -28,8 +29,12 @@ class RenameColPackageSubscriberFeaturesTabel extends Migration
      */
     public function down()
     {
+        if (Schema::hasTable('package_subscriber_features')) {
+
         Schema::table('package_subscriber_features', function(Blueprint $table) {
             $table->renameColumn('package_subscriber_log_id', 'subscription_package_id');
         });
+
+        }
     }
 }

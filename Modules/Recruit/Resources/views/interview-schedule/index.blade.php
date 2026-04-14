@@ -130,8 +130,6 @@
                                         </p>
 
                                         @php
-    try {
-
                                             $secEmp = [];
                                             foreach($event->employees as $usrdt){
                                                 $secEmp[] = $usrdt->id;
@@ -141,11 +139,7 @@
                                             $employeeStatus = $event->employeesData->filter(function ($value, $key) use ($loggedEmployee)  {
                                                 return $value->user_id == $loggedEmployee->id;
                                             })->first();
-                                        
-    } catch (\Exception $e) {
-        // Table may not exist yet
-    }
-@endphp
+                                        @endphp
                                         @if (in_array($loggedEmployee->id, $secEmp))
                                             @if ($employeeStatus->user_accept_status == 'accept')
                                                 <label

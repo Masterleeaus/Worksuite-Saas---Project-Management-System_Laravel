@@ -13,15 +13,16 @@ class AddHouseAndStreetColInUserAddressesTable extends Migration
      */
     public function up()
     {
-        if (! Schema::hasTable('user_addresses')) {
-            return;
-        }
-        if (!Schema::hasColumn('user_addresses', 'house')) {
-            Schema::table('user_addresses', function (Blueprint $table) {
+        if (Schema::hasTable('user_addresses')) {
+        Schema::table('user_addresses', function (Blueprint $table) {
+            if (!Schema::hasColumn('user_addresses', 'house')) {
                 $table->string('house')->nullable();
+            }
+            if (!Schema::hasColumn('user_addresses', 'floor')) {
                 $table->string('floor')->nullable();
-            });
-        }
+            }
+        });
+    }
     }
 
     /**
@@ -31,9 +32,15 @@ class AddHouseAndStreetColInUserAddressesTable extends Migration
      */
     public function down()
     {
+        if (Schema::hasTable('user_addresses')) {
         Schema::table('user_addresses', function (Blueprint $table) {
-            $table->dropColumn('house');
-            $table->dropColumn('floor');
+            if (Schema::hasColumn('user_addresses', 'house')) {
+                $table->dropColumn('house');
+            }
+            if (Schema::hasColumn('user_addresses', 'floor')) {
+                $table->dropColumn('floor');
+            }
         });
+    }
     }
 }

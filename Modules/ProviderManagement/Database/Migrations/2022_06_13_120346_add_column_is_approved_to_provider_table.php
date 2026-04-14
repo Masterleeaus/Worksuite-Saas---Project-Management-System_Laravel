@@ -13,14 +13,13 @@ class AddColumnIsApprovedToProviderTable extends Migration
      */
     public function up()
     {
-        if (! Schema::hasTable('providers')) {
-            return;
-        }
-        if (!Schema::hasColumn('providers', 'is_approved')) {
-            Schema::table('providers', function (Blueprint $table) {
+        if (Schema::hasTable('providers')) {
+        Schema::table('providers', function (Blueprint $table) {
+            if (!Schema::hasColumn('providers', 'is_approved')) {
                 $table->boolean('is_approved')->default(0);
-            });
-        }
+            }
+        });
+    }
     }
 
     /**
@@ -30,8 +29,12 @@ class AddColumnIsApprovedToProviderTable extends Migration
      */
     public function down()
     {
+        if (Schema::hasTable('providers')) {
         Schema::table('providers', function (Blueprint $table) {
-            $table->dropColumn('is_approved');
+            if (Schema::hasColumn('providers', 'is_approved')) {
+                $table->dropColumn('is_approved');
+            }
         });
+    }
     }
 }

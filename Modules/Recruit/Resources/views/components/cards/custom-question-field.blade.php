@@ -91,8 +91,6 @@
                 </x-forms.label>
                 <div class="d-flex checkbox-{{$question->id}}">
                     @php
-    try {
-
                         $checkedValues = '';
                         $questionValues = is_array($question->values) ? $question->values : json_decode($question->values, true);
 
@@ -104,11 +102,7 @@
                                 $checkedValues .= ($checkedValues == '') ? $value : ', '.$value;
                             }
                         }
-                    
-    } catch (\Exception $e) {
-        // Table may not exist yet
-    }
-@endphp
+                    @endphp
 
                     <input type="hidden" name="answer[{{$question->id}}]"
                         id="{{$question->id}}"
@@ -116,16 +110,10 @@
 
                     @foreach ($question->values as $key => $value)
                         @php
-    try {
-
                             $answerObj = $values->where('recruit_job_question_id', $question->id)->first();
                             $answer = $answerObj ? $answerObj->answer : '';
                             $isChecked = $answer != '' && in_array($value, explode(', ', $answer));
-                        
-    } catch (\Exception $e) {
-        // Table may not exist yet
-    }
-@endphp
+                        @endphp
                         <x-forms.checkbox fieldId="optionsRadios{{ $key . $question->id }}"
                                         :fieldLabel="$value"
                                         :fieldName="$question->id.'[]'"

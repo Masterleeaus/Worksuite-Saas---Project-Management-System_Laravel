@@ -13,14 +13,13 @@ class AddCoverImageInProvidersTable extends Migration
      */
     public function up()
     {
-        if (! Schema::hasTable('providers')) {
-            return;
-        }
-        if (!Schema::hasColumn('providers', 'cover_image')) {
-            Schema::table('providers', function (Blueprint $table) {
+        if (Schema::hasTable('providers')) {
+        Schema::table('providers', function (Blueprint $table) {
+            if (!Schema::hasColumn('providers', 'cover_image')) {
                 $table->string('cover_image',191)->nullable();
-            });
-        }
+            }
+        });
+    }
     }
 
     /**
@@ -30,8 +29,12 @@ class AddCoverImageInProvidersTable extends Migration
      */
     public function down()
     {
+        if (Schema::hasTable('providers')) {
         Schema::table('providers', function (Blueprint $table) {
-            $table->dropColumn('cover_image');
+            if (Schema::hasColumn('providers', 'cover_image')) {
+                $table->dropColumn('cover_image');
+            }
         });
+    }
     }
 }

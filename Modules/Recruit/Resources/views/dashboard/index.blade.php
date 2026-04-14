@@ -130,8 +130,6 @@
                             @if($viewInterviewPermission != 'none')
                                 <tr>
                                     @php
-    try {
-
                                         $secEmp = [];
                                             foreach($item->employees as $usrdt){
                                                 $secEmp[] = $usrdt->id;
@@ -140,11 +138,7 @@
                                             $employeeStatus = $item->employeesData->filter(function ($value, $key) use ($loggedEmployee)  {
                                                 return $value->user_id == $loggedEmployee->id;
                                             })->first();
-                                    
-    } catch (\Exception $e) {
-        // Table may not exist yet
-    }
-@endphp
+                                    @endphp
                                     @if ($viewInterviewPermission == 'all'
                                     || ($viewInterviewPermission == 'added' && $item->added_by == user()->id)
                                     || ($viewInterviewPermission == 'owned' && in_array($loggedEmployee->id, $secEmp))

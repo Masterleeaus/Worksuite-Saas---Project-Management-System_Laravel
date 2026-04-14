@@ -13,14 +13,13 @@ class AddToColReadableIdInReviewTable extends Migration
      */
     public function up()
     {
-        if (! Schema::hasTable('reviews')) {
-            return;
-        }
-        if (!Schema::hasColumn('reviews', 'readable_id')) {
-            Schema::table('reviews', function (Blueprint $table) {
+        if (Schema::hasTable('reviews')) {
+        Schema::table('reviews', function (Blueprint $table) {
+            if (!Schema::hasColumn('reviews', 'readable_id')) {
                 $table->bigInteger('readable_id')->after('id');
-            });
-        }
+            }
+        });
+    }
     }
 
     /**
@@ -30,8 +29,12 @@ class AddToColReadableIdInReviewTable extends Migration
      */
     public function down()
     {
+        if (Schema::hasTable('reviews')) {
         Schema::table('reviews', function (Blueprint $table) {
-            $table->dropColumn('readable_id');
+            if (Schema::hasColumn('reviews', 'readable_id')) {
+                $table->dropColumn('readable_id');
+            }
         });
+    }
     }
 }

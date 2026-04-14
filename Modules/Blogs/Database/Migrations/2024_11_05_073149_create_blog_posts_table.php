@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('blog_posts')) {
-            return;
-        }
         Schema::create('blog_posts', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('company_id')->nullable()->index();
             $table->string('title');
             $table->string('image')->nullable();
             $table->string('slug');
@@ -27,10 +23,7 @@ return new class extends Migration
             $table->string('tags')->nullable();
             $table->string('seo_title')->nullable();
             $table->string('seo_description')->nullable();
-            $table->unsignedInteger('language_id')->nullable()->index();
-            $table->unsignedBigInteger('parent_id')->default(0)->index();
-            $table->unsignedInteger('created_by')->nullable()->index();
-            $table->unsignedInteger('updated_by')->nullable()->index();
+            $table->integer('language_id')->default(true);
             $table->timestamps();
             $table->softDeletes();
 

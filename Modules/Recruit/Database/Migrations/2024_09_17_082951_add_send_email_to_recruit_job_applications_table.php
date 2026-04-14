@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (! Schema::hasTable('recruit_job_applications')) {
-            return;
-        }
-        if (!Schema::hasColumn('recruit_job_applications', 'send_email')) {
-            Schema::table('recruit_job_applications', function (Blueprint $table) {
+        if (Schema::hasTable('recruit_job_applications')) {
+        Schema::table('recruit_job_applications', function (Blueprint $table) {
+            if (!Schema::hasColumn('recruit_job_applications', 'send_email')) {
                 $table->boolean('send_email')->nullable();
-            });
-        }
+            }
+        });
+    }
     }
 
     /**

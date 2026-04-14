@@ -5,7 +5,7 @@
 
     <!-- CONTENT WRAPPER START -->
     <div class="content-wrapper">
-        @include('quality_control::schedules.ajax.show')
+        @include('quality_control::inspection_schedules.ajax.show')
     </div>
     <!-- CONTENT WRAPPER END -->
 

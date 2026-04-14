@@ -8,10 +8,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (! Schema::hasTable('customerconnect_deliveries')) {
-            return;
-        }
-        
+        if (Schema::hasTable('customerconnect_deliveries')) {
+
         Schema::table('customerconnect_deliveries', function (Blueprint $table) {
             if (!Schema::hasColumn('customerconnect_deliveries', 'scheduled_for')) {
                 $table->timestamp('scheduled_for')->nullable()->index()->after('status');
@@ -20,14 +18,14 @@ return new class extends Migration
                 $table->timestamp('last_attempt_at')->nullable()->after('attempts');
             }
         });
+
+        }
     }
 
     public function down(): void
     {
-        if (! Schema::hasTable('customerconnect_deliveries')) {
-            return;
-        }
-        
+        if (Schema::hasTable('customerconnect_deliveries')) {
+
         Schema::table('customerconnect_deliveries', function (Blueprint $table) {
             if (Schema::hasColumn('customerconnect_deliveries', 'scheduled_for')) {
                 $table->dropColumn('scheduled_for');
@@ -36,5 +34,7 @@ return new class extends Migration
                 $table->dropColumn('last_attempt_at');
             }
         });
+
+        }
     }
 };

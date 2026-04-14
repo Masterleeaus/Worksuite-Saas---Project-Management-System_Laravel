@@ -8,10 +8,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (! Schema::hasTable('faqs')) {
-            return;
-        }
-        
+        if (Schema::hasTable('faqs')) {
+
         Schema::table('faqs', function (Blueprint $table) {
             if (!Schema::hasColumn('faqs', 'company_id')) {
                 $table->unsignedBigInteger('company_id')->nullable()->index();
@@ -32,14 +30,14 @@ return new class extends Migration
                 $table->unsignedBigInteger('updated_by')->nullable();
             }
         });
+
+        }
     }
 
     public function down(): void
     {
-        if (! Schema::hasTable('faqs')) {
-            return;
-        }
-        
+        if (Schema::hasTable('faqs')) {
+
         Schema::table('faqs', function (Blueprint $table) {
             foreach (['updated_by','created_by','tags','source_type','visibility','company_id'] as $col) {
                 if (Schema::hasColumn('faqs', $col)) {
@@ -47,5 +45,7 @@ return new class extends Migration
                 }
             }
         });
+
+        }
     }
 };

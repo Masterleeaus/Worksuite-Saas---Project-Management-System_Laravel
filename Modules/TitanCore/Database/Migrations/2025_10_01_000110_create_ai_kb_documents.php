@@ -4,9 +4,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
   public function up(){
-    if (Schema::hasTable('ai_kb_documents')) {
-        return;
-    }
+    if (Schema::hasTable('ai_kb_documents')) { return; }
     Schema::create('ai_kb_documents', function(Blueprint $t){
       $t->bigIncrements('id');
       $t->unsignedBigInteger('source_id');

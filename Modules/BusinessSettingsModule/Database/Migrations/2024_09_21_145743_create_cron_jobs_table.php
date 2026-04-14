@@ -13,9 +13,6 @@ class CreateCronJobsTable extends Migration
      */
     public function up()
     {
-        if (Schema::hasTable('cron_jobs')) {
-            return;
-        }
         Schema::create('cron_jobs', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index();

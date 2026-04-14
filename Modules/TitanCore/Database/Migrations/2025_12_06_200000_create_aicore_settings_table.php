@@ -8,9 +8,6 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (Schema::hasTable('titancore_settings')) {
-            return;
-        }
         Schema::create('titancore_settings', function (Blueprint $table) {
             $table->id();
             $table->string('default_provider')->default('openai');

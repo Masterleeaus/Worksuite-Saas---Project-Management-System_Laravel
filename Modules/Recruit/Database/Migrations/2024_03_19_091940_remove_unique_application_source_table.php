@@ -14,13 +14,13 @@ return new class extends Migration {
     {
         try {
             if (Schema::hasColumn('application_sources', 'application_source')) {
-                if (! Schema::hasTable('application_sources')) {
-                    return;
-                }
-                
+                if (Schema::hasTable('application_sources')) {
+
                 Schema::table('application_sources', function (Blueprint $table) {
                     $table->dropUnique('application_sources_application_source_unique');
                 });
+
+                }
             }
         } catch (\Exception $e) {
 

@@ -12,9 +12,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (! Schema::hasTable('performance_meetings')) {
-            return;
-        }
         Schema::table('performance_meetings', function (Blueprint $table) {
             $table->datetime('completed_on')->after('status')->nullable();
         });
@@ -25,9 +22,13 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (Schema::hasTable('performance_meetings')) {
         Schema::table('performance_meetings', function (Blueprint $table) {
-            $table->dropColumn('completed_on');
+            if (Schema::hasColumn('performance_meetings', 'completed_on')) {
+                $table->dropColumn('completed_on');
+            }
         });
+    }
     }
 
 };

@@ -12,14 +12,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (! Schema::hasTable('services')) {
-            return;
-        }
-        if (!Schema::hasColumn('services', 'slug')) {
-            Schema::table('services', function (Blueprint $table) {
+        if (Schema::hasTable('services')) {
+        Schema::table('services', function (Blueprint $table) {
+            if (!Schema::hasColumn('services', 'slug')) {
                 $table->string('slug')->nullable()->after('name');
-            });
-        }
+            }
+        });
+    }
 
         Service::whereNull('slug')
             ->orWhere('slug', '')
@@ -40,9 +39,13 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (Schema::hasTable('services')) {
         Schema::table('services', function (Blueprint $table) {
             $table->dropUnique(['slug']);
-            $table->dropColumn('slug');
+            if (Schema::hasColumn('services', 'slug')) {
+                $table->dropColumn('slug');
+            }
         });
+    }
     }
 };

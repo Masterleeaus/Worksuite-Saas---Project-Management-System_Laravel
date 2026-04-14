@@ -13,13 +13,8 @@ class AddToColPackageSubscriptionTabel extends Migration
      */
     public function up()
     {
-        if (! Schema::hasTable('package_subscribers')) {
-            return;
-        }
         Schema::table('package_subscribers', function (Blueprint $table) {
-            if (! Schema::hasColumn('package_subscribers', 'payment_id')) {
-                $table->foreignUuid('payment_id')->nullable();
-            }
+            $table->foreignUuid('payment_id')->nullable();
         });
     }
 
@@ -30,8 +25,12 @@ class AddToColPackageSubscriptionTabel extends Migration
      */
     public function down()
     {
+        if (Schema::hasTable('package_subscribers')) {
         Schema::table('package_subscribers', function (Blueprint $table) {
-            $table->dropColumn('payment_id');
+            if (Schema::hasColumn('package_subscribers', 'payment_id')) {
+                $table->dropColumn('payment_id');
+            }
         });
+    }
     }
 }

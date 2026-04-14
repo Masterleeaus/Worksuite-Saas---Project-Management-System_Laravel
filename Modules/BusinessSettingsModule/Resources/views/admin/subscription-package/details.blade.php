@@ -182,17 +182,11 @@
                             @endforeach
 
                             @php
-    try {
-
                                 $bookingCheck = $subscriptionPackage->subscriptionPackageLimit->where('key', 'booking')->first();
                                 $categoryCheck = $subscriptionPackage->subscriptionPackageLimit->where('key', 'category')->first();
                                 $isBookingLimit = $bookingCheck?->is_limited;
                                 $isCategoryLimit = $categoryCheck?->is_limited;
-                            
-    } catch (\Exception $e) {
-        // Table may not exist yet
-    }
-@endphp
+                            @endphp
                             @if($isBookingLimit == 0)
                                 <div class="d-flex gap-2 lh-1 align-items-center">
                                     <span class="material-icons c1 fs-16">check_circle</span>

@@ -12,17 +12,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (! Schema::hasTable('objectives')) {
-            return;
-        }
-        if (!Schema::hasColumn('objectives', 'project_id')) {
-            Schema::table('objectives', function (Blueprint $table) {
+        if (Schema::hasTable('objectives')) {
+        Schema::table('objectives', function (Blueprint $table) {
+            if (!Schema::hasColumn('objectives', 'project_id')) {
                 $table->unsignedInteger('project_id')->after('id')->nullable();
-                $table->foreign('project_id')->references('id')->on('projects')
-                    ->onDelete('cascade')
-                    ->onUpdate('cascade');
-            });
-        }
+            }
+            $table->foreign('project_id')->references('id')->on('projects')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
+    }
     }
 
     /**
@@ -30,10 +29,14 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (Schema::hasTable('objectives')) {
         Schema::table('objectives', function (Blueprint $table) {
             $table->dropForeign(['project_id']);
-            $table->dropColumn('project_id');
+            if (Schema::hasColumn('objectives', 'project_id')) {
+                $table->dropColumn('project_id');
+            }
         });
+    }
     }
 
 };

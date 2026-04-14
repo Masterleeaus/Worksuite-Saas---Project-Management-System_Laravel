@@ -13,9 +13,6 @@ class CreateSearchedDataTable extends Migration
      */
     public function up()
     {
-        if (Schema::hasTable('searched_data')) {
-            return;
-        }
         Schema::create('searched_data', function (Blueprint $table) {
             $table->uuid('id')->index()->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();

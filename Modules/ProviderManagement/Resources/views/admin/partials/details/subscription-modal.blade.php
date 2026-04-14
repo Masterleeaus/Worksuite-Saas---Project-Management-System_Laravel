@@ -1,6 +1,4 @@
 @php
-    try {
-
     $daysDifference = NULL;
     $provider = Modules\ProviderManagement\Entities\Provider::where('id', request()->provider_id)->first();
 
@@ -21,10 +19,6 @@
             $daysDifference = $endDate->diffInDays($today);
         }
         $commissionStatus = (int)((business_config('provider_commision', 'provider_config'))->live_values);
-    }
-
-    } catch (\Exception $e) {
-        // Table may not exist yet
     }
 @endphp
 

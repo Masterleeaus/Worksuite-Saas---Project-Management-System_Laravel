@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (! Schema::hasTable('purchase_settings')) {
-            return;
-        }
-        if (!Schema::hasColumn('purchase_settings', 'purchase_terms')) {
-            Schema::table('purchase_settings', function (Blueprint $table) {
+        if (Schema::hasTable('purchase_settings')) {
+        Schema::table('purchase_settings', function (Blueprint $table) {
+            if (!Schema::hasColumn('purchase_settings', 'purchase_terms')) {
                 $table->text('purchase_terms')->nullable();
-            });
-        }
+            }
+        });
+    }
     }
 
     /**
@@ -26,12 +25,12 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (! Schema::hasTable('purchase_setting')) {
-            return;
-        }
-        
+        if (Schema::hasTable('purchase_setting')) {
         Schema::table('purchase_setting', function (Blueprint $table) {
-            $table->dropColumn('purchase_terms');
+            if (Schema::hasColumn('purchase_setting', 'purchase_terms')) {
+                $table->dropColumn('purchase_terms');
+            }
         });
+    }
     }
 };

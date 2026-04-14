@@ -217,11 +217,4 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     // Recruit Settings
     Route::resource('recruit-settings', RecruitSettingController::class);
     Route::resource('recruiter', RecruiterController::class);
-
-    // FSM Applicant Pipeline (pre-employee state — Cleaning Business Upgrade)
-    Route::post('job-applicants/{job_applicant}/hire', [\Modules\Recruit\Http\Controllers\JobApplicantController::class, 'hire'])->name('recruit.job-applicants.hire');
-    Route::resource('job-applicants', \Modules\Recruit\Http\Controllers\JobApplicantController::class)->names('recruit.job-applicants');
-
-    // Job Postings (vacancy management)
-    Route::resource('job-postings', \Modules\Recruit\Http\Controllers\JobPostingController::class)->names('recruit.job-postings');
 });

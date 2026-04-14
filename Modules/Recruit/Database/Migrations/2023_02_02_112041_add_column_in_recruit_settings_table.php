@@ -14,27 +14,23 @@ return new class extends Migration
     public function up()
     {
         if (! Schema::hasColumn('recruit_settings', 'offer_letter_reminder')) {
-            if (! Schema::hasTable('recruit_settings')) {
-                return;
-            }
-            
-            Schema::table('recruit_settings', function (Blueprint $table) {
-                if (! Schema::hasColumn('recruit_settings', 'offer_letter_reminder')) {
-                    $table->integer('offer_letter_reminder')->default(null)->after('career_site')->nullable();
+            if (Schema::hasTable('recruit_settings')) {
+        Schema::table('recruit_settings', function (Blueprint $table) {
+                if (!Schema::hasColumn('recruit_settings', 'offer_letter_reminder')) {
+                    $table->integer('offer_letter_reminder')->default(null)->after('career_site');
                 }
-            });
+        });
+    }
         }
 
         if (! Schema::hasColumn('recruit_settings', 'job_alert_status')) {
-            if (! Schema::hasTable('recruit_settings')) {
-                return;
-            }
-            
-            Schema::table('recruit_settings', function (Blueprint $table) {
-                if (! Schema::hasColumn('recruit_settings', 'job_alert_status')) {
-                    $table->enum('job_alert_status', ['yes', 'no'])->default('no')->after('offer_letter_reminder')->nullable();
+            if (Schema::hasTable('recruit_settings')) {
+        Schema::table('recruit_settings', function (Blueprint $table) {
+                if (!Schema::hasColumn('recruit_settings', 'job_alert_status')) {
+                    $table->enum('job_alert_status', ['yes', 'no'])->default('no')->after('offer_letter_reminder');
                 }
-            });
+        });
+    }
         }
 
     }

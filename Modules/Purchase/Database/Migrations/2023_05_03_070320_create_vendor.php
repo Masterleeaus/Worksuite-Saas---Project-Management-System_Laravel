@@ -41,39 +41,37 @@ return new class extends Migration {
 
 
         // Product Table changes
-        if (! Schema::hasTable('products')) {
-            return;
-        }
-        
+        if (Schema::hasTable('products')) {
         Schema::table('products', function (Blueprint $table) {
-            if (! Schema::hasColumn('products', 'type')) {
+            if (!Schema::hasColumn('products', 'type')) {
                 $table->enum('type', ['goods', 'service'])->default('goods')->after('default_image')->nullable();
             }
-            if (! Schema::hasColumn('products', 'purchase_price')) {
+            if (!Schema::hasColumn('products', 'purchase_price')) {
                 $table->string('purchase_price')->after('price')->nullable();
             }
-            if (! Schema::hasColumn('products', 'purchase_information')) {
-                $table->enum('purchase_information', [1, 0])->default(0)->after('purchase_price')->nullable();
+            if (!Schema::hasColumn('products', 'purchase_information')) {
+                $table->enum('purchase_information', [1, 0])->default(0)->after('purchase_price');
             }
-            if (! Schema::hasColumn('products', 'track_inventory')) {
-                $table->enum('track_inventory', [1, 0])->default(0)->after('purchase_information')->nullable();
+            if (!Schema::hasColumn('products', 'track_inventory')) {
+                $table->enum('track_inventory', [1, 0])->default(0)->after('purchase_information');
             }
-            if (! Schema::hasColumn('products', 'sales_description')) {
+            if (!Schema::hasColumn('products', 'sales_description')) {
                 $table->longText('sales_description')->after('track_inventory')->nullable();
             }
-            if (! Schema::hasColumn('products', 'purchase_description')) {
+            if (!Schema::hasColumn('products', 'purchase_description')) {
                 $table->longText('purchase_description')->after('sales_description')->nullable();
             }
-            if (! Schema::hasColumn('products', 'opening_stock')) {
+            if (!Schema::hasColumn('products', 'opening_stock')) {
                 $table->integer('opening_stock')->after('purchase_description')->nullable();
             }
-            if (! Schema::hasColumn('products', 'rate_per_unit')) {
+            if (!Schema::hasColumn('products', 'rate_per_unit')) {
                 $table->double('rate_per_unit')->after('opening_stock')->nullable();
             }
-            if (! Schema::hasColumn('products', 'status')) {
-                $table->enum('status', ['active', 'inactive'])->default('active')->after('type')->nullable();
+            if (!Schema::hasColumn('products', 'status')) {
+                $table->enum('status', ['active', 'inactive'])->default('active')->after('type');
             }
         });
+    }
 
         Schema::whenTableDoesntHaveColumn('products', 'sku', function (Blueprint $table) {
             $table->string('sku', 100)->after('hsn_sac_code')->nullable();
@@ -499,28 +497,26 @@ return new class extends Migration {
                 $table->timestamps();
             });
 
-            if (! Schema::hasTable('purchase_payment_histories')) {
-                Schema::create('purchase_payment_histories', function (Blueprint $table) {
-                    $table->increments('id');
-                    $table->integer('company_id')->unsigned()->nullable();
-                    $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade')->onUpdate('cascade');
-                    $table->integer('purchase_vendor_id')->unsigned()->nullable();
-                    $table->foreign('purchase_vendor_id')->references('id')->on('purchase_vendors')->onDelete('cascade')->onUpdate('cascade');
-                    $table->integer('purchase_payment_id')->unsigned()->nullable();
-                    $table->foreign('purchase_payment_id')->references('id')->on('purchase_vendor_payments')->onDelete('cascade')->onUpdate('cascade');
-                    $table->integer('purchase_order_id')->unsigned()->nullable();
-                    $table->foreign('purchase_order_id')->references('id')->on('purchase_orders')->onDelete('cascade')->onUpdate('cascade');
-                    $table->string('purchase_order')->nullable();
-                    $table->integer('purchase_bill_id')->unsigned()->nullable();
-                    $table->foreign('purchase_bill_id')->references('id')->on('purchase_bills')->onDelete('cascade')->onUpdate('cascade');
-                    $table->double('amount', 16, 2)->default(0)->nullable();
-                    $table->integer('user_id')->unsigned()->nullable();
-                    $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
-                    $table->text('details')->nullable();
-                    $table->text('label')->nullable();
-                    $table->timestamps();
-                });
-            }
+            Schema::create('purchase_payment_histories', function (Blueprint $table) {
+                $table->increments('id');
+                $table->integer('company_id')->unsigned()->nullable();
+                $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade')->onUpdate('cascade');
+                $table->integer('purchase_vendor_id')->unsigned()->nullable();
+                $table->foreign('purchase_vendor_id')->references('id')->on('purchase_vendors')->onDelete('cascade')->onUpdate('cascade');
+                $table->integer('purchase_payment_id')->unsigned()->nullable();
+                $table->foreign('purchase_payment_id')->references('id')->on('purchase_vendor_payments')->onDelete('cascade')->onUpdate('cascade');
+                $table->integer('purchase_order_id')->unsigned()->nullable();
+                $table->foreign('purchase_order_id')->references('id')->on('purchase_orders')->onDelete('cascade')->onUpdate('cascade');
+                $table->string('purchase_order')->nullable();
+                $table->integer('purchase_bill_id')->unsigned()->nullable();
+                $table->foreign('purchase_bill_id')->references('id')->on('purchase_bills')->onDelete('cascade')->onUpdate('cascade');
+                $table->double('amount', 16, 2)->default(0)->nullable();
+                $table->integer('user_id')->unsigned()->nullable();
+                $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
+                $table->text('details')->nullable();
+                $table->text('label')->nullable();
+                $table->timestamps();
+            });
         }
 
         if (!Schema::hasTable('purchase_vendor_credit_histories')) {
@@ -601,16 +597,14 @@ return new class extends Migration {
             });
         }
 
-        if (! Schema::hasTable('bank_transactions')) {
-            return;
-        }
-        
+        if (Schema::hasTable('bank_transactions')) {
         Schema::table('bank_transactions', function (Blueprint $table) {
-            if (! Schema::hasColumn('bank_transactions', 'purchase_payment_id')) {
+            if (!Schema::hasColumn('bank_transactions', 'purchase_payment_id')) {
                 $table->integer('purchase_payment_id')->unsigned()->nullable();
             }
             $table->foreign('purchase_payment_id')->references('id')->on('purchase_vendor_payments')->onDelete('set null')->onUpdate('cascade');
         });
+    }
 
         if (!Schema::hasTable('purchase_notification_settings')) {
             Schema::create('purchase_notification_settings', function (Blueprint $table) {

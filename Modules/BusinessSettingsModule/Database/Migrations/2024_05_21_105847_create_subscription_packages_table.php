@@ -13,9 +13,6 @@ class CreateSubscriptionPackagesTable extends Migration
      */
     public function up()
     {
-        if (Schema::hasTable('subscription_packages')) {
-            return;
-        }
         Schema::create('subscription_packages', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->unsignedBigInteger('company_id')->nullable()->index();

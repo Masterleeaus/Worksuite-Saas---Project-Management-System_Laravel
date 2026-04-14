@@ -13,14 +13,13 @@ class AddCusColInReview extends Migration
      */
     public function up()
     {
-        if (! Schema::hasTable('reviews')) {
-            return;
-        }
+        if (Schema::hasTable('reviews')) {
+
         Schema::table('reviews', function (Blueprint $table) {
-            if (! Schema::hasColumn('reviews', 'customer_id')) {
-                $table->foreignUuid('customer_id')->nullable();
-            }
+            $table->foreignUuid('customer_id')->nullable();
         });
+
+        }
     }
 
     /**

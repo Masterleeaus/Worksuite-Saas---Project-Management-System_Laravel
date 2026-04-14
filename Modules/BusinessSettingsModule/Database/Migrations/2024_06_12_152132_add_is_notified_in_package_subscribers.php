@@ -13,14 +13,13 @@ class AddIsNotifiedInPackageSubscribers extends Migration
      */
     public function up()
     {
-        if (! Schema::hasTable('package_subscribers')) {
-            return;
-        }
-        if (!Schema::hasColumn('package_subscribers', 'is_notified')) {
-            Schema::table('package_subscribers', function (Blueprint $table) {
+        if (Schema::hasTable('package_subscribers')) {
+        Schema::table('package_subscribers', function (Blueprint $table) {
+            if (!Schema::hasColumn('package_subscribers', 'is_notified')) {
                 $table->tinyInteger('is_notified')->default(0);
-            });
-        }
+            }
+        });
+    }
     }
 
     /**
@@ -30,8 +29,12 @@ class AddIsNotifiedInPackageSubscribers extends Migration
      */
     public function down()
     {
+        if (Schema::hasTable('package_subscribers')) {
         Schema::table('package_subscribers', function (Blueprint $table) {
-            $table->dropColumn('is_notified');
+            if (Schema::hasColumn('package_subscribers', 'is_notified')) {
+                $table->dropColumn('is_notified');
+            }
         });
+    }
     }
 }
