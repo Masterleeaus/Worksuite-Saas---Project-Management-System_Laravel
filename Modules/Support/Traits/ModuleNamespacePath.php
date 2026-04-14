@@ -6,7 +6,7 @@ trait ModuleNamespacePath
 {
     protected function moduleNamespace(string $module, string $path = ''): string
     {
-        $baseNamespace = trim((string) config('modules.namespace', 'Modules'), '\\');
+        $baseNamespace = trim(config('modules.namespace', 'Modules'), '\\');
         $normalizedPath = $this->normalizeNamespacePath($path);
 
         return $normalizedPath === ''
@@ -16,6 +16,6 @@ trait ModuleNamespacePath
 
     protected function normalizeNamespacePath(string $path): string
     {
-        return trim(str_replace('/', '\\', $path), '/\\');
+        return trim(str_replace('/', '\\', $path), '\\');
     }
 }
