@@ -143,7 +143,7 @@ class CompanyDataTable extends BaseDataTable
             } elseif ($packageModel && $packageModel->default == 'trial') {
                 $package .= '<br>Ends On: ' . $time;
             } elseif ($packageModel) {
-                $package .= ' (' . ($packageModel?->package ?: '--') . ')';
+                $package .= ' (' . ($packageModel->package ?: '--') . ')';
             }
 
             return "<div class='w-100'>
