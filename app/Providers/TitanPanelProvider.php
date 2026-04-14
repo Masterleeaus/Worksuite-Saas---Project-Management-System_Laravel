@@ -5,16 +5,28 @@ namespace App\Providers;
 use App\Filament\Pages\AutomationQueue;
 use App\Filament\Pages\CommandCentre;
 use App\Filament\Resources\ClientResource;
+use App\Filament\Resources\ContractResource;
 use App\Filament\Resources\DocumentTemplateResource;
+use App\Filament\Resources\EstimateResource;
+use App\Filament\Resources\InvoiceResource;
+use App\Filament\Resources\LeadResource;
+use App\Filament\Resources\PaymentResource;
 use App\Filament\Resources\ProjectResource;
+use App\Filament\Resources\TaskResource;
 use App\Filament\Pages\ScoutStatus;
 use App\Filament\Pages\SentinelApprovals;
 use App\Filament\Pages\SignalLogs;
+use App\Filament\Widgets\ActiveContractsWidget;
 use App\Filament\Widgets\ActivityFeedWidget;
 use App\Filament\Widgets\JobsTodayWidget;
+use App\Filament\Widgets\OpenLeadsWidget;
+use App\Filament\Widgets\OverdueTasksWidget;
+use App\Filament\Widgets\PendingEstimatesWidget;
+use App\Filament\Widgets\RecentPaymentsWidget;
 use App\Filament\Widgets\RevenueWidget;
 use App\Filament\Widgets\SystemSignalsWidget;
 use App\Filament\Widgets\TitanChatWidget;
+use App\Filament\Widgets\UnpaidInvoicesWidget;
 use App\Http\Middleware\FilamentAuthenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -98,11 +110,23 @@ class TitanPanelProvider extends PanelProvider
                 RevenueWidget::class,
                 ActivityFeedWidget::class,
                 TitanChatWidget::class,
+                OpenLeadsWidget::class,
+                PendingEstimatesWidget::class,
+                OverdueTasksWidget::class,
+                UnpaidInvoicesWidget::class,
+                RecentPaymentsWidget::class,
+                ActiveContractsWidget::class,
             ])
             ->resources([
                 DocumentTemplateResource::class,
                 ClientResource::class,
                 ProjectResource::class,
+                LeadResource::class,
+                EstimateResource::class,
+                ContractResource::class,
+                TaskResource::class,
+                InvoiceResource::class,
+                PaymentResource::class,
             ])
 
             // ----------------------------------------------------------------
@@ -183,7 +207,7 @@ class TitanPanelProvider extends PanelProvider
      */
     public static function getModuleNavigationGroups(): array
     {
-        $groups = ['Titan', 'CRM', 'Operations'];
+        $groups = ['Command Centre', 'CRM', 'Sales', 'Projects', 'Finance'];
 
         $modulesPath    = base_path('Modules');
         $extensionsPath = app_path('Extensions');

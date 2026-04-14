@@ -9,6 +9,7 @@ use App\Traits\HasCompany;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Notifications\Notifiable;
 
 /**
@@ -171,6 +172,11 @@ class Lead extends BaseModel
     public function leadOwner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'lead_owner')->withoutGlobalScope(ActiveScope::class);
+    }
+
+    public function estimates(): HasMany
+    {
+        return $this->hasMany(Estimate::class, 'client_id', 'client_id');
     }
 
     public static function allLeads($contactId = null)
