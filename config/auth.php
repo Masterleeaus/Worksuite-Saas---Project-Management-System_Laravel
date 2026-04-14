@@ -72,7 +72,7 @@ return [
 
         'api_users' => [
             'driver' => 'eloquent',
-            'model' => App\Models\UserAuth::class,
+            'model' => Modules\RestAPI\Entities\UserAuth::class,
             'table' => 'users'
         ],
     ],

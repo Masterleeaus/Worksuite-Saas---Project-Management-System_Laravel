@@ -8,7 +8,7 @@ use Modules\Sms\Http\Controllers\Gateway\Web\Admin\SmsGatewayConfigController;
 
 /*
 |--------------------------------------------------------------------------
-| Web Routes — Sms Module (merged Sms + Sms)
+| Web Routes — Sms Module (merged Sms + SMSModule)
 |--------------------------------------------------------------------------
 |
 | Two route groups:
@@ -33,7 +33,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
 });
 
 // -----------------------------------------------------------------------
-// Group 2: SaaS admin gateway configuration (merged from Sms)
+// Group 2: SaaS admin gateway configuration (merged from SMSModule)
 // -----------------------------------------------------------------------
 Route::group([
     'prefix'     => 'admin',

@@ -5,7 +5,7 @@ use Modules\Sms\Http\Controllers\Gateway\Api\V1\Admin\SmsGatewayConfigApiControl
 
 /*
 |--------------------------------------------------------------------------
-| API Routes — Sms Module (merged Sms + Sms)
+| API Routes — Sms Module (merged Sms + SMSModule)
 |--------------------------------------------------------------------------
 |
 | Gateway config endpoints are versioned under api/v1 via the
@@ -14,7 +14,7 @@ use Modules\Sms\Http\Controllers\Gateway\Api\V1\Admin\SmsGatewayConfigApiControl
 */
 
 // -----------------------------------------------------------------------
-// API v1 – Admin gateway configuration (merged from Sms)
+// API v1 – Admin gateway configuration (merged from SMSModule)
 // -----------------------------------------------------------------------
 Route::group([
     'prefix'     => 'admin',

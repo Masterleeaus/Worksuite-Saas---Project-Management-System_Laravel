@@ -1,0 +1,40 @@
+<?php
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class AddOriginalFileNameColToConversationFilesTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        if (Schema::hasTable('conversation_files')) {
+        Schema::table('conversation_files', function (Blueprint $table) {
+            if (!Schema::hasColumn('conversation_files', 'original_file_name')) {
+                $table->string('original_file_name')->nullable()->after('stored_file_name');
+            }
+        });
+    }
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        if (Schema::hasTable('conversation_files')) {
+        Schema::table('conversation_files', function (Blueprint $table) {
+            if (Schema::hasColumn('conversation_files', 'original_file_name')) {
+                $table->dropColumn('original_file_name');
+            }
+        });
+    }
+    }
+}

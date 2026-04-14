@@ -1,5 +1,7 @@
 <?php
 
+<?php
+
 return [
     'name'        => 'FSMStageAction',
     'menu'        => 'FSM StageAction',

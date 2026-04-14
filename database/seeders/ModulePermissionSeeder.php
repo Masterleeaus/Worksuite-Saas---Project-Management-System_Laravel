@@ -23,6 +23,7 @@ class ModulePermissionSeeder extends Seeder
 
         // FOR existing packages to update
         DB::statement("DELETE FROM modules WHERE module_name='ticket support';");
+        DB::statement("UPDATE modules SET module_name=REPLACE( module_name, 'Zoom', 'zoom' );");
 
         foreach ($modules as $module) {
             $moduleData = Module::withoutGlobalScopes()->where('module_name', $module['module_name'])->first() ?: new Module();

@@ -230,6 +230,7 @@ class FixUpgradeCompanyCommand extends Command
     private function packageFix()
     {
         DB::statement("UPDATE packages SET module_in_package=REPLACE( module_in_package, 'ticket support', 'tickets' )");
+        DB::statement("UPDATE packages SET module_in_package=REPLACE( module_in_package, 'Zoom', 'zoom' )");
     }
 
     private function logoUpdate()

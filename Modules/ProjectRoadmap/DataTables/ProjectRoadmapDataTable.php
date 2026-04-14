@@ -209,7 +209,7 @@ class ProjectRoadmapDataTable extends BaseDataTable
                         $status .= 'selected';
                     }
 
-                    $status .= '  data-content="<i class=\'fa fa-circle mr-2\' style=\'color: ' . $item->color . '\'></i> ' . $item->status_name . '" value="' . $item->status_name . '" >' . $item->status_name . '</option>';
+                    $status .= '  data-content="<i class=\'fa fa-circle mr-2\' style=\'color: ' . $item->color . '\\'></i> ' . $item->status_name . '" value="' . $item->status_name . '" >' . $item->status_name . '</option>';
                 }
 
                 $status .= '</select>';
