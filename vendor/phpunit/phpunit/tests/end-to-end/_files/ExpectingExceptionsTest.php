@@ -14,19 +14,19 @@ use PHPUnit\Framework\TestCase;
 
 final class ExpectingExceptionsTest extends TestCase
 {
-    public function test_expectException_and_expected_exception_is_thrown(): void
+    public function testPassesWhenExpectedExceptionIsThrown(): void
     {
         $this->expectException(Exception::class);
 
         throw new Exception;
     }
 
-    public function test_expectException_and_expected_exception_is_not_thrown(): void
+    public function testFailsWhenExpectedExceptionIsNotThrown(): void
     {
         $this->expectException(Exception::class);
     }
 
-    public function test_expectException_and_expectExceptionMessage_and_expected_exception_is_thrown_and_has_expected_message(): void
+    public function testPassesWhenExpectedExceptionIsThrownAndHasMessageThatIsOrContainsExpectedMessage(): void
     {
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('message');
@@ -34,14 +34,7 @@ final class ExpectingExceptionsTest extends TestCase
         throw new Exception('message');
     }
 
-    public function test_expectExceptionMessage_and_exception_is_thrown_and_has_expected_message(): void
-    {
-        $this->expectExceptionMessage('message');
-
-        throw new Exception('message');
-    }
-
-    public function test_expectException_and_expectExceptionMessage_and_expected_exception_is_thrown_but_does_not_have_expected_message(): void
+    public function testFailsWhenExpectedExceptionIsThrownAndDoesNotHaveMessageThatIsOrContainsExpectedMessage(): void
     {
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('message');
@@ -49,19 +42,7 @@ final class ExpectingExceptionsTest extends TestCase
         throw new Exception;
     }
 
-    public function test_expectExceptionMessage_and_exception_is_thrown_but_does_not_have_expected_message(): void
-    {
-        $this->expectExceptionMessage('message');
-
-        throw new Exception;
-    }
-
-    public function test_expectExceptionMessage_and_no_exception_is_thrown(): void
-    {
-        $this->expectExceptionMessage('message');
-    }
-
-    public function test_expectException_and_expectExceptionMessageMatches_and_expected_exception_is_thrown_and_has_expected_message(): void
+    public function testPassesWhenExpectedExceptionIsThrownAndHasMessageThatMatchesRegularExpression(): void
     {
         $this->expectException(Exception::class);
         $this->expectExceptionMessageMatches('/message/');
@@ -69,14 +50,7 @@ final class ExpectingExceptionsTest extends TestCase
         throw new Exception('message');
     }
 
-    public function test_expectExceptionMessageMatches_and_exception_is_thrown_and_has_expected_message(): void
-    {
-        $this->expectExceptionMessageMatches('/message/');
-
-        throw new Exception('message');
-    }
-
-    public function test_expectException_and_expectExceptionMessageMatches_and_expected_exception_is_thrown_but_does_not_have_expected_message(): void
+    public function testFailsWhenExpectedExceptionIsThrownAndDoesNotHaveMessageThatMatchesRegularExpression(): void
     {
         $this->expectException(Exception::class);
         $this->expectExceptionMessageMatches('/message/');
@@ -84,19 +58,7 @@ final class ExpectingExceptionsTest extends TestCase
         throw new Exception;
     }
 
-    public function test_expectExceptionMessageMatches_and_exception_is_thrown_but_does_not_have_expected_message(): void
-    {
-        $this->expectExceptionMessageMatches('/message/');
-
-        throw new Exception;
-    }
-
-    public function test_expectExceptionMessageMatches_and_no_exception_is_thrown(): void
-    {
-        $this->expectExceptionMessageMatches('/message/');
-    }
-
-    public function test_expectException_and_expectExceptionCode_and_expected_exception_is_thrown_and_has_expected_code(): void
+    public function testPassesWhenExpectedExceptionIsThrownAndHasExpectedCode(): void
     {
         $this->expectException(Exception::class);
         $this->expectExceptionCode(1234);
@@ -104,14 +66,7 @@ final class ExpectingExceptionsTest extends TestCase
         throw new Exception(code: 1234);
     }
 
-    public function test_expectExceptionCode_and_exception_is_thrown_and_has_expected_code(): void
-    {
-        $this->expectExceptionCode(1234);
-
-        throw new Exception(code: 1234);
-    }
-
-    public function test_expectException_and_expectExceptionCode_and_expected_exception_is_thrown_but_does_not_have_expected_code(): void
+    public function testFailsWhenExpectedExceptionIsThrownAndDoesNotHaveExpectedCode(): void
     {
         $this->expectException(Exception::class);
         $this->expectExceptionCode(1234);
@@ -119,33 +74,14 @@ final class ExpectingExceptionsTest extends TestCase
         throw new Exception;
     }
 
-    public function test_expectExceptionCode_and_exception_is_thrown_but_does_not_have_expected_code(): void
-    {
-        $this->expectExceptionCode(1234);
-
-        throw new Exception;
-    }
-
-    public function test_expectExceptionCode_and_no_exception_is_thrown(): void
-    {
-        $this->expectExceptionCode(1234);
-    }
-
-    public function test_expectExceptionObject_and_expected_exception_is_thrown(): void
+    public function testPassesWhenExpectedExceptionObjectIsThrown(): void
     {
         $this->expectExceptionObject(new Exception('message', 1234));
 
         throw new Exception('message', 1234);
     }
 
-    public function test_expectExceptionObject_and_expected_exception_is_not_thrown(): void
-    {
-        $this->expectExceptionObject(new Exception('message', 1234));
-
-        throw new Exception('not-the-message', 5678);
-    }
-
-    public function test_expectExceptionObject_and_no_exception_is_thrown(): void
+    public function testFailsWhenExpectedExceptionObjectIsNotThrown(): void
     {
         $this->expectExceptionObject(new Exception('message', 1234));
     }
