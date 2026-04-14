@@ -1,0 +1,13 @@
+{
+  "module": "servicemanagement",
+  "version": "1.0.1",
+  "lifecycle": {
+    "stages": [
+      "company_created",
+      "service_catalog_setup",
+      "service_published",
+      "operational"
+    ],
+    "primary_signal": "service_management.service_updated"
+  }
+}

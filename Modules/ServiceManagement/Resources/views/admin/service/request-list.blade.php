@@ -143,7 +143,7 @@
                                                         @elseif($item->status == 'denied')
                                                                 <span class="badge badge-pill badge-danger">{{translate('Feedback Sent')}}</span>
                                                         @elseif($item->status == 'pending')
-                                                            @can('service_manage_status')
+                                                            @can('edit_service')
                                                             <button type="button" class="btn btn--primary" data-bs-toggle="modal" data-bs-target="#review-modal--{{$key}}">
                                                                 {{translate('Give Feedback')}}
                                                             </button>

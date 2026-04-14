@@ -5,15 +5,18 @@ namespace Modules\ServiceManagement\Entities;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\ServiceManagement\Traits\CompanyScoped;
 
 class ServicePricingRule extends Model
 {
+    use CompanyScoped;
     use SoftDeletes;
 
     protected $table = 'service_pricing_rules';
 
     protected $fillable = [
         'service_id',
+        'company_id',
         'zone_id',
         'label',
         'base_price_override',
@@ -33,7 +36,7 @@ class ServicePricingRule extends Model
 
     public function service(): BelongsTo
     {
-        return $this->belongsTo(Service::class, 'service_id', 'id')->withoutGlobalScopes();
+        return $this->belongsTo(Service::class, 'service_id', 'id');
     }
 
     public function zone()

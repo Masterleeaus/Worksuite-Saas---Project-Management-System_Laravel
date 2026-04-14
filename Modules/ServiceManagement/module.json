@@ -4,6 +4,7 @@
     "description": "Manage cleaning service types, pricing, duration and add-ons",
     "keywords": ["services", "cleaning", "pricing", "addons"],
     "priority": 0,
+    "version": "1.0.1",
     "providers": [
         "Modules\\ServiceManagement\\Providers\\ServiceManagementServiceProvider",
         "Modules\\ServiceManagement\\Providers\\EventServiceProvider"
@@ -15,6 +16,16 @@
     "requires": [],
     "active": 1,
     "order": 0,
+    "api_routes": [
+        "api/v1/customer/service",
+        "api/v1/provider/service",
+        "api/v1/worker/service/data/sub-category-wise"
+    ],
+    "ai_tools": "ai_tools.json",
+    "cms_surfaces": "cms_manifest.json",
+    "omni_manifest": "omni_manifest.json",
+    "lifecycle_manifest": "lifecycle_manifest.json",
+    "signals_manifest": "signals_manifest.json",
     "permissions": [
         "view_services",
         "add_service",

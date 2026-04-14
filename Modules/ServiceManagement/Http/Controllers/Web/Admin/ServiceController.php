@@ -64,7 +64,7 @@ class ServiceController extends Controller
      */
     public function create(Request $request): View|Factory|Application
     {
-        $this->authorize('service_add');
+        $this->authorize('add_service');
         $categories = $this->category->ofStatus(1)->ofType('main')->latest()->get();
         $zones = $this->zone->ofStatus(1)->latest()->get();
 
@@ -125,7 +125,7 @@ class ServiceController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $this->authorize('service_add');
+        $this->authorize('add_service');
 
         $check = $this->validateUploadedFile($request, ['cover_image', 'thumbnail']);
         if ($check !== true) {
@@ -363,7 +363,7 @@ class ServiceController extends Controller
      */
     public function edit(string $id): View|Factory|RedirectResponse|Application
     {
-        $this->authorize('service_update');
+        $this->authorize('edit_service');
         $service = $this->service->withoutGlobalScope('translate')->where('id', $id)->with(['category.children', 'category.zones', 'variations'])->first();
         if (isset($service)) {
             $editingVariants = $service->variations->pluck('variant_key')->unique()->toArray();
@@ -399,7 +399,7 @@ class ServiceController extends Controller
      */
     public function update(Request $request, string $id): JsonResponse|RedirectResponse
     {
-        $this->authorize('service_update');
+        $this->authorize('edit_service');
 
         $check = $this->validateUploadedFile($request, ['cover_image', 'thumbnail']);
         if ($check !== true) {
@@ -581,7 +581,7 @@ class ServiceController extends Controller
      */
     public function destroy(Request $request, $id): RedirectResponse
     {
-        $this->authorize('service_delete');
+        $this->authorize('delete_service');
         $service = $this->service->where('id', $id)->first();
         if (isset($service)) {
             foreach (['thumbnail', 'cover_image'] as $item) {
@@ -607,7 +607,7 @@ class ServiceController extends Controller
      */
     public function statusUpdate(Request $request, $id): JsonResponse
     {
-        $this->authorize('service_manage_status');
+        $this->authorize('edit_service');
         $service = $this->service->where('id', $id)->first();
         $this->service->where('id', $id)->update(['is_active' => !$service->is_active]);
 

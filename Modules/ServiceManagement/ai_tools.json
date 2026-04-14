@@ -1,0 +1,18 @@
+{
+  "module": "servicemanagement",
+  "version": "1.0.1",
+  "tools": [
+    {
+      "name": "get_service_catalog_snapshot",
+      "method": "GET",
+      "endpoint": "/api/v1/customer/service",
+      "description": "Read active service catalog scoped to tenant/company and zone context."
+    },
+    {
+      "name": "get_worker_service_options",
+      "method": "GET",
+      "endpoint": "/api/v1/worker/service/data/sub-category-wise",
+      "description": "Return worker-visible services for a sub-category."
+    }
+  ]
+}

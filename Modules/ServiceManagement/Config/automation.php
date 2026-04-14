@@ -16,11 +16,26 @@ return [
     */
 
     'signals' => [
-        // Example:
-        // 'booking_late' => [
-        //     'severity' => 'amber',
-        //     'facts' => ['minutes_late', 'booking_id', 'customer_id', 'provider_id'],
-        // ],
+        'service_management.service_created' => [
+            'severity' => 'info',
+            'facts' => ['service_id', 'company_id', 'name', 'category_id', 'sub_category_id', 'is_active'],
+        ],
+        'service_management.service_updated' => [
+            'severity' => 'info',
+            'facts' => ['service_id', 'company_id', 'changes'],
+        ],
+        'service_management.service_deleted' => [
+            'severity' => 'warning',
+            'facts' => ['service_id', 'company_id', 'name'],
+        ],
+        'service_management.pricing_changed' => [
+            'severity' => 'info',
+            'facts' => ['action', 'pricing_rule_id', 'service_id', 'company_id', 'zone_id', 'base_price_override'],
+        ],
+        'service_management.addon_changed' => [
+            'severity' => 'info',
+            'facts' => ['action', 'addon_id', 'service_id', 'company_id', 'name', 'price'],
+        ],
     ],
 
     'actions' => [
