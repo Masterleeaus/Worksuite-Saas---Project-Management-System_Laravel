@@ -16,7 +16,7 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
             $table->unsignedBigInteger('fsm_order_id')->index();
-            $table->unsignedBigInteger('product_id')->index();
+            $table->unsignedBigInteger('product_id')->nullable()->index();
             if (Schema::hasTable('fsm_stock_items')) {
                 $table->foreign('product_id')->references('id')->on('fsm_stock_items')->nullOnDelete();
             }
