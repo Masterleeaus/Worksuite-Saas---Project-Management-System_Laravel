@@ -26,7 +26,7 @@ Route::prefix('v1')
     ->group(function () {
 
         // Bookings (tasks with task_type='booking')
-        Route::apiResource('bookings', BookingApiController::class);
+        Route::apiResource('bookings', BookingApiController::class)->names('titan-integrations.bookings');
 
         // Clients (users with 'client' role)
         Route::get('clients',       [ClientApiController::class, 'index']);

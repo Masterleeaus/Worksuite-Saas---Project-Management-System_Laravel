@@ -79,7 +79,7 @@ if (!$isPublished) {
         Route::group(['prefix' => 'paystack', 'as' => 'paystack.'], function () {
             Route::get('pay', [PaystackController::class, 'index'])->name('pay');
             Route::post('payment', [PaystackController::class, 'redirectToGateway'])->name('payment');
-            Route::get('callback', [PaystackController::class, 'handleGatewayCallback'])->name('callback');
+            Route::get('callback', [PaystackController::class, 'handleGatewayCallback'])->name('gateway_callback');
         });
     });
 }

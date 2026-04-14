@@ -49,7 +49,7 @@
                                 <td>{{ $survey->sent_at?->format('d M Y H:i') ?? '--' }}</td>
                                 <td>
                                     @if(user()->permission('publish_testimonials') === 'all')
-                                    <form method="POST" action="{{ route('nps.toggle-public', $survey->id) }}" class="d-inline">
+                                    <form method="POST" action="{{ route('customer-feedback.nps.toggle-public', $survey->id) }}" class="d-inline">
                                         @csrf
                                         <button class="btn btn-sm btn-{{ $survey->is_public ? 'success' : 'outline-secondary' }}" title="Toggle Testimonial">
                                             <i class="fa fa-star"></i>
@@ -57,7 +57,7 @@
                                     </form>
                                     @endif
                                     @if(user()->permission('manage_surveys') === 'all')
-                                    <form method="POST" action="{{ route('nps.destroy', $survey->id) }}" class="d-inline" onsubmit="return confirm('Delete?')">
+                                    <form method="POST" action="{{ route('customer-feedback.nps.destroy', $survey->id) }}" class="d-inline" onsubmit="return confirm('Delete?')">
                                         @csrf @method('DELETE')
                                         <button class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
                                     </form>
