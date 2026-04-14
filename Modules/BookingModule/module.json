@@ -17,7 +17,6 @@
         "start.php"
     ],
     "requires": [
-        "CategoryManagement",
         "ProviderManagement",
         "ServiceManagement",
         "ZoneManagement"

@@ -15,7 +15,6 @@ use Modules\BookingModule\Http\Traits\BookingScopes;
 use Modules\BusinessSettingsModule\Emails\CashInHandOverflowMail;
 use Modules\BusinessSettingsModule\Emails\SubscriptionToCommissionMail;
 use Modules\BusinessSettingsModule\Entities\PackageSubscriber;
-use Modules\CategoryManagement\Entities\Category;
 use Modules\ProviderManagement\Entities\Provider;
 use Modules\ReviewModule\Entities\Review;
 use Modules\UserManagement\Entities\Serviceman;
