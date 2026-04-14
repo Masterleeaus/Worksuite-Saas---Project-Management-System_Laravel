@@ -165,10 +165,6 @@ class TitanPanelProvider extends PanelProvider
             return $authUser->user;
         }
 
-        if (method_exists($authUser, 'user') && is_object($authUser->user)) {
-            return $authUser->user;
-        }
-
         if (function_exists('user')) {
             $sessionUser = user();
 

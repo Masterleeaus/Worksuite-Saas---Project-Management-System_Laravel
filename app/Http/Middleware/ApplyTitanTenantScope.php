@@ -49,6 +49,8 @@ class ApplyTitanTenantScope
             $company = $user->company ?? null;
 
             if ($company === null) {
+                // Fallback for runtime contexts where company_id is present but the
+                // relation is not hydrated on the resolved Worksuite user object.
                 $company = Company::withoutGlobalScopes()->find($companyId);
             }
 
