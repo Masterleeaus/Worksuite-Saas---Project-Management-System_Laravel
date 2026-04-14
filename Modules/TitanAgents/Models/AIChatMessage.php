@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Modules\AICore\Models\AIModel;
-use Modules\AICore\Models\AIProvider;
+use Modules\Aitools\Entities\AiModel as AIModel;
+use Modules\Aitools\Entities\AiProvider as AIProvider;
 
 class AIChatMessage extends Model
 {

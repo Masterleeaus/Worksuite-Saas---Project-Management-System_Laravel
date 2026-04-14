@@ -13,8 +13,8 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 use Modules\TitanAgents\Models\AIChat;
 use Modules\TitanAgents\Models\AIChatMessage;
-use Modules\AICore\Models\AIModel;
-use Modules\AICore\Models\AIProvider;
+use Modules\Aitools\Entities\AiModel as AIModel;
+use Modules\Aitools\Entities\AiProvider as AIProvider;
 use Modules\AICore\Services\AIRequestService;
 use Modules\AICore\Services\AIUsageTracker;
 
