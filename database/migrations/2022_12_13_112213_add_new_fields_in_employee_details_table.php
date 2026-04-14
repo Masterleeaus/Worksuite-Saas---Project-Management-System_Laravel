@@ -3,6 +3,7 @@
 use App\Models\Company;
 use App\Models\DashboardWidget;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
@@ -65,12 +66,27 @@ return new class extends Migration {
         }
 
         // Remove duplicates from module_settings table
-        \Illuminate\Support\Facades\DB::statement('DELETE t1 FROM module_settings t1
-        INNER JOIN module_settings t2 WHERE
-        t1.id > t2.id
-        AND t1.type = t2.type
-        AND t1.module_name = t2.module_name
-        AND t1.company_id = t2.company_id;');
+        if (Schema::hasTable('module_settings')) {
+            if (DB::getDriverName() === 'sqlite') {
+                DB::statement('DELETE FROM module_settings
+                    WHERE id IN (
+                        SELECT t1.id
+                        FROM module_settings t1
+                        INNER JOIN module_settings t2
+                            ON t1.id > t2.id
+                            AND t1.type = t2.type
+                            AND t1.module_name = t2.module_name
+                            AND t1.company_id = t2.company_id
+                    )');
+            } else {
+                DB::statement('DELETE t1 FROM module_settings t1
+                    INNER JOIN module_settings t2
+                        ON t1.id > t2.id
+                        AND t1.type = t2.type
+                        AND t1.module_name = t2.module_name
+                        AND t1.company_id = t2.company_id');
+            }
+        }
 
         if (!Schema::hasColumn('attendance_settings', 'monthly_report')) {
             Schema::table('attendance_settings', function (Blueprint $table) {
