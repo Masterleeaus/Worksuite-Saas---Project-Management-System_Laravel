@@ -38,7 +38,8 @@ class TitanDocsServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->register(RouteServiceProvider::class);
-        }
+        $this->app->register(EventServiceProvider::class);
+    }
 
     /**
      * Register config.
