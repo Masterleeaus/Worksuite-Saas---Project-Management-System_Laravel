@@ -26,6 +26,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (! Schema::hasTable('titanzero_ai_chat_sessions')) {
+            return;
+        }
+        
         Schema::table('titanzero_ai_chat_sessions', function (Blueprint $table) {
             $table->dropColumn(['openai_vector_id', 'openai_file_id', 'doc_name', 'reference_url']);
         });

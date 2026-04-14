@@ -13,6 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('zoom_meeting_notes')) {
+            return;
+        }
+        
         Schema::create(
             'zoom_meeting_notes', function (Blueprint $table) {
                 $table->id();

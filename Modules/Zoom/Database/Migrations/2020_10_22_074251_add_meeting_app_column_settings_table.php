@@ -36,10 +36,18 @@ return new class extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('zoom_setting')) {
+            return;
+        }
+        
         Schema::table('zoom_setting', function (Blueprint $table) {
             $table->dropColumn(['meeting_app']);
         });
 
+        if (! Schema::hasTable('zoom_meetings')) {
+            return;
+        }
+        
         Schema::table('zoom_meetings', function (Blueprint $table) {
             $table->dropColumn(['password']);
         });

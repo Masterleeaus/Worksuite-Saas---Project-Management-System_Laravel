@@ -14,6 +14,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('tasks')) {
+            return;
+        }
+        
         Schema::table('tasks', function (Blueprint $table) {
             // ── Discriminator ──────────────────────────────────────────────
             if (! Schema::hasColumn('tasks', 'task_type')) {
@@ -151,6 +155,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (! Schema::hasTable('tasks')) {
+            return;
+        }
+        
         Schema::table('tasks', function (Blueprint $table) {
             // Drop indexes first (ignore errors if they don't exist).
             $this->dropIndexSafe($table, 'tasks_task_type_index');

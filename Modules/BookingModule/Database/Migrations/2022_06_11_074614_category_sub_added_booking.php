@@ -20,8 +20,12 @@ return new class extends Migration
             return;
         }
         Schema::table('bookings', function($table) {
-            $table->foreignUuid('category_id')->nullable();
-            $table->foreignUuid('sub_category_id')->nullable();
+            if (! Schema::hasColumn('bookings', 'category_id')) {
+                $table->foreignUuid('category_id')->nullable();
+            }
+            if (! Schema::hasColumn('bookings', 'sub_category_id')) {
+                $table->foreignUuid('sub_category_id')->nullable();
+            }
         });
     }
 

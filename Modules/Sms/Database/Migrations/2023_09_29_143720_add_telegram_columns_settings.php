@@ -16,6 +16,10 @@ return new class extends Migration
     public function up()
     {
         if (Schema::hasColumn('sms_notification_settings', 'whatsapp_template')) {
+            if (! Schema::hasTable('sms_notification_settings')) {
+                return;
+            }
+            
             Schema::table('sms_notification_settings', function (Blueprint $table) {
                 $table->dropColumn('whatsapp_template');
                 $table->dropColumn('msg91_template');

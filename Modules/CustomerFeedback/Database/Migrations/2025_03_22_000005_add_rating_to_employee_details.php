@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (! Schema::hasTable('employee_details')) {
+            return;
+        }
+        
         Schema::table('employee_details', function (Blueprint $table) {
             if (!Schema::hasColumn('employee_details', 'star_rating')) {
                 $table->decimal('star_rating', 3, 2)->default(0.00)->after('id');
@@ -20,6 +24,10 @@ return new class extends Migration {
 
     public function down(): void
     {
+        if (! Schema::hasTable('employee_details')) {
+            return;
+        }
+        
         Schema::table('employee_details', function (Blueprint $table) {
             $table->dropColumnIfExists('star_rating');
             $table->dropColumnIfExists('total_ratings');

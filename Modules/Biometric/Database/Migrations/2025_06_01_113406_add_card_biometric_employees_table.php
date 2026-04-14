@@ -13,8 +13,14 @@ return new class extends Migration
     public function up(): void
     {
         if (!Schema::hasColumn('biometric_employees', 'card_number')) {
+            if (! Schema::hasTable('biometric_employees')) {
+                return;
+            }
+            
             Schema::table('biometric_employees', function (Blueprint $table) {
-                $table->string('card_number')->nullable()->after('user_id');
+                if (! Schema::hasColumn('biometric_employees', 'card_number')) {
+                    $table->string('card_number')->nullable()->after('user_id');
+                }
             });
         }
     }
@@ -25,6 +31,10 @@ return new class extends Migration
     public function down(): void
     {
         if (Schema::hasColumn('biometric_employees', 'card_number')) {
+            if (! Schema::hasTable('biometric_employees')) {
+                return;
+            }
+            
             Schema::table('biometric_employees', function (Blueprint $table) {
                 $table->dropColumn('card_number');
             });

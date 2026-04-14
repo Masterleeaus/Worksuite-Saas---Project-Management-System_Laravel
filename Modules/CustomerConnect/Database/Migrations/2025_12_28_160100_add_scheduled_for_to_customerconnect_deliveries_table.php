@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('customerconnect_deliveries')) {
+            return;
+        }
+        
         Schema::table('customerconnect_deliveries', function (Blueprint $table) {
             if (!Schema::hasColumn('customerconnect_deliveries', 'scheduled_for')) {
                 $table->timestamp('scheduled_for')->nullable()->index()->after('status');
@@ -20,6 +24,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (! Schema::hasTable('customerconnect_deliveries')) {
+            return;
+        }
+        
         Schema::table('customerconnect_deliveries', function (Blueprint $table) {
             if (Schema::hasColumn('customerconnect_deliveries', 'scheduled_for')) {
                 $table->dropColumn('scheduled_for');

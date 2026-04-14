@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('zones')) {
+            return;
+        }
+        
         Schema::table('zones', function (Blueprint $table) {
             if (!Schema::hasColumn('zones', 'zone_type')) {
                 $table->enum('zone_type', ['polygon', 'circle'])->default('polygon')->after('is_active');
@@ -27,6 +31,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (! Schema::hasTable('zones')) {
+            return;
+        }
+        
         Schema::table('zones', function (Blueprint $table) {
             $table->dropColumn(['zone_type', 'center_lat', 'center_lng', 'radius']);
         });

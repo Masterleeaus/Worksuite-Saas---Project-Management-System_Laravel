@@ -48,6 +48,10 @@ return new class extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('salary_slips')) {
+            return;
+        }
+        
         Schema::table('salary_slips', function (Blueprint $table) {
             $table->dropForeign('salary_slips_currency_id_foreign');
             $table->dropColumn('currency_id');

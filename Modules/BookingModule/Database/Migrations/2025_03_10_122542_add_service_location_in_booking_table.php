@@ -25,7 +25,9 @@ return new class extends Migration
         }
 
         Schema::table('bookings', function (Blueprint $table) {
-            $table->string('service_location')->default('customer')->comment('customer,provider');
+            if (! Schema::hasColumn('bookings', 'service_location')) {
+                $table->string('service_location')->default('customer')->comment('customer,provider')->nullable();
+            }
         });
     }
 

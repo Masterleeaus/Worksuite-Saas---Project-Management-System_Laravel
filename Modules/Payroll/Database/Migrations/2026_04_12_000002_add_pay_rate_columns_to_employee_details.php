@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('employee_details')) {
+            return;
+        }
+        
         Schema::table('employee_details', function (Blueprint $table) {
             if (!Schema::hasColumn('employee_details', 'pay_type')) {
                 $table->string('pay_type')->default('hourly')
@@ -71,6 +75,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (! Schema::hasTable('employee_details')) {
+            return;
+        }
+        
         Schema::table('employee_details', function (Blueprint $table) {
             $columns = [
                 'pay_type', 'hourly_rate', 'daily_rate', 'per_job_rate',

@@ -12,77 +12,83 @@ return new class extends Migration {
         }
 
         // Recurring Order Templates (named presets for recurring configs)
-        Schema::create('fsm_recurring_templates', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->unsignedBigInteger('company_id')->nullable()->index();
-            $table->string('name');
-            $table->boolean('active')->default(true);
-            $table->text('description')->nullable();
-            $table->unsignedBigInteger('frequency_set_id')->nullable()->index();
-            $table->unsignedInteger('max_orders')->default(0)->comment('0 = unlimited');
-            $table->unsignedBigInteger('fsm_template_id')->nullable()->index()
-                ->comment('FSM order template to use for generated orders');
-            $table->timestamps();
+        if (! Schema::hasTable('fsm_recurring_templates')) {
+            Schema::create('fsm_recurring_templates', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->unsignedBigInteger('company_id')->nullable()->index();
+                $table->string('name');
+                $table->boolean('active')->default(true);
+                $table->text('description')->nullable();
+                $table->unsignedBigInteger('frequency_set_id')->nullable()->index();
+                $table->unsignedInteger('max_orders')->default(0)->comment('0 = unlimited');
+                $table->unsignedBigInteger('fsm_template_id')->nullable()->index()
+                    ->comment('FSM order template to use for generated orders');
+                $table->timestamps();
 
-            if (Schema::hasTable('fsm_frequency_sets')) {
-                $table->foreign('frequency_set_id')->references('id')->on('fsm_frequency_sets')->nullOnDelete();
-            }
-            if (Schema::hasTable('fsm_templates')) {
-                $table->foreign('fsm_template_id')->references('id')->on('fsm_templates')->nullOnDelete();
-            }
-        });
+                if (Schema::hasTable('fsm_frequency_sets')) {
+                    $table->foreign('frequency_set_id')->references('id')->on('fsm_frequency_sets')->nullOnDelete();
+                }
+                if (Schema::hasTable('fsm_templates')) {
+                    $table->foreign('fsm_template_id')->references('id')->on('fsm_templates')->nullOnDelete();
+                }
+            });
+        }
 
         // Recurring Orders (the repeating schedule)
-        Schema::create('fsm_recurrings', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->unsignedBigInteger('company_id')->nullable()->index();
-            $table->string('name', 64)->unique();
-            // State machine: draft → progress → suspend / close
-            $table->string('state', 20)->default('draft');
-            $table->unsignedBigInteger('recurring_template_id')->nullable()->index();
-            $table->unsignedBigInteger('location_id')->nullable()->index();
-            $table->text('description')->nullable();
-            $table->unsignedBigInteger('frequency_set_id')->nullable()->index();
-            $table->decimal('scheduled_duration', 8, 2)->nullable()->comment('Hours');
-            $table->datetime('start_date')->nullable();
-            $table->datetime('end_date')->nullable()->comment('No orders generated after this date');
-            $table->unsignedInteger('max_orders')->default(0)->comment('0 = unlimited');
-            $table->unsignedBigInteger('fsm_template_id')->nullable()->index()
-                ->comment('FSM order template for generated orders');
-            $table->unsignedBigInteger('team_id')->nullable()->index();
-            $table->unsignedBigInteger('person_id')->nullable()->index();
-            $table->timestamps();
+        if (! Schema::hasTable('fsm_recurrings')) {
+            Schema::create('fsm_recurrings', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->unsignedBigInteger('company_id')->nullable()->index();
+                $table->string('name', 64)->unique();
+                // State machine: draft → progress → suspend / close
+                $table->string('state', 20)->default('draft');
+                $table->unsignedBigInteger('recurring_template_id')->nullable()->index();
+                $table->unsignedBigInteger('location_id')->nullable()->index();
+                $table->text('description')->nullable();
+                $table->unsignedBigInteger('frequency_set_id')->nullable()->index();
+                $table->decimal('scheduled_duration', 8, 2)->nullable()->comment('Hours');
+                $table->datetime('start_date')->nullable();
+                $table->datetime('end_date')->nullable()->comment('No orders generated after this date');
+                $table->unsignedInteger('max_orders')->default(0)->comment('0 = unlimited');
+                $table->unsignedBigInteger('fsm_template_id')->nullable()->index()
+                    ->comment('FSM order template for generated orders');
+                $table->unsignedBigInteger('team_id')->nullable()->index();
+                $table->unsignedBigInteger('person_id')->nullable()->index();
+                $table->timestamps();
 
-            if (Schema::hasTable('fsm_recurring_templates')) {
-                $table->foreign('recurring_template_id')->references('id')->on('fsm_recurring_templates')->nullOnDelete();
-            }
-            if (Schema::hasTable('fsm_locations')) {
-                $table->foreign('location_id')->references('id')->on('fsm_locations')->nullOnDelete();
-            }
-            if (Schema::hasTable('fsm_frequency_sets')) {
-                $table->foreign('frequency_set_id')->references('id')->on('fsm_frequency_sets')->nullOnDelete();
-            }
-            if (Schema::hasTable('fsm_templates')) {
-                $table->foreign('fsm_template_id')->references('id')->on('fsm_templates')->nullOnDelete();
-            }
-            if (Schema::hasTable('fsm_teams')) {
-                $table->foreign('team_id')->references('id')->on('fsm_teams')->nullOnDelete();
-            }
-        });
+                if (Schema::hasTable('fsm_recurring_templates')) {
+                    $table->foreign('recurring_template_id')->references('id')->on('fsm_recurring_templates')->nullOnDelete();
+                }
+                if (Schema::hasTable('fsm_locations')) {
+                    $table->foreign('location_id')->references('id')->on('fsm_locations')->nullOnDelete();
+                }
+                if (Schema::hasTable('fsm_frequency_sets')) {
+                    $table->foreign('frequency_set_id')->references('id')->on('fsm_frequency_sets')->nullOnDelete();
+                }
+                if (Schema::hasTable('fsm_templates')) {
+                    $table->foreign('fsm_template_id')->references('id')->on('fsm_templates')->nullOnDelete();
+                }
+                if (Schema::hasTable('fsm_teams')) {
+                    $table->foreign('team_id')->references('id')->on('fsm_teams')->nullOnDelete();
+                }
+            });
+        }
 
         // Pivot: recurring ↔ equipment
-        Schema::create('fsm_recurring_equipment', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->unsignedBigInteger('fsm_recurring_id');
-            $table->unsignedBigInteger('fsm_equipment_id');
+        if (! Schema::hasTable('fsm_recurring_equipment')) {
+            Schema::create('fsm_recurring_equipment', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->unsignedBigInteger('fsm_recurring_id');
+                $table->unsignedBigInteger('fsm_equipment_id');
 
-            if (Schema::hasTable('fsm_recurrings')) {
-                $table->foreign('fsm_recurring_id')->references('id')->on('fsm_recurrings')->cascadeOnDelete();
-            }
-            if (Schema::hasTable('fsm_equipment')) {
-                $table->foreign('fsm_equipment_id')->references('id')->on('fsm_equipment')->cascadeOnDelete();
-            }
-        });
+                if (Schema::hasTable('fsm_recurrings')) {
+                    $table->foreign('fsm_recurring_id')->references('id')->on('fsm_recurrings')->cascadeOnDelete();
+                }
+                if (Schema::hasTable('fsm_equipment')) {
+                    $table->foreign('fsm_equipment_id')->references('id')->on('fsm_equipment')->cascadeOnDelete();
+                }
+            });
+        }
     }
 
     public function down(): void

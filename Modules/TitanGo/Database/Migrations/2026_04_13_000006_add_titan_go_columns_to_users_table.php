@@ -14,6 +14,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('users')) {
+            return;
+        }
+        
         Schema::table('users', function (Blueprint $table) {
             if (!Schema::hasColumn('users', 'titan_go_fcm_token')) {
                 $table->string('titan_go_fcm_token')->nullable()->after('email');
@@ -26,6 +30,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (! Schema::hasTable('users')) {
+            return;
+        }
+        
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn(['titan_go_fcm_token', 'titan_go_device_id']);
         });

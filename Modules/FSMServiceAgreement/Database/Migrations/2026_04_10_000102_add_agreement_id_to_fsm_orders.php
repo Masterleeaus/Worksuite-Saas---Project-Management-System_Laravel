@@ -21,6 +21,10 @@ return new class extends Migration {
 
     public function down(): void
     {
+        if (! Schema::hasTable('fsm_orders')) {
+            return;
+        }
+        
         Schema::table('fsm_orders', function (Blueprint $table) {
             $table->dropForeign(['agreement_id']);
             $table->dropColumn('agreement_id');

@@ -13,6 +13,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('users_chat')) {
+            return;
+        }
+        
         Schema::table('users_chat', function (Blueprint $table) {
             if (!Schema::hasColumn('users_chat', 'message_type')) {
                 $table->string('message_type')->default('text')->after('message');
@@ -56,6 +60,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (! Schema::hasTable('users_chat')) {
+            return;
+        }
+        
         Schema::table('users_chat', function (Blueprint $table) {
             $columns = [
                 'message_type',

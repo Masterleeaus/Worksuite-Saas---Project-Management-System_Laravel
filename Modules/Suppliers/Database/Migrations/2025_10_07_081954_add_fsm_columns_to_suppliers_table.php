@@ -6,6 +6,10 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
     public function up(): void {
+        if (! Schema::hasTable('suppliers')) {
+            return;
+        }
+        
         Schema::table('suppliers', function (Blueprint $table) {
             if (!Schema::hasColumn('suppliers', 'fsm_rating')) {
                 $table->unsignedTinyInteger('fsm_rating')->nullable()->after('email');
@@ -19,6 +23,10 @@ return new class extends Migration {
         });
     }
     public function down(): void {
+        if (! Schema::hasTable('suppliers')) {
+            return;
+        }
+        
         Schema::table('suppliers', function (Blueprint $table) {
             $cols = array_filter(
                 ['fsm_rating', 'fsm_lead_time_days', 'fsm_payment_terms'],

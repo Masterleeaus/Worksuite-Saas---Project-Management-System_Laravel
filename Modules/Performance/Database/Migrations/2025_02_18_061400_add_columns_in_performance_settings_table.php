@@ -59,7 +59,9 @@ return new class extends Migration
         }
 
         Schema::table('performance_settings', function (Blueprint $table) {
-            $table->enum('send_notification', ['yes', 'no'])->default('no')->after('company_id');
+            if (! Schema::hasColumn('performance_settings', 'send_notification')) {
+                $table->enum('send_notification', ['yes', 'no'])->default('no')->after('company_id')->nullable();
+            }
         });
     }
 

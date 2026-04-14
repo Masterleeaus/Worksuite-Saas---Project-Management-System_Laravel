@@ -23,6 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (! Schema::hasTable('order_items')) {
+            return;
+        }
+        
         Schema::table('order_items', function (Blueprint $table) {
 
         });

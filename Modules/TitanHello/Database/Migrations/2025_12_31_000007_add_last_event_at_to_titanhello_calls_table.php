@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (! Schema::hasTable('titanhello_calls')) {
+            return;
+        }
+        
         Schema::table('titanhello_calls', function (Blueprint $table) {
             if (!Schema::hasColumn('titanhello_calls', 'last_event_at')) {
                 $table->dateTime('last_event_at')->nullable()->after('ended_at');
@@ -16,6 +20,10 @@ return new class extends Migration {
 
     public function down(): void
     {
+        if (! Schema::hasTable('titanhello_calls')) {
+            return;
+        }
+        
         Schema::table('titanhello_calls', function (Blueprint $table) {
             if (Schema::hasColumn('titanhello_calls', 'last_event_at')) $table->dropColumn('last_event_at');
         });

@@ -28,7 +28,7 @@ return new class extends Migration
 
         DB::statement('ALTER TABLE `recruit_job_applications` CHANGE `current_ctc` `current_ctc` INT(11) NULL DEFAULT NULL');
 
-        if (!Schema::hasColumn('recruit_settings', 'application_restriction')) {
+        if (Schema::hasTable('recruit_settings') && !Schema::hasColumn('recruit_settings', 'application_restriction')) {
             Schema::table('recruit_settings', function (Blueprint $table) {
                 $table->integer('application_restriction')->default('180');
             });
@@ -36,7 +36,7 @@ return new class extends Migration
 
         DB::statement('ALTER TABLE `recruit_job_applications` CHANGE `email` `email` VARCHAR(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL');
 
-        if (!Schema::hasColumn('recruit_settings', 'career_site')) {
+        if (Schema::hasTable('recruit_settings') && !Schema::hasColumn('recruit_settings', 'career_site')) {
             Schema::table('recruit_settings', function (Blueprint $table) {
                 $table->enum('career_site', ['yes', 'no'])->default('yes')->after('company_website');
             });

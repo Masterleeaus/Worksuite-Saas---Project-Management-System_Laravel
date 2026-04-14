@@ -16,6 +16,10 @@ return new class extends Migration {
 
     public function down(): void
     {
+        if (! Schema::hasTable('attendances')) {
+            return;
+        }
+        
         Schema::table('attendances', function (Blueprint $table) {
             $table->dropColumn('booking_id');
         });

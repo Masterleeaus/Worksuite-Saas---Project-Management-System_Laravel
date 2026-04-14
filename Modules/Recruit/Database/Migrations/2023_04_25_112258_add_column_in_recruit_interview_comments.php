@@ -15,8 +15,14 @@ return new class extends Migration
     public function up()
     {
         if (!Schema::hasColumn('recruit_interview_comments', 'candidate_comment')) {
+            if (! Schema::hasTable('recruit_interview_comments')) {
+                return;
+            }
+            
             Schema::table('recruit_interview_comments', function (Blueprint $table) {
-                $table->string('candidate_comment')->after('comment')->nullable();
+                if (! Schema::hasColumn('recruit_interview_comments', 'candidate_comment')) {
+                    $table->string('candidate_comment')->after('comment')->nullable();
+                }
             });
         }
     }

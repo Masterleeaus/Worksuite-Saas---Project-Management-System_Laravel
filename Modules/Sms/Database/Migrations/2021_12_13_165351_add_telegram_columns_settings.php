@@ -37,11 +37,19 @@ return new class extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('sms_settings')) {
+            return;
+        }
+        
         Schema::table('sms_settings', function (Blueprint $table) {
             $table->dropColumn(['telegram_status']);
             $table->dropColumn(['telegram_bot_token']);
         });
 
+        if (! Schema::hasTable('users')) {
+            return;
+        }
+        
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn(['telegram_user_id']);
         });

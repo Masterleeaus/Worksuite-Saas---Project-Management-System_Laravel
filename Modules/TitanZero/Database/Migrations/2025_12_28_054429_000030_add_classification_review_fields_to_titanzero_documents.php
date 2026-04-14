@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (! Schema::hasTable('titanzero_documents')) {
+            return;
+        }
+        
         Schema::table('titanzero_documents', function (Blueprint $table) {
             if (!Schema::hasColumn('titanzero_documents', 'classification_confidence')) {
                 $table->unsignedSmallInteger('classification_confidence')->default(0)->index(); // 0..100

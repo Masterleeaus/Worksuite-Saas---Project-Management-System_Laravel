@@ -36,6 +36,10 @@ return new class extends Migration {
 
     public function up(): void
     {
+        if (! Schema::hasTable('orders')) {
+            return;
+        }
+        
         Schema::table('orders', function (Blueprint $table) {
             if (!Schema::hasColumn('orders', 'order_type')) {
                 // 'sale' keeps every existing row behaving as before
@@ -112,6 +116,10 @@ return new class extends Migration {
 
     public function down(): void
     {
+        if (! Schema::hasTable('orders')) {
+            return;
+        }
+        
         Schema::table('orders', function (Blueprint $table) {
             // Drop FK before dropping column
             if (Schema::hasColumn('orders', 'supplier_id')) {

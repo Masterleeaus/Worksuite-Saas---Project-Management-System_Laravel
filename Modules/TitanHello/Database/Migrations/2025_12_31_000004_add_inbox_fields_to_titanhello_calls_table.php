@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (! Schema::hasTable('titanhello_calls')) {
+            return;
+        }
+        
         Schema::table('titanhello_calls', function (Blueprint $table) {
             if (!Schema::hasColumn('titanhello_calls', 'priority')) {
                 $table->unsignedTinyInteger('priority')->default(0)->after('disposition_notes');
@@ -22,6 +26,10 @@ return new class extends Migration {
 
     public function down(): void
     {
+        if (! Schema::hasTable('titanhello_calls')) {
+            return;
+        }
+        
         Schema::table('titanhello_calls', function (Blueprint $table) {
             if (Schema::hasColumn('titanhello_calls', 'missed_at')) $table->dropColumn('missed_at');
             if (Schema::hasColumn('titanhello_calls', 'callback_due_at')) $table->dropColumn('callback_due_at');
