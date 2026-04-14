@@ -25,7 +25,9 @@ return new class extends Migration {
             });
         }
 
-        DB::statement("ALTER TABLE file_storage CHANGE COLUMN storage_location storage_location ENUM('local', 'aws_s3', 'digitalocean') NOT NULL DEFAULT 'local'");
+        if (in_array(DB::getDriverName(), ['mysql', 'mariadb'], true)) {
+            DB::statement("ALTER TABLE file_storage CHANGE COLUMN storage_location storage_location ENUM('local', 'aws_s3', 'digitalocean') NOT NULL DEFAULT 'local'");
+        }
 
 
         if (!Schema::hasColumn('companies', 'show_new_webhook_alert')) {
@@ -106,6 +108,10 @@ return new class extends Migration {
 
     private function foreignKeyFixCompaniesTable()
     {
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
         try {
             // Renaming the index names
             Schema::table('companies', function (Blueprint $table) {
