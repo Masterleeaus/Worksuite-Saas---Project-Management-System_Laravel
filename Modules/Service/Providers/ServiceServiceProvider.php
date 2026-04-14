@@ -24,7 +24,7 @@ class ServiceServiceProvider extends ServiceProvider
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
-        $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
+        $this->loadMigrationsFrom(module_path($this->name, 'Database/Migrations'));
     }
 
     /**
@@ -74,8 +74,8 @@ class ServiceServiceProvider extends ServiceProvider
      */
     protected function registerConfig(): void
     {
-        $this->publishes([module_path($this->name, 'config/config.php') => config_path($this->nameLower.'.php')], 'config');
-        $this->mergeConfigFrom(module_path($this->name, 'config/config.php'), $this->nameLower);
+        $this->publishes([module_path($this->name, 'Config/config.php') => config_path($this->nameLower.'.php')], 'config');
+        $this->mergeConfigFrom(module_path($this->name, 'Config/config.php'), $this->nameLower);
     }
 
     /**
@@ -84,7 +84,7 @@ class ServiceServiceProvider extends ServiceProvider
     public function registerViews(): void
     {
         $viewPath = resource_path('views/modules/'.$this->nameLower);
-        $sourcePath = module_path($this->name, 'resources/views');
+        $sourcePath = module_path($this->name, 'Resources/views');
 
         $this->publishes([$sourcePath => $viewPath], ['views', $this->nameLower.'-module-views']);
 
