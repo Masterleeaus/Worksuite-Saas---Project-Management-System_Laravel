@@ -3,6 +3,7 @@
 use App\Models\Permission;
 use App\Models\Module;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -26,6 +27,10 @@ return new class extends Migration
 
     public function up(): void
     {
+        if (! Schema::hasTable('modules') || ! Schema::hasTable('permissions')) {
+            return;
+        }
+
         $module = Module::firstOrCreate(['module_name' => 'payroll']);
 
         foreach ($this->permissionsToAdd as $permData) {
@@ -38,6 +43,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (! Schema::hasTable('modules') || ! Schema::hasTable('permissions')) {
+            return;
+        }
+
         $module = Module::where('module_name', 'payroll')->first();
 
         if (! $module) {
