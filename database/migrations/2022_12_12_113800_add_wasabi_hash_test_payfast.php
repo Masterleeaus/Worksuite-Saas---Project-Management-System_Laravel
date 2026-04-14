@@ -3,6 +3,8 @@
 use App\Models\GlobalSetting;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
 
@@ -15,7 +17,9 @@ return new class extends Migration {
     {
         if (!Schema::hasColumn('global_settings', 'header_color')) {
 
-            DB::statement("ALTER TABLE file_storage CHANGE COLUMN storage_location storage_location ENUM('local', 'aws_s3', 'digitalocean','wasabi') NOT NULL DEFAULT 'local'");
+            if (DB::getDriverName() !== 'sqlite' && Schema::hasTable('file_storage') && Schema::hasColumn('file_storage', 'storage_location')) {
+                DB::statement("ALTER TABLE file_storage CHANGE COLUMN storage_location storage_location ENUM('local', 'aws_s3', 'digitalocean','wasabi') NOT NULL DEFAULT 'local'");
+            }
 
             Schema::table('global_settings', function (Blueprint $table) {
                 $table->string('header_color')->after('logo_background_color')->default('#1D82F5');
