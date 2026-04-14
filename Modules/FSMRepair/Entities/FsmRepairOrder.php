@@ -5,7 +5,7 @@ namespace Modules\FSMRepair\Entities;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Modules\FSMCore\Entities\FsmOrder;
+use Modules\FSMCore\Models\FSMOrder;
 
 class FsmRepairOrder extends Model
 {

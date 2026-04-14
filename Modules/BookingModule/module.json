@@ -20,7 +20,6 @@
         "CategoryManagement",
         "ProviderManagement",
         "ServiceManagement",
-        "UserManagement",
         "ZoneManagement"
     ],
     "active": 1,

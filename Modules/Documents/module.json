@@ -12,5 +12,8 @@
         "psr-4": {
             "Modules\\Documents\\": ""
         }
-    }
+    },
+    "priority": 0,
+    "description": "",
+    "keywords": []
 }

@@ -14,7 +14,7 @@ class QcCreateScheduleFilesTable extends Migration
     public function up()
     {
         if (!Schema::hasTable('inspection_schedule_files')) {
-            Schema::create('inspection_schedule_files', function (Blueprint $table) {
+            if (!Schema::hasTable('inspection_schedule_files')) Schema::create('inspection_schedule_files', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
             $table->unsignedInteger('user_id')->nullable();

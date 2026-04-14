@@ -2,7 +2,13 @@
     "name": "StaffCompliance",
     "alias": "staffcompliance",
     "description": "Tracks mandatory compliance documents for field workers: police checks, working with children checks, insurance, trade licences and certifications",
-    "keywords": ["compliance", "certifications", "police-check", "licence", "field-worker"],
+    "keywords": [
+        "compliance",
+        "certifications",
+        "police-check",
+        "licence",
+        "field-worker"
+    ],
     "active": 1,
     "order": 0,
     "providers": [
@@ -41,5 +47,6 @@
             "sort_order": 95
         }
     ],
-    "sidebar_menu": true
+    "sidebar_menu": true,
+    "priority": 0
 }

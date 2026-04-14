@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (!Schema::hasTable('faqs')) {
+            return;
+        }
+
         Schema::table('faqs', function (Blueprint $table) {
             if (!Schema::hasColumn('faqs', 'company_id')) {
                 $table->unsignedBigInteger('company_id')->nullable()->index()->after('id');
@@ -32,6 +36,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (!Schema::hasTable('faqs')) {
+            return;
+        }
+
         Schema::table('faqs', function (Blueprint $table) {
             $table->dropColumn(['company_id','visibility','source_type','tags','created_by','updated_by']);
         });

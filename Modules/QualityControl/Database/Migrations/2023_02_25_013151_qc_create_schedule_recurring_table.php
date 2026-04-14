@@ -14,7 +14,7 @@ class QcCreateScheduleRecurringTable extends Migration
     public function up()
     {
         if (!Schema::hasTable('inspection_schedule_recurring')) {
-            Schema::create('inspection_schedule_recurring', function (Blueprint $table) {
+            if (!Schema::hasTable('inspection_schedule_recurring')) Schema::create('inspection_schedule_recurring', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('company_id')->nullable();
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('set null')->onUpdate('cascade');

@@ -4,7 +4,7 @@ namespace Modules\Aitools\Services;
 
 use Illuminate\Support\Facades\DB;
 
-class CoreCoreUsageLogger
+class CoreUsageLogger
 {
     public static function add(string $key, int $tokens = 0, int $requests = 1): void
     {

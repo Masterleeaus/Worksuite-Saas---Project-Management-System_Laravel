@@ -2,7 +2,7 @@
 
 namespace Modules\TitanZero\Services;
 
-use Modules\AICore\Contracts\AI\ClientInterface as TitanClient;
+use Modules\TitanCore\Contracts\AI\ClientInterface as TitanClient;
 use Modules\TitanZero\Entities\TitanZeroUsage;
 use Modules\TitanCore\Services\UsageCostLogger;
 

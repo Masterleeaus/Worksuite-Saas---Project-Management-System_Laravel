@@ -12,7 +12,7 @@ return new class extends Migration
             return;
         }
 
-        Schema::create('ai_prompts', function (Blueprint $table) {
+        if (!Schema::hasTable('ai_prompts')) Schema::create('ai_prompts', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable()->index(); // null = global
             $table->string('namespace')->default('aitools');

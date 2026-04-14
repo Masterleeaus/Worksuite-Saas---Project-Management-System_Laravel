@@ -1,15 +1,23 @@
 {
     "name": "TitanTalk",
     "alias": "titantalk",
-    "description": "TitanTalk — Slack-like internal communications for service-business operations",
-    "keywords": ["chat", "channels", "messaging", "slack", "titantalk"],
+    "description": "TitanTalk \u2014 Slack-like internal communications for service-business operations",
+    "keywords": [
+        "chat",
+        "channels",
+        "messaging",
+        "slack",
+        "titantalk"
+    ],
     "active": 1,
     "order": 5,
     "providers": [
         "Modules\\TitanTalk\\Providers\\TitanTalkServiceProvider"
     ],
     "aliases": {},
-    "files": ["start.php"],
+    "files": [
+        "start.php"
+    ],
     "requires": [],
     "permissions": [
         "view_titan_talk",
@@ -33,5 +41,6 @@
             "create_titan_talk_rooms",
             "send_titan_talk_messages"
         ]
-    }
+    },
+    "priority": 0
 }

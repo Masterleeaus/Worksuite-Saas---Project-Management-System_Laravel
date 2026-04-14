@@ -14,7 +14,7 @@ class QcCreateSchedulesTable extends Migration
     public function up()
     {
         if (!Schema::hasTable('inspection_schedules')) {
-            Schema::create('inspection_schedules', function (Blueprint $table) {
+            if (!Schema::hasTable('inspection_schedules')) Schema::create('inspection_schedules', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('company_id')->nullable();
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('set null')->onUpdate('cascade');

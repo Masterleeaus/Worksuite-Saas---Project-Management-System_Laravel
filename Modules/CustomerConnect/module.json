@@ -1,8 +1,22 @@
 {
     "name": "CustomerConnect",
     "alias": "customerconnect",
-    "description": "Customer self-service portal — rebooking, invoices, payments and property management. Also provides multi-channel campaign marketing, inbox management, inbound webhooks, SLA monitoring, and TitanZero AI bridge.",
-    "keywords": ["crm", "inbox", "campaigns", "sms", "whatsapp", "telegram", "email", "twilio", "vonage", "marketing", "portal", "customer-portal", "self-service"],
+    "description": "Customer self-service portal \u2014 rebooking, invoices, payments and property management. Also provides multi-channel campaign marketing, inbox management, inbound webhooks, SLA monitoring, and TitanZero AI bridge.",
+    "keywords": [
+        "crm",
+        "inbox",
+        "campaigns",
+        "sms",
+        "whatsapp",
+        "telegram",
+        "email",
+        "twilio",
+        "vonage",
+        "marketing",
+        "portal",
+        "customer-portal",
+        "self-service"
+    ],
     "active": 1,
     "order": 0,
     "version": "5.0.0",
@@ -65,5 +79,6 @@
             "sort_order": 63
         }
     ],
-    "sidebar_menu": true
+    "sidebar_menu": true,
+    "priority": 0
 }

@@ -10,5 +10,6 @@
     ],
     "aliases": {},
     "files": [],
-    "requires": []
+    "requires": [],
+    "priority": 0
 }

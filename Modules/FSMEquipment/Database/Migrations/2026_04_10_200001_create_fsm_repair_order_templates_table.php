@@ -11,7 +11,7 @@ return new class extends Migration {
             return;
         }
 
-        Schema::create('fsm_repair_order_templates', function (Blueprint $table) {
+        if (!Schema::hasTable('fsm_repair_order_templates')) Schema::create('fsm_repair_order_templates', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
             $table->string('name', 256);
