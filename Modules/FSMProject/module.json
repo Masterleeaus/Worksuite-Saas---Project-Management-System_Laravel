@@ -10,8 +10,8 @@
   "active": 1,
   "order": 0,
   "providers": [
-    "Modules\\\\FSMProject\\\\Providers\\\\FSMProjectServiceProvider",
-    "Modules\\\\FSMProject\\\\Providers\\\\RouteServiceProvider"
+    "Modules\\FSMProject\\Providers\\FSMProjectServiceProvider",
+    "Modules\\FSMProject\\Providers\\RouteServiceProvider"
   ],
   "aliases": {},
   "files": [],

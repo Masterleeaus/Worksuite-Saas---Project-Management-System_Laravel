@@ -10,8 +10,8 @@
   "active": 1,
   "order": 0,
   "providers": [
-    "Modules\\\\FSMAccount\\\\Providers\\\\FSMAccountServiceProvider",
-    "Modules\\\\FSMAccount\\\\Providers\\\\RouteServiceProvider"
+    "Modules\\FSMAccount\\Providers\\FSMAccountServiceProvider",
+    "Modules\\FSMAccount\\Providers\\RouteServiceProvider"
   ],
   "aliases": {},
   "files": [],
