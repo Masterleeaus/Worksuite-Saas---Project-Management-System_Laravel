@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 
 class CleanupModuleUploads extends Command
 {
@@ -83,7 +84,7 @@ class CleanupModuleUploads extends Command
             }
         }
         
-        \Log::info("Module upload cleanup executed", [
+        Log::info("Module upload cleanup executed", [
             'days' => $days,
             'deleted' => $deleted,
             'errors' => count($errors),

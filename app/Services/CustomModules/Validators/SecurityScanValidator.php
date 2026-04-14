@@ -181,8 +181,8 @@ class SecurityScanValidator
         // This is a basic check - not bulletproof but catches obvious cases
         
         // Remove comments (PHP-style)
-        $content = preg_replace('/#.*$/', '', $content);
-        $content = preg_replace('/\/\/.*$/', '', $content);
+        $content = preg_replace('/#.*$/m', '', $content);
+        $content = preg_replace('/\/\/.*$/m', '', $content);
         $content = preg_replace('%/\*.*?\*/%s', '', $content);
         
         // Look for function calls or direct usage

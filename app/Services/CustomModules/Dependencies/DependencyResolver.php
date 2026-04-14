@@ -222,7 +222,7 @@ class DependencyResolver
         }
 
         if (in_array($module, $visiting, true)) {
-            throw new \RuntimeException("Circular dependency detected: {$module}");
+            throw new \RuntimeException("Circular dependency detected: " . implode(' -> ', $visiting) . " -> {$module}");
         }
 
         $visiting[] = $module;
