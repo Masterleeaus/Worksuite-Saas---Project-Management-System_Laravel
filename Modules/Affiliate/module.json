@@ -7,7 +7,6 @@
     "providers": [
         "Modules\\Affiliate\\Providers\\AffiliateServiceProvider",
         "Modules\\Affiliate\\Providers\\EventServiceProvider"
-
     ],
     "files": [
         "start.php"

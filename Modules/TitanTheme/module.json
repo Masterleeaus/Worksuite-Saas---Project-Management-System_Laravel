@@ -1,8 +1,15 @@
 {
     "name": "TitanTheme",
     "alias": "titantheme",
-    "description": "TitanTheme — Complete visual theming, navigation management, and white-label customisation system. Unifies LiveCustomizer, MegaMenu, and Menu extensions.",
-    "keywords": ["theme", "customizer", "white-label", "mega-menu", "navigation", "branding"],
+    "description": "TitanTheme \u2014 Complete visual theming, navigation management, and white-label customisation system. Unifies LiveCustomizer, MegaMenu, and Menu extensions.",
+    "keywords": [
+        "theme",
+        "customizer",
+        "white-label",
+        "mega-menu",
+        "navigation",
+        "branding"
+    ],
     "active": 1,
     "order": 0,
     "version": "1.0.0",
@@ -65,5 +72,6 @@
             "sort_order": 97
         }
     ],
-    "sidebar_menu": true
+    "sidebar_menu": true,
+    "priority": 0
 }

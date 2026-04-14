@@ -1,8 +1,15 @@
 {
     "name": "Payroll",
     "alias": "payroll",
-    "description": "Payroll management module — payslips, payroll runs, ABA export, superannuation, tax withholding and FSM cleaner pay rates.",
-    "keywords": ["payroll", "payslip", "salary", "aba", "superannuation", "tax"],
+    "description": "Payroll management module \u2014 payslips, payroll runs, ABA export, superannuation, tax withholding and FSM cleaner pay rates.",
+    "keywords": [
+        "payroll",
+        "payslip",
+        "salary",
+        "aba",
+        "superannuation",
+        "tax"
+    ],
     "order": 0,
     "active": 1,
     "providers": [
@@ -18,5 +25,6 @@
         "approve_payroll",
         "export_payroll",
         "manage_employee_salary"
-    ]
+    ],
+    "priority": 0
 }

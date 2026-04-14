@@ -1,8 +1,16 @@
 {
     "name": "Asset",
     "alias": "asset",
-    "description": "Equipment and asset tracking — vacuums, chemicals, vehicles and consumables",
-    "keywords": ["asset", "equipment", "maintenance", "inventory", "consumables", "vehicle", "cleaning"],
+    "description": "Equipment and asset tracking \u2014 vacuums, chemicals, vehicles and consumables",
+    "keywords": [
+        "asset",
+        "equipment",
+        "maintenance",
+        "inventory",
+        "consumables",
+        "vehicle",
+        "cleaning"
+    ],
     "active": 1,
     "order": 2,
     "providers": [
@@ -47,5 +55,6 @@
             "sort_order": 47
         }
     ],
-    "sidebar_menu": true
+    "sidebar_menu": true,
+    "priority": 0
 }
