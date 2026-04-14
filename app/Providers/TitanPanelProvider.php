@@ -4,7 +4,9 @@ namespace App\Providers;
 
 use App\Filament\Pages\AutomationQueue;
 use App\Filament\Pages\CommandCentre;
+use App\Filament\Resources\ClientResource;
 use App\Filament\Resources\DocumentTemplateResource;
+use App\Filament\Resources\ProjectResource;
 use App\Filament\Pages\ScoutStatus;
 use App\Filament\Pages\SentinelApprovals;
 use App\Filament\Pages\SignalLogs;
@@ -99,6 +101,8 @@ class TitanPanelProvider extends PanelProvider
             ])
             ->resources([
                 DocumentTemplateResource::class,
+                ClientResource::class,
+                ProjectResource::class,
             ])
 
             // ----------------------------------------------------------------
@@ -153,7 +157,7 @@ class TitanPanelProvider extends PanelProvider
      */
     public static function getModuleNavigationGroups(): array
     {
-        $groups = ['Titan'];
+        $groups = ['Titan', 'CRM', 'Operations'];
 
         $modulesPath    = base_path('Modules');
         $extensionsPath = app_path('Extensions');
