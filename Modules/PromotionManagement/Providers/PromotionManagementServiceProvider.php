@@ -174,9 +174,9 @@ class PromotionManagementServiceProvider extends ServiceProvider
         $bladeCompiler = Blade::getFacadeRoot();
 
         if ($bladeCompiler && method_exists($bladeCompiler, 'includeIf')) {
-            Blade::includeIf('promotionmanagement::sections.sidebar', 'promotionmanagement_sidebar');
+            $bladeCompiler->includeIf('promotionmanagement::sections.sidebar', 'promotionmanagement_sidebar');
         } elseif ($bladeCompiler && method_exists($bladeCompiler, 'include') && view()->exists('promotionmanagement::sections.sidebar')) {
-            Blade::include('promotionmanagement::sections.sidebar', 'promotionmanagement_sidebar');
+            $bladeCompiler->include('promotionmanagement::sections.sidebar', 'promotionmanagement_sidebar');
         }
 
         view()->share('promotionManagementSidebarView', 'promotionmanagement::sections.sidebar');
