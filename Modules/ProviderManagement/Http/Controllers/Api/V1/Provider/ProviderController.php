@@ -22,7 +22,7 @@ use Modules\ProviderManagement\Entities\BankDetail;
 use Modules\ProviderManagement\Entities\Provider;
 use Modules\ProviderManagement\Entities\SubscribedService;
 use Modules\ReviewModule\Entities\Review;
-use Modules\SMSModule\Lib\SMS_gateway;
+use Modules\Sms\Lib\SMS_gateway;
 use Modules\TransactionModule\Entities\Account;
 use Modules\TransactionModule\Entities\Transaction;
 use Modules\UserManagement\Entities\Serviceman;

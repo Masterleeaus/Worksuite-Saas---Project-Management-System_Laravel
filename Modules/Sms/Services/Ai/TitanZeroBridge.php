@@ -29,7 +29,7 @@ class TitanZeroBridge
             $resp = $gw->ingestSignal($signal, is_numeric($tenantId) ? (int)$tenantId : null);
             return ['ok' => true, 'response' => $resp];
         } catch (\Throwable $e) {
-            Log::warning('[TitanAI] ingestSignal failed', ['module' => 'SMSModule', 'err' => $e->getMessage()]);
+            Log::warning('[TitanAI] ingestSignal failed', ['module' => 'Sms', 'err' => $e->getMessage()]);
             return ['ok' => false, 'reason' => $e->getMessage()];
         }
     }
@@ -48,7 +48,7 @@ class TitanZeroBridge
                 'input' => $context,
             ], is_numeric($tenantId) ? (int)$tenantId : null);
         } catch (\Throwable $e) {
-            Log::warning('[TitanAI] runAgent failed', ['module' => 'SMSModule', 'agent' => $agentSlug, 'err' => $e->getMessage()]);
+            Log::warning('[TitanAI] runAgent failed', ['module' => 'Sms', 'agent' => $agentSlug, 'err' => $e->getMessage()]);
             return null;
         }
     }

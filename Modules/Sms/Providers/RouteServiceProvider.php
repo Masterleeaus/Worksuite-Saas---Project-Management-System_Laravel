@@ -33,7 +33,7 @@ class RouteServiceProvider extends ServiceProvider
     }
 
     /**
-     * API routes — prefixed api/v1 (matches SMSModule convention).
+     * API routes — prefixed api/v1 (matches Sms convention).
      */
     protected function mapApiRoutes(): void
     {

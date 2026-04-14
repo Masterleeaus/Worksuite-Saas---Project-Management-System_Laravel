@@ -198,7 +198,7 @@ class SmsServiceProvider extends ServiceProvider
         }
 
         // ---------------------------------------------------------------
-        // SMSModule gateway lib: auto-require if present (backward compat)
+        // Sms gateway lib: auto-require if present (backward compat)
         // Ensures SMS_gateway helper class is available for legacy callers.
         // ---------------------------------------------------------------
         $gatewayLib = __DIR__ . '/../Lib/SMS_gateway.php';
@@ -239,7 +239,7 @@ class SmsServiceProvider extends ServiceProvider
             'sms::xss_ignore'
         );
 
-        // Automation/AI manifest (merged from SMSModule)
+        // Automation/AI manifest (merged from Sms)
         $this->mergeConfigFrom(__DIR__ . '/../Config/automation.php', 'sms.automation');
     }
 

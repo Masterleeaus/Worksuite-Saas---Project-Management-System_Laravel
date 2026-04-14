@@ -930,13 +930,7 @@ class HomeController extends Controller
             );
         }
 
-        if (!in_array('RestAPI', array_keys($plugins))) {
-            $message = 'Rest API module is not activated';
-        } elseif (!Module::has('RestAPI')) {
-            $message = 'Rest API module is not installed';
-        } elseif (((int)str_replace('.', '', $enableModules['RestAPI'])) < 110) {
-            $message = 'Please update Rest API module greater then 1.1.0 version';
-        } elseif (((int)str_replace('.', '', $enableModules['worksuite'])) < 400) {
+        if (((int)str_replace('.', '', $enableModules['worksuite'])) < 400) {
             $message = 'Please update' . config('app.name') . ' greater then 4.0.0 version';
         }
 

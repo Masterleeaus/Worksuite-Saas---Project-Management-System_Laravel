@@ -56,19 +56,6 @@ return [
         'TitanHello'           => ['TitanCore'],
         'TitanZero'            => ['TitanCore'],
 
-        // Business modules that need GlobalSetting seeded first
-        'Payroll'              => ['GlobalSetting'],
-        'Zoom'                 => ['GlobalSetting'],
-        'Subdomain'            => ['GlobalSetting'],
-        'Affiliate'            => ['GlobalSetting'],
-        'BookingModule'        => ['GlobalSetting'],
-        'PaymentModule'        => ['GlobalSetting'],
-        'BusinessSettingsModule' => ['GlobalSetting'],
-        'ServiceManagement'    => ['GlobalSetting'],
-        'ServicemanModule'     => ['GlobalSetting'],
-        'ProviderManagement'   => ['GlobalSetting'],
-        'PromotionManagement'  => ['GlobalSetting'],
-
         // QualityControl re-uses Inspection tables — Inspection must run first
         'QualityControl'       => ['Inspection'],
     ],
@@ -82,7 +69,6 @@ return [
     */
 
     'order' => [
-        'GlobalSetting',
         'Accounting',
         'Inspection',
         'FSMCore',
@@ -105,10 +91,8 @@ return [
         'TitanZero',
         'QualityControl',
         'Payroll',
-        'Zoom',
         'Subdomain',
         'BookingModule',
-        'PaymentModule',
         'BusinessSettingsModule',
         'Affiliate',
         'ServiceManagement',
