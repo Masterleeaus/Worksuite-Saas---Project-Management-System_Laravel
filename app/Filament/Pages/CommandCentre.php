@@ -3,10 +3,12 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Widgets\ActivityFeedWidget;
+use App\Filament\Widgets\ActiveProjectsWidget;
 use App\Filament\Widgets\JobsTodayWidget;
 use App\Filament\Widgets\RevenueWidget;
 use App\Filament\Widgets\SystemSignalsWidget;
 use App\Filament\Widgets\TitanChatWidget;
+use App\Filament\Widgets\TotalClientsWidget;
 
 /**
  * CommandCentre
@@ -43,6 +45,8 @@ class CommandCentre extends TitanPage
             RevenueWidget::class,
             ActivityFeedWidget::class,
             TitanChatWidget::class,
+            TotalClientsWidget::class,
+            ActiveProjectsWidget::class,
         ];
     }
 }
