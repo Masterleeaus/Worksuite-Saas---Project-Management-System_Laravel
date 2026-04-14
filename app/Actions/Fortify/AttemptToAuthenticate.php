@@ -168,6 +168,10 @@ class AttemptToAuthenticate
 
         $attendanceSettings = $this->attendanceShift($showClockIn, $authUser->id, $authUser->company);
 
+        if (is_null($attendanceSettings)) {
+            return false;
+        }
+
         $startTimestamp = now()->format('Y-m-d') . ' ' . $attendanceSettings->office_start_time;
         $endTimestamp = now()->format('Y-m-d') . ' ' . $attendanceSettings->office_end_time;
         $officeStartTime = Carbon::createFromFormat('Y-m-d H:i:s', $startTimestamp, $globalSetting->timezone);
@@ -241,6 +245,11 @@ class AttemptToAuthenticate
         $showClockIn = AttendanceSetting::where('company_id', $company->company_id)->first();
         $globalSetting = GlobalSetting::first();
         $attendanceSettings = $this->attendanceShift($showClockIn, $authUser, $authUserCompany->company);
+
+        if (is_null($attendanceSettings)) {
+            return Reply::error(__('messages.permissionDenied'));
+        }
+
         $attendanceUser = User::find($authUser);
 
         $startTimestamp = now()->format('Y-m-d') . ' ' . $attendanceSettings->office_start_time;
@@ -403,12 +412,19 @@ class AttemptToAuthenticate
             ->where('date', now($company->timezone)->toDateString())
             ->first();
 
-        $backDayFromDefault = Carbon::parse(now($company->timezone)->subDay()->format('Y-m-d') . ' ' . $defaultAttendanceSettings->office_start_time);
+        $backDayFromDefault = null;
+        $backDayToDefault = null;
+        $hasDefaultAttendanceWindow = !is_null($defaultAttendanceSettings)
+            && !is_null($defaultAttendanceSettings->office_start_time)
+            && !is_null($defaultAttendanceSettings->office_end_time);
 
-        $backDayToDefault = Carbon::parse(now($company->timezone)->subDay()->format('Y-m-d') . ' ' . $defaultAttendanceSettings->office_end_time);
+        if ($hasDefaultAttendanceWindow) {
+            $backDayFromDefault = Carbon::parse(now($company->timezone)->subDay()->format('Y-m-d') . ' ' . $defaultAttendanceSettings->office_start_time);
+            $backDayToDefault = Carbon::parse(now($company->timezone)->subDay()->format('Y-m-d') . ' ' . $defaultAttendanceSettings->office_end_time);
 
-        if ($backDayFromDefault->gt($backDayToDefault)) {
-            $backDayToDefault->addDay();
+            if ($backDayFromDefault->gt($backDayToDefault)) {
+                $backDayToDefault->addDay();
+            }
         }
 
         $nowTime = Carbon::createFromFormat('Y-m-d H:i:s', now($company->timezone)->toDateTimeString(), 'UTC');
@@ -417,7 +433,7 @@ class AttemptToAuthenticate
             $attendanceSettings = $checkPreviousDayShift;
 
         }
-        else if ($nowTime->betweenIncluded($backDayFromDefault, $backDayToDefault)) {
+        else if ($hasDefaultAttendanceWindow && $nowTime->betweenIncluded($backDayFromDefault, $backDayToDefault)) {
             $attendanceSettings = $defaultAttendanceSettings;
 
         }
@@ -435,8 +451,11 @@ class AttemptToAuthenticate
             $attendanceSettings = $checkTodayShift;
         }
         else {
+            $attendanceSettings = $defaultAttendanceSettings ?? $checkTodayShift ?? $checkPreviousDayShift;
+        }
 
-            $attendanceSettings = $defaultAttendanceSettings;
+        if (is_null($attendanceSettings)) {
+            return null;
         }
 
         if (isset($attendanceSettings->shift)) {
