@@ -11,5 +11,9 @@ class BlogsDatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call([
+            BlogsModuleInstallSeeder::class,
+            BlogsPermissionSeeder::class,
+        ]);
     }
 }

@@ -1,0 +1,11 @@
+{
+  "module": "blogs",
+  "version": "1.0.0",
+  "signals": [
+    "blog.post.created",
+    "blog.post.updated",
+    "blog.post.published",
+    "blog.comment.created",
+    "blog.category.created"
+  ]
+}

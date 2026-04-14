@@ -29,7 +29,7 @@ class BlogsServiceProvider extends ServiceProvider
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
-        $this->loadMigrationsFrom(module_path($this->name, 'Database/migrations'));
+        $this->loadMigrationsFrom(module_path($this->name, 'Database/Migrations'));
     }
 
     /**
@@ -63,13 +63,14 @@ class BlogsServiceProvider extends ServiceProvider
     public function registerTranslations(): void
     {
         $langPath = resource_path('lang/modules/'.$this->nameLower);
+        $moduleLangPath = module_path($this->name, 'Resources/lang');
 
         if (is_dir($langPath)) {
             $this->loadTranslationsFrom($langPath, $this->nameLower);
             $this->loadJsonTranslationsFrom($langPath);
         } else {
-            $this->loadTranslationsFrom(module_path($this->name, 'lang'), $this->nameLower);
-            $this->loadJsonTranslationsFrom(module_path($this->name, 'lang'));
+            $this->loadTranslationsFrom($moduleLangPath, $this->nameLower);
+            $this->loadJsonTranslationsFrom($moduleLangPath);
         }
     }
 

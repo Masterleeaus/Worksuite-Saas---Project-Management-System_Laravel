@@ -16,9 +16,14 @@ return new class extends Migration
         }
         Schema::create('blog_categories', function (Blueprint $table) {
             $table->id();
+            $table->unsignedInteger('company_id')->nullable()->index();
             $table->string('name');
             $table->string('slug');
             $table->boolean('status')->default(true);
+            $table->unsignedInteger('language_id')->nullable()->index();
+            $table->unsignedBigInteger('parent_id')->default(0)->index();
+            $table->unsignedInteger('created_by')->nullable()->index();
+            $table->unsignedInteger('updated_by')->nullable()->index();
             $table->timestamps();
             $table->softDeletes();
         });

@@ -17,9 +17,9 @@
     },
     "autoload": {
         "psr-4": {
-            "Modules\\Blogs\\": "app/",
-            "Modules\\Blogs\\Database\\Factories\\": "database/factories/",
-            "Modules\\Blogs\\Database\\Seeders\\": "database/seeders/"
+            "Modules\\Blogs\\": "",
+            "Modules\\Blogs\\Database\\Factories\\": "Database/factories/",
+            "Modules\\Blogs\\Database\\Seeders\\": "Database/Seeders/"
         }
     },
     "autoload-dev": {
