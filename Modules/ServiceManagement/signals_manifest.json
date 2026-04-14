@@ -1,0 +1,9 @@
+{
+  "module": "servicemanagement",
+  "version": "1.0.1",
+  "signals": [
+    "service_management.service_created",
+    "service_management.service_updated",
+    "service_management.service_request_created"
+  ]
+}

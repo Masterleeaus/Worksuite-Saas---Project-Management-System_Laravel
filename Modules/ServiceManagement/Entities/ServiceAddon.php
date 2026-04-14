@@ -5,9 +5,11 @@ namespace Modules\ServiceManagement\Entities;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\ServiceManagement\Traits\CompanyScoped;
 
 class ServiceAddon extends Model
 {
+    use CompanyScoped;
     use SoftDeletes;
 
     protected $table = 'service_addons';
@@ -17,6 +19,7 @@ class ServiceAddon extends Model
         'price',
         'duration_extra',
         'service_id',
+        'company_id',
         'is_active',
     ];
 
@@ -28,6 +31,6 @@ class ServiceAddon extends Model
 
     public function service(): BelongsTo
     {
-        return $this->belongsTo(Service::class, 'service_id', 'id')->withoutGlobalScopes();
+        return $this->belongsTo(Service::class, 'service_id', 'id');
     }
 }

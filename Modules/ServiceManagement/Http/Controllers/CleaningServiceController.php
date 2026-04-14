@@ -33,7 +33,7 @@ class CleaningServiceController extends Controller
 
     public function index(Request $request): View
     {
-        $services = Service::withoutGlobalScopes()
+        $services = Service::query()
             ->when($request->filled('search'), fn ($q) => $q->where('name', 'like', '%' . $request->search . '%'))
             ->when($request->filled('status'), fn ($q) => $q->where('is_active', $request->status))
             ->when($request->filled('frequency'), fn ($q) => $q->where('frequency', $request->frequency))
@@ -91,14 +91,14 @@ class CleaningServiceController extends Controller
 
     public function show(string $id): View
     {
-        $service = Service::withoutGlobalScopes()->with(['addons', 'pricingRules'])->findOrFail($id);
+        $service = Service::with(['addons', 'pricingRules'])->findOrFail($id);
 
         return view('servicemanagement::cleaning.show', compact('service'));
     }
 
     public function edit(string $id): View
     {
-        $service     = Service::withoutGlobalScopes()->findOrFail($id);
+        $service     = Service::findOrFail($id);
         $categories  = $this->getCategories();
         $zones        = $this->getZones();
 
@@ -113,7 +113,7 @@ class CleaningServiceController extends Controller
 
     public function update(Request $request, string $id): RedirectResponse
     {
-        $service = Service::withoutGlobalScopes()->findOrFail($id);
+        $service = Service::findOrFail($id);
 
         $validated = $request->validate([
             'name'              => 'required|string|max:191',
@@ -146,7 +146,7 @@ class CleaningServiceController extends Controller
 
     public function destroy(string $id): RedirectResponse
     {
-        $service = Service::withoutGlobalScopes()->findOrFail($id);
+        $service = Service::findOrFail($id);
         $service->delete();
 
         session()->flash('success', __('app.serviceDeletedSuccessfully', [], 'Service deleted successfully.'));
@@ -156,7 +156,7 @@ class CleaningServiceController extends Controller
 
     public function toggleActive(string $id): RedirectResponse
     {
-        $service            = Service::withoutGlobalScopes()->findOrFail($id);
+        $service            = Service::findOrFail($id);
         $service->is_active = ! $service->is_active;
         $service->save();
 

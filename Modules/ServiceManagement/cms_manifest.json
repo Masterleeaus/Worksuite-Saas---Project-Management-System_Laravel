@@ -1,0 +1,14 @@
+{
+  "module": "servicemanagement",
+  "version": "1.0.1",
+  "surfaces": {
+    "services_catalog": {
+      "endpoint": "/api/v1/customer/service",
+      "route_group": "customer.service"
+    },
+    "company_services_admin": {
+      "endpoint": "/account/services",
+      "route_name": "services.index"
+    }
+  }
+}

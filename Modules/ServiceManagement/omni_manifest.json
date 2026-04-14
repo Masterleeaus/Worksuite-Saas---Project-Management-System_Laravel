@@ -1,0 +1,10 @@
+{
+  "module": "servicemanagement",
+  "version": "1.0.1",
+  "channels": [
+    "web",
+    "api",
+    "worker_app",
+    "customer_app"
+  ]
+}

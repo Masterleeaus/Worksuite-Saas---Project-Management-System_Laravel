@@ -42,6 +42,10 @@ Route::group(['prefix' => 'serviceman', 'as' => 'serviceman.', 'namespace' => 'A
 
 });
 
+Route::group(['prefix' => 'worker', 'as' => 'worker.', 'namespace' => 'Api\V1\Worker', 'middleware' => ['auth:api']], function () {
+    Route::get('service/data/sub-category-wise', [ServicemanServiceController::class, 'servicesBySubcategory']);
+});
+
 Route::group(['prefix' => 'customer', 'as' => 'customer.', 'namespace' => 'Api\V1\Customer'], function () {
 
     Route::group(['prefix' => 'favorite', 'as' => 'favorite.', 'middleware' => ['auth:api']], function () {

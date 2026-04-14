@@ -24,7 +24,7 @@ class ServicePricingController extends Controller
             ->paginate(20)
             ->withQueryString();
 
-        $services = Service::withoutGlobalScopes()->where('is_active', 1)->get(['id', 'name']);
+        $services = Service::where('is_active', 1)->get(['id', 'name']);
         $zones     = $this->getZones();
 
         return view('servicemanagement::pricing.index', compact('rules', 'services', 'zones'));
@@ -32,7 +32,7 @@ class ServicePricingController extends Controller
 
     public function create(): View
     {
-        $services = Service::withoutGlobalScopes()->where('is_active', 1)->get(['id', 'name']);
+        $services = Service::where('is_active', 1)->get(['id', 'name']);
         $zones     = $this->getZones();
 
         return view('servicemanagement::pricing.create', compact('services', 'zones'));
@@ -63,7 +63,7 @@ class ServicePricingController extends Controller
     public function edit(string $id): View
     {
         $rule     = ServicePricingRule::findOrFail($id);
-        $services = Service::withoutGlobalScopes()->where('is_active', 1)->get(['id', 'name']);
+        $services = Service::where('is_active', 1)->get(['id', 'name']);
         $zones     = $this->getZones();
 
         return view('servicemanagement::pricing.edit', compact('rule', 'services', 'zones'));

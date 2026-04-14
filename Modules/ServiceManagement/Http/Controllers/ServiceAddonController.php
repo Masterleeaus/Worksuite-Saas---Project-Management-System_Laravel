@@ -29,14 +29,14 @@ class ServiceAddonController extends Controller
             ->paginate(20)
             ->withQueryString();
 
-        $services = Service::withoutGlobalScopes()->where('is_active', 1)->get(['id', 'name']);
+        $services = Service::where('is_active', 1)->get(['id', 'name']);
 
         return view('servicemanagement::addons.index', compact('addons', 'services'));
     }
 
     public function create(): View
     {
-        $services        = Service::withoutGlobalScopes()->where('is_active', 1)->get(['id', 'name']);
+        $services        = Service::where('is_active', 1)->get(['id', 'name']);
         $predefinedAddons = self::PREDEFINED_ADDONS;
 
         return view('servicemanagement::addons.create', compact('services', 'predefinedAddons'));
@@ -64,7 +64,7 @@ class ServiceAddonController extends Controller
     public function edit(string $id): View
     {
         $addon    = ServiceAddon::findOrFail($id);
-        $services = Service::withoutGlobalScopes()->where('is_active', 1)->get(['id', 'name']);
+        $services = Service::where('is_active', 1)->get(['id', 'name']);
 
         return view('servicemanagement::addons.edit', compact('addon', 'services'));
     }
