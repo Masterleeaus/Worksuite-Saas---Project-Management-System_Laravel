@@ -3,5 +3,5 @@
 $routes = module_path('Faq', 'Routes/api.php');
 
 if (file_exists($routes)) {
-    require $routes;
+    require_once $routes;
 }
