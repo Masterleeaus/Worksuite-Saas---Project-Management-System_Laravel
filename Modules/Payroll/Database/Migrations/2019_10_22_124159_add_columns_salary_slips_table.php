@@ -13,17 +13,16 @@ return new class extends Migration
      */
     public function up()
     {
-        if (Schema::hasTable('salary_payment_methods')) {
-            return;
+        if (! Schema::hasTable('salary_payment_methods')) {
+            Schema::create('salary_payment_methods', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('payment_method');
+                $table->boolean('default');
+                $table->timestamps();
+            });
         }
-        Schema::create('salary_payment_methods', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string('payment_method');
-            $table->boolean('default');
-            $table->timestamps();
-        });
 
-        if (!Schema::hasColumn('salary_slips', 'salary_json')) {
+        if (Schema::hasTable('salary_slips') && !Schema::hasColumn('salary_slips', 'salary_json')) {
             Schema::table('salary_slips', function (Blueprint $table) {
                 $table->text('salary_json')->nullable();
                 $table->text('extra_json')->nullable();

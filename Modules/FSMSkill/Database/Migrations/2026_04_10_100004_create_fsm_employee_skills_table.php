@@ -12,6 +12,10 @@ return new class extends Migration {
         }
 
         // Skills assigned to individual workers/cleaners
+        if (Schema::hasTable('fsm_employee_skills')) {
+            return;
+        }
+        
         Schema::create('fsm_employee_skills', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();

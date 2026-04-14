@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('employee_details')) {
+            return;
+        }
+        
         Schema::table('employee_details', function (Blueprint $table) {
             if (!Schema::hasColumn('employee_details', 'police_check_date')) {
                 $table->date('police_check_date')->nullable()->after('about_me');
@@ -41,6 +45,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (! Schema::hasTable('employee_details')) {
+            return;
+        }
+        
         Schema::table('employee_details', function (Blueprint $table) {
             $cols = ['police_check_date', 'police_check_expiry', 'insurance_expiry', 'wwcc_expiry', 'abn', 'max_jobs_per_day', 'is_subcontractor', 'fsm_zone_ids', 'star_rating'];
             $toDrop = array_filter($cols, fn($col) => Schema::hasColumn('employee_details', $col));

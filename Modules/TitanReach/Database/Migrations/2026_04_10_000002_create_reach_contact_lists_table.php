@@ -21,12 +21,14 @@ return new class extends Migration {
             $table->softDeletes();
         });
 
-        Schema::create('reach_contact_list_contact', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('contact_list_id')->index();
-            $table->unsignedBigInteger('contact_id')->index();
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('reach_contact_list_contact')) {
+            Schema::create('reach_contact_list_contact', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('contact_list_id')->index();
+                $table->unsignedBigInteger('contact_id')->index();
+                $table->timestamps();
+            });
+        }
     }
 
     public function down(): void

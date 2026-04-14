@@ -31,6 +31,10 @@ return new class extends Migration
 
         $newSetting->saveQuietly();
 
+        if (! Schema::hasTable('payroll_settings')) {
+            return;
+        }
+        
         Schema::table('payroll_settings', function (Blueprint $table) {
             $table->dropColumn(['purchase_code']);
         });
@@ -46,6 +50,10 @@ return new class extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('zoom_setting')) {
+            return;
+        }
+        
         Schema::table('zoom_setting', function (Blueprint $table) {
             $table->dropColumn(['purchase_code', 'supported_until']);
         });

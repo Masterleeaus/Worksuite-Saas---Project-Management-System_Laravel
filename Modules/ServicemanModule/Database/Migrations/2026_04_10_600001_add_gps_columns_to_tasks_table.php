@@ -24,6 +24,10 @@ return new class extends Migration {
 
     public function down(): void
     {
+        if (! Schema::hasTable('tasks')) {
+            return;
+        }
+        
         Schema::table('tasks', function (Blueprint $table) {
             $table->dropColumn([
                 'checkin_lat',

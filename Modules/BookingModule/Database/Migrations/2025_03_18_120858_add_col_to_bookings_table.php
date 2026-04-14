@@ -25,7 +25,9 @@ return new class extends Migration
         }
 
         Schema::table('bookings', function (Blueprint $table) {
-            $table->text('service_address_location')->nullable();
+            if (! Schema::hasColumn('bookings', 'service_address_location')) {
+                $table->text('service_address_location')->nullable();
+            }
         });
     }
 

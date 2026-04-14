@@ -20,6 +20,10 @@ return new class extends Migration
     public function up()
     {
         if (!Schema::hasColumn('application_sources', 'is_predefined')) {
+            if (! Schema::hasTable('application_sources')) {
+                return;
+            }
+            
             Schema::table('application_sources', function (Blueprint $table) {
                 $table->boolean('is_predefined')->default(true);
             });

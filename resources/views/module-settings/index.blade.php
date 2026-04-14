@@ -1,3 +1,4 @@
+@includeIf('module-settings.partials.doctor-summary')
 @extends('layouts.app')
 
 @section('content')
@@ -161,3 +162,5 @@
 
     </script>
 @endpush
+
+@includeIf('module-settings.partials.menu-truth-summary')

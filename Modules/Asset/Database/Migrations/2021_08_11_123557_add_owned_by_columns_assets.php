@@ -19,15 +19,27 @@ return new class extends Migration
     public function up()
     {
         if (! Schema::hasColumn('assets', 'value')) {
+            if (! Schema::hasTable('assets')) {
+                return;
+            }
+            
             Schema::table('assets', function (Blueprint $table) {
 
-                $table->string('value')->nullable();
-                $table->string('location')->nullable();
+                if (! Schema::hasColumn('assets', 'value')) {
+                    $table->string('value')->nullable();
+                }
+                if (! Schema::hasColumn('assets', 'location')) {
+                    $table->string('location')->nullable();
+                }
 
-                $table->integer('added_by')->unsigned()->nullable();
+                if (! Schema::hasColumn('assets', 'added_by')) {
+                    $table->integer('added_by')->unsigned()->nullable();
+                }
                 $table->foreign('added_by')->references('id')->on('users')->onDelete('SET NULL')->onUpdate('cascade');
 
-                $table->integer('last_updated_by')->unsigned()->nullable();
+                if (! Schema::hasColumn('assets', 'last_updated_by')) {
+                    $table->integer('last_updated_by')->unsigned()->nullable();
+                }
                 $table->foreign('last_updated_by')->references('id')->on('users')->onDelete('SET NULL')->onUpdate('cascade');
             });
         }

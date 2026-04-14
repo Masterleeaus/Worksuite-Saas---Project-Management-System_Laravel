@@ -20,7 +20,9 @@ return new class extends Migration
             return;
         }
         Schema::table('booking_status_histories', function (Blueprint $table) {
-            $table->foreignUuid('booking_repeat_id')->nullable();
+            if (! Schema::hasColumn('booking_status_histories', 'booking_repeat_id')) {
+                $table->foreignUuid('booking_repeat_id')->nullable();
+            }
         });
     }
 

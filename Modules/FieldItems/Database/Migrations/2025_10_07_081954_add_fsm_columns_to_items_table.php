@@ -46,6 +46,10 @@ return new class extends Migration
     public function up(): void
     {
         // 1) Add new scalar columns if they don't exist
+        if (! Schema::hasTable('items')) {
+            return;
+        }
+        
         Schema::table('items', function (Blueprint $table) {
             if (!Schema::hasColumn('items', 'fsm_cost')) {
                 $table->decimal('fsm_cost', 12, 2)->nullable()->after('price');
@@ -61,12 +65,18 @@ return new class extends Migration
         // 2) Add supplier FK column with a type that matches suppliers.id
         $isBig = $this->suppliersIdIsBigint();
 
+        if (! Schema::hasTable('items')) {
+            return;
+        }
+        
         Schema::table('items', function (Blueprint $table) use ($isBig) {
             if (!Schema::hasColumn('items', 'fsm_default_supplier_id')) {
                 if ($isBig) {
                     $table->unsignedBigInteger('fsm_default_supplier_id')->nullable()->after('fsm_unit');
                 } else {
-                    $table->unsignedInteger('fsm_default_supplier_id')->nullable()->after('fsm_unit');
+                    if (! Schema::hasColumn('items', 'fsm_default_supplier_id')) {
+                        $table->unsignedInteger('fsm_default_supplier_id')->nullable()->after('fsm_unit');
+                    }
                 }
             }
         });
@@ -95,6 +105,10 @@ return new class extends Migration
 
         // 4) Add the foreign key if missing
         if (!$this->hasForeignKey('items', 'items_fsm_default_supplier_id_foreign')) {
+            if (! Schema::hasTable('items')) {
+                return;
+            }
+            
             Schema::table('items', function (Blueprint $table) {
                 // ensure suppliers table exists before adding FK
                 if (Schema::hasTable('suppliers')) {
@@ -110,12 +124,20 @@ return new class extends Migration
     {
         // Drop FK if present
         if ($this->hasForeignKey('items', 'items_fsm_default_supplier_id_foreign')) {
+            if (! Schema::hasTable('items')) {
+                return;
+            }
+            
             Schema::table('items', function (Blueprint $table) {
                 $table->dropForeign('items_fsm_default_supplier_id_foreign');
             });
         }
 
         // Drop columns if present
+        if (! Schema::hasTable('items')) {
+            return;
+        }
+        
         Schema::table('items', function (Blueprint $table) {
             if (Schema::hasColumn('items', 'fsm_default_supplier_id')) {
                 $table->dropColumn('fsm_default_supplier_id');

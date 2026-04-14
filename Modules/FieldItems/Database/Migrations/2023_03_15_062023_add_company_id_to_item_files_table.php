@@ -28,6 +28,10 @@ return new class extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('item_files')) {
+            return;
+        }
+        
         Schema::table('item_files', function (Blueprint $table) {
                 $table->dropForeign(['company_id']);
                 $table->dropColumn('company_id');

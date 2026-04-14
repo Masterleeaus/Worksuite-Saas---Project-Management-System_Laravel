@@ -12,6 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('client_details')) {
+            return;
+        }
+        
         Schema::table('client_details', function (Blueprint $table) {
             if (! Schema::hasColumn('client_details', 'preferred_cleaner_id')) {
                 $table->unsignedBigInteger('preferred_cleaner_id')->nullable()->after('sub_category_id');
@@ -44,6 +48,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (! Schema::hasTable('client_details')) {
+            return;
+        }
+        
         Schema::table('client_details', function (Blueprint $table) {
             foreach (['preferred_cleaner_id', 'key_holding', 'pet_info', 'alarm_code', 'access_notes', 'client_tag'] as $column) {
                 if (Schema::hasColumn('client_details', $column)) {

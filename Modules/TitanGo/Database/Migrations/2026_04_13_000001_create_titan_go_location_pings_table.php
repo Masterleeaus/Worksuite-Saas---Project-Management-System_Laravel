@@ -14,6 +14,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('titan_go_location_pings')) {
+            return;
+        }
+        
         Schema::create('titan_go_location_pings', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('company_id');

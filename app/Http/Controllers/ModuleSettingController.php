@@ -6,15 +6,18 @@ use App\Helper\Reply;
 use App\Models\ModuleSetting;
 use Illuminate\Http\Request;
 
-class ModuleSettingController extends AccountBaseController
+class ModuleSettingController extends Controller
 {
 
     public function __construct()
     {
-        parent::__construct();
         $this->pageTitle = 'app.menu.moduleSettings';
         $this->activeSettingMenu = 'module_settings';
         $this->middleware(function ($request, $next) {
+            if (!auth()->check()) {
+                return redirect()->route('login');
+            }
+
             abort_403(!(user()->permission('manage_module_setting') == 'all'));
             return $next($request);
         });
@@ -28,7 +31,7 @@ class ModuleSettingController extends AccountBaseController
         $this->modulesData = match ($tab) {
             'employee' => ModuleSetting::where('module_name', '<>', 'settings')->where('is_allowed', 1)->where('type', 'employee')->get(),
             'client' => ModuleSetting::where('module_name', '<>', 'settings')->where('is_allowed', 1)->where('type', 'client')->get(),
-            default => ModuleSetting::where('module_name', '<>', 'settings')->where('is_allowed', 1)->where('type', 'admin')->get(),
+            default => ModuleSetting::where('module_name', '<>', 'settings')->where('is_allowed', 1)->where('type', 'admin')->orderBy('module_name')->get(),
         };
 
         $this->view = 'module-settings.ajax.modules';

@@ -20,7 +20,9 @@ return new class extends Migration
             return;
         }
         Schema::table('bookings', function (Blueprint $table) {
-            $table->foreignUuid('serviceman_id')->nullable();
+            if (! Schema::hasColumn('bookings', 'serviceman_id')) {
+                $table->foreignUuid('serviceman_id')->nullable();
+            }
         });
     }
 

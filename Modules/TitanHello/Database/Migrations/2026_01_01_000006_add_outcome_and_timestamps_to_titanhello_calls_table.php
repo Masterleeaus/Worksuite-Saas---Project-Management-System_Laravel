@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (! Schema::hasTable('titanhello_calls')) {
+            return;
+        }
+        
         Schema::table('titanhello_calls', function (Blueprint $table) {
             if (!Schema::hasColumn('titanhello_calls', 'call_outcome')) {
                 $table->string('call_outcome')->nullable()->after('status'); // answered|missed|failed|voicemail
@@ -28,6 +32,10 @@ return new class extends Migration {
 
     public function down(): void
     {
+        if (! Schema::hasTable('titanhello_calls')) {
+            return;
+        }
+        
         Schema::table('titanhello_calls', function (Blueprint $table) {
             foreach (['missed_reason','ring_duration','ended_at','answered_at','call_outcome'] as $col) {
                 if (Schema::hasColumn('titanhello_calls', $col)) {
