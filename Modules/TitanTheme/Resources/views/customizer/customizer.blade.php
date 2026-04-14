@@ -18,8 +18,11 @@
         return;
     }
 
-    $canManageThemeSettings = in_array(user()->permission('manage_theme_settings'), ['all', 'added', 'owned', 'both'], true)
-        || user()->permission('manage_theme_setting') === 'all';
+    $canManageThemeSettings = in_array('titantheme', user_modules(), true)
+        && (
+            in_array(user()->permission('manage_theme_settings'), ['all', 'added', 'owned', 'both'], true)
+            || user()->permission('manage_theme_setting') === 'all'
+        );
 
     if (!$canManageThemeSettings) {
         return;

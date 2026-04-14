@@ -120,11 +120,13 @@ class MegaMenuController extends AccountBaseController
 
     protected function canViewMegaMenu(): bool
     {
-        return in_array($this->user->permission('view_mega_menu'), ['all', 'added', 'owned', 'both'], true);
+        return in_array('titantheme', user_modules(), true)
+            && in_array($this->user->permission('view_mega_menu'), ['all', 'added', 'owned', 'both'], true);
     }
 
     protected function canManageMegaMenu(): bool
     {
-        return in_array($this->user->permission('manage_mega_menu'), ['all', 'added', 'owned', 'both'], true);
+        return in_array('titantheme', user_modules(), true)
+            && in_array($this->user->permission('manage_mega_menu'), ['all', 'added', 'owned', 'both'], true);
     }
 }

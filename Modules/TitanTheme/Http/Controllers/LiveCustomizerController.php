@@ -121,25 +121,40 @@ class LiveCustomizerController extends AccountBaseController
         abort_403(!$this->canManageThemeSettings());
 
         if (Helper::appIsNotDemo()) {
+            $data = $request->validate([
+                'style' => 'nullable|string|max:50000',
+                'fonts' => 'nullable|array',
+                'fonts.fontBody' => 'nullable|string|max:100',
+                'fonts.fontHeading' => 'nullable|string|max:100',
+                'clear' => 'nullable|boolean',
+                'header_color' => 'nullable|string|max:20',
+                'sidebar_theme' => 'nullable|in:dark,light',
+                'sidebar_color' => 'nullable|string|max:20',
+                'sidebar_text_color' => 'nullable|string|max:20',
+                'link_color' => 'nullable|string|max:20',
+                'enable_rounded_theme' => 'nullable|boolean',
+                'user_css' => 'nullable|string|max:50000',
+            ]);
+
             $dashTheme = setting('dash_theme') ?? 'default';
 
             setting([
-                $dashTheme . '_live_customizer'       => $request->get('style'),
-                $dashTheme . '_live_customizer_fonts' => $request->get('fonts'),
+                $dashTheme . '_live_customizer'       => $data['style'] ?? null,
+                $dashTheme . '_live_customizer_fonts' => $data['fonts'] ?? null,
                 'show_live_customizer'                => 0,
             ])->save();
 
             $this->themeService->applyOfficialThemeSettings([
-                'header_color' => $request->get('header_color'),
-                'sidebar_theme' => $request->get('sidebar_theme'),
-                'sidebar_color' => $request->get('sidebar_color'),
-                'sidebar_text_color' => $request->get('sidebar_text_color'),
-                'link_color' => $request->get('link_color'),
+                'header_color' => $data['header_color'] ?? null,
+                'sidebar_theme' => $data['sidebar_theme'] ?? null,
+                'sidebar_color' => $data['sidebar_color'] ?? null,
+                'sidebar_text_color' => $data['sidebar_text_color'] ?? null,
+                'link_color' => $data['link_color'] ?? null,
                 'enable_rounded_theme' => $request->boolean('enable_rounded_theme'),
-                'user_css' => $request->get('user_css') ?: $request->get('style'),
+                'user_css' => $data['user_css'] ?? ($data['style'] ?? null),
             ]);
 
-            $message = $request->get('clear')
+            $message = $request->boolean('clear')
                 ? __('titantheme::titantheme.changes_discarded')
                 : __('titantheme::titantheme.theme_updated');
 
@@ -157,8 +172,9 @@ class LiveCustomizerController extends AccountBaseController
 
     protected function canManageThemeSettings(): bool
     {
-        $hasPermission = in_array($this->user->permission('manage_theme_settings'), ['all', 'added', 'owned', 'both'], true)
-            || $this->user->permission('manage_theme_setting') === 'all';
+        $hasPermission = in_array('titantheme', user_modules(), true)
+            && (in_array($this->user->permission('manage_theme_settings'), ['all', 'added', 'owned', 'both'], true)
+            || $this->user->permission('manage_theme_setting') === 'all');
 
         if (!$hasPermission) {
             return false;

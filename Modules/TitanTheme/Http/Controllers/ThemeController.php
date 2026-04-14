@@ -4,6 +4,8 @@ namespace Modules\TitanTheme\Http\Controllers;
 
 use App\Helper\Reply;
 use App\Http\Controllers\AccountBaseController;
+use App\Models\ThemeSetting;
+use App\Scopes\CompanyScope;
 use Illuminate\Http\Request;
 use Modules\TitanTheme\Models\ThemePreset;
 use Modules\TitanTheme\Services\ThemeService;
@@ -169,13 +171,34 @@ class ThemeController extends AccountBaseController
 
     protected function canViewThemeSettings(): bool
     {
-        return in_array($this->user->permission('view_theme_settings'), ['all', 'added', 'owned', 'both'], true)
-            || $this->user->permission('manage_theme_setting') === 'all';
+        return in_array('titantheme', user_modules(), true)
+            && (
+                in_array($this->user->permission('view_theme_settings'), ['all', 'added', 'owned', 'both'], true)
+                || $this->user->permission('manage_theme_setting') === 'all'
+            );
     }
 
     protected function canManageThemeSettings(): bool
     {
-        return in_array($this->user->permission('manage_theme_settings'), ['all', 'added', 'owned', 'both'], true)
-            || $this->user->permission('manage_theme_setting') === 'all';
+        $hasPermission = in_array('titantheme', user_modules(), true)
+            && (
+                in_array($this->user->permission('manage_theme_settings'), ['all', 'added', 'owned', 'both'], true)
+                || $this->user->permission('manage_theme_setting') === 'all'
+            );
+
+        if (!$hasPermission) {
+            return false;
+        }
+
+        $superAdminThemeSetting = ThemeSetting::withoutGlobalScope(CompanyScope::class)
+            ->where('panel', 'superadmin')
+            ->whereNull('company_id')
+            ->first();
+
+        if (!$superAdminThemeSetting || !$superAdminThemeSetting->restrict_admin_theme_change) {
+            return true;
+        }
+
+        return (bool) ($this->user->is_superadmin ?? false);
     }
 }

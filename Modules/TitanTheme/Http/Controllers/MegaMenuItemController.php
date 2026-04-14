@@ -5,6 +5,7 @@ namespace Modules\TitanTheme\Http\Controllers;
 use App\Helper\Reply;
 use App\Http\Controllers\AccountBaseController;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Modules\TitanTheme\Models\MegaMenu;
 use Modules\TitanTheme\Models\MegaMenuItem;
 
@@ -26,7 +27,12 @@ class MegaMenuItemController extends AccountBaseController
         $menu = MegaMenu::findOrFail($menuId);
 
         $data = $request->validate([
-            'parent_id'       => 'nullable|integer|exists:titan_mega_menu_items,id',
+            'parent_id'       => [
+                'nullable',
+                'integer',
+                Rule::exists('titan_mega_menu_items', 'id')
+                    ->where(fn ($query) => $query->where('mega_menu_id', $menu->id)),
+            ],
             'label'           => 'required|string|max:255',
             'url'             => 'nullable|string|max:500',
             'route_name'      => 'nullable|string|max:200',
@@ -66,7 +72,12 @@ class MegaMenuItemController extends AccountBaseController
         $item = $menu->allItems()->findOrFail($itemId);
 
         $data = $request->validate([
-            'parent_id'       => 'nullable|integer|exists:titan_mega_menu_items,id',
+            'parent_id'       => [
+                'nullable',
+                'integer',
+                Rule::exists('titan_mega_menu_items', 'id')
+                    ->where(fn ($query) => $query->where('mega_menu_id', $menu->id)),
+            ],
             'label'           => 'required|string|max:255',
             'url'             => 'nullable|string|max:500',
             'route_name'      => 'nullable|string|max:200',
@@ -85,6 +96,7 @@ class MegaMenuItemController extends AccountBaseController
         $data['is_active']       = $request->boolean('is_active', true);
         $data['is_featured']     = $request->boolean('is_featured', false);
         $data['open_in_new_tab'] = $request->boolean('open_in_new_tab', false);
+        $data['parent_id'] = ($data['parent_id'] ?? null) == $item->id ? null : ($data['parent_id'] ?? null);
 
         $item->update($data);
 
@@ -129,6 +141,7 @@ class MegaMenuItemController extends AccountBaseController
 
     protected function canManageMegaMenu(): bool
     {
-        return in_array($this->user->permission('manage_mega_menu'), ['all', 'added', 'owned', 'both'], true);
+        return in_array('titantheme', user_modules(), true)
+            && in_array($this->user->permission('manage_mega_menu'), ['all', 'added', 'owned', 'both'], true);
     }
 }

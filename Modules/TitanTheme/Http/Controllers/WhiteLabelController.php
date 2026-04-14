@@ -83,6 +83,7 @@ class WhiteLabelController extends AccountBaseController
 
     protected function canManageWhiteLabel(): bool
     {
-        return in_array($this->user->permission('manage_white_label'), ['all', 'added', 'owned', 'both'], true);
+        return in_array('titantheme', user_modules(), true)
+            && in_array($this->user->permission('manage_white_label'), ['all', 'added', 'owned', 'both'], true);
     }
 }
