@@ -4,6 +4,10 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void {
+        if (Schema::hasTable('module_doctor_truth_snapshots')) {
+            return;
+        }
+
         Schema::create('module_doctor_truth_snapshots', function (Blueprint $table) {
             $table->id();
             $table->string('module_name');

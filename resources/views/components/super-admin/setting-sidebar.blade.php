@@ -87,6 +87,11 @@
                              :href="route('superadmin.settings.custom-module-settings.index')"
                              :text="__('app.menu.moduleSettings')"/>
         @endif
+        @if (user()->permission('manage_modules_registry') == 'all')
+        <x-setting-menu-item :active="$activeMenu" menu="module_registry"
+                             :href="route('modules.dashboard')"
+                             :text="__('Module Registry')"/>
+        @endif
 
         @foreach (worksuite_plugins() as $item)
             @includeIf(strtolower($item).'::sections.superadmin.setting-sidebar')

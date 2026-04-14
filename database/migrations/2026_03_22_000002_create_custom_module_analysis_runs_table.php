@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('custom_module_analysis_runs')) {
+            return;
+        }
+
         Schema::create('custom_module_analysis_runs', function (Blueprint $table) {
             $table->id();
             $table->string('file_name')->nullable();

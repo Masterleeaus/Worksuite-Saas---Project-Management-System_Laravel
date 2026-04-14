@@ -53,3 +53,17 @@ Route::middleware(['auth', 'superadmin'])->prefix('admin/modules')->group(functi
     Route::post('/logs/export', [ModuleInstallerDashboardController::class, 'exportLogs'])->name('modules.logs.export');
     Route::get('/{install}', [ModuleInstallerDashboardController::class, 'show'])->name('modules.show');
 });
+
+// Alias routes required by the Module Registry dashboard validation
+Route::middleware(['auth', 'superadmin'])->prefix('account/settings')->group(function () {
+    Route::get('/custom-modules/dashboard', [ModuleInstallerDashboardController::class, 'index'])
+        ->name('custom-modules.dashboard');
+    Route::get('/custom-modules/install', [CustomModuleController::class, 'create'])
+        ->name('custom-modules.install');
+    Route::get('/custom-modules/analysis', [CustomModuleController::class, 'index'])
+        ->name('custom-modules.analysis');
+    Route::get('/custom-modules/registry', [ModuleInstallerDashboardController::class, 'index'])
+        ->name('custom-modules.registry');
+    Route::get('/custom-modules/repairs', [CustomModuleController::class, 'index'])
+        ->name('custom-modules.repairs');
+});

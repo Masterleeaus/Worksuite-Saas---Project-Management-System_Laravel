@@ -2037,6 +2037,26 @@ class Module extends BaseModel
                 [
                     'allowed_permissions' => Permission::ALL_NONE,
                     'is_custom' => 1,
+                    'name' => 'manage_modules_registry',
+                ],
+                [
+                    'allowed_permissions' => Permission::ALL_NONE,
+                    'is_custom' => 1,
+                    'name' => 'view_modules_registry',
+                ],
+                [
+                    'allowed_permissions' => Permission::ALL_NONE,
+                    'is_custom' => 1,
+                    'name' => 'run_module_repairs',
+                ],
+                [
+                    'allowed_permissions' => Permission::ALL_NONE,
+                    'is_custom' => 1,
+                    'name' => 'install_custom_modules',
+                ],
+                [
+                    'allowed_permissions' => Permission::ALL_NONE,
+                    'is_custom' => 1,
                     'name' => 'manage_superadmin_database_backup_settings',
                 ],
                 [

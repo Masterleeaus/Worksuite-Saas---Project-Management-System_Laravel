@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('module_install_logs')) {
+            return;
+        }
+
         Schema::create('module_install_logs', function (Blueprint $table) {
             $table->id();
             $table->string('event', 50);
