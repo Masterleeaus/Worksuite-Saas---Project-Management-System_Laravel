@@ -14,6 +14,7 @@ use App\Events\SuperAdmin\OfflinePackageChangeRequestEvent;
 use App\Listeners\SuperAdmin\SupportTicketRequesterListener;
 use App\Events\SuperAdmin\OfflinePackageChangeConfirmationEvent;
 use App\Listeners\SuperAdmin\CompanyRegisteredListener;
+use App\Listeners\SuperAdmin\CompanyModuleSettingsListener;
 use App\Listeners\SuperAdmin\OfflinePackageChangeRequestListener;
 use App\Listeners\SuperAdmin\OfflinePackageChangeConfirmationListener;
 use App\Models\SuperAdmin\FooterMenu;
@@ -39,7 +40,10 @@ class EventServiceProvider extends ServiceProvider
         OfflinePackageChangeRequestEvent::class => [OfflinePackageChangeRequestListener::class],
         SupportTicketReplyEvent::class => [SupportTicketReplyListener::class],
         SupportTicketRequesterEvent::class => [SupportTicketRequesterListener::class],
-        NewCompanyCreatedEvent::class => [CompanyRegisteredListener::class],
+        NewCompanyCreatedEvent::class => [
+            CompanyRegisteredListener::class,
+            CompanyModuleSettingsListener::class,
+        ],
     ];
 
     protected $observers = [
