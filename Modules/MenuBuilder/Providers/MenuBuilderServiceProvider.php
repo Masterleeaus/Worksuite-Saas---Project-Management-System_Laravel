@@ -76,8 +76,8 @@ class MenuBuilderServiceProvider extends ServiceProvider
      */
     protected function registerConfig(): void
     {
-        $this->publishes([module_path($this->name, 'config/config.php') => config_path($this->nameLower.'.php')], 'config');
-        $this->mergeConfigFrom(module_path($this->name, 'config/config.php'), $this->nameLower);
+        $this->publishes([module_path($this->name, 'Config/config.php') => config_path($this->nameLower.'.php')], 'config');
+        $this->mergeConfigFrom(module_path($this->name, 'Config/config.php'), $this->nameLower);
     }
 
     /**
@@ -86,7 +86,7 @@ class MenuBuilderServiceProvider extends ServiceProvider
     public function registerViews(): void
     {
         $viewPath = resource_path('views/modules/'.$this->nameLower);
-        $sourcePath = module_path($this->name, 'resources/views');
+        $sourcePath = module_path($this->name, 'Resources/views');
 
         $this->publishes([$sourcePath => $viewPath], ['views', $this->nameLower.'-module-views']);
 
