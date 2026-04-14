@@ -124,14 +124,21 @@ class TitanPanelProvider extends PanelProvider
 
     public static function canAccess(): bool
     {
-        $user = auth()->user();
+        $user = self::resolveWorksuiteUser();
 
-        if (!$user || empty($user->company_id)) {
+        if (!$user) {
             return false;
         }
 
-        $isAdmin = method_exists($user, 'hasRole')
-            && ($user->hasRole('admin') || $user->hasRole('superadmin'));
+        if ((int) ($user->is_superadmin ?? 0) === 1) {
+            return true;
+        }
+
+        if (empty($user->company_id)) {
+            return false;
+        }
+
+        $isAdmin = method_exists($user, 'hasRole') && $user->hasRole('admin');
 
         $permission = method_exists($user, 'permission')
             ? $user->permission('titan_access')
@@ -140,6 +147,37 @@ class TitanPanelProvider extends PanelProvider
         $hasTitanPermission = !in_array($permission, [false, null, 'none'], true);
 
         return $isAdmin || $hasTitanPermission;
+    }
+
+    public static function resolveWorksuiteUser(): ?object
+    {
+        $authUser = auth()->user();
+
+        if (!$authUser) {
+            return null;
+        }
+
+        if (is_object($authUser) && isset($authUser->company_id)) {
+            return $authUser;
+        }
+
+        if (isset($authUser->user) && is_object($authUser->user)) {
+            return $authUser->user;
+        }
+
+        if (method_exists($authUser, 'user') && is_object($authUser->user)) {
+            return $authUser->user;
+        }
+
+        if (function_exists('user')) {
+            $sessionUser = user();
+
+            if (is_object($sessionUser)) {
+                return $sessionUser;
+            }
+        }
+
+        return null;
     }
 
     /**

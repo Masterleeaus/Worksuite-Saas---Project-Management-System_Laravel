@@ -22,12 +22,18 @@ class TitanPanelRuntimeTest extends TestCase
         $this->assertSame(route('login'), $method->invoke($middleware, $request));
     }
 
-    public function test_titan_panel_access_requires_tenant_and_admin_or_titan_permission(): void
+    public function test_titan_panel_access_gate_matches_required_roles_and_permissions(): void
     {
         auth()->logout();
         $this->assertFalse(TitanPanelProvider::canAccess());
 
+        auth()->setUser(new TitanRuntimeFakeUser(null, [], false, true));
+        $this->assertTrue(TitanPanelProvider::canAccess());
+
         auth()->setUser(new TitanRuntimeFakeUser(1, ['employee'], false));
+        $this->assertFalse(TitanPanelProvider::canAccess());
+
+        auth()->setUser(new TitanRuntimeFakeUser(1, [], false));
         $this->assertFalse(TitanPanelProvider::canAccess());
 
         auth()->setUser(new TitanRuntimeFakeUser(1, ['admin'], false));
@@ -37,11 +43,21 @@ class TitanPanelRuntimeTest extends TestCase
         $this->assertTrue(TitanPanelProvider::canAccess());
     }
 
+    public function test_titan_panel_access_resolves_wrapped_worksuite_user_from_auth_user(): void
+    {
+        $worksuiteUser = new TitanRuntimeFakeUser(1, ['admin'], false);
+        auth()->setUser(new TitanRuntimeAuthWrapper($worksuiteUser));
+
+        $this->assertTrue(TitanPanelProvider::canAccess());
+    }
+
 }
 
 class TitanRuntimeFakeUser extends AuthenticatableUser
 {
     public ?int $company_id = null;
+    public int $is_superadmin = 0;
+    public ?object $company = null;
 
     /** @var array<int, string> */
     private array $roles = [];
@@ -51,12 +67,14 @@ class TitanRuntimeFakeUser extends AuthenticatableUser
     /**
      * @param array<int, string> $roles
      */
-    public function __construct(?int $companyId = null, array $roles = [], string|bool $titanPermission = false)
+    public function __construct(?int $companyId = null, array $roles = [], string|bool $titanPermission = false, bool $isSuperadmin = false)
     {
         parent::__construct([]);
         $this->company_id = $companyId;
+        $this->company = $companyId ? (object) ['id' => $companyId] : null;
         $this->roles = $roles;
         $this->titanPermission = $titanPermission;
+        $this->is_superadmin = $isSuperadmin ? 1 : 0;
     }
 
     public function hasRole(string $role): bool
@@ -71,5 +89,16 @@ class TitanRuntimeFakeUser extends AuthenticatableUser
         }
 
         return $this->titanPermission;
+    }
+}
+
+class TitanRuntimeAuthWrapper extends AuthenticatableUser
+{
+    public ?object $user = null;
+
+    public function __construct(?object $worksuiteUser = null)
+    {
+        parent::__construct([]);
+        $this->user = $worksuiteUser;
     }
 }
