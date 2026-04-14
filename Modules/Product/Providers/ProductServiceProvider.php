@@ -4,9 +4,12 @@ namespace Modules\Product\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Modules\Support\Traits\ModuleNamespacePath;
 
 class ProductServiceProvider extends ServiceProvider
 {
+    use ModuleNamespacePath;
+
     protected string $name = 'Product';
 
     protected string $nameLower = 'product';
@@ -86,7 +89,7 @@ class ProductServiceProvider extends ServiceProvider
 
         $this->loadViewsFrom(array_merge($this->getPublishableViewPaths(), [$sourcePath]), $this->nameLower);
 
-        $componentNamespace = $this->module_namespace($this->name, $this->app_path(config('modules.paths.generator.component-class.path')));
+        $componentNamespace = $this->moduleNamespace($this->name, (string) config('modules.paths.generator.component-class.path'));
         Blade::componentNamespace($componentNamespace, $this->nameLower);
     }
 
@@ -110,18 +113,4 @@ class ProductServiceProvider extends ServiceProvider
         return $paths;
     }
 
-    private function app_path(string $path = ''): string
-    {
-        return trim($path, '/\\');
-    }
-
-    private function module_namespace(string $module, string $path = ''): string
-    {
-        $baseNamespace = trim((string) config('modules.namespace', 'Modules'), '\\');
-        $normalizedPath = str_replace(['/', '\\'], '\\', trim($path, '/\\'));
-
-        return $normalizedPath === ''
-            ? $baseNamespace.'\\'.$module
-            : $baseNamespace.'\\'.$module.'\\'.$normalizedPath;
-    }
 }
