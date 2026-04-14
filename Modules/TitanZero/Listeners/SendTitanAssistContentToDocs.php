@@ -4,13 +4,13 @@ namespace Modules\TitanZero\Listeners;
 
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
-use Modules\TitanZero\Events\TitanZeroContentGenerated;
+use Modules\TitanZero\Events\TitanAssistContentGenerated;
 use Modules\AIDocument\Entities\AiPromptHistory;
 use Modules\AIDocument\Entities\AiPromptResponse;
 
-class SendTitanZeroContentToDocs
+class SendTitanAssistContentToDocs
 {
-    public function handle(TitanZeroContentGenerated $event): void
+    public function handle(TitanAssistContentGenerated $event): void
     {
         if (! Config::get('aiassistant.integrations.docs_enabled', true)) {
             return;

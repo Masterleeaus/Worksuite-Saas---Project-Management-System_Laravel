@@ -6,11 +6,11 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use Modules\TitanZero\Events\TitanZeroContentGenerated;
+use Modules\TitanZero\Events\TitanAssistContentGenerated;
 
-class SendTitanZeroContentToTasks
+class SendTitanAssistContentToTasks
 {
-    public function handle(TitanZeroContentGenerated $event): void
+    public function handle(TitanAssistContentGenerated $event): void
     {
         if (! Config::get('aiassistant.integrations.tasks_enabled', true)) {
             return;
