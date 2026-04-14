@@ -50,40 +50,35 @@ jobs:
         shell: bash
         run: |
           set -e
-          if [ ! -d "$DEPLOY_PATH" ]; then
-            echo "::error::Deploy path does not exist: $DEPLOY_PATH"
-            exit 1
-          fi
-
-          if [ ! -d "$DEPLOY_PATH/.git" ]; then
-            echo "::error::$DEPLOY_PATH is not a git working tree."
-            exit 1
-          fi
-
-          if [ ! -f "$DEPLOY_PATH/.env" ]; then
-            echo "::error::.env not found at $DEPLOY_PATH/.env"
-            exit 1
-          fi
+          [ -d "$DEPLOY_PATH" ] || { echo "::error::Deploy path does not exist: $DEPLOY_PATH"; exit 1; }
+          [ -d "$DEPLOY_PATH/.git" ] || { echo "::error::$DEPLOY_PATH is not a git working tree."; exit 1; }
+          [ -f "$DEPLOY_PATH/.env" ] || { echo "::error::.env not found at $DEPLOY_PATH/.env"; exit 1; }
 
       - name: Prepare git working tree
         shell: bash
         run: |
           set -e
           cd "$DEPLOY_PATH"
-
           git config --global --add safe.directory "$DEPLOY_PATH" || true
+          [ ! -f .git/index.lock ] || rm -f .git/index.lock
 
-          if [ -f .git/index.lock ]; then
-            echo "==> Found stale .git/index.lock"
-            rm -f .git/index.lock
-          fi
-
-      - name: Fetch latest refs
+      - name: Normalize branch and fetch refs
         shell: bash
         run: |
           set -e
           cd "$DEPLOY_PATH"
+
+          cp .env /tmp/.deploy_env_backup
+
+          git stash push -m "precheck-temp-$(date +%s)" \
+            bootstrap/cache \
+            .phpunit.result.cache \
+            || true
+
           git fetch --all --prune
+          git checkout "$DEPLOY_BRANCH" || git checkout -b "$DEPLOY_BRANCH" "origin/$DEPLOY_BRANCH"
+
+          mv /tmp/.deploy_env_backup .env
 
       - name: Detect drift and capture if needed
         id: drift
@@ -147,11 +142,6 @@ jobs:
 
           cp .env /tmp/.deploy_env_backup
 
-          CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "$DEPLOY_BRANCH")"
-          if [ -z "$CURRENT_BRANCH" ] || [ "$CURRENT_BRANCH" = "HEAD" ]; then
-            CURRENT_BRANCH="$DEPLOY_BRANCH"
-          fi
-
           git branch -D "$DRIFT_BRANCH" 2>/dev/null || true
           git checkout -b "$DRIFT_BRANCH"
 
@@ -175,7 +165,7 @@ jobs:
 
           if git diff --cached --quiet; then
             echo "==> Nothing staged after filtering."
-            git checkout "$CURRENT_BRANCH" || git checkout "$DEPLOY_BRANCH" || true
+            git checkout "$DEPLOY_BRANCH" || true
             mv /tmp/.deploy_env_backup .env
             echo "should_deploy=true" >> "$GITHUB_OUTPUT"
             echo "drift_branch=" >> "$GITHUB_OUTPUT"
@@ -231,41 +221,30 @@ jobs:
         shell: bash
         run: |
           set -e
-          if [ ! -d "$DEPLOY_PATH" ]; then
-            echo "::error::Deploy path does not exist: $DEPLOY_PATH"
-            exit 1
-          fi
-
-          if [ ! -d "$DEPLOY_PATH/.git" ]; then
-            echo "::error::$DEPLOY_PATH is not a git working tree."
-            exit 1
-          fi
-
-          if [ ! -f "$DEPLOY_PATH/.env" ]; then
-            echo "::error::.env not found at $DEPLOY_PATH/.env"
-            exit 1
-          fi
+          [ -d "$DEPLOY_PATH" ] || { echo "::error::Deploy path does not exist: $DEPLOY_PATH"; exit 1; }
+          [ -d "$DEPLOY_PATH/.git" ] || { echo "::error::$DEPLOY_PATH is not a git working tree."; exit 1; }
+          [ -f "$DEPLOY_PATH/.env" ] || { echo "::error::.env not found at $DEPLOY_PATH/.env"; exit 1; }
 
       - name: Prepare git working tree
         shell: bash
         run: |
           set -e
           cd "$DEPLOY_PATH"
-
           git config --global --add safe.directory "$DEPLOY_PATH" || true
+          [ ! -f .git/index.lock ] || rm -f .git/index.lock
 
-          if [ -f .git/index.lock ]; then
-            echo "==> Found stale .git/index.lock"
-            rm -f .git/index.lock
-          fi
-
-      - name: Update server branch without deleting server changes
+      - name: Normalize to deploy branch without deleting server files
         shell: bash
         run: |
           set -e
           cd "$DEPLOY_PATH"
 
           cp .env /tmp/.deploy_env_backup
+
+          git stash push -m "deploy-temp-$(date +%s)" \
+            bootstrap/cache \
+            .phpunit.result.cache \
+            || true
 
           git fetch origin "$DEPLOY_BRANCH"
           git checkout "$DEPLOY_BRANCH" || git checkout -b "$DEPLOY_BRANCH" "origin/$DEPLOY_BRANCH"
