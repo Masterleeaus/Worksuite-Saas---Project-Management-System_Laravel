@@ -51,23 +51,7 @@ return [
         'Accountings'          => ['Accounting'],
 
         // Titan stack
-        'TitanAgents'          => ['TitanCore'],
         'TitanDocs'            => ['TitanCore'],
-        'TitanHello'           => ['TitanCore'],
-        'TitanZero'            => ['TitanCore'],
-
-        // Business modules that need GlobalSetting seeded first
-        'Payroll'              => ['GlobalSetting'],
-        'Zoom'                 => ['GlobalSetting'],
-        'Subdomain'            => ['GlobalSetting'],
-        'Affiliate'            => ['GlobalSetting'],
-        'BookingModule'        => ['GlobalSetting'],
-        'PaymentModule'        => ['GlobalSetting'],
-        'BusinessSettingsModule' => ['GlobalSetting'],
-        'ServiceManagement'    => ['GlobalSetting'],
-        'ServicemanModule'     => ['GlobalSetting'],
-        'ProviderManagement'   => ['GlobalSetting'],
-        'PromotionManagement'  => ['GlobalSetting'],
 
         // QualityControl re-uses Inspection tables — Inspection must run first
         'QualityControl'       => ['Inspection'],
@@ -82,7 +66,6 @@ return [
     */
 
     'order' => [
-        'GlobalSetting',
         'Accounting',
         'Inspection',
         'FSMCore',
@@ -99,22 +82,8 @@ return [
         'FSMCRM',
         'FSMCalendar',
         'TitanCore',
-        'TitanAgents',
         'TitanDocs',
-        'TitanHello',
-        'TitanZero',
         'QualityControl',
-        'Payroll',
-        'Zoom',
-        'Subdomain',
-        'BookingModule',
-        'PaymentModule',
-        'BusinessSettingsModule',
-        'Affiliate',
-        'ServiceManagement',
-        'ServicemanModule',
-        'ProviderManagement',
-        'PromotionManagement',
     ],
 
 ];

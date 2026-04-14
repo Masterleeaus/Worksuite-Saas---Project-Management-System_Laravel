@@ -9,7 +9,6 @@ use App\Models\Holiday;
 use App\Models\TaskboardColumn;
 use App\Models\User;
 use Illuminate\Console\Command;
-use Modules\Recruit\Entities\RecruitInterviewEmployees;
 
 class DailyScheduleReminder extends Command
 {
@@ -92,11 +91,11 @@ class DailyScheduleReminder extends Command
                         });
                 })->whereDate('date', '=', now())->count();
 
-                if (module_enabled('Recruit')) {
-                    $interview = RecruitInterviewEmployees::with(['schedule' => function ($q) {
+                if (module_enabled('Recruit') && class_exists(\Modules\Recruit\Entities\RecruitInterviewEmployees::class)) {
+                    $recruitInterviewEmployeeModel = \Modules\Recruit\Entities\RecruitInterviewEmployees::class;
+                    $interview = $recruitInterviewEmployeeModel::with(['schedule' => function ($q) {
                         $q->whereDate('schedule_date', '=', now());
                     }])->where('user_id', $user->id)->count();
-
                     $data[$user->id]['interview'] = $interview;
                 }
 
