@@ -16,19 +16,8 @@ class AIServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        foreach ([__DIR__.'/../Routes/web.php', __DIR__.'/../routes/web.php'] as $routeFile) {
-            if (file_exists($routeFile)) {
-                $this->loadRoutesFrom($routeFile);
-                break;
-            }
-        }
-
-        foreach ([__DIR__.'/../Routes/api.php', __DIR__.'/../routes/api.php'] as $routeFile) {
-            if (file_exists($routeFile)) {
-                $this->loadRoutesFrom($routeFile);
-                break;
-            }
-        }
+        $this->loadFirstRouteFile([__DIR__.'/../Routes/web.php', __DIR__.'/../routes/web.php']);
+        $this->loadFirstRouteFile([__DIR__.'/../Routes/api.php', __DIR__.'/../routes/api.php']);
         $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
         $this->loadViewsFrom(__DIR__.'/../Resources/views', 'titancore');
 
@@ -46,6 +35,16 @@ class AIServiceProvider extends ServiceProvider
                 __DIR__.'/../Resources/views/components/create-with-ai.blade.php' =>
                     resource_path('views/vendor/titancore/components/create-with-ai.blade.php'),
             ], 'titancore-ui');
+        }
+    }
+
+    private function loadFirstRouteFile(array $routeCandidates): void
+    {
+        foreach ($routeCandidates as $routeFile) {
+            if (file_exists($routeFile)) {
+                $this->loadRoutesFrom($routeFile);
+                break;
+            }
         }
     }
 }
