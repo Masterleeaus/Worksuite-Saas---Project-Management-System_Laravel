@@ -4,7 +4,7 @@ namespace Modules\Payroll\Http\Requests\OvertimeSetting\Request;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class PayCodeStoreRequest extends FormRequest
+class RequestStoreRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.

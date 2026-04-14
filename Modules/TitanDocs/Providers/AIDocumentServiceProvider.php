@@ -5,7 +5,7 @@ namespace Modules\TitanDocs\Providers;
 use Illuminate\Support\ServiceProvider;
 
 
-class TitanDocsServiceProvider extends ServiceProvider
+class AIDocumentServiceProvider extends ServiceProvider
 {
     /**
      * @var string $moduleName
