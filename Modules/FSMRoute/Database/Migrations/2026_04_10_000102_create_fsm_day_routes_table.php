@@ -25,7 +25,9 @@ return new class extends Migration
             $table->float('max_allow_time')->default(10.0);
             $table->timestamps();
 
-            $table->foreign('route_id')->references('id')->on('fsm_routes')->nullOnDelete();
+            if (Schema::hasTable('fsm_routes')) {
+                $table->foreign('route_id')->references('id')->on('fsm_routes')->nullOnDelete();
+            }
         });
     }
 

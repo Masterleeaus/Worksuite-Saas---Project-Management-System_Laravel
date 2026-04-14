@@ -22,7 +22,9 @@ return new class extends Migration {
             $table->text('notes')->nullable();
             $table->timestamps();
 
-            $table->foreign('equipment_id')->references('id')->on('fsm_equipment')->cascadeOnDelete();
+            if (Schema::hasTable('fsm_equipment')) {
+                $table->foreign('equipment_id')->references('id')->on('fsm_equipment')->cascadeOnDelete();
+            }
         });
     }
 

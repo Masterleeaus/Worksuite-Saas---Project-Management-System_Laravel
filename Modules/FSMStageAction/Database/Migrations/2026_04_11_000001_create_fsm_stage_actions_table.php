@@ -54,8 +54,10 @@ return new class extends Migration {
                 $table->text('message')->nullable();
                 $table->timestamp('ran_at')->useCurrent();
 
-                $table->foreign('stage_action_id')->references('id')
-                      ->on('fsm_stage_actions')->cascadeOnDelete();
+                if (Schema::hasTable('fsm_stage_actions')) {
+                    $table->foreign('stage_action_id')->references('id')
+                          ->on('fsm_stage_actions')->cascadeOnDelete();
+                }
                 if (Schema::hasTable('fsm_orders')) {
                     $table->foreign('fsm_order_id')->references('id')
                           ->on('fsm_orders')->cascadeOnDelete();

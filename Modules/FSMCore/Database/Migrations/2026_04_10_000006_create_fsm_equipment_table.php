@@ -22,7 +22,9 @@ return new class extends Migration {
             $table->boolean('active')->default(true);
             $table->timestamps();
 
-            $table->foreign('location_id')->references('id')->on('fsm_locations')->nullOnDelete();
+            if (Schema::hasTable('fsm_locations')) {
+                $table->foreign('location_id')->references('id')->on('fsm_locations')->nullOnDelete();
+            }
         });
     }
 

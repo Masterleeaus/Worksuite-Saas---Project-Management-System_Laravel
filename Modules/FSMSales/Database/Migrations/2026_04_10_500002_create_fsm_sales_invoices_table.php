@@ -60,8 +60,12 @@ return new class extends Migration {
             $table->unsignedBigInteger('fsm_sales_invoice_id')->index();
             $table->unsignedBigInteger('fsm_order_id')->index();
 
-            $table->foreign('fsm_sales_invoice_id')->references('id')->on('fsm_sales_invoices')->cascadeOnDelete();
-            $table->foreign('fsm_order_id')->references('id')->on('fsm_orders')->cascadeOnDelete();
+            if (Schema::hasTable('fsm_sales_invoices')) {
+                $table->foreign('fsm_sales_invoice_id')->references('id')->on('fsm_sales_invoices')->cascadeOnDelete();
+            }
+            if (Schema::hasTable('fsm_orders')) {
+                $table->foreign('fsm_order_id')->references('id')->on('fsm_orders')->cascadeOnDelete();
+            }
         });
     }
 

@@ -40,8 +40,10 @@ return new class extends Migration {
 
             $table->timestamps();
 
-            $table->foreign('fsm_sales_invoice_id')
-                ->references('id')->on('fsm_sales_invoices')->cascadeOnDelete();
+            if (Schema::hasTable('fsm_sales_invoices')) {
+                $table->foreign('fsm_sales_invoice_id')
+                    ->references('id')->on('fsm_sales_invoices')->cascadeOnDelete();
+            }
         });
     }
 
