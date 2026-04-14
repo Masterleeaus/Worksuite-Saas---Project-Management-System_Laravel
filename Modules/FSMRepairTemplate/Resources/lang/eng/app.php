@@ -1,7 +1,5 @@
 <?php
 
-<?php
-
 return [
     'name'        => 'FSMRepairTemplate',
     'menu'        => 'FSM RepairTemplate',

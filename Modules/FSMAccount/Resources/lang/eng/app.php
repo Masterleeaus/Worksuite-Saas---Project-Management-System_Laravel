@@ -1,7 +1,5 @@
 <?php
 
-<?php
-
 return [
     'name'        => 'FSMAccount',
     'menu'        => 'FSM Account',

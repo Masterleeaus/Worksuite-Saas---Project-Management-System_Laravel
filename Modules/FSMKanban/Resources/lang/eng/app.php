@@ -1,7 +1,5 @@
 <?php
 
-<?php
-
 return [
     'name'        => 'FSMKanban',
     'menu'        => 'FSM Kanban',
