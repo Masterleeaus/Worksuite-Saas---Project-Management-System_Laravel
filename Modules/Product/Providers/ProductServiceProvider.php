@@ -4,11 +4,11 @@ namespace Modules\Product\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
-use Nwidart\Modules\Traits\PathNamespace;
+use Modules\Support\Traits\ModuleNamespacePath;
 
 class ProductServiceProvider extends ServiceProvider
 {
-    use PathNamespace;
+    use ModuleNamespacePath;
 
     protected string $name = 'Product';
 
@@ -89,7 +89,7 @@ class ProductServiceProvider extends ServiceProvider
 
         $this->loadViewsFrom(array_merge($this->getPublishableViewPaths(), [$sourcePath]), $this->nameLower);
 
-        $componentNamespace = $this->module_namespace($this->name, $this->app_path(config('modules.paths.generator.component-class.path')));
+        $componentNamespace = $this->moduleNamespace($this->name, config('modules.paths.generator.component-class.path', ''));
         Blade::componentNamespace($componentNamespace, $this->nameLower);
     }
 
@@ -112,4 +112,5 @@ class ProductServiceProvider extends ServiceProvider
 
         return $paths;
     }
+
 }
