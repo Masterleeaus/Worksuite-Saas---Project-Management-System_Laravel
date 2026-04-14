@@ -16,8 +16,19 @@ class AIServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        $this->loadRoutesFrom(__DIR__.'/../Routes/web.php');
-        $this->loadRoutesFrom(__DIR__.'/../Routes/api.php');
+        foreach ([__DIR__.'/../Routes/web.php', __DIR__.'/../routes/web.php'] as $routeFile) {
+            if (file_exists($routeFile)) {
+                $this->loadRoutesFrom($routeFile);
+                break;
+            }
+        }
+
+        foreach ([__DIR__.'/../Routes/api.php', __DIR__.'/../routes/api.php'] as $routeFile) {
+            if (file_exists($routeFile)) {
+                $this->loadRoutesFrom($routeFile);
+                break;
+            }
+        }
         $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
         $this->loadViewsFrom(__DIR__.'/../Resources/views', 'titancore');
 
