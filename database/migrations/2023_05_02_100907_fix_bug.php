@@ -26,13 +26,17 @@ return new class extends Migration {
             $table->foreign('board_column_id')->references('id')->on('taskboard_columns')->onDelete('cascade')->onUpdate('cascade');
         });
 
-        DB::statement("ALTER TABLE `users` CHANGE `gender` `gender` ENUM('male','female','others') NULL DEFAULT 'male';");
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE `users` CHANGE `gender` `gender` ENUM('male','female','others') NULL DEFAULT 'male';");
+        }
 
         User::whereNull('gender')->update(['gender' => 'male']);
 
-        Schema::table('employee_details', function (Blueprint $table) {
-            $table->string('marital_status')->nullable()->default(MaritalStatus::Single->value)->change();
-        });
+        if (DB::getDriverName() === 'mysql') {
+            Schema::table('employee_details', function (Blueprint $table) {
+                $table->string('marital_status')->nullable()->default(MaritalStatus::Single->value)->change();
+            });
+        }
 
         EmployeeDetails::whereNull('marital_status')->update(['marital_status' => MaritalStatus::Single]);
 

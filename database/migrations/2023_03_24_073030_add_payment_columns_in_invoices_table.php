@@ -14,16 +14,31 @@ return new class extends Migration
      */
     public function up()
     {
-        if (!Schema::hasColumn('invoices', 'payment_status')) {
-            Schema::table('invoices', function (Blueprint $table) {
-
-                $table->enum('payment_status', [1, 0])->default(0)->after('custom_invoice_number');
-                $table->unsignedInteger('offline_method_id')->nullable()->index('payments_offline_method_id_foreign')->after('payment_status');
-                $table->foreign(['offline_method_id'])->references(['id'])->on('offline_payment_methods')->onUpdate('CASCADE')->onDelete('SET NULL');
-                $table->string('transaction_id')->nullable()->unique()->after('offline_method_id');
-                $table->string('gateway')->nullable()->after('transaction_id');
-            });
+        if (!Schema::hasTable('invoices')) {
+            return;
         }
+
+        Schema::table('invoices', function (Blueprint $table) {
+            if (!Schema::hasColumn('invoices', 'payment_status')) {
+                $table->enum('payment_status', [1, 0])->default(0)->after('custom_invoice_number');
+            }
+
+            if (!Schema::hasColumn('invoices', 'offline_method_id')) {
+                $table->unsignedInteger('offline_method_id')->nullable()->after('payment_status');
+
+                if (Schema::hasTable('offline_payment_methods')) {
+                    $table->foreign(['offline_method_id'])->references(['id'])->on('offline_payment_methods')->onUpdate('CASCADE')->onDelete('SET NULL');
+                }
+            }
+
+            if (!Schema::hasColumn('invoices', 'transaction_id')) {
+                $table->string('transaction_id')->nullable()->unique()->after('offline_method_id');
+            }
+
+            if (!Schema::hasColumn('invoices', 'gateway')) {
+                $table->string('gateway')->nullable()->after('transaction_id');
+            }
+        });
     }
 
     /**
@@ -33,9 +48,22 @@ return new class extends Migration
      */
     public function down()
     {
+        if (!Schema::hasTable('invoices')) {
+            return;
+        }
+
         Schema::table('invoices', function (Blueprint $table) {
-            $table->dropForeign(['offline_method_id']);
-            $table->dropColumn(['payment_status', 'offline_method_id', 'transaction_id', 'gateway']);
+            $columns = [];
+
+            foreach (['payment_status', 'offline_method_id', 'transaction_id', 'gateway'] as $column) {
+                if (Schema::hasColumn('invoices', $column)) {
+                    $columns[] = $column;
+                }
+            }
+
+            if (!empty($columns)) {
+                $table->dropColumn($columns);
+            }
         });
     }
 
