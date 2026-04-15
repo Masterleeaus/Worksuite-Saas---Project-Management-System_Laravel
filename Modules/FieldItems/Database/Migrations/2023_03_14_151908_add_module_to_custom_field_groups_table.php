@@ -19,25 +19,21 @@ return new class extends Migration
             return;
         }
 
-        $companyId = DB::table('companies')->min('id');
+        $companyIds = DB::table('companies')->pluck('id')->all();
 
-        if (!$companyId) {
+        if (empty($companyIds)) {
             return;
         }
 
-        $data = [
-            'company_id' => $companyId,
-            'name' => 'Item',
-            'model' => 'Modules\FieldItems\Entities\Item'
-        ];
-
-        CustomFieldGroup::firstOrCreate(
-            [
-                'name' => $data['name'],
-                'model' => $data['model'],
-            ],
-            $data
-        );
+        foreach ($companyIds as $companyId) {
+            CustomFieldGroup::firstOrCreate(
+                [
+                    'company_id' => $companyId,
+                    'name' => 'Item',
+                    'model' => 'Modules\FieldItems\Entities\Item',
+                ]
+            );
+        }
     }
 
     /**
