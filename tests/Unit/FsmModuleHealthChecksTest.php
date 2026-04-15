@@ -86,4 +86,31 @@ class FsmModuleHealthChecksTest extends TestCase
         $this->assertStringContainsString("'id'       => 'fsmrecurring:service_provider'", $content);
         $this->assertStringContainsString("'id'       => 'fsmrecurring:fsm_core_dep'", $content);
     }
+
+    public function test_fsm_repair_health_checks_are_defined(): void
+    {
+        $content = file_get_contents($this->repoRoot . '/Modules/FSMRepair/health/checks.php');
+
+        $this->assertStringContainsString("'id'       => 'fsmrepair:module_json'", $content);
+        $this->assertStringContainsString("'id'       => 'fsmrepair:migrations'", $content);
+        $this->assertStringContainsString("'id'       => 'fsmrepair:fsm_core_dep'", $content);
+    }
+
+    public function test_fsm_repair_template_health_checks_are_defined(): void
+    {
+        $content = file_get_contents($this->repoRoot . '/Modules/FSMRepairTemplate/health/checks.php');
+
+        $this->assertStringContainsString("'id'       => 'fsmrepairtemplate:module_json'", $content);
+        $this->assertStringContainsString("'id'       => 'fsmrepairtemplate:service_provider'", $content);
+        $this->assertStringContainsString("'id'       => 'fsmrepairtemplate:fsm_repair_dep'", $content);
+    }
+
+    public function test_fsm_size_health_checks_are_defined(): void
+    {
+        $content = file_get_contents($this->repoRoot . '/Modules/FSMSize/health/checks.php');
+
+        $this->assertStringContainsString("'id'       => 'fsmsize:module_json'", $content);
+        $this->assertStringContainsString("'id'       => 'fsmsize:service_provider'", $content);
+        $this->assertStringContainsString("'id'       => 'fsmsize:fsm_core_dep'", $content);
+    }
 }
