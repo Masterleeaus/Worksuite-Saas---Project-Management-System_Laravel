@@ -31,6 +31,11 @@ return new class extends Migration {
      */
     public function up()
     {
+        // This migration contains multiple MySQL-specific ALTER statements and
+        // foreign-key mutations that are not supported by SQLite.
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
 
         if (Schema::hasColumn('pusher_settings', 'company_id')) {
             Schema::table('pusher_settings', function ($table) {
