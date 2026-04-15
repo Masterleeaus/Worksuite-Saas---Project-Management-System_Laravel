@@ -15,7 +15,7 @@ return [
         'id' => 'titanintegrations:service_provider',
         'label' => 'ServiceProvider present',
         'severity' => 'error',
-        'ok' => (bool) glob(__DIR__ . '/../Providers/*ServiceProvider.php'),
+        'ok' => !empty(glob(__DIR__ . '/../Providers/*ServiceProvider.php')),
         'hint' => 'Ensure Providers/<Module>ServiceProvider.php exists and is registered in module.json.',
     ],
     [
@@ -57,8 +57,8 @@ return [
     [
         'id' => 'titanintegrations:titan_zero_available',
         'label' => 'TitanZero available',
-        'ok' => class_exists('\Modules\TitanZero\Services\ZeroGateway'),
         'severity' => 'warn',
+        'ok' => class_exists('\Modules\TitanZero\Services\ZeroGateway'),
         'hint' => 'Install/enable TitanZero to use AI bridge features.',
     ],
 
