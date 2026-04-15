@@ -42,7 +42,7 @@ return new class extends Migration
             }
 
             if (!Schema::hasColumn('tickets', 'assigned_cleaner_id')) {
-                $table->unsignedBigInteger('assigned_cleaner_id')->nullable()->after('refund_amount');
+                $table->unsignedInteger('assigned_cleaner_id')->nullable()->after('refund_amount');
             }
 
             if (!Schema::hasColumn('tickets', 'complaint_source')) {
@@ -59,7 +59,7 @@ return new class extends Migration
             }
 
             if (!Schema::hasColumn('tickets', 'resolved_by')) {
-                $table->unsignedBigInteger('resolved_by')->nullable()->after('resolved_at');
+                $table->unsignedInteger('resolved_by')->nullable()->after('resolved_at');
             }
         });
 

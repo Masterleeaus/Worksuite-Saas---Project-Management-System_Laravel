@@ -103,7 +103,7 @@ return new class extends Migration {
             }
         }
 
-        if (Schema::hasColumn('global_settings', 'google_recaptcha_status')) {
+        if (Schema::hasColumn('global_settings', 'google_recaptcha_status') && DB::connection()->getDriverName() === 'mysql') {
             DB::statement("ALTER TABLE `global_settings` CHANGE `google_recaptcha_status` `google_recaptcha_status` ENUM('active','deactive') NOT NULL DEFAULT 'deactive';");
             GlobalSetting::where('google_recaptcha_status', '')->update(['google_recaptcha_status' => 'deactive']);
         }

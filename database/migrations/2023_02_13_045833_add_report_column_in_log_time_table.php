@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -33,7 +34,9 @@ return new class extends Migration
             });
         }
 
-        DB::statement("ALTER TABLE smtp_settings CHANGE COLUMN mail_encryption mail_encryption ENUM('ssl', 'tls','starttls') NULL DEFAULT 'tls'");
+        if (Schema::hasTable('smtp_settings') && Schema::hasColumn('smtp_settings', 'mail_encryption') && DB::connection()->getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE smtp_settings CHANGE COLUMN mail_encryption mail_encryption ENUM('ssl', 'tls','starttls') NULL DEFAULT 'tls'");
+        }
 
     }
 
