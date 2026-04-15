@@ -30,6 +30,8 @@ return new class extends Migration
                 [
                     'company_id' => $companyId,
                     'name' => 'Item',
+                ],
+                [
                     'model' => 'Modules\FieldItems\Entities\Item',
                 ]
             );
