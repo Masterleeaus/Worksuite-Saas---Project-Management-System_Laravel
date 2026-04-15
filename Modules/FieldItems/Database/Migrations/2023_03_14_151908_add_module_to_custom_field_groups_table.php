@@ -15,7 +15,15 @@ return new class extends Migration
      */
     public function up()
     {
-        $companyId = Schema::hasTable('companies') ? DB::table('companies')->value('id') : null;
+        if (!Schema::hasTable('custom_field_groups') || !Schema::hasTable('companies')) {
+            return;
+        }
+
+        $companyId = DB::table('companies')->orderBy('id')->value('id');
+
+        if (!$companyId) {
+            return;
+        }
 
         $data = [
             'company_id' => $companyId,
