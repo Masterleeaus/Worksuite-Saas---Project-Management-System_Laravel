@@ -56,9 +56,9 @@ return [
     [
         'id' => 'titan_zero_available',
         'label' => 'TitanZero available',
-        'status' => class_exists('\Modules\TitanZero\Services\ZeroGateway'),
+        'ok' => class_exists('\Modules\TitanZero\Services\ZeroGateway'),
         'severity' => 'warning',
-        'help' => 'Install/enable TitanZero to use AI bridge features.',
+        'hint' => 'Install/enable TitanZero to use AI bridge features.',
     ],
 
 ];
