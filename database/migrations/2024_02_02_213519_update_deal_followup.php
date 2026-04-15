@@ -3,6 +3,7 @@
 use App\Models\Deal;
 use App\Models\DealFollowUp;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
 
@@ -11,6 +12,10 @@ return new class extends Migration {
      */
     public function up(): void
     {
+        if (!Schema::hasTable('deals')) {
+            return;
+        }
+
         // Set all deals default follow up yes
         Deal::where(function ($q) {
             $q->where('next_follow_up', 'no');
@@ -19,7 +24,9 @@ return new class extends Migration {
         })
             ->update(['next_follow_up' => 'yes']);
 
-        DealFollowUp::where('status', 'incomplete')->update(['status' => 'pending']);
+        if (Schema::hasTable('deal_follow_ups')) {
+            DealFollowUp::where('status', 'incomplete')->update(['status' => 'pending']);
+        }
     }
 
 };

@@ -15,6 +15,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        $isMysql = Schema::getConnection()->getDriverName() === 'mysql';
 
         if (!Schema::hasColumn('packages', 'package')) {
             Schema::table('packages', function (Blueprint $table) {
@@ -22,9 +23,11 @@ return new class extends Migration
             });
         }
 
-        DB::statement("ALTER TABLE `packages`
-            MODIFY COLUMN `default`
-            ENUM('yes', 'no', 'trial', 'lifetime') NOT NULL DEFAULT 'no'");
+        if ($isMysql && Schema::hasTable('packages')) {
+            DB::statement("ALTER TABLE `packages`
+                MODIFY COLUMN `default`
+                ENUM('yes', 'no', 'trial', 'lifetime') NOT NULL DEFAULT 'no'");
+        }
 
     }
 

@@ -4,6 +4,7 @@ use App\Models\Company;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Scopes\CompanyScope;
 use Modules\Sms\Entities\SmsNotificationSetting;
 
 return new class extends Migration
@@ -15,13 +16,18 @@ return new class extends Migration
      */
     public function up()
     {
+        if (!Schema::hasTable('sms_notification_settings')) {
+            return;
+        }
+
         if (Schema::hasColumn('sms_notification_settings', 'whatsapp_template')) {
-            if (! Schema::hasTable('sms_notification_settings')) {
-                return;
-            }
-            
             Schema::table('sms_notification_settings', function (Blueprint $table) {
                 $table->dropColumn('whatsapp_template');
+            });
+        }
+
+        if (Schema::hasColumn('sms_notification_settings', 'msg91_template')) {
+            Schema::table('sms_notification_settings', function (Blueprint $table) {
                 $table->dropColumn('msg91_template');
             });
         }

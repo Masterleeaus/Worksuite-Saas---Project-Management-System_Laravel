@@ -13,6 +13,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::getConnection()->getDriverName() !== 'mysql' || !Schema::hasTable('projects')) {
+            return;
+        }
+
         // get the ids of the projects where calculate_task_progress is true
         $projectstrue = Project::where('calculate_task_progress', 'true')->get(); 
         $projectsfalse = Project::where('calculate_task_progress', 'false')->get();
@@ -36,6 +40,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (Schema::getConnection()->getDriverName() !== 'mysql' || !Schema::hasTable('projects')) {
+            return;
+        }
+
         // Revert back to the original enum values
         DB::statement("ALTER TABLE projects MODIFY COLUMN calculate_task_progress ENUM('true', 'false') DEFAULT 'true'");
     }

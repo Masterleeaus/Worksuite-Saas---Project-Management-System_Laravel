@@ -17,13 +17,15 @@ return new class extends Migration {
 
     public function up()
     {
+        $isMysql = Schema::getConnection()->getDriverName() === 'mysql';
+
         if (!Schema::hasColumn('currencies', 'no_of_decimal')) {
-            Schema::table('currencies', function (Blueprint $table) {
+            Schema::table('currencies', function (Blueprint $table) use ($isMysql) {
                 $table->unsignedInteger('no_of_decimal')->default(2);
                 $table->string('thousand_separator')->nullable();
                 $table->string('decimal_separator')->nullable();
 
-                if (Schema::hasColumn('currencies', 'currency_position')) {
+                if ($isMysql && Schema::hasColumn('currencies', 'currency_position')) {
                     DB::statement("ALTER TABLE currencies CHANGE COLUMN currency_position currency_position ENUM('left', 'right', 'left_with_space', 'right_with_space') NOT NULL DEFAULT 'left'");
                 }
                 else {

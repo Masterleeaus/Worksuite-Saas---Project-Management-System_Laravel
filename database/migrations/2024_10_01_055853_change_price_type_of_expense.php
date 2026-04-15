@@ -13,6 +13,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::getConnection()->getDriverName() !== 'mysql' || !Schema::hasTable('expenses')) {
+            return;
+        }
+
         DB::statement('ALTER TABLE expenses MODIFY price DOUBLE');
     }
 

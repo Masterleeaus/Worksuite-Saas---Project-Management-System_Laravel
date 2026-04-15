@@ -29,6 +29,10 @@ return new class extends Migration {
      */
     public function up(): void
     {
+        if (Schema::getConnection()->getDriverName() === 'sqlite') {
+            return;
+        }
+
         $this->createTables();
         $this->companySpecificChanges();
         $this->createDealsFromLeads();
@@ -82,13 +86,13 @@ return new class extends Migration {
                 $table->unsignedInteger('lead_id')->nullable();
                 $table->foreign('lead_id')->references('id')->on('leads')->onDelete('cascade')->onUpdate('cascade');
                 $table->date('close_date')->nullable();
-                $table->unsignedBigInteger('agent_id')->nullable()->index('leads_agent_id_foreign');
+                $table->unsignedBigInteger('agent_id')->nullable()->index();
                 $table->foreign(['agent_id'])->references(['id'])->on('lead_agents')->onUpdate('CASCADE')->onDelete('CASCADE');
                 $table->enum('next_follow_up', ['yes', 'no'])->default('yes');
                 $table->double('value', 30, 2)->nullable()->default(0);
                 $table->longText('note')->nullable();
                 $table->text('hash')->nullable();
-                $table->unsignedInteger('currency_id')->nullable()->index('leads_currency_id_foreign');
+                $table->unsignedInteger('currency_id')->nullable()->index();
                 $table->foreign(['currency_id'])->references(['id'])->on('currencies')->onUpdate('CASCADE')->onDelete('SET NULL');
                 $table->unsignedInteger('added_by')->nullable();
                 $table->foreign('added_by')->references('id')->on('users')->onDelete('cascade');

@@ -12,6 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::getConnection()->getDriverName() !== 'mysql' || !Schema::hasTable('companies')) {
+            return;
+        }
+
         DB::statement("ALTER TABLE `companies` CHANGE `package_type` `package_type` ENUM('monthly','annual','lifetime') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'monthly'");
 
     }

@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -21,7 +22,9 @@ return new class extends Migration
             });
         }
 
-        DB::statement("ALTER TABLE file_storage CHANGE COLUMN storage_location storage_location ENUM('local', 'aws_s3', 'digitalocean', 'wasabi', 'minio') NOT NULL DEFAULT 'local'");
+        if (Schema::getConnection()->getDriverName() === 'mysql' && Schema::hasTable('file_storage')) {
+            DB::statement("ALTER TABLE file_storage CHANGE COLUMN storage_location storage_location ENUM('local', 'aws_s3', 'digitalocean', 'wasabi', 'minio') NOT NULL DEFAULT 'local'");
+        }
     }
 
     /**

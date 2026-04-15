@@ -45,6 +45,10 @@ return new class extends Migration
 
     public function up(): void
     {
+        if (Schema::getConnection()->getDriverName() !== 'mysql') {
+            return;
+        }
+
         // 1) Add new scalar columns if they don't exist
         if (! Schema::hasTable('items')) {
             return;

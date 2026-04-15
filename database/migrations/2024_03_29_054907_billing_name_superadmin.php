@@ -13,6 +13,10 @@ return new class extends Migration {
     public function up(): void
     {
         $tableGateway = 'global_invoice_settings';
+        if (!Schema::hasTable($tableGateway)) {
+            return;
+        }
+
         if (!Schema::hasColumn($tableGateway, 'billing_name')) {
             Schema::table($tableGateway, function (Blueprint $table) {
                 $table->string('billing_name')->nullable()->after('id');
@@ -26,9 +30,11 @@ return new class extends Migration {
 
             if($setting){
                 $invoice = GlobalInvoiceSetting::first();
-                $invoice->billing_name = $setting->global_app_name;
-                $invoice->billing_address = $setting->address;
-                $invoice->save();
+                if ($invoice) {
+                    $invoice->billing_name = $setting->global_app_name;
+                    $invoice->billing_address = $setting->address;
+                    $invoice->save();
+                }
             }
 
         }

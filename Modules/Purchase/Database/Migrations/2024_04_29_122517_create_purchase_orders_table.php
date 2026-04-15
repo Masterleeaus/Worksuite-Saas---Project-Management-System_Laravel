@@ -12,8 +12,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-       DB::statement('ALTER TABLE `purchase_orders` CHANGE `purchase_order_number` `purchase_order_number` INT NULL DEFAULT NULL;
-       ');
+        if (Schema::getConnection()->getDriverName() !== 'mysql' || !Schema::hasTable('purchase_orders')) {
+            return;
+        }
+
+        DB::statement('ALTER TABLE `purchase_orders` CHANGE `purchase_order_number` `purchase_order_number` INT NULL DEFAULT NULL');
     }
 
     /**

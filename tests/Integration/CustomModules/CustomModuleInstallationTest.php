@@ -5,6 +5,8 @@ namespace Tests\Integration\CustomModules;
 use Tests\TestCase;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
 use App\Models\ModuleInstallLog;
 use ZipArchive;
 
@@ -16,6 +18,9 @@ class CustomModuleInstallationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->withoutMiddleware();
+        $this->ensureInstallerTestTables();
         
         $this->testModulePath = storage_path('test_module');
         $this->testZipPath = storage_path('test_module.zip');
@@ -37,7 +42,7 @@ class CustomModuleInstallationTest extends TestCase
     {
         $zip = $this->createValidTestModule('TestModule', '1.0.0');
         
-        $response = $this->post('/admin/custom-modules', [
+        $response = $this->post(route('custom-modules.store'), [
             'filePath' => $zip,
         ]);
         
@@ -75,7 +80,7 @@ class CustomModuleInstallationTest extends TestCase
             'edit_invoices'
         );
         
-        $response = $this->post('/admin/custom-modules', [
+        $response = $this->post(route('custom-modules.store'), [
             'filePath' => $zip,
         ]);
         
@@ -103,7 +108,7 @@ class CustomModuleInstallationTest extends TestCase
             '/admin/settings'
         );
         
-        $response = $this->post('/admin/custom-modules', [
+        $response = $this->post(route('custom-modules.store'), [
             'filePath' => $zip,
         ]);
         
@@ -123,7 +128,7 @@ class CustomModuleInstallationTest extends TestCase
         // Create module with shell_exec
         $zip = $this->createTestModuleWithShellCode('MaliciousModule');
         
-        $response = $this->post('/admin/custom-modules', [
+        $response = $this->post(route('custom-modules.store'), [
             'filePath' => $zip,
         ]);
         
@@ -143,7 +148,7 @@ class CustomModuleInstallationTest extends TestCase
         // Install module
         $zip = $this->createValidTestModule('RollbackTestModule', '1.0.0');
         
-        $response = $this->post('/admin/custom-modules', [
+        $response = $this->post(route('custom-modules.store'), [
             'filePath' => $zip,
         ]);
         
@@ -153,9 +158,7 @@ class CustomModuleInstallationTest extends TestCase
         $install = ModuleInstallLog::latest()->first();
         
         // Rollback
-        $rollbackResponse = $this->post(
-            "/admin/custom-modules/{$install->id}/rollback"
-        );
+        $rollbackResponse = $this->post(route('custom-modules.rollback', ['install' => $install->id]));
         
         $rollbackResponse->assertStatus(200);
         $rollbackResponse->assertJsonPath('status', 'success');
@@ -174,7 +177,7 @@ class CustomModuleInstallationTest extends TestCase
     {
         $zip = $this->createValidTestModule('RepairTestModule', '1.0.0');
         
-        $response = $this->post('/admin/custom-modules', [
+        $response = $this->post(route('custom-modules.store'), [
             'filePath' => $zip,
         ]);
         
@@ -193,7 +196,7 @@ class CustomModuleInstallationTest extends TestCase
     {
         $zip = $this->createValidTestModule('SnapshotTestModule', '1.0.0');
         
-        $response = $this->post('/admin/custom-modules', [
+        $response = $this->post(route('custom-modules.store'), [
             'filePath' => $zip,
         ]);
         
@@ -213,12 +216,38 @@ class CustomModuleInstallationTest extends TestCase
         // Mock a repair failure
         // (This would require more complex setup)
         
-        $response = $this->post('/admin/custom-modules', [
+        $response = $this->post(route('custom-modules.store'), [
             'filePath' => $zip,
         ]);
         
         // Response should indicate success or partial based on repairs
         $this->assertContains($response->json('status'), ['success', 'partial']);
+    }
+
+    protected function ensureInstallerTestTables(): void
+    {
+        if (!Schema::hasTable('permissions')) {
+            Schema::create('permissions', function (Blueprint $table) {
+                $table->increments('id');
+                $table->string('permission_key')->nullable();
+                $table->string('name')->nullable();
+                $table->string('module')->nullable();
+                $table->string('display_name')->nullable();
+                $table->timestamps();
+            });
+        }
+
+        if (!Schema::hasTable('module_install_logs')) {
+            Schema::create('module_install_logs', function (Blueprint $table) {
+                $table->increments('id');
+                $table->string('event')->nullable();
+                $table->string('module_name')->nullable();
+                $table->string('status')->nullable();
+                $table->json('pre_install_snapshot')->nullable();
+                $table->boolean('can_rollback')->default(false);
+                $table->timestamps();
+            });
+        }
     }
     
     // ========================================================================

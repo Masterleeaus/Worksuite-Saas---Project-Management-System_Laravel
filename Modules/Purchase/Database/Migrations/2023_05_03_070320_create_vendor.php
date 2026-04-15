@@ -108,7 +108,7 @@ return new class extends Migration {
                 $table->increments('id');
                 $table->unsignedInteger('company_id')->nullable();
                 $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade')->onUpdate('cascade');
-                $table->unsignedInteger('purchase_vendor_id')->index('purchase_vendor_contacts_purchase_vendor_id_foreign');
+                $table->unsignedInteger('purchase_vendor_id')->index();
                 $table->foreign('purchase_vendor_id')->references('id')->on('purchase_vendors')->onDelete('cascade')->onUpdate('cascade');
                 $table->string('title')->nullable();
                 $table->string('contact_name', 50);
@@ -175,8 +175,8 @@ return new class extends Migration {
                 $table->enum('billed_status', ['billed', 'unbilled'])->default('unbilled');
                 $table->enum('delivery_status', ['delivered', 'delivery_failed', 'in_transaction', 'not_started'])->default('not_started');
                 $table->enum('calculate_tax', ['after_discount', 'before_discount'])->default('after_discount');
-                $table->unsignedInteger('added_by')->nullable()->index('purchase_orders_added_by_foreign');
-                $table->unsignedInteger('last_updated_by')->nullable()->index('purchase_orders_last_updated_by_foreign');
+                $table->unsignedInteger('added_by')->nullable()->index();
+                $table->unsignedInteger('last_updated_by')->nullable()->index();
                 $table->foreign(['added_by'])->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('SET NULL');
                 $table->foreign(['last_updated_by'])->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('SET NULL');
                 $table->timestamps();
@@ -283,8 +283,8 @@ return new class extends Migration {
                 $table->string('dropbox_link')->nullable();
                 $table->string('external_link_name')->nullable();
                 $table->text('external_link')->nullable();
-                $table->unsignedInteger('added_by')->nullable()->index('project_files_added_by_foreign');
-                $table->unsignedInteger('last_updated_by')->nullable()->index('project_files_last_updated_by_foreign');
+                $table->unsignedInteger('added_by')->nullable()->index();
+                $table->unsignedInteger('last_updated_by')->nullable()->index();
                 $table->foreign(['added_by'])->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('SET NULL');
                 $table->foreign(['last_updated_by'])->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('SET NULL');
                 $table->timestamps();
@@ -323,7 +323,7 @@ return new class extends Migration {
                 $table->integer('purchase_vendor_id')->unsigned();
                 $table->foreign('purchase_vendor_id')->references('id')->on('purchase_vendors')->onDelete('cascade')->onUpdate('cascade');
                 $table->date('payment_date')->nullable();
-                $table->unsignedInteger('vendor_credit_id')->nullable()->index('purchase_vendor_credits_id_foreign');
+                $table->unsignedInteger('vendor_credit_id')->nullable()->index();
                 $table->integer('bank_account_id')->unsigned()->nullable();
                 $table->foreign('bank_account_id')->references('id')->on('bank_accounts')->onDelete('cascade')->onUpdate('cascade');
                 $table->double('received_payment');
@@ -343,7 +343,7 @@ return new class extends Migration {
             Schema::create('purchase_item_images', function (Blueprint $table) {
                 $table->increments('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
-                $table->unsignedInteger('purchase_item_id')->index('purchase_item_images_purchase_item_id_foreign');
+                $table->unsignedInteger('purchase_item_id')->index();
                 $table->foreign(['purchase_item_id'])->references(['id'])->on('purchase_items')->onUpdate('CASCADE')->onDelete('CASCADE');
                 $table->string('filename');
                 $table->string('hashname')->nullable();
@@ -356,11 +356,11 @@ return new class extends Migration {
             Schema::create('purchase_order_files', function (Blueprint $table) {
                 $table->increments('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
-                $table->unsignedInteger('purchase_order_id')->index('purchase_files_invoice_id_foreign');
+                $table->unsignedInteger('purchase_order_id')->index();
                 $table->foreign(['purchase_order_id'])->references(['id'])->on('purchase_orders')->onUpdate('CASCADE')->onDelete('CASCADE');
-                $table->unsignedInteger('added_by')->nullable()->index('purchase_files_added_by_foreign');
+                $table->unsignedInteger('added_by')->nullable()->index();
                 $table->foreign(['added_by'])->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('SET NULL');
-                $table->unsignedInteger('last_updated_by')->nullable()->index('purchase_files_last_updated_by_foreign');
+                $table->unsignedInteger('last_updated_by')->nullable()->index();
                 $table->foreign(['last_updated_by'])->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('SET NULL');
                 $table->string('filename', 200)->nullable();
                 $table->string('hashname', 200)->nullable();
@@ -392,8 +392,8 @@ return new class extends Migration {
                 $table->increments('id');
                 $table->integer('company_id')->unsigned()->nullable();
                 $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade')->onUpdate('cascade');
-                $table->unsignedInteger('user_id')->index('purchase_vendor_user_notes_user_id_foreign');
-                $table->unsignedInteger('vendor_note_id')->index('purchase_vendor_user_notes_vendor_note_id_foreign');
+                $table->unsignedInteger('user_id')->index();
+                $table->unsignedInteger('vendor_note_id')->index();
                 $table->foreign(['vendor_note_id'])->references(['id'])->on('purchase_vendor_notes')->onUpdate('CASCADE')->onDelete('CASCADE');
                 $table->foreign(['user_id'])->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('CASCADE');
                 $table->timestamps();
@@ -440,8 +440,8 @@ return new class extends Migration {
                 $table->foreign('bill_id')->references('id')->on('purchase_bills')->onDelete('cascade')->onUpdate('cascade');
                 $table->integer('payment_id')->unsigned()->nullable();
                 $table->foreign('payment_id')->references('id')->on('purchase_vendor_payments')->onDelete('cascade')->onUpdate('cascade');
-                $table->unsignedInteger('added_by')->nullable()->index('purchase_vendor_credits_added_by_foreign');
-                $table->unsignedInteger('last_updated_by')->nullable()->index('purchase_vendor_credits_last_updated_by_foreign');
+                $table->unsignedInteger('added_by')->nullable()->index();
+                $table->unsignedInteger('last_updated_by')->nullable()->index();
                 $table->foreign(['added_by'])->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('SET NULL');
                 $table->foreign(['last_updated_by'])->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('SET NULL');
                 $table->timestamps();
@@ -490,7 +490,7 @@ return new class extends Migration {
             Schema::create('purchase_vendor_credit_item_images', function (Blueprint $table) {
                 $table->increments('id');
             $table->unsignedBigInteger('company_id')->nullable()->index();
-                $table->unsignedInteger('vendor_item_id')->index('purchase_vendor_item_images_vendor_item_id_foreign');
+                $table->unsignedInteger('vendor_item_id')->index();
                 $table->foreign(['vendor_item_id'])->references(['id'])->on('purchase_vendor_items')->onUpdate('CASCADE')->onDelete('CASCADE');
                 $table->string('filename');
                 $table->string('hashname')->nullable();
