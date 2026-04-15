@@ -1,4 +1,10 @@
 # Readme for worksuite
+
+## Installation
+
+See the full installation and smoke-check guide at:
+- [docs/install.md](docs/install.md)
+
 ### Plugins used in the app
 
 <ol>

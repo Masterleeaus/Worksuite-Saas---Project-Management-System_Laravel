@@ -97,7 +97,9 @@ return new class extends Migration {
             });
         }
 
-        DB::statement('ALTER TABLE companies MODIFY status ENUM("active", "inactive", "license_expired") DEFAULT "active"');
+        if (Schema::hasTable('companies') && Schema::hasColumn('companies', 'status') && in_array(DB::connection()->getDriverName(), ['mysql', 'mariadb'], true)) {
+            DB::statement('ALTER TABLE companies MODIFY status ENUM("active", "inactive", "license_expired") DEFAULT "active"');
+        }
 
 
         if (Schema::hasTable('global_currencies')) {

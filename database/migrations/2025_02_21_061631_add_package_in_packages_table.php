@@ -16,15 +16,17 @@ return new class extends Migration
     public function up(): void
     {
 
-        if (!Schema::hasColumn('packages', 'package')) {
+        if (Schema::hasTable('packages') && !Schema::hasColumn('packages', 'package')) {
             Schema::table('packages', function (Blueprint $table) {
                 $table->string('package')->nullable()->after('annual_status');
             });
         }
 
-        DB::statement("ALTER TABLE `packages`
-            MODIFY COLUMN `default`
-            ENUM('yes', 'no', 'trial', 'lifetime') NOT NULL DEFAULT 'no'");
+        if (Schema::hasTable('packages') && Schema::hasColumn('packages', 'default') && in_array(DB::connection()->getDriverName(), ['mysql', 'mariadb'], true)) {
+            DB::statement("ALTER TABLE `packages`
+                MODIFY COLUMN `default`
+                ENUM('yes', 'no', 'trial', 'lifetime') NOT NULL DEFAULT 'no'");
+        }
 
     }
 
