@@ -47,18 +47,19 @@ return [
         'hint' => 'Optional: add translations if module has user-facing strings.',
     ],
 
-[
-    'key' => 'automation_config',
-    'label' => 'Automation manifest present',
-    'ok' => (is_file(__DIR__ . '/../Config/automation.php') || is_file(__DIR__ . '/../config/automation.php')),
-    'hint' => 'Add Config/automation.php (or config/automation.php) to declare signals/actions for AI & automation.',
-],
     [
-        'id' => 'titan_zero_available',
+        'id' => 'titanvault:automation_config',
+        'label' => 'Automation manifest present',
+        'severity' => 'info',
+        'ok' => (is_file(__DIR__ . '/../Config/automation.php') || is_file(__DIR__ . '/../config/automation.php')),
+        'hint' => 'Add Config/automation.php (or config/automation.php) to declare signals/actions for AI & automation.',
+    ],
+    [
+        'id' => 'titanvault:titan_zero_available',
         'label' => 'TitanZero available',
-        'status' => class_exists('\Modules\TitanZero\Services\ZeroGateway'),
-        'severity' => 'warning',
-        'help' => 'Install/enable TitanZero to use AI bridge features.',
+        'ok' => class_exists('\Modules\TitanZero\Services\ZeroGateway'),
+        'severity' => 'warn',
+        'hint' => 'Install/enable TitanZero to use AI bridge features.',
     ],
 
 ];
