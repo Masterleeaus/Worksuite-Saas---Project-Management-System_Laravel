@@ -113,4 +113,40 @@ class FsmModuleHealthChecksTest extends TestCase
         $this->assertStringContainsString("'id'       => 'fsmsize:service_provider'", $content);
         $this->assertStringContainsString("'id'       => 'fsmsize:fsm_core_dep'", $content);
     }
+
+    public function test_fsm_skill_health_checks_are_defined(): void
+    {
+        $content = file_get_contents($this->repoRoot . '/Modules/FSMSkill/health/checks.php');
+
+        $this->assertStringContainsString("'id'       => 'fsmskill:module_json'", $content);
+        $this->assertStringContainsString("'id'       => 'fsmskill:migrations'", $content);
+        $this->assertStringContainsString("'id'       => 'fsmskill:fsm_core_dep'", $content);
+    }
+
+    public function test_fsm_stage_action_health_checks_are_defined(): void
+    {
+        $content = file_get_contents($this->repoRoot . '/Modules/FSMStageAction/health/checks.php');
+
+        $this->assertStringContainsString("'id'       => 'fsmstageaction:module_json'", $content);
+        $this->assertStringContainsString("'id'       => 'fsmstageaction:service_provider'", $content);
+        $this->assertStringContainsString("'id'       => 'fsmstageaction:fsm_core_dep'", $content);
+    }
+
+    public function test_fsm_stock_health_checks_are_defined(): void
+    {
+        $content = file_get_contents($this->repoRoot . '/Modules/FSMStock/health/checks.php');
+
+        $this->assertStringContainsString("'id'       => 'fsmstock:module_json'", $content);
+        $this->assertStringContainsString("'id'       => 'fsmstock:migrations'", $content);
+        $this->assertStringContainsString("'id'       => 'fsmstock:fsm_core_dep'", $content);
+    }
+
+    public function test_fsm_timesheet_health_checks_are_defined(): void
+    {
+        $content = file_get_contents($this->repoRoot . '/Modules/FSMTimesheet/health/checks.php');
+
+        $this->assertStringContainsString("'id'       => 'fsmtimesheet:module_json'", $content);
+        $this->assertStringContainsString("'id'       => 'fsmtimesheet:service_provider'", $content);
+        $this->assertStringContainsString("'id'       => 'fsmtimesheet:fsm_core_dep'", $content);
+    }
 }
