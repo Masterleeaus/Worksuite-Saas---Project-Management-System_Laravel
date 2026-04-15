@@ -59,4 +59,31 @@ class FsmModuleHealthChecksTest extends TestCase
         $this->assertStringContainsString("'id'       => 'fsmproject:service_provider'", $content);
         $this->assertStringContainsString("'id'       => 'fsmproject:fsm_core_dep'", $content);
     }
+
+    public function test_fsm_activity_health_checks_are_defined(): void
+    {
+        $content = file_get_contents($this->repoRoot . '/Modules/FSMActivity/health/checks.php');
+
+        $this->assertStringContainsString("'id'       => 'fsmactivity:module_json'", $content);
+        $this->assertStringContainsString("'id'       => 'fsmactivity:service_provider'", $content);
+        $this->assertStringContainsString("'id'       => 'fsmactivity:fsm_core_dep'", $content);
+    }
+
+    public function test_fsm_equipment_health_checks_are_defined(): void
+    {
+        $content = file_get_contents($this->repoRoot . '/Modules/FSMEquipment/health/checks.php');
+
+        $this->assertStringContainsString("'id'       => 'fsmequipment:module_json'", $content);
+        $this->assertStringContainsString("'id'       => 'fsmequipment:migrations'", $content);
+        $this->assertStringContainsString("'id'       => 'fsmequipment:fsm_core_dep'", $content);
+    }
+
+    public function test_fsm_recurring_health_checks_are_defined(): void
+    {
+        $content = file_get_contents($this->repoRoot . '/Modules/FSMRecurring/health/checks.php');
+
+        $this->assertStringContainsString("'id'       => 'fsmrecurring:module_json'", $content);
+        $this->assertStringContainsString("'id'       => 'fsmrecurring:service_provider'", $content);
+        $this->assertStringContainsString("'id'       => 'fsmrecurring:fsm_core_dep'", $content);
+    }
 }
