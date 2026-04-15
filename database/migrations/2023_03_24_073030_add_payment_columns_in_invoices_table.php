@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
@@ -24,7 +25,7 @@ return new class extends Migration
             }
 
             if (!Schema::hasColumn('invoices', 'offline_method_id')) {
-                $table->unsignedInteger('offline_method_id')->nullable()->after('payment_status');
+                $table->unsignedInteger('offline_method_id')->nullable()->index('payments_offline_method_id_foreign')->after('payment_status');
 
                 if (Schema::hasTable('offline_payment_methods')) {
                     $table->foreign(['offline_method_id'])->references(['id'])->on('offline_payment_methods')->onUpdate('CASCADE')->onDelete('SET NULL');
@@ -66,7 +67,7 @@ return new class extends Migration
                     try {
                         $table->dropForeign(['offline_method_id']);
                     }
-                    catch (\Throwable $e) {
+                    catch (QueryException $e) {
                         // no-op: foreign key may not exist in drifted schemas
                     }
                 }

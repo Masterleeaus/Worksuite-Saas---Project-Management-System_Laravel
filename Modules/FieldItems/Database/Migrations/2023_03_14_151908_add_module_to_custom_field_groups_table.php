@@ -19,7 +19,7 @@ return new class extends Migration
             return;
         }
 
-        $companyId = DB::table('companies')->orderBy('id')->value('id');
+        $companyId = DB::table('companies')->min('id');
 
         if (!$companyId) {
             return;
