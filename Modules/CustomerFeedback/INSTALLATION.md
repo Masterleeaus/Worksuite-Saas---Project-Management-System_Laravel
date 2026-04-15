@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - Laravel 9.0+
-- PHP 8.1+
+- PHP 8.3+
 - MySQL 5.7+ or PostgreSQL 10+
 - Composer
 

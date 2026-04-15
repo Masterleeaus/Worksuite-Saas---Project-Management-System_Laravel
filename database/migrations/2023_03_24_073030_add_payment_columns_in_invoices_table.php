@@ -18,7 +18,7 @@ return new class extends Migration
             Schema::table('invoices', function (Blueprint $table) {
 
                 $table->enum('payment_status', [1, 0])->default(0)->after('custom_invoice_number');
-                $table->unsignedInteger('offline_method_id')->nullable()->index('payments_offline_method_id_foreign')->after('payment_status');
+                $table->unsignedInteger('offline_method_id')->nullable()->after('payment_status');
                 $table->foreign(['offline_method_id'])->references(['id'])->on('offline_payment_methods')->onUpdate('CASCADE')->onDelete('SET NULL');
                 $table->string('transaction_id')->nullable()->unique()->after('offline_method_id');
                 $table->string('gateway')->nullable()->after('transaction_id');

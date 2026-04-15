@@ -218,7 +218,7 @@ class CustomModuleInstallationTest extends TestCase
         ]);
         
         // Response should indicate success or partial based on repairs
-        $this->assertIn($response->json('status'), ['success', 'partial']);
+        $this->assertContains($response->json('status'), ['success', 'partial']);
     }
     
     // ========================================================================
