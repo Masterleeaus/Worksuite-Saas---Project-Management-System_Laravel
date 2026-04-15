@@ -2,6 +2,27 @@
 
 return [
     [
+        'id'       => 'fsmworkflow:module_json',
+        'label'    => 'module.json present',
+        'severity' => 'error',
+        'ok'       => file_exists(__DIR__ . '/../module.json'),
+        'hint'     => 'module.json is required for module discovery.',
+    ],
+    [
+        'id'       => 'fsmworkflow:service_provider',
+        'label'    => 'ServiceProvider present',
+        'severity' => 'error',
+        'ok'       => (bool) glob(__DIR__ . '/../Providers/*ServiceProvider.php'),
+        'hint'     => 'Ensure Providers/FSMWorkflowServiceProvider.php exists.',
+    ],
+    [
+        'id'       => 'fsmworkflow:routes_web',
+        'label'    => 'Routes/web.php present',
+        'severity' => 'warn',
+        'ok'       => file_exists(__DIR__ . '/../Routes/web.php'),
+        'hint'     => 'Routes/web.php is required for FSMWorkflow web routes.',
+    ],
+    [
         'id'       => 'fsmworkflow:migrations',
         'label'    => 'Migrations present',
         'severity' => 'warn',
