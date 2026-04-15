@@ -41,7 +41,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     // Pass 4: Tools registry + dispatch
     Route::get('settings/ai-tools-tools', [AiToolController::class, 'index'])->name('ai-tools.tools.index');
     Route::post('settings/ai-tools-tools', [AiToolController::class, 'store'])->name('ai-tools.tools.store');
-    Route::post('ai-tools-tools/dispatch', [AiToolController::class, 'dispatch'])->name('ai-tools.tools.dispatch');
+    Route::post('ai-tools-tools/dispatch', [AiToolController::class, 'dispatchTool'])->name('ai-tools.tools.dispatch');
 
     // Company-level usage and history page
     Route::get('settings/ai-tools-usage', [AiToolsSettingController::class, 'companyUsage'])->name('ai-tools-usage.index');
@@ -60,5 +60,4 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
         Route::post('rephrase-text', [AiRephraseController::class, 'rephraseText'])->name('projects.rephrase-text');
     });
 });
-
 

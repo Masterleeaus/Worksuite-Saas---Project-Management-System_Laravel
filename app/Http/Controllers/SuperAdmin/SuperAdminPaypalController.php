@@ -62,6 +62,12 @@ class SuperAdminPaypalController extends AccountBaseController
         parent::__construct();
 
         $credential = GlobalPaymentGatewayCredentials::first();
+        if (!$credential) {
+            $this->_api_context = null;
+            $this->pageTitle = 'modules.paymentSetting.paypal';
+
+            return;
+        }
 
         if ($credential->paypal_mode == 'sandbox') {
 
@@ -75,8 +81,12 @@ class SuperAdminPaypalController extends AccountBaseController
         /** setup PayPal api context **/
         config(['paypal.settings.mode' => $credential->paypal_mode]);
         $paypal_conf = Config::get('paypal');
-        $this->_api_context = new ApiContext(new OAuthTokenCredential($paypalClientId, $PaypalSecret));
-        $this->_api_context->setConfig($paypal_conf['settings']);
+        if (!empty($paypalClientId) && !empty($PaypalSecret)) {
+            $this->_api_context = new ApiContext(new OAuthTokenCredential($paypalClientId, $PaypalSecret));
+            $this->_api_context->setConfig($paypal_conf['settings']);
+        } else {
+            $this->_api_context = null;
+        }
         $this->pageTitle = 'modules.paymentSetting.paypal';
     }
 

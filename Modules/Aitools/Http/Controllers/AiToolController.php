@@ -51,7 +51,7 @@ class AiToolController extends AccountBaseController
         return Reply::success(__('messages.recordSaved'));
     }
 
-    public function dispatch(Request $request)
+    public function dispatchTool(Request $request)
     {
         abort_403(!(module_enabled('Aitools') && user()->permission('view_aitools') == 'all'));
 

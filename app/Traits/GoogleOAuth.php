@@ -10,6 +10,9 @@ trait GoogleOAuth
     public function setGoogleoAuthConfig()
     {
         $setting = global_setting();
+        if (!$setting) {
+            return;
+        }
 
         $subdomain = config('app.main_application_subdomain');
         $rootCrmSubDomain = preg_replace('#^https?://#', '', $subdomain); // Remove 'http://' or 'https://'

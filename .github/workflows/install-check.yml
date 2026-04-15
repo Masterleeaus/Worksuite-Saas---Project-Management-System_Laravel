@@ -105,6 +105,7 @@ jobs:
 
       - name: Validate route list (app bootstrap check)
         run: |
+          set -o pipefail
           php artisan route:list > /tmp/route-list.txt
           tail -5 /tmp/route-list.txt
 

@@ -15,6 +15,7 @@ use QuickBooksOnline\API\Facades\Customer;
 use QuickBooksOnline\API\Facades\Invoice;
 use QuickBooksOnline\API\Facades\Item;
 use QuickBooksOnline\API\Facades\Payment;
+use Illuminate\Support\Facades\Schema;
 
 class QuickbookController extends AccountBaseController
 {
@@ -25,18 +26,35 @@ class QuickbookController extends AccountBaseController
     public function __construct()
     {
         parent::__construct();
-        $this->quickBooksSetting = QuickBooksSetting::first();
-        $this->quickBooksEnvironment = $this->quickBooksSetting->environment;
-        $this->quickBooksAccessToken = $this->quickBooksSetting->access_token;
-        $this->quickBooksRefreshToken = $this->quickBooksSetting->refresh_token;
-        $this->quickBooksRealmId = $this->quickBooksSetting->realmid;
-        $this->quickBooksClientId = $this->quickBooksEnvironment == 'Development' ? $this->quickBooksSetting->sandbox_client_id : $this->quickBooksSetting->client_id;
-        $this->quickBooksClientSecret = $this->quickBooksEnvironment == 'Development' ? $this->quickBooksSetting->sandbox_client_secret : $this->quickBooksSetting->client_secret;
+        $this->getCredentials();
     }
 
     public function getCredentials()
     {
+        if (!Schema::hasTable('quick_books_settings')) {
+            $this->quickBooksSetting = null;
+            $this->quickBooksEnvironment = '';
+            $this->quickBooksAccessToken = '';
+            $this->quickBooksRefreshToken = '';
+            $this->quickBooksRealmId = '';
+            $this->quickBooksClientId = '';
+            $this->quickBooksClientSecret = '';
+
+            return;
+        }
+
         $this->quickBooksSetting = QuickBooksSetting::first();
+        if (!$this->quickBooksSetting) {
+            $this->quickBooksEnvironment = '';
+            $this->quickBooksAccessToken = '';
+            $this->quickBooksRefreshToken = '';
+            $this->quickBooksRealmId = '';
+            $this->quickBooksClientId = '';
+            $this->quickBooksClientSecret = '';
+
+            return;
+        }
+
         $this->quickBooksEnvironment = $this->quickBooksSetting->environment;
         $this->quickBooksAccessToken = $this->quickBooksSetting->access_token;
         $this->quickBooksRefreshToken = $this->quickBooksSetting->refresh_token;

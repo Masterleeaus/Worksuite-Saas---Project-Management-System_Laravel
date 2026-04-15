@@ -28,7 +28,15 @@ class StripeController extends Controller
 
         /** setup Stripe credentials **/
         // Company Specific
-        Stripe::setApiKey($stripeCredentials->stripe_mode == 'test' ? $stripeCredentials->test_stripe_secret : $stripeCredentials->live_stripe_secret);
+        if ($stripeCredentials) {
+            $apiKey = $stripeCredentials->stripe_mode == 'test'
+                ? $stripeCredentials->test_stripe_secret
+                : $stripeCredentials->live_stripe_secret;
+
+            if (!empty($apiKey)) {
+                Stripe::setApiKey($apiKey);
+            }
+        }
         $this->pageTitle = __('app.stripe');
     }
 
