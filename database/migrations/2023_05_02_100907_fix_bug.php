@@ -41,7 +41,9 @@ return new class extends Migration {
             });
         }
 
-        EmployeeDetails::whereNull('marital_status')->update(['marital_status' => MaritalStatus::Single]);
+        if (Schema::hasTable('employee_details')) {
+            EmployeeDetails::whereNull('marital_status')->update(['marital_status' => MaritalStatus::Single]);
+        }
 
     }
 
