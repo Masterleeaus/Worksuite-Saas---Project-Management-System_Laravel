@@ -1,1 +1,0 @@
-{"version":2,"defects":[],"times":{"Tests\\Unit\\FsmModuleHealthChecksTest::test_fsm_vehicle_health_checks_are_not_placeholder":0.003,"Tests\\Unit\\FsmModuleHealthChecksTest::test_fsm_workflow_health_checks_include_core_structure_guards":0}}
