@@ -48,8 +48,9 @@ return [
     ],
 
 [
-    'key' => 'automation_config',
+    'id' => 'restapi:automation_config',
     'label' => 'Automation manifest present',
+    'severity' => 'info',
     'ok' => (is_file(__DIR__ . '/../Config/automation.php') || is_file(__DIR__ . '/../config/automation.php')),
     'hint' => 'Add Config/automation.php (or config/automation.php) to declare signals/actions for AI & automation.',
 ],
