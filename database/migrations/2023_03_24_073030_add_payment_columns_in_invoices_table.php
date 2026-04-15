@@ -62,6 +62,15 @@ return new class extends Migration
             }
 
             if (!empty($columns)) {
+                if (in_array('offline_method_id', $columns, true)) {
+                    try {
+                        $table->dropForeign(['offline_method_id']);
+                    }
+                    catch (\Throwable $e) {
+                        // no-op: foreign key may not exist in drifted schemas
+                    }
+                }
+
                 $table->dropColumn($columns);
             }
         });

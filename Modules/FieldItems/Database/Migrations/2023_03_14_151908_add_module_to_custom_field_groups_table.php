@@ -15,7 +15,7 @@ return new class extends Migration
      */
     public function up()
     {
-        $companyId = DB::table('companies')->value('id');
+        $companyId = Schema::hasTable('companies') ? DB::table('companies')->value('id') : null;
 
         $data = [
             'company_id' => $companyId,
