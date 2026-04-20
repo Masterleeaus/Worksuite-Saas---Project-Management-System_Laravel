@@ -13,6 +13,7 @@ class RegionController extends Controller
     {
         $filter  = $request->only(['q']);
         $regions = FSMRegion::with(['manager', 'districts'])
+            ->where('company_id', company()->id)
             ->when($filter['q'] ?? null, fn($q, $v) => $q->where('name', 'like', "%$v%"))
             ->orderBy('name')
             ->paginate(20)
@@ -35,6 +36,7 @@ class RegionController extends Controller
             'description' => 'nullable|string|max:512',
             'manager_id'  => 'nullable|integer',
         ]);
+        $data['company_id'] = company()->id;
 
         FSMRegion::create($data);
 
@@ -44,7 +46,7 @@ class RegionController extends Controller
 
     public function edit(int $id)
     {
-        $region = FSMRegion::findOrFail($id);
+        $region = FSMRegion::where('company_id', company()->id)->findOrFail($id);
         $users  = User::orderBy('name')->get();
 
         return view('fsmterritory::regions.edit', compact('region', 'users'));
@@ -52,7 +54,7 @@ class RegionController extends Controller
 
     public function update(Request $request, int $id)
     {
-        $region = FSMRegion::findOrFail($id);
+        $region = FSMRegion::where('company_id', company()->id)->findOrFail($id);
 
         $data = $request->validate([
             'name'        => 'required|string|max:256',
@@ -68,7 +70,7 @@ class RegionController extends Controller
 
     public function destroy(int $id)
     {
-        FSMRegion::findOrFail($id)->delete();
+        FSMRegion::where('company_id', company()->id)->findOrFail($id)->delete();
 
         return redirect()->route('fsmterritory.regions.index')
             ->with('success', 'Region deleted.');

@@ -61,6 +61,27 @@ class FsmModuleTitanReadinessTest extends TestCase
         }
     }
 
+    public function test_fsm_routes_reference_existing_controller_classes(): void
+    {
+        foreach ($this->fsmModuleDirectories() as $moduleDirectory) {
+            foreach (['web', 'api'] as $routeType) {
+                $routePath = "{$moduleDirectory}/Routes/{$routeType}.php";
+                if (!is_file($routePath)) {
+                    continue;
+                }
+
+                $routeContents = (string) file_get_contents($routePath);
+                preg_match_all('/use\\s+([A-Za-z0-9_\\\\]+Controller);/', $routeContents, $matches);
+                $imports = $matches[1] ?? [];
+
+                foreach ($imports as $importedController) {
+                    $controllerPath = $this->repoRoot . '/' . str_replace('\\', '/', $importedController) . '.php';
+                    $this->assertFileExists($controllerPath, "Route file {$routePath} imports missing controller {$importedController}");
+                }
+            }
+        }
+    }
+
     /**
      * @return array<int, string>
      */
