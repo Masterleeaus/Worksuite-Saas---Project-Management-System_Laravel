@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'laravel/laravel',
-        'pretty_version' => 'dev-copilot/refactor-existing-modules',
-        'version' => 'dev-copilot/refactor-existing-modules',
-        'reference' => '97638c86e056cdb2e41269b45c6c80e3d1a96b66',
+        'pretty_version' => 'dev-copilot/refactor-qualitycontrol-and-inspection',
+        'version' => 'dev-copilot/refactor-qualitycontrol-and-inspection',
+        'reference' => '8f0ed32b0fb52ae03dd8f4e3a172e98519cf7f91',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -1267,9 +1267,9 @@
             'dev_requirement' => false,
         ),
         'laravel/laravel' => array(
-            'pretty_version' => 'dev-copilot/refactor-existing-modules',
-            'version' => 'dev-copilot/refactor-existing-modules',
-            'reference' => '97638c86e056cdb2e41269b45c6c80e3d1a96b66',
+            'pretty_version' => 'dev-copilot/refactor-qualitycontrol-and-inspection',
+            'version' => 'dev-copilot/refactor-qualitycontrol-and-inspection',
+            'reference' => '8f0ed32b0fb52ae03dd8f4e3a172e98519cf7f91',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
