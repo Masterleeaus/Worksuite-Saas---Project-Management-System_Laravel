@@ -145,7 +145,8 @@
         "laravel": {
             "dont-discover": [
                 "barryvdh/laravel-ide-helper",
-                "laravel/mcp"
+                "laravel/mcp",
+                "laravel/reverb"
             ]
         }
     },
