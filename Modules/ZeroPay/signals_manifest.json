@@ -1,0 +1,3 @@
+{
+  "signals": ["zeropay.session.created", "zeropay.attempt.confirmed", "zeropay.followup.queued"]
+}

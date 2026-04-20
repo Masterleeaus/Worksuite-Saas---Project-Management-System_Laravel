@@ -1,0 +1,42 @@
+{
+    "name": "ZeroPay",
+    "alias": "zeropay",
+    "description": "ZeroPay payment session and payment operations orchestration layer for Worksuite",
+    "keywords": ["payments", "zerofee", "qr", "payment-link", "followup"],
+    "priority": 0,
+    "version": "1.0.0",
+    "providers": [
+        "Modules\\ZeroPay\\Providers\\ZeroPayServiceProvider"
+    ],
+    "aliases": {},
+    "files": [
+        "start.php"
+    ],
+    "requires": [],
+    "active": 1,
+    "order": 0,
+    "api_routes": [
+        "api/zeropay/session",
+        "api/zeropay/matches"
+    ],
+    "ai_tools": "ai_tools.json",
+    "cms_surfaces": "cms_manifest.json",
+    "omni_manifest": "omni_manifest.json",
+    "signals_manifest": "signals_manifest.json",
+    "permissions": [
+        "view_zeropay_dashboard",
+        "manage_zeropay_settings",
+        "manage_zeropay_sessions"
+    ],
+    "roles_permissions": {
+        "admin": [
+            "view_zeropay_dashboard",
+            "manage_zeropay_settings",
+            "manage_zeropay_sessions"
+        ],
+        "manager": [
+            "view_zeropay_dashboard",
+            "manage_zeropay_sessions"
+        ]
+    }
+}

@@ -46,6 +46,9 @@ class TitanPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
+            ->discoverPages(in: base_path('Modules/ZeroPay/Filament/Pages'), for: 'Modules\\ZeroPay\\Filament\\Pages')
+            ->discoverResources(in: base_path('Modules/ZeroPay/Filament/Resources'), for: 'Modules\\ZeroPay\\Filament\\Resources')
+            ->discoverWidgets(in: base_path('Modules/ZeroPay/Filament/Widgets'), for: 'Modules\\ZeroPay\\Filament\\Widgets')
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

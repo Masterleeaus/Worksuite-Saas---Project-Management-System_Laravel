@@ -1,0 +1,3 @@
+{
+  "tools": ["followup_drafter", "rail_recommender", "bank_match_suggester"]
+}

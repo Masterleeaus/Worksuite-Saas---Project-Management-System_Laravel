@@ -1,0 +1,3 @@
+{
+  "entities": ["zeropay_session", "zeropay_attempt", "zeropay_followup", "zeropay_bank_match"]
+}
