@@ -11,7 +11,29 @@ class EnsureTitanPanelAccess
 {
     public function handle(Request $request, Closure $next): Response
     {
-        abort_unless(TitanPanelProvider::canAccess(), 403);
+        if (!auth()->check()) {
+            if ($request->expectsJson()) {
+                abort(401);
+            }
+
+            return redirect()->route('login');
+        }
+
+        $user = TitanPanelProvider::resolveWorksuiteUser();
+
+        if (!$user) {
+            abort(403);
+        }
+
+        $isSuperAdmin = (bool) ($user->is_superadmin ?? false);
+
+        if (!$isSuperAdmin && empty($user->company_id)) {
+            abort(403);
+        }
+
+        if (!TitanPanelProvider::canAccess()) {
+            abort(403);
+        }
 
         return $next($request);
     }

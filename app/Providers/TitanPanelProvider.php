@@ -2,48 +2,9 @@
 
 namespace App\Providers;
 
-use App\Filament\Pages\AutomationQueue;
-use App\Filament\Pages\CommandCentre;
-use App\Filament\Resources\ClientResource;
-use App\Filament\Resources\ContractResource;
-use App\Filament\Resources\DocumentTemplateResource;
-use App\Filament\Resources\EmployeeResource;
-use App\Filament\Resources\EstimateResource;
-use App\Filament\Resources\InvoiceResource;
-use App\Filament\Resources\LeadResource;
-use App\Filament\Resources\LeaveResource;
-use App\Filament\Resources\PaymentResource;
-use App\Filament\Resources\ProjectResource;
-use App\Filament\Resources\ProjectFileResource;
-use App\Filament\Resources\ProjectNoteResource;
-use App\Filament\Resources\TaskResource;
-use App\Filament\Resources\AttendanceResource;
-use App\Filament\Resources\TimeLogResource;
-use App\Filament\Pages\ScoutStatus;
-use App\Filament\Pages\SentinelApprovals;
-use App\Filament\Pages\SignalLogs;
-use App\Filament\Widgets\ActiveContractsWidget;
-use App\Filament\Widgets\ActivityFeedWidget;
-use App\Filament\Widgets\ClockedInTodayWidget;
-use App\Filament\Widgets\EmployeesActiveTodayWidget;
-use App\Filament\Widgets\JobsTodayWidget;
-use App\Filament\Widgets\MissingTimeLogsWidget;
-use App\Filament\Widgets\OpenLeadsWidget;
-use App\Filament\Widgets\OverdueTasksWidget;
-use App\Filament\Widgets\PendingEstimatesWidget;
-use App\Filament\Widgets\PendingLeaveRequestsWidget;
-use App\Filament\Widgets\RecentPaymentsWidget;
-use App\Filament\Widgets\RecentProjectFilesWidget;
-use App\Filament\Widgets\RecentProjectNotesWidget;
-use App\Filament\Widgets\RevenueWidget;
-use App\Filament\Widgets\SystemSignalsWidget;
-use App\Filament\Widgets\TitanChatWidget;
-use App\Filament\Widgets\UpcomingAbsencesWidget;
-use App\Filament\Widgets\UnpaidInvoicesWidget;
 use App\Http\Middleware\FilamentAuthenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -77,87 +38,14 @@ class TitanPanelProvider extends PanelProvider
         return $panel
             ->id('titan')
             ->path('titan')
-
-            // ----------------------------------------------------------------
-            // Authentication – reuse Worksuite's existing web guard / User model.
-            // NO ->login() here: unauthenticated access is redirected to the
-            // standard Worksuite login (/login) by the Authenticate middleware.
-            // ----------------------------------------------------------------
             ->authGuard('web')
-
-            // ----------------------------------------------------------------
-            // Branding
-            // ----------------------------------------------------------------
             ->brandName('Titan Command Centre')
             ->colors([
                 'primary' => Color::Indigo,
             ])
-
-            // ----------------------------------------------------------------
-            // Navigation groups – auto-detected from Modules/* and Extensions/*
-            // ----------------------------------------------------------------
-            ->navigationGroups(
-                array_map(
-                    fn (string $name) => NavigationGroup::make($name),
-                    self::getModuleNavigationGroups()
-                )
-            )
-
-            // ----------------------------------------------------------------
-            // Pages
-            // ----------------------------------------------------------------
-            ->pages([
-                CommandCentre::class,
-                AutomationQueue::class,
-                ScoutStatus::class,
-                SentinelApprovals::class,
-                SignalLogs::class,
-            ])
-
-            // ----------------------------------------------------------------
-            // Widgets
-            // ----------------------------------------------------------------
-            ->widgets([
-                SystemSignalsWidget::class,
-                JobsTodayWidget::class,
-                RevenueWidget::class,
-                ActivityFeedWidget::class,
-                TitanChatWidget::class,
-                OpenLeadsWidget::class,
-                PendingEstimatesWidget::class,
-                OverdueTasksWidget::class,
-                UnpaidInvoicesWidget::class,
-                RecentPaymentsWidget::class,
-                ActiveContractsWidget::class,
-                EmployeesActiveTodayWidget::class,
-                ClockedInTodayWidget::class,
-                PendingLeaveRequestsWidget::class,
-                RecentProjectNotesWidget::class,
-                RecentProjectFilesWidget::class,
-                MissingTimeLogsWidget::class,
-                UpcomingAbsencesWidget::class,
-            ])
-            ->resources([
-                DocumentTemplateResource::class,
-                ClientResource::class,
-                EmployeeResource::class,
-                ProjectResource::class,
-                LeadResource::class,
-                EstimateResource::class,
-                ContractResource::class,
-                TaskResource::class,
-                InvoiceResource::class,
-                PaymentResource::class,
-                AttendanceResource::class,
-                TimeLogResource::class,
-                LeaveResource::class,
-                ProjectNoteResource::class,
-                ProjectFileResource::class,
-            ])
-
-            // ----------------------------------------------------------------
-            // Middleware – standard Filament stack using the existing session
-            // ----------------------------------------------------------------
+            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
+            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -171,8 +59,6 @@ class TitanPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 FilamentAuthenticate::class,
-                \App\Http\Middleware\ApplyTitanTenantScope::class,
-                \App\Http\Middleware\EnsureTitanPanelAccess::class,
             ]);
     }
 
@@ -192,7 +78,8 @@ class TitanPanelProvider extends PanelProvider
             return false;
         }
 
-        $isAdmin = method_exists($user, 'hasRole') && $user->hasRole('admin');
+        $hasInternalRole = method_exists($user, 'hasRole')
+            && ($user->hasRole('admin') || $user->hasRole('employee') || $user->hasRole('superadmin'));
 
         $permission = method_exists($user, 'permission')
             ? $user->permission('titan_access')
@@ -200,7 +87,7 @@ class TitanPanelProvider extends PanelProvider
 
         $hasTitanPermission = !in_array($permission, [false, null, 'none'], true);
 
-        return $isAdmin || $hasTitanPermission;
+        return $hasInternalRole || $hasTitanPermission;
     }
 
     public static function resolveWorksuiteUser(): ?object
