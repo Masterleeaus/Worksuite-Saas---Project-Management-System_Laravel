@@ -31,7 +31,7 @@ class CorrectiveActionOverdueListener implements ShouldQueue
         foreach ($adminEmails as $email) {
             try {
                 Mail::to($email)->queue(new ComplaintEscalatedMail(
-                    $action->complaint_id ?? 0,
+                    $action->complaint_id ?? null,
                     'Corrective action overdue — ' . $action->title,
                     $action->qc_record_id
                 ));

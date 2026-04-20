@@ -25,6 +25,15 @@ final class CreateQcFromComplaintAction
             return null;
         }
 
+        // Tenancy guard: prevent cross-company data leakage.
+        if (
+            isset($source->company_id) &&
+            isset($complaint->company_id) &&
+            (string) $source->company_id !== (string) $complaint->company_id
+        ) {
+            return null;
+        }
+
         $follow = new $scheduleClass();
         $follow->company_id = $source->company_id;
         $follow->subject = 'Follow-up: ' . ($source->subject ?: 'Inspection');

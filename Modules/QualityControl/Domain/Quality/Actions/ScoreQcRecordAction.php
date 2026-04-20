@@ -30,12 +30,14 @@ final class ScoreQcRecordAction
 
     private function severityIndex(?string $level): int
     {
-        return array_search($level ?? 'low', ['low', 'medium', 'high', 'critical'], true) ?: 0;
+        $idx = array_search($level ?? 'low', ['low', 'medium', 'high', 'critical'], true);
+        return $idx !== false ? (int) $idx : 0;
     }
 
     private function severityThresholdIndex(): int
     {
         $threshold = config('quality_control.qc_auto_create_complaint_threshold', 'high');
-        return array_search($threshold, ['low', 'medium', 'high', 'critical'], true) ?: 2;
+        $idx = array_search($threshold, ['low', 'medium', 'high', 'critical'], true);
+        return $idx !== false ? (int) $idx : 2;
     }
 }

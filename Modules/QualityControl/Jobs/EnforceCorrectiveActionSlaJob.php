@@ -8,10 +8,8 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Modules\QualityControl\Entities\QcCorrectiveAction;
 use Modules\QualityControl\Events\CorrectiveActionOverdueEvent;
-use Modules\QualityControl\Mail\QcFailedMail;
 
 /**
  * Scheduler-driven SLA enforcement job.
@@ -47,9 +45,6 @@ class EnforceCorrectiveActionSlaJob implements ShouldQueue
 
         foreach ($overdue as $action) {
             try {
-                EscalateOverdueCorrectiveActionsJob::dispatch($action->company_id)
-                    ->onQueue('qc-automation');
-
                 CorrectiveActionOverdueEvent::dispatch($action, 'sla_enforcer');
 
                 Log::info('[EnforceSla] Escalated action', ['corrective_action_id' => $action->id]);
