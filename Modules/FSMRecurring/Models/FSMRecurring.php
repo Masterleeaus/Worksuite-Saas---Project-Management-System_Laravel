@@ -2,6 +2,7 @@
 
 namespace Modules\FSMRecurring\Models;
 
+use App\Traits\HasCompany;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Modules\FSMCore\Models\FSMOrder;
@@ -21,6 +22,8 @@ use Modules\FSMCore\Models\FSMTemplate;
  */
 class FSMRecurring extends Model
 {
+    use HasCompany;
+
     protected $table = 'fsm_recurrings';
 
     protected $fillable = [

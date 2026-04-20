@@ -10,7 +10,7 @@ class SkillTypeController extends Controller
 {
     public function index()
     {
-        $types = FSMSkillType::withCount('skills')->orderBy('name')->paginate(50);
+        $types = FSMSkillType::where('company_id', $this->companyId())->withCount('skills')->orderBy('name')->paginate(50);
         return view('fsmskill::skill_types.index', compact('types'));
     }
 
@@ -27,6 +27,7 @@ class SkillTypeController extends Controller
             'active'      => 'nullable|boolean',
         ]);
         $data['active'] = $request->boolean('active', true);
+        $data['company_id'] = $this->companyId();
 
         FSMSkillType::create($data);
 
@@ -36,13 +37,13 @@ class SkillTypeController extends Controller
 
     public function edit(int $id)
     {
-        $type = FSMSkillType::findOrFail($id);
+        $type = FSMSkillType::where('company_id', $this->companyId())->findOrFail($id);
         return view('fsmskill::skill_types.edit', compact('type'));
     }
 
     public function update(Request $request, int $id)
     {
-        $type = FSMSkillType::findOrFail($id);
+        $type = FSMSkillType::where('company_id', $this->companyId())->findOrFail($id);
         $data = $request->validate([
             'name'        => 'required|string|max:128',
             'description' => 'nullable|string|max:65535',
@@ -58,8 +59,16 @@ class SkillTypeController extends Controller
 
     public function destroy(int $id)
     {
-        FSMSkillType::findOrFail($id)->delete();
+        FSMSkillType::where('company_id', $this->companyId())->findOrFail($id)->delete();
         return redirect()->route('fsmskill.skill-types.index')
             ->with('success', 'Skill type deleted.');
+    }
+
+    private function companyId(): int
+    {
+        $user = auth()->user();
+        abort_if(!$user || !$user->company_id, 403);
+
+        return (int) $user->company_id;
     }
 }

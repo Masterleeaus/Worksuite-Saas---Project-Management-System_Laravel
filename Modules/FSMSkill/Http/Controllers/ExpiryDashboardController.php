@@ -14,6 +14,7 @@ class ExpiryDashboardController extends Controller
 
         // Expired
         $expired = FSMEmployeeSkill::with(['user', 'skill.skillType', 'skillLevel'])
+            ->where('company_id', $this->companyId())
             ->whereNotNull('expiry_date')
             ->whereDate('expiry_date', '<', Carbon::today())
             ->orderBy('expiry_date')
@@ -21,6 +22,7 @@ class ExpiryDashboardController extends Controller
 
         // Expiring within configured window
         $expiringSoon = FSMEmployeeSkill::with(['user', 'skill.skillType', 'skillLevel'])
+            ->where('company_id', $this->companyId())
             ->whereNotNull('expiry_date')
             ->whereDate('expiry_date', '>=', Carbon::today())
             ->whereDate('expiry_date', '<=', Carbon::today()->addDays($days))
@@ -28,5 +30,13 @@ class ExpiryDashboardController extends Controller
             ->get();
 
         return view('fsmskill::expiry_dashboard.index', compact('expired', 'expiringSoon', 'days'));
+    }
+
+    private function companyId(): int
+    {
+        $user = auth()->user();
+        abort_if(!$user || !$user->company_id, 403);
+
+        return (int) $user->company_id;
     }
 }

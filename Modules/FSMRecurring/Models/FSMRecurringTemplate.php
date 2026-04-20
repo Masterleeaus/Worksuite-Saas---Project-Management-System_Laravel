@@ -2,6 +2,7 @@
 
 namespace Modules\FSMRecurring\Models;
 
+use App\Traits\HasCompany;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -10,6 +11,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class FSMRecurringTemplate extends Model
 {
+    use HasCompany;
+
     protected $table = 'fsm_recurring_templates';
 
     protected $fillable = [

@@ -14,6 +14,7 @@ class DistrictController extends Controller
     {
         $filter    = $request->only(['q']);
         $districts = FSMDistrict::with(['region', 'manager'])
+            ->where('company_id', company()->id)
             ->when($filter['q'] ?? null, fn($q, $v) => $q->where('name', 'like', "%$v%"))
             ->orderBy('name')
             ->paginate(20)
@@ -24,7 +25,7 @@ class DistrictController extends Controller
 
     public function create()
     {
-        $regions = FSMRegion::orderBy('name')->get();
+        $regions = FSMRegion::where('company_id', company()->id)->orderBy('name')->get();
         $users   = User::orderBy('name')->get();
 
         return view('fsmterritory::districts.create', compact('regions', 'users'));
@@ -38,6 +39,7 @@ class DistrictController extends Controller
             'region_id'   => 'nullable|integer',
             'manager_id'  => 'nullable|integer',
         ]);
+        $data['company_id'] = company()->id;
 
         FSMDistrict::create($data);
 
@@ -47,8 +49,8 @@ class DistrictController extends Controller
 
     public function edit(int $id)
     {
-        $district = FSMDistrict::findOrFail($id);
-        $regions  = FSMRegion::orderBy('name')->get();
+        $district = FSMDistrict::where('company_id', company()->id)->findOrFail($id);
+        $regions  = FSMRegion::where('company_id', company()->id)->orderBy('name')->get();
         $users    = User::orderBy('name')->get();
 
         return view('fsmterritory::districts.edit', compact('district', 'regions', 'users'));
@@ -56,7 +58,7 @@ class DistrictController extends Controller
 
     public function update(Request $request, int $id)
     {
-        $district = FSMDistrict::findOrFail($id);
+        $district = FSMDistrict::where('company_id', company()->id)->findOrFail($id);
 
         $data = $request->validate([
             'name'        => 'required|string|max:256',
@@ -73,7 +75,7 @@ class DistrictController extends Controller
 
     public function destroy(int $id)
     {
-        FSMDistrict::findOrFail($id)->delete();
+        FSMDistrict::where('company_id', company()->id)->findOrFail($id)->delete();
 
         return redirect()->route('fsmterritory.districts.index')
             ->with('success', 'District deleted.');

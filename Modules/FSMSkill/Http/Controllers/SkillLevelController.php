@@ -11,20 +11,20 @@ class SkillLevelController extends Controller
 {
     public function index(int $skillId)
     {
-        $skill  = FSMSkill::findOrFail($skillId);
-        $levels = FSMSkillLevel::where('skill_id', $skillId)->orderBy('progress')->get();
+        $skill  = FSMSkill::where('company_id', $this->companyId())->findOrFail($skillId);
+        $levels = FSMSkillLevel::where('company_id', $this->companyId())->where('skill_id', $skillId)->orderBy('progress')->get();
         return view('fsmskill::skill_levels.index', compact('skill', 'levels'));
     }
 
     public function create(int $skillId)
     {
-        $skill = FSMSkill::findOrFail($skillId);
+        $skill = FSMSkill::where('company_id', $this->companyId())->findOrFail($skillId);
         return view('fsmskill::skill_levels.create', compact('skill'));
     }
 
     public function store(Request $request, int $skillId)
     {
-        FSMSkill::findOrFail($skillId); // ensure parent exists
+        FSMSkill::where('company_id', $this->companyId())->findOrFail($skillId); // ensure parent exists
 
         $data = $request->validate([
             'name'          => 'required|string|max:128',
@@ -33,10 +33,11 @@ class SkillLevelController extends Controller
         ]);
         $data['skill_id']      = $skillId;
         $data['default_level'] = $request->boolean('default_level', false);
+        $data['company_id'] = $this->companyId();
 
         // Only one default per skill
         if ($data['default_level']) {
-            FSMSkillLevel::where('skill_id', $skillId)->update(['default_level' => false]);
+            FSMSkillLevel::where('company_id', $this->companyId())->where('skill_id', $skillId)->update(['default_level' => false]);
         }
 
         FSMSkillLevel::create($data);
@@ -47,15 +48,15 @@ class SkillLevelController extends Controller
 
     public function edit(int $skillId, int $levelId)
     {
-        $skill = FSMSkill::findOrFail($skillId);
-        $level = FSMSkillLevel::where('skill_id', $skillId)->findOrFail($levelId);
+        $skill = FSMSkill::where('company_id', $this->companyId())->findOrFail($skillId);
+        $level = FSMSkillLevel::where('company_id', $this->companyId())->where('skill_id', $skillId)->findOrFail($levelId);
         return view('fsmskill::skill_levels.edit', compact('skill', 'level'));
     }
 
     public function update(Request $request, int $skillId, int $levelId)
     {
-        FSMSkill::findOrFail($skillId);
-        $level = FSMSkillLevel::where('skill_id', $skillId)->findOrFail($levelId);
+        FSMSkill::where('company_id', $this->companyId())->findOrFail($skillId);
+        $level = FSMSkillLevel::where('company_id', $this->companyId())->where('skill_id', $skillId)->findOrFail($levelId);
 
         $data = $request->validate([
             'name'          => 'required|string|max:128',
@@ -65,7 +66,7 @@ class SkillLevelController extends Controller
         $data['default_level'] = $request->boolean('default_level', false);
 
         if ($data['default_level']) {
-            FSMSkillLevel::where('skill_id', $skillId)->where('id', '!=', $levelId)->update(['default_level' => false]);
+            FSMSkillLevel::where('company_id', $this->companyId())->where('skill_id', $skillId)->where('id', '!=', $levelId)->update(['default_level' => false]);
         }
 
         $level->update($data);
@@ -76,9 +77,17 @@ class SkillLevelController extends Controller
 
     public function destroy(int $skillId, int $levelId)
     {
-        $level = FSMSkillLevel::where('skill_id', $skillId)->findOrFail($levelId);
+        $level = FSMSkillLevel::where('company_id', $this->companyId())->where('skill_id', $skillId)->findOrFail($levelId);
         $level->delete();
         return redirect()->route('fsmskill.skill-levels.index', $skillId)
             ->with('success', 'Level deleted.');
+    }
+
+    private function companyId(): int
+    {
+        $user = auth()->user();
+        abort_if(!$user || !$user->company_id, 403);
+
+        return (int) $user->company_id;
     }
 }

@@ -11,8 +11,9 @@ class TimesheetController extends Controller
 {
     public function index(int $orderId)
     {
-        $order = FSMOrder::findOrFail($orderId);
+        $order = FSMOrder::where('company_id', $this->companyId())->findOrFail($orderId);
         $lines = FSMTimesheetLine::with('user')
+            ->where('company_id', $order->company_id)
             ->where('fsm_order_id', $orderId)
             ->orderBy('date')
             ->orderBy('start_time')
@@ -29,15 +30,15 @@ class TimesheetController extends Controller
 
     public function create(int $orderId)
     {
-        $order = FSMOrder::findOrFail($orderId);
-        $users = \App\Models\User::orderBy('name')->get();
+        $order = FSMOrder::where('company_id', $this->companyId())->findOrFail($orderId);
+        $users = \App\Models\User::where('company_id', $this->companyId())->orderBy('name')->get();
 
         return view('fsmtimesheet::timesheets.create', compact('order', 'users'));
     }
 
     public function store(Request $request, int $orderId)
     {
-        $order = FSMOrder::findOrFail($orderId);
+        $order = FSMOrder::where('company_id', $this->companyId())->findOrFail($orderId);
 
         $data = $request->validate([
             'user_id'     => 'nullable|integer|exists:users,id',
@@ -59,17 +60,17 @@ class TimesheetController extends Controller
 
     public function edit(int $orderId, int $id)
     {
-        $order = FSMOrder::findOrFail($orderId);
-        $line  = FSMTimesheetLine::where('fsm_order_id', $orderId)->findOrFail($id);
-        $users = \App\Models\User::orderBy('name')->get();
+        $order = FSMOrder::where('company_id', $this->companyId())->findOrFail($orderId);
+        $line  = FSMTimesheetLine::where('company_id', $order->company_id)->where('fsm_order_id', $orderId)->findOrFail($id);
+        $users = \App\Models\User::where('company_id', $this->companyId())->orderBy('name')->get();
 
         return view('fsmtimesheet::timesheets.edit', compact('order', 'line', 'users'));
     }
 
     public function update(Request $request, int $orderId, int $id)
     {
-        FSMOrder::findOrFail($orderId);
-        $line = FSMTimesheetLine::where('fsm_order_id', $orderId)->findOrFail($id);
+        $order = FSMOrder::where('company_id', $this->companyId())->findOrFail($orderId);
+        $line = FSMTimesheetLine::where('company_id', $order->company_id)->where('fsm_order_id', $orderId)->findOrFail($id);
 
         $data = $request->validate([
             'user_id'     => 'nullable|integer|exists:users,id',
@@ -88,8 +89,8 @@ class TimesheetController extends Controller
 
     public function destroy(int $orderId, int $id)
     {
-        FSMOrder::findOrFail($orderId);
-        $line = FSMTimesheetLine::where('fsm_order_id', $orderId)->findOrFail($id);
+        $order = FSMOrder::where('company_id', $this->companyId())->findOrFail($orderId);
+        $line = FSMTimesheetLine::where('company_id', $order->company_id)->where('fsm_order_id', $orderId)->findOrFail($id);
         $line->delete();
 
         return redirect()->route('fsmtimesheet.timesheets.index', $orderId)
@@ -108,5 +109,10 @@ class TimesheetController extends Controller
         $diff = $order->scheduled_date_start->diffInMinutes($order->scheduled_date_end);
 
         return round($diff / 60, 2);
+    }
+
+    private function companyId(): ?int
+    {
+        return auth()->user()?->company_id;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Modules\FSMRecurring\Models;
 
+use App\Traits\HasCompany;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
@@ -13,6 +14,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class FSMFrequency extends Model
 {
+    use HasCompany;
+
     protected $table = 'fsm_frequencies';
 
     protected $fillable = [

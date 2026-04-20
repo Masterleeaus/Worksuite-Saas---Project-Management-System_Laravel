@@ -11,8 +11,10 @@ class AvailabilityRuleController extends Controller
 {
     public function index(int $userId)
     {
-        $worker = User::findOrFail($userId);
-        $rules  = FSMAvailabilityRule::where('person_id', $userId)
+        $companyId = $this->companyId();
+        $worker = User::where('company_id', $companyId)->findOrFail($userId);
+        $rules  = FSMAvailabilityRule::where('company_id', $companyId)
+            ->where('person_id', $userId)
             ->orderByRaw("FIELD(day_of_week,'mon','tue','wed','thu','fri','sat','sun')")
             ->get();
 
@@ -21,7 +23,7 @@ class AvailabilityRuleController extends Controller
 
     public function create(int $userId)
     {
-        $worker = User::findOrFail($userId);
+        $worker = User::where('company_id', $this->companyId())->findOrFail($userId);
         $days   = FSMAvailabilityRule::$days;
 
         return view('fsmavailability::rules.create', compact('worker', 'days'));
@@ -29,7 +31,8 @@ class AvailabilityRuleController extends Controller
 
     public function store(Request $request, int $userId)
     {
-        $worker = User::findOrFail($userId);
+        $companyId = $this->companyId();
+        $worker = User::where('company_id', $companyId)->findOrFail($userId);
 
         $data = $request->validate([
             'day_of_week' => 'required|in:mon,tue,wed,thu,fri,sat,sun',
@@ -39,11 +42,11 @@ class AvailabilityRuleController extends Controller
         ]);
 
         $data['person_id']  = $userId;
-        $data['company_id'] = auth()->user()?->company_id ?? null;
+        $data['company_id'] = $companyId;
         $data['active']     = $request->boolean('active', true);
 
         FSMAvailabilityRule::updateOrCreate(
-            ['person_id' => $userId, 'day_of_week' => $data['day_of_week']],
+            ['company_id' => $companyId, 'person_id' => $userId, 'day_of_week' => $data['day_of_week']],
             $data
         );
 
@@ -53,8 +56,9 @@ class AvailabilityRuleController extends Controller
 
     public function edit(int $userId, int $id)
     {
-        $worker = User::findOrFail($userId);
-        $rule   = FSMAvailabilityRule::where('person_id', $userId)->findOrFail($id);
+        $companyId = $this->companyId();
+        $worker = User::where('company_id', $companyId)->findOrFail($userId);
+        $rule   = FSMAvailabilityRule::where('company_id', $companyId)->where('person_id', $userId)->findOrFail($id);
         $days   = FSMAvailabilityRule::$days;
 
         return view('fsmavailability::rules.edit', compact('worker', 'rule', 'days'));
@@ -62,7 +66,7 @@ class AvailabilityRuleController extends Controller
 
     public function update(Request $request, int $userId, int $id)
     {
-        $rule = FSMAvailabilityRule::where('person_id', $userId)->findOrFail($id);
+        $rule = FSMAvailabilityRule::where('company_id', $this->companyId())->where('person_id', $userId)->findOrFail($id);
 
         $data = $request->validate([
             'day_of_week' => 'required|in:mon,tue,wed,thu,fri,sat,sun',
@@ -80,9 +84,17 @@ class AvailabilityRuleController extends Controller
 
     public function destroy(int $userId, int $id)
     {
-        FSMAvailabilityRule::where('person_id', $userId)->findOrFail($id)->delete();
+        FSMAvailabilityRule::where('company_id', $this->companyId())->where('person_id', $userId)->findOrFail($id)->delete();
 
         return redirect()->route('fsmavailability.rules.index', $userId)
             ->with('success', 'Rule deleted.');
+    }
+
+    private function companyId(): int
+    {
+        $user = auth()->user();
+        abort_if(!$user || !$user->company_id, 403);
+
+        return (int) $user->company_id;
     }
 }
