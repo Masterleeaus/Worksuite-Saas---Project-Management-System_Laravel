@@ -1,7 +1,7 @@
 name: PR Summary
 
 on:
-  pull_request_target:
+  pull_request:
     types: [opened, synchronize, reopened]
 
 permissions:
@@ -17,8 +17,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          # pull_request_target runs in base-branch context; explicitly check out
-          # the PR head so the summary reflects the proposed changes.
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Detect changed areas

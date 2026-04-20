@@ -14,7 +14,7 @@ return new class extends Migration
     {
         if(!Schema::hasColumn('project_milestones', 'company_id')){
             Schema::table('project_milestones', function (Blueprint $table) {
-                $table->unsignedInteger('company_id')->nullable()->index('project_milestones_company_id_index')->after('id');
+                $table->unsignedInteger('company_id')->nullable()->index()->after('id');
                 $table->foreign('company_id')->references('id')->on('companies')->onUpdate('CASCADE')->onDelete('CASCADE');
             });
         }

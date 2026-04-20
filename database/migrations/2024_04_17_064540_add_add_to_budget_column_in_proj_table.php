@@ -12,27 +12,31 @@ return new class extends Migration {
     public function up(): void
     {
 
-        if (!Schema::hasColumn('deals', 'deal_watcher')) {
+        if (Schema::hasTable('deals') && !Schema::hasColumn('deals', 'deal_watcher')) {
             Schema::table('deals', function (Blueprint $table) {
                 $table->integer('deal_watcher')->nullable();
             });
         }
 
-        if (!Schema::hasColumn('project_milestones', 'add_to_budget')) {
+        if (Schema::hasTable('project_milestones') && !Schema::hasColumn('project_milestones', 'add_to_budget')) {
             Schema::table('project_milestones', function (Blueprint $table) {
                 $table->enum('add_to_budget', ['yes', 'no'])->default('no')->after('status');
             });
         }
 
-        Schema::table('leave_types', function (Blueprint $table) {
-            $table->decimal('monthly_limit', 10, 2)->change();
-        });
+        if (Schema::hasTable('leave_types') && Schema::hasColumn('leave_types', 'monthly_limit')) {
+            Schema::table('leave_types', function (Blueprint $table) {
+                $table->decimal('monthly_limit', 10, 2)->change();
+            });
+        }
 
-        Schema::table('project_time_logs', function (Blueprint $table) {
-            $table->double('earnings', 16, 2)->change();
-        });
+        if (Schema::hasTable('project_time_logs') && Schema::hasColumn('project_time_logs', 'earnings')) {
+            Schema::table('project_time_logs', function (Blueprint $table) {
+                $table->double('earnings', 16, 2)->change();
+            });
+        }
 
-        if (!Schema::hasColumn('attendance_settings', 'qr_enable')) {
+        if (Schema::hasTable('attendance_settings') && !Schema::hasColumn('attendance_settings', 'qr_enable')) {
             Schema::table('attendance_settings', function (Blueprint $table) {
                 $table->enum('qr_enable', ['1', '0'])->default('1');
             });
