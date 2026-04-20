@@ -147,14 +147,11 @@ class FSMOrder extends Model
 
     public function invoices()
     {
-        if (!class_exists(\Modules\FSMSales\Models\FSMSalesInvoice::class)) {
-            return null;
-        }
         return $this->belongsToMany(
-            \Modules\FSMSales\Models\FSMSalesInvoice::class,
-            'fsm_sales_invoice_order',
+            \App\Models\Invoice::class,
+            'fsm_order_invoice',
             'fsm_order_id',
-            'fsm_sales_invoice_id'
+            'invoice_id'
         );
     }
 }

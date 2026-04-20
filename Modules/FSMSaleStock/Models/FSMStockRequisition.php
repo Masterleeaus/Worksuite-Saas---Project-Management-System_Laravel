@@ -49,7 +49,7 @@ class FSMStockRequisition extends Model
 
     public function invoice()
     {
-        return $this->belongsTo(\Modules\FSMSales\Models\FSMSalesInvoice::class, 'invoice_id');
+        return $this->belongsTo(\App\Models\Invoice::class, 'invoice_id');
     }
 
     public function requestedBy()

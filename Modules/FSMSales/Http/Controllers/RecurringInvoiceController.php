@@ -2,28 +2,36 @@
 
 namespace Modules\FSMSales\Http\Controllers;
 
+use App\Models\RecurringInvoice;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Modules\FSMSales\Models\FSMRecurringInvoice;
 use Modules\FSMSales\Services\InvoiceGenerationService;
 
 class RecurringInvoiceController extends Controller
 {
     public function index(Request $request)
     {
-        $q = FSMRecurringInvoice::with(['client'])->latest();
+        $q = RecurringInvoice::with(['client', 'recurrings'])->latest();
 
         if ($request->filled('status')) {
             $q->where('status', $request->get('status'));
         }
 
         if ($request->filled('schedule')) {
-            $q->where('billing_schedule', $request->get('schedule'));
+            $q->where('rotation', $request->get('schedule'));
         }
 
         $recurring  = $q->paginate(50)->withQueryString();
-        $statuses   = config('fsmsales.invoice_statuses', []);
-        $schedules  = config('fsmsales.billing_schedules', []);
+        $statuses   = ['active' => 'Active', 'inactive' => 'Inactive'];
+        $schedules  = [
+            'monthly' => 'Monthly',
+            'quarterly' => 'Quarterly',
+            'annually' => 'Annual',
+            'weekly' => 'Weekly',
+            'bi-weekly' => 'Bi-Weekly',
+            'daily' => 'Daily',
+            'half-yearly' => 'Half Yearly',
+        ];
         $filter     = $request->only(['status', 'schedule']);
 
         return view('fsmsales::recurring.index', compact('recurring', 'statuses', 'schedules', 'filter'));
@@ -31,7 +39,7 @@ class RecurringInvoiceController extends Controller
 
     public function show(int $id)
     {
-        $entry = FSMRecurringInvoice::with(['client', 'invoice.lines', 'agreement'])->findOrFail($id);
+        $entry = RecurringInvoice::with(['client', 'recurrings.items'])->findOrFail($id);
 
         return view('fsmsales::recurring.show', compact('entry'));
     }
@@ -41,10 +49,10 @@ class RecurringInvoiceController extends Controller
      */
     public function convertToInvoice(int $id, InvoiceGenerationService $service)
     {
-        $entry = FSMRecurringInvoice::findOrFail($id);
+        $entry = RecurringInvoice::findOrFail($id);
 
-        if ($entry->status !== FSMRecurringInvoice::STATUS_DRAFT) {
-            return back()->with('error', 'Only draft recurring invoices can be converted.');
+        if ($entry->status !== 'active') {
+            return back()->with('error', 'Only active recurring invoices can be converted.');
         }
 
         $invoice = $service->convertRecurringToInvoice($entry);
@@ -58,15 +66,15 @@ class RecurringInvoiceController extends Controller
      */
     public function markPaid(int $id)
     {
-        $entry = FSMRecurringInvoice::findOrFail($id);
-        $entry->update(['status' => FSMRecurringInvoice::STATUS_PAID]);
+        $entry = RecurringInvoice::findOrFail($id);
+        $entry->update(['status' => 'inactive']);
 
         return back()->with('success', 'Recurring invoice marked as paid.');
     }
 
     public function destroy(int $id)
     {
-        FSMRecurringInvoice::findOrFail($id)->delete();
+        RecurringInvoice::findOrFail($id)->delete();
 
         return redirect()->route('fsmsales.recurring.index')
             ->with('success', 'Recurring invoice entry deleted.');

@@ -2,11 +2,11 @@
 
 namespace Modules\FSMSaleStock\Http\Controllers;
 
+use App\Models\Invoice;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\FSMCore\Models\FSMOrder;
 use Modules\FSMSaleStock\Models\FSMStockRequisition;
-use Modules\FSMSales\Models\FSMSalesInvoice;
 
 class StockRequisitionController extends Controller
 {
@@ -29,7 +29,7 @@ class StockRequisitionController extends Controller
     public function create()
     {
         $orders   = FSMOrder::orderBy('name')->get();
-        $invoices = FSMSalesInvoice::orderByDesc('invoice_date')->get();
+        $invoices = Invoice::orderByDesc('issue_date')->get();
         $statuses = FSMStockRequisition::$statuses;
 
         return view('fsmsalestock::requisitions.create', compact('orders', 'invoices', 'statuses'));
@@ -39,7 +39,7 @@ class StockRequisitionController extends Controller
     {
         $data = $request->validate([
             'fsm_order_id'   => 'nullable|integer|exists:fsm_orders,id',
-            'invoice_id'     => 'nullable|integer|exists:fsm_sales_invoices,id',
+            'invoice_id'     => 'nullable|integer|exists:invoices,id',
             'status'         => 'required|in:' . implode(',', array_keys(FSMStockRequisition::$statuses)),
             'notes'          => 'nullable|string',
             'requested_date' => 'nullable|date',
@@ -64,7 +64,7 @@ class StockRequisitionController extends Controller
     {
         $requisition = FSMStockRequisition::with('lines')->findOrFail($id);
         $orders   = FSMOrder::orderBy('name')->get();
-        $invoices = FSMSalesInvoice::orderByDesc('invoice_date')->get();
+        $invoices = Invoice::orderByDesc('issue_date')->get();
         $statuses = FSMStockRequisition::$statuses;
 
         return view('fsmsalestock::requisitions.edit', compact('requisition', 'orders', 'invoices', 'statuses'));
@@ -76,7 +76,7 @@ class StockRequisitionController extends Controller
 
         $data = $request->validate([
             'fsm_order_id'   => 'nullable|integer|exists:fsm_orders,id',
-            'invoice_id'     => 'nullable|integer|exists:fsm_sales_invoices,id',
+            'invoice_id'     => 'nullable|integer|exists:invoices,id',
             'status'         => 'required|in:' . implode(',', array_keys(FSMStockRequisition::$statuses)),
             'notes'          => 'nullable|string',
             'requested_date' => 'nullable|date',

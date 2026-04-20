@@ -121,7 +121,7 @@ class OrderController extends Controller
         ]);
 
         // FSMSales billing fields (optional, only when module is installed)
-        if (class_exists(\Modules\FSMSales\Models\FSMSalesInvoice::class)
+        if (class_exists(\App\Models\Invoice::class)
             && \Illuminate\Support\Facades\Schema::hasColumn('fsm_orders', 'billing_policy')
         ) {
             $billingData = $request->validate([
@@ -230,7 +230,7 @@ class OrderController extends Controller
         ]);
 
         // FSMSales billing fields (optional, only when module is installed)
-        if (class_exists(\Modules\FSMSales\Models\FSMSalesInvoice::class)
+        if (class_exists(\App\Models\Invoice::class)
             && \Illuminate\Support\Facades\Schema::hasColumn('fsm_orders', 'billing_policy')
         ) {
             $billingData = $request->validate([

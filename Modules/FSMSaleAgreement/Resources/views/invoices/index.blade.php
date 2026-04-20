@@ -21,14 +21,14 @@
         <tbody>
         @forelse($invoices as $invoice)
             @php
-                $synced = $invoice->orders->every(fn($o) => $o->agreement_id == $invoice->agreement_id);
+                $synced = $invoice->fsmOrders->every(fn($o) => $o->agreement_id == ($invoice->agreement_id ?? $o->agreement_id));
             @endphp
             <tr>
                 <td>{{ $invoice->number }}</td>
                 <td>{{ $invoice->client?->name ?? '—' }}</td>
-                <td>{{ $invoice->agreement_id }}</td>
+                <td>{{ $invoice->agreement_id ?? '—' }}</td>
                 <td>{{ $invoice->invoice_date?->format('d M Y') ?? '—' }}</td>
-                <td>{{ $invoice->orders->count() }}</td>
+                <td>{{ $invoice->fsmOrders->count() }}</td>
                 <td>
                     @if($synced)
                         <span class="badge bg-success">Synced</span>

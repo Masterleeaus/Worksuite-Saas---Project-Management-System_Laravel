@@ -19,9 +19,9 @@
         @if(class_exists(\Modules\FSMActivity\Http\Controllers\ActivityController::class))
             <a href="{{ route('fsmactivity.activities.index', $order->id) }}" class="btn btn-outline-warning">Activity Log</a>
         @endif
-        @if(class_exists(\Modules\FSMSales\Http\Controllers\InvoiceController::class) && \Illuminate\Support\Facades\Schema::hasTable('fsm_sales_invoices'))
+        @if(class_exists(\Modules\FSMSales\Http\Controllers\InvoiceController::class) && \Illuminate\Support\Facades\Schema::hasTable('invoices'))
             @php
-                $fsmSalesInvoiceCount = \Modules\FSMSales\Models\FSMSalesInvoice::whereHas('orders', fn($q) => $q->where('fsm_orders.id', $order->id))->count();
+                $fsmSalesInvoiceCount = \App\Models\Invoice::whereHas('fsmOrders', fn($q) => $q->where('fsm_orders.id', $order->id))->count();
             @endphp
             <a href="{{ route('fsmsales.invoices.index') }}" class="btn btn-outline-success">
                 💰 Invoices{{ $fsmSalesInvoiceCount > 0 ? " ({$fsmSalesInvoiceCount})" : '' }}
@@ -427,13 +427,13 @@
 </div>
 
 {{-- FSMSales: Billing tab --}}
-@if(class_exists(\Modules\FSMSales\Models\FSMSalesInvoice::class) && \Illuminate\Support\Facades\Schema::hasTable('fsm_sales_invoices') && \Illuminate\Support\Facades\Schema::hasTable('fsm_orders') && \Illuminate\Support\Facades\Schema::hasColumn('fsm_orders', 'billing_policy'))
+@if(class_exists(\App\Models\Invoice::class) && \Illuminate\Support\Facades\Schema::hasTable('invoices') && \Illuminate\Support\Facades\Schema::hasTable('fsm_orders') && \Illuminate\Support\Facades\Schema::hasColumn('fsm_orders', 'billing_policy'))
 <div class="row">
     <div class="col-12">
         @php
             $fsmSalesBillingPolicies = config('fsmsales.billing_policies', []);
-            $fsmSalesInvoices = \Modules\FSMSales\Models\FSMSalesInvoice::with('lines')
-                ->whereHas('orders', fn($q) => $q->where('fsm_orders.id', $order->id))
+            $fsmSalesInvoices = \App\Models\Invoice::with('items')
+                ->whereHas('fsmOrders', fn($q) => $q->where('fsm_orders.id', $order->id))
                 ->latest()
                 ->get();
         @endphp
@@ -485,7 +485,7 @@
                             @php $fsmInvSl = $fsmInv->statusLabel(); @endphp
                             <tr>
                                 <td>{{ $fsmInv->number }}</td>
-                                <td>{{ $fsmInv->invoice_date->format('d M Y') }}</td>
+                                <td>{{ $fsmInv->invoice_date?->format('d M Y') }}</td>
                                 <td>{{ $fsmInv->due_date?->format('d M Y') ?? '—' }}</td>
                                 <td class="text-end">${{ number_format($fsmInv->total, 2) }}</td>
                                 <td><span class="badge {{ $fsmInvSl['class'] }}">{{ $fsmInvSl['label'] }}</span></td>

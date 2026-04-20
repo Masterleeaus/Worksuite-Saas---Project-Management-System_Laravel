@@ -7,6 +7,7 @@ use App\Traits\CustomFieldsTrait;
 use App\Traits\HasCompany;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Notifications\Notifiable;
 
@@ -198,6 +199,21 @@ class Invoice extends BaseModel
         return $this->hasMany(InvoiceItems::class, 'invoice_id');
     }
 
+    public function lines(): HasMany
+    {
+        return $this->hasMany(InvoiceItems::class, 'invoice_id');
+    }
+
+    public function fsmOrders(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            \Modules\FSMCore\Models\FSMOrder::class,
+            'fsm_order_invoice',
+            'invoice_id',
+            'fsm_order_id'
+        );
+    }
+
     public function payment(): HasMany
     {
         return $this->hasMany(Payment::class, 'invoice_id')->orderByDesc('paid_on');
@@ -313,5 +329,44 @@ class Invoice extends BaseModel
     public function files(): HasMany
     {
         return $this->hasMany(InvoiceFiles::class, 'invoice_id')->orderByDesc('id');
+    }
+
+    public function getNumberAttribute(): string
+    {
+        return (string) $this->invoice_number;
+    }
+
+    public function getInvoiceDateAttribute()
+    {
+        return $this->issue_date;
+    }
+
+    public function getAmountPaidAttribute(): float
+    {
+        return max(0, (float) $this->total - (float) $this->due_amount);
+    }
+
+    public function getBalanceDueAttribute(): float
+    {
+        return max(0, (float) $this->due_amount);
+    }
+
+    public function isOverdue(): bool
+    {
+        return $this->due_date !== null
+            && Carbon::parse($this->due_date)->isPast()
+            && !in_array($this->status, ['paid', 'canceled'], true);
+    }
+
+    public function statusLabel(): array
+    {
+        return match ($this->status) {
+            'paid' => ['label' => 'Paid', 'class' => 'bg-success'],
+            'canceled' => ['label' => 'Void', 'class' => 'bg-secondary'],
+            'draft' => ['label' => 'Draft', 'class' => 'bg-warning text-dark'],
+            default => $this->isOverdue()
+                ? ['label' => 'Overdue', 'class' => 'bg-danger']
+                : ['label' => 'Sent', 'class' => 'bg-info text-dark'],
+        };
     }
 }

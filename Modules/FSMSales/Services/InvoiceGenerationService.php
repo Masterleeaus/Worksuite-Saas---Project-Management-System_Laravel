@@ -2,11 +2,11 @@
 
 namespace Modules\FSMSales\Services;
 
+use App\Models\Invoice;
+use App\Models\InvoiceItems;
+use App\Models\RecurringInvoice;
 use Carbon\Carbon;
 use Modules\FSMCore\Models\FSMOrder;
-use Modules\FSMSales\Models\FSMRecurringInvoice;
-use Modules\FSMSales\Models\FSMSalesInvoice;
-use Modules\FSMSales\Models\FSMSalesInvoiceLine;
 
 class InvoiceGenerationService
 {
@@ -14,7 +14,7 @@ class InvoiceGenerationService
      * Attempt to auto-generate an invoice for an FSM Order based on its billing policy.
      * Returns the created invoice or null if the policy does not trigger auto-generation.
      */
-    public function generateForOrder(FSMOrder $order): ?FSMSalesInvoice
+    public function generateForOrder(FSMOrder $order): ?Invoice
     {
         $policy = $order->billing_policy ?? 'manual';
 
@@ -28,49 +28,60 @@ class InvoiceGenerationService
     /**
      * Create a draft invoice when an order is marked complete (billing_policy = on_completion).
      */
-    public function createFromOrderCompletion(FSMOrder $order): FSMSalesInvoice
+    public function createFromOrderCompletion(FSMOrder $order): Invoice
     {
         $terms   = (int) config('fsmsales.payment_terms_days', 14);
-        $invoice = FSMSalesInvoice::create([
+        $invoice = Invoice::create([
             'company_id'   => $order->company_id,
-            'number'       => FSMSalesInvoice::nextNumber(),
+            'invoice_number' => $this->nextInvoiceNumber($order->company_id),
             'client_id'    => $this->resolveClientId($order),
-            'agreement_id' => $order->agreement_id,
-            'invoice_date' => now()->toDateString(),
+            'issue_date' => now()->toDateString(),
             'due_date'     => now()->addDays($terms)->toDateString(),
-            'status'       => FSMSalesInvoice::STATUS_DRAFT,
+            'status'       => 'draft',
+            'currency_id' => company()?->currency_id ?? null,
+            'default_currency_id' => company()?->currency_id ?? null,
+            'sub_total' => 0,
+            'total' => 0,
+            'due_amount' => 0,
+            'discount' => 0,
+            'discount_type' => 'percent',
+            'recurring' => 'no',
+            'fsm_order_id' => $order->id,
         ]);
 
         // Attach the order
-        $invoice->orders()->attach($order->id);
+        $invoice->fsmOrders()->syncWithoutDetaching([$order->id]);
 
         // Service charge line
         $amount = $this->resolveServiceAmount($order);
-        FSMSalesInvoiceLine::create([
+        InvoiceItems::create([
             'company_id'           => $order->company_id,
-            'fsm_sales_invoice_id' => $invoice->id,
+            'invoice_id' => $invoice->id,
             'fsm_order_id'         => $order->id,
-            'line_type'            => FSMSalesInvoiceLine::TYPE_SERVICE,
-            'description'          => 'Service – ' . $order->name,
-            'qty'                  => 1,
+            'type' => 'item',
+            'item_name' => 'Service',
+            'item_summary' => 'Service – ' . $order->name,
+            'quantity'                  => 1,
             'unit_price'           => $amount,
-            'tax_rate'             => 0,
+            'amount' => $amount,
         ]);
 
         // Billable stock lines (FSMStock integration)
         $this->attachBillableStockLines($invoice, $order);
 
+        $this->recalculateInvoiceTotals($invoice);
+
         // Mark order as invoiced
         $order->is_invoiced = true;
         $order->save();
 
-        return $invoice->fresh(['lines']);
+        return $invoice->fresh(['items']);
     }
 
     /**
      * Create a draft invoice from timesheet hours × hourly_rate.
      */
-    public function createFromOrderTimesheet(FSMOrder $order): ?FSMSalesInvoice
+    public function createFromOrderTimesheet(FSMOrder $order): ?Invoice
     {
         if (!class_exists(\Modules\FSMTimesheet\Models\FSMTimesheetLine::class)) {
             return null;
@@ -87,35 +98,45 @@ class InvoiceGenerationService
         $amount  = round($totalHours * $rate, 2);
         $terms   = (int) config('fsmsales.payment_terms_days', 14);
 
-        $invoice = FSMSalesInvoice::create([
+        $invoice = Invoice::create([
             'company_id'   => $order->company_id,
-            'number'       => FSMSalesInvoice::nextNumber(),
+            'invoice_number' => $this->nextInvoiceNumber($order->company_id),
             'client_id'    => $this->resolveClientId($order),
-            'agreement_id' => $order->agreement_id,
-            'invoice_date' => now()->toDateString(),
+            'issue_date' => now()->toDateString(),
             'due_date'     => now()->addDays($terms)->toDateString(),
-            'status'       => FSMSalesInvoice::STATUS_DRAFT,
+            'status'       => 'draft',
+            'currency_id' => company()?->currency_id ?? null,
+            'default_currency_id' => company()?->currency_id ?? null,
+            'sub_total' => 0,
+            'total' => 0,
+            'due_amount' => 0,
+            'discount' => 0,
+            'discount_type' => 'percent',
+            'recurring' => 'no',
+            'fsm_order_id' => $order->id,
         ]);
 
-        $invoice->orders()->attach($order->id);
+        $invoice->fsmOrders()->syncWithoutDetaching([$order->id]);
 
-        FSMSalesInvoiceLine::create([
+        InvoiceItems::create([
             'company_id'           => $order->company_id,
-            'fsm_sales_invoice_id' => $invoice->id,
+            'invoice_id' => $invoice->id,
             'fsm_order_id'         => $order->id,
-            'line_type'            => FSMSalesInvoiceLine::TYPE_TIMESHEET,
-            'description'          => sprintf('Labour – %s (%.2f hrs @ $%.2f/hr)', $order->name, $totalHours, $rate),
-            'qty'                  => $totalHours,
+            'type' => 'item',
+            'item_name' => 'Timesheet',
+            'item_summary' => sprintf('Labour – %s (%.2f hrs @ $%.2f/hr)', $order->name, $totalHours, $rate),
+            'quantity' => $totalHours,
             'unit_price'           => $rate,
-            'tax_rate'             => 0,
+            'amount' => $amount,
         ]);
 
         $this->attachBillableStockLines($invoice, $order);
+        $this->recalculateInvoiceTotals($invoice);
 
         $order->is_invoiced = true;
         $order->save();
 
-        return $invoice->fresh(['lines']);
+        return $invoice->fresh(['items']);
     }
 
     /**
@@ -124,7 +145,7 @@ class InvoiceGenerationService
      *
      * @param  Carbon|string  $from
      * @param  Carbon|string  $to
-     * @return \Illuminate\Support\Collection<FSMSalesInvoice>
+     * @return \Illuminate\Support\Collection<Invoice>
      */
     public function bulkCreateForPeriod(mixed $from, mixed $to, ?int $companyId = null): \Illuminate\Support\Collection
     {
@@ -158,59 +179,66 @@ class InvoiceGenerationService
         string $schedule,
         Carbon $periodStart,
         Carbon $periodEnd
-    ): FSMRecurringInvoice {
+    ): RecurringInvoice {
         $terms  = (int) config('fsmsales.payment_terms_days', 14);
         $amount = $this->prorateAmount($agreement, $periodStart, $periodEnd, $schedule);
 
-        return FSMRecurringInvoice::create([
-            'company_id'      => $agreement->company_id,
-            'agreement_id'    => $agreement->id,
-            'client_id'       => $agreement->partner_id,
-            'billing_schedule'=> $schedule,
-            'period_start'    => $periodStart->toDateString(),
-            'period_end'      => $periodEnd->toDateString(),
-            'amount'          => $amount,
-            'status'          => FSMRecurringInvoice::STATUS_DRAFT,
-            'due_date'        => $periodEnd->copy()->addDays($terms)->toDateString(),
+        return RecurringInvoice::create([
+            'company_id' => $agreement->company_id,
+            'project_id' => null,
+            'client_id' => $agreement->partner_id,
+            'currency_id' => company()?->currency_id ?? null,
+            'issue_date' => $periodStart->toDateString(),
+            'next_invoice_date' => $periodEnd->copy()->addDay()->toDateString(),
+            'due_date' => $periodEnd->copy()->addDays($terms)->toDateString(),
+            'sub_total' => $amount,
+            'total' => $amount,
+            'discount' => 0,
+            'discount_type' => 'percent',
+            'status' => 'active',
+            'rotation' => $this->mapScheduleToRotation($schedule),
+            'note' => 'FSM agreement #' . $agreement->id,
+            'show_shipping_address' => 'no',
         ]);
     }
 
     /**
-     * Convert a recurring invoice entry into a proper FSMSalesInvoice (on admin approval).
+     * Convert a recurring invoice entry into a proper Invoice (on admin approval).
      */
-    public function convertRecurringToInvoice(FSMRecurringInvoice $recurring): FSMSalesInvoice
+    public function convertRecurringToInvoice(RecurringInvoice $recurring): Invoice
     {
-        $invoice = FSMSalesInvoice::create([
+        $invoice = Invoice::create([
             'company_id'      => $recurring->company_id,
-            'number'          => FSMSalesInvoice::nextNumber(),
+            'invoice_number'  => $this->nextInvoiceNumber($recurring->company_id),
             'client_id'       => $recurring->client_id,
-            'agreement_id'    => $recurring->agreement_id,
-            'invoice_date'    => now()->toDateString(),
+            'issue_date'    => now()->toDateString(),
             'due_date'        => $recurring->due_date?->toDateString(),
-            'status'          => FSMSalesInvoice::STATUS_DRAFT,
-            'billing_schedule'=> $recurring->billing_schedule,
+            'status'          => 'draft',
+            'currency_id' => $recurring->currency_id ?? company()?->currency_id ?? null,
+            'default_currency_id' => company()?->currency_id ?? null,
+            'sub_total' => 0,
+            'total' => 0,
+            'due_amount' => 0,
+            'discount' => 0,
+            'discount_type' => 'percent',
+            'recurring' => 'no',
+            'invoice_recurring_id' => $recurring->id,
         ]);
 
-        FSMSalesInvoiceLine::create([
+        InvoiceItems::create([
             'company_id'           => $recurring->company_id,
-            'fsm_sales_invoice_id' => $invoice->id,
-            'line_type'            => FSMSalesInvoiceLine::TYPE_SERVICE,
-            'description'          => sprintf(
-                'Service Agreement – %s to %s',
-                $recurring->period_start?->format('d M Y'),
-                $recurring->period_end?->format('d M Y')
-            ),
-            'qty'        => 1,
-            'unit_price' => $recurring->amount,
-            'tax_rate'   => 0,
+            'invoice_id' => $invoice->id,
+            'type' => 'item',
+            'item_name' => 'Recurring Service',
+            'item_summary' => $recurring->note ?: 'Recurring invoice',
+            'quantity' => 1,
+            'unit_price' => $recurring->total,
+            'amount' => $recurring->total,
         ]);
 
-        $recurring->update([
-            'fsm_sales_invoice_id' => $invoice->id,
-            'status'               => FSMRecurringInvoice::STATUS_SENT,
-        ]);
+        $this->recalculateInvoiceTotals($invoice);
 
-        return $invoice->fresh(['lines']);
+        return $invoice->fresh(['items']);
     }
 
     // ── Private helpers ──────────────────────────────────────────────────────
@@ -244,7 +272,7 @@ class InvoiceGenerationService
         return 0.0;
     }
 
-    private function attachBillableStockLines(FSMSalesInvoice $invoice, FSMOrder $order): void
+    private function attachBillableStockLines(Invoice $invoice, FSMOrder $order): void
     {
         // Guard: FSMStock must be installed and have billable lines
         if (!class_exists(\Modules\FSMStock\Models\FSMOrderStockLine::class)) {
@@ -260,18 +288,41 @@ class InvoiceGenerationService
             ->get();
 
         foreach ($stockLines as $stockLine) {
-            FSMSalesInvoiceLine::create([
+            InvoiceItems::create([
                 'company_id'           => $order->company_id,
-                'fsm_sales_invoice_id' => $invoice->id,
+                'invoice_id' => $invoice->id,
                 'fsm_order_id'         => $order->id,
-                'line_type'            => FSMSalesInvoiceLine::TYPE_STOCK,
-                'description'          => $stockLine->product_name ?? 'Consumable',
-                'qty'                  => (float) ($stockLine->qty ?? 1),
+                'type' => 'item',
+                'item_name' => 'Stock',
+                'item_summary' => $stockLine->product_name ?? 'Consumable',
+                'quantity' => (float) ($stockLine->qty ?? 1),
                 'unit_price'           => (float) ($stockLine->unit_price ?? 0),
-                'tax_rate'             => 0,
-                'stock_line_id'        => $stockLine->id,
+                'amount' => round((float) ($stockLine->qty ?? 1) * (float) ($stockLine->unit_price ?? 0), 2),
             ]);
         }
+    }
+
+    private function recalculateInvoiceTotals(Invoice $invoice): void
+    {
+        $subTotal = (float) $invoice->items()->sum('amount');
+        $invoice->sub_total = $subTotal;
+        $invoice->total = $subTotal;
+        $invoice->due_amount = $subTotal;
+        $invoice->save();
+    }
+
+    private function nextInvoiceNumber(?int $companyId = null): int
+    {
+        return Invoice::lastInvoiceNumber($companyId) + 1;
+    }
+
+    private function mapScheduleToRotation(string $schedule): string
+    {
+        return match ($schedule) {
+            'quarterly' => 'quarterly',
+            'annual' => 'annually',
+            default => 'monthly',
+        };
     }
 
     /**

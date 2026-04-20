@@ -35,8 +35,8 @@
                             <span class="badge bg-danger ms-1">OVERDUE</span>
                         @endif
                     </dd>
-                    @if($invoice->notes)
-                    <dt class="col-sm-4">Notes</dt><dd class="col-sm-8">{{ $invoice->notes }}</dd>
+                    @if($invoice->note)
+                    <dt class="col-sm-4">Notes</dt><dd class="col-sm-8">{{ $invoice->note }}</dd>
                     @endif
                 </dl>
             </div>
@@ -60,12 +60,12 @@
                     <tbody>
                         @forelse($invoice->lines as $line)
                         <tr>
-                            <td><span class="badge bg-secondary">{{ ucfirst($line->line_type) }}</span></td>
-                            <td>{{ $line->description ?? '—' }}</td>
-                            <td class="text-end">{{ number_format($line->qty, 2) }}</td>
+                            <td><span class="badge bg-secondary">{{ $line->item_name ?? 'Item' }}</span></td>
+                            <td>{{ $line->item_summary ?? '—' }}</td>
+                            <td class="text-end">{{ number_format($line->quantity, 2) }}</td>
                             <td class="text-end">${{ number_format($line->unit_price, 2) }}</td>
-                            <td class="text-end">${{ number_format($line->line_tax, 2) }}</td>
-                            <td class="text-end">${{ number_format($line->line_total, 2) }}</td>
+                            <td class="text-end">$0.00</td>
+                            <td class="text-end">${{ number_format($line->amount, 2) }}</td>
                         </tr>
                         @empty
                         <tr><td colspan="6" class="text-center text-muted">No lines yet.</td></tr>
@@ -74,11 +74,11 @@
                     <tfoot class="table-light fw-semibold">
                         <tr>
                             <td colspan="4" class="text-end">Subtotal</td>
-                            <td colspan="2" class="text-end">${{ number_format($invoice->subtotal, 2) }}</td>
+                            <td colspan="2" class="text-end">${{ number_format($invoice->sub_total, 2) }}</td>
                         </tr>
                         <tr>
                             <td colspan="4" class="text-end">Tax</td>
-                            <td colspan="2" class="text-end">${{ number_format($invoice->tax_total, 2) }}</td>
+                            <td colspan="2" class="text-end">$0.00</td>
                         </tr>
                         <tr>
                             <td colspan="4" class="text-end">Total</td>
@@ -98,7 +98,7 @@
         </div>
 
         {{-- Linked Orders --}}
-        @if($invoice->orders->isNotEmpty())
+        @if($invoice->fsmOrders->isNotEmpty())
         <div class="card">
             <div class="card-header fw-semibold">Linked FSM Orders</div>
             <div class="table-responsive">
@@ -107,7 +107,7 @@
                         <tr><th>Reference</th><th>Location</th><th>Completed</th><th></th></tr>
                     </thead>
                     <tbody>
-                        @foreach($invoice->orders as $order)
+                        @foreach($invoice->fsmOrders as $order)
                         <tr>
                             <td>{{ $order->name }}</td>
                             <td>{{ $order->location?->name ?? '—' }}</td>

@@ -2,9 +2,9 @@
 
 namespace Modules\FSMSales\Console\Commands;
 
+use App\Models\RecurringInvoice;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Modules\FSMSales\Models\FSMRecurringInvoice;
 use Modules\FSMSales\Services\InvoiceGenerationService;
 
 /**
@@ -44,9 +44,8 @@ class GenerateRecurringInvoices extends Command
 
         foreach ($agreements as $agreement) {
             // Skip if a recurring entry already exists for this agreement + period
-            $exists = FSMRecurringInvoice::where('agreement_id', $agreement->id)
-                ->where('billing_schedule', $schedule)
-                ->where('period_start', $periodStart->toDateString())
+            $exists = RecurringInvoice::where('client_id', $agreement->partner_id)
+                ->whereDate('issue_date', $periodStart->toDateString())
                 ->exists();
 
             if ($exists) {

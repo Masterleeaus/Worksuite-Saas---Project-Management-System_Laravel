@@ -47,7 +47,7 @@
                         </div>
                         <div class="col-12">
                             <label class="form-label">Notes</label>
-                            <textarea name="notes" class="form-control" rows="2">{{ $invoice->notes }}</textarea>
+                            <textarea name="notes" class="form-control" rows="2">{{ $invoice->note }}</textarea>
                         </div>
                     </div>
                     <div class="mt-3">
@@ -105,10 +105,10 @@
                         @forelse($invoice->lines as $line)
                         <tr>
                             <td>
-                                <span class="badge bg-secondary small">{{ ucfirst($line->line_type) }}</span>
-                                {{ $line->description ?? '—' }}
+                                <span class="badge bg-secondary small">{{ $line->item_name ?? 'Item' }}</span>
+                                {{ $line->item_summary ?? '—' }}
                             </td>
-                            <td class="text-end">${{ number_format($line->line_total, 2) }}</td>
+                            <td class="text-end">${{ number_format($line->amount, 2) }}</td>
                             <td>
                                 <form method="POST" action="{{ route('fsmsales.invoices.lines.delete', [$invoice->id, $line->id]) }}">
                                     @csrf
