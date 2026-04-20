@@ -23,7 +23,7 @@ return new class extends Migration {
         // fsm_teams gets a default project
         if (Schema::hasTable('fsm_teams') && ! Schema::hasColumn('fsm_teams', 'project_id')) {
             Schema::table('fsm_teams', function (Blueprint $table) {
-                $table->unsignedBigInteger('project_id')->nullable()->after('team_leader_id');
+                $table->unsignedBigInteger('project_id')->nullable();
             });
         }
 

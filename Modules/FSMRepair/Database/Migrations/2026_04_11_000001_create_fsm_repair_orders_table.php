@@ -57,7 +57,7 @@ return new class extends Migration {
         // Add repair_count counter to fsm_orders
         if (Schema::hasTable('fsm_orders') && ! Schema::hasColumn('fsm_orders', 'repair_count')) {
             Schema::table('fsm_orders', function (Blueprint $table) {
-                $table->integer('repair_count')->default(0)->after('type_id');
+                $table->integer('repair_count')->default(0);
             });
         }
     }

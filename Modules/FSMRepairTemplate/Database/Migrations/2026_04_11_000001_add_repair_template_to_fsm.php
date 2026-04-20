@@ -11,7 +11,7 @@ return new class extends Migration {
         // Add repair_order_template_id to fsm_templates
         if (Schema::hasTable('fsm_templates') && ! Schema::hasColumn('fsm_templates', 'repair_order_template_id')) {
             Schema::table('fsm_templates', function (Blueprint $table) {
-                $table->unsignedBigInteger('repair_order_template_id')->nullable()->after('stage_id');
+                $table->unsignedBigInteger('repair_order_template_id')->nullable();
             });
         }
 

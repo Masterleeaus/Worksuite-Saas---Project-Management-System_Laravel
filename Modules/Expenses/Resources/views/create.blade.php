@@ -1,6 +1,6 @@
 <x-layout>
 <h1>New Expense</h1>
-<form method="POST" action="{{ route('expenses.store') }}">
+<form method="POST" action="{{ route('module-expenses.store') }}">
   @csrf
   <input type="date" name="date" required>
   <input type="number" step="0.01" name="amount" placeholder="Amount" required>
