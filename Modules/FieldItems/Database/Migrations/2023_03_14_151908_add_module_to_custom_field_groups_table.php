@@ -15,7 +15,7 @@ return new class extends Migration
      */
     public function up()
     {
-        $companyId = Company::query()->whereKey(1)->exists() ? 1 : null;
+        $companyId = Company::query()->value('id');
 
         $data = [
             'company_id' => $companyId,
