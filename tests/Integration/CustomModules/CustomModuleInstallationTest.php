@@ -96,7 +96,7 @@ class CustomModuleInstallationTest extends TestCase
         
         $response->assertStatus(200);
         $response->assertJsonPath('status', 'fail');
-        $this->assertStringContainsString('edit_invoices', (string) $response->json('analysis.blocking_issues.0'));
+        $response->assertJsonPath('blocking_issues.0.code', 'PERMISSION_COLLISION');
         
         // Verify module was NOT installed
         $this->assertFalse(File::exists(base_path('Modules/BadModule')));
