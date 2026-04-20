@@ -1,0 +1,53 @@
+{
+    "name": "ZeroPay",
+    "alias": "zeropay",
+    "description": "ZeroPay payment session and payment rail orchestration layer for Worksuite",
+    "keywords": ["payments", "zerofee", "qr", "payment-link", "followup", "reconciliation"],
+    "priority": 0,
+    "version": "1.1.0",
+    "providers": [
+        "Modules\\ZeroPay\\Providers\\ZeroPayServiceProvider"
+    ],
+    "aliases": {},
+    "files": [
+        "start.php"
+    ],
+    "requires": [],
+    "active": 1,
+    "order": 0,
+    "api_routes": [
+        "api/zeropay/session",
+        "api/zeropay/matches",
+        "api/zeropay/callbacks/stripe"
+    ],
+    "ai_tools": "manifests/ai_tools.json",
+    "cms_surfaces": "manifests/cms_manifest.json",
+    "omni_manifest": "manifests/omni_manifest.json",
+    "signals_manifest": "manifests/signals_manifest.json",
+    "lifecycle_manifest": "manifests/lifecycle_manifest.json",
+    "api_manifest": "manifests/api_manifest.json",
+    "package_manifest": "manifests/package_manifest.json",
+    "permissions": [
+        "view_zeropay_dashboard",
+        "manage_zeropay_settings",
+        "manage_zeropay_sessions",
+        "manage_zeropay_reconciliation",
+        "manage_zeropay_followups"
+    ],
+    "roles_permissions": {
+        "admin": [
+            "view_zeropay_dashboard",
+            "manage_zeropay_settings",
+            "manage_zeropay_sessions",
+            "manage_zeropay_reconciliation",
+            "manage_zeropay_followups"
+        ],
+        "manager": [
+            "view_zeropay_dashboard",
+            "manage_zeropay_sessions",
+            "manage_zeropay_reconciliation",
+            "manage_zeropay_followups"
+        ]
+    },
+    "sidebar_menu": true
+}

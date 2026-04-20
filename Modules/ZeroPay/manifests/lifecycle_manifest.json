@@ -1,0 +1,15 @@
+{
+  "stages": [
+    "created",
+    "sent",
+    "method_selected",
+    "awaiting_confirmation",
+    "paid",
+    "expired"
+  ],
+  "hooks": [
+    "session_created",
+    "session_resend",
+    "session_expire"
+  ]
+}
