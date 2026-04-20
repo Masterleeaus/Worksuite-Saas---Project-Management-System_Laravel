@@ -495,74 +495,20 @@ class ComplaintController extends AccountBaseController
         $editPermission = user()->permission('edit_complaint');
         abort_403(!in_array($editPermission, ['all', 'owned', 'both']) && $complaint->agent_id != user()->id);
 
-        if (!class_exists('Modules\\QualityControl\\Entities\\Schedule')) {
+        if (!class_exists('Modules\\QualityControl\\Domain\\Quality\\Actions\\CreateQcFromComplaintAction')) {
             return Reply::error('Quality Inspections module not installed.');
         }
 
-        if (empty($complaint->quality_control_id)) {
-            return Reply::error('This issue is not linked to an inspection schedule.');
-        }
+        /** @var \Modules\QualityControl\Domain\Quality\Actions\CreateQcFromComplaintAction $action */
+        $action = app('Modules\\QualityControl\\Domain\\Quality\\Actions\\CreateQcFromComplaintAction');
+        $followUpId = $action->handle($complaint);
 
-        // If follow-up already exists, return it.
-        if (!empty($complaint->follow_up_schedule_id)) {
-            return Reply::successWithData(__('messages.updateSuccess'), [
-                'follow_up_schedule_id' => $complaint->follow_up_schedule_id,
-            ]);
-        }
-
-        $scheduleClass = 'Modules\\QualityControl\\Entities\\Schedule';
-        $orig = $scheduleClass::find($complaint->quality_control_id);
-
-        if (!$orig) {
+        if (!$followUpId) {
             return Reply::error('Linked inspection schedule not found.');
         }
 
-        // Clone schedule fields for follow-up.
-        $follow = new $scheduleClass();
-        $follow->subject = 'Follow-up: ' . ($orig->subject ?: 'Inspection');
-        $follow->tower_id = $orig->tower_id ?? null;
-        $follow->floor_id = $orig->floor_id ?? null;
-        $follow->lokasi = $orig->lokasi ?? null;
-        $follow->shift = $orig->shift ?? null;
-        $follow->awal = $orig->awal ?? null;
-        $follow->akhir = $orig->akhir ?? null;
-        $follow->worker_id = $orig->worker_id ?? null;
-        $follow->issue_date = now()->addDay()->format('Y-m-d');
-        $follow->job_id = $orig->job_id ?? ($complaint->job_id ?? null);
-        $follow->complaint_id = $complaint->id;
-
-        // Default outcome starts pending.
-        $follow->qc_outcome = 'pending';
-        $follow->qc_outcome_set_at = null;
-
-        $follow->save();
-
-        // Copy checklist items if any
-        try {
-            if (method_exists($orig, 'items')) {
-                foreach ($orig->items as $item) {
-                    $itemClass = 'Modules\\QualityControl\\Entities\\ScheduleItems';
-                    if (class_exists($itemClass)) {
-                        $itemClass::create([
-                            'schedule_id' => $follow->id,
-                            'item_name' => $item->item_name,
-                        ]);
-                    }
-                }
-            }
-        } catch (\Throwable $e) {
-            // non-fatal
-        }
-
-        // Link both ways
-        $complaint->follow_up_schedule_id = $follow->id;
-        $complaint->save();
-
-        $orig->follow_up_schedule_id = $follow->id;
-        $orig->save();
-
         return Reply::successWithData(__('messages.recordSaved'), [
-            'follow_up_schedule_id' => $follow->id,
+            'follow_up_schedule_id' => $followUpId,
         ]);
     }
 

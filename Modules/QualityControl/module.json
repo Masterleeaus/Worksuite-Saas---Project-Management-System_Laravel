@@ -12,7 +12,9 @@
         "view_qc_reports",
         "manage_qc_templates",
         "trigger_reclean",
-        "view_cleaner_ratings"
+        "view_cleaner_ratings",
+        "manage_qc_corrective_actions",
+        "verify_qc_followups"
     ],
     "roles_permissions": {
         "admin": [
@@ -23,7 +25,9 @@
             "view_qc_reports",
             "manage_qc_templates",
             "trigger_reclean",
-            "view_cleaner_ratings"
+            "view_cleaner_ratings",
+            "manage_qc_corrective_actions",
+            "verify_qc_followups"
         ],
         "manager": [
             "view_quality_control",
@@ -32,7 +36,9 @@
             "view_qc_reports",
             "manage_qc_templates",
             "trigger_reclean",
-            "view_cleaner_ratings"
+            "view_cleaner_ratings",
+            "manage_qc_corrective_actions",
+            "verify_qc_followups"
         ]
     },
     "priority": 0,

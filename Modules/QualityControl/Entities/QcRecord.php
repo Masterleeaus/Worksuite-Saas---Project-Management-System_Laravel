@@ -20,11 +20,18 @@ class QcRecord extends Model
         'template_id',
         'schedule_id',
         'overall_score',
+        'risk_score',
         'status',
+        'severity_level',
         'reclean_triggered',
+        'reclean_status',
         'reclean_triggered_at',
+        'reclean_due_at',
         'reclean_job_id',
         'complaint_id',
+        'site_id',
+        'team_id',
+        'service_type',
         'notes',
         'inspected_by',
         'inspected_at',
@@ -33,14 +40,16 @@ class QcRecord extends Model
     protected $casts = [
         'reclean_triggered'    => 'boolean',
         'reclean_triggered_at' => 'datetime',
+        'reclean_due_at'       => 'datetime',
         'inspected_at'         => 'datetime',
         'overall_score'        => 'integer',
+        'risk_score'           => 'integer',
     ];
 
     /**
      * Statuses available for a QC record.
      */
-    public const STATUSES = ['pending', 'pass', 'fail', 'reclean_required', 'reclean_done'];
+    public const STATUSES = ['pending', 'pass', 'fail', 'reclean_required', 'reclean_done', 'closed'];
 
     public function items(): HasMany
     {

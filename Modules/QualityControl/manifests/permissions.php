@@ -1,16 +1,7 @@
 <?php
 
 return [
-    'module_alias' => 'quality_control',
-    'module_name' => 'Quality Control',
-    'packages' => [
-        'superadmin',
-        'company',
-    ],
-    'roles' => [
-        'admin',
-        'employee',
-    ],
+    'module' => 'quality_control',
     'permissions' => [
         'view_quality_control',
         'add_quality_control',
@@ -23,8 +14,14 @@ return [
         'manage_qc_corrective_actions',
         'verify_qc_followups',
     ],
-    'package_labels' => [
-        'qualitycontrol' => 'Quality Control',
-        'quality_control' => 'Quality Control',
+    'legacy_aliases' => [
+        'view_inspection',
+        'add_inspection',
+        'edit_inspection',
+        'delete_inspection',
+        'inspection.view',
+        'inspection.create',
+        'inspection.update',
+        'inspection.delete',
     ],
 ];
