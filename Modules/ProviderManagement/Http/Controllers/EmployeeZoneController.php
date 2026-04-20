@@ -48,7 +48,7 @@ class EmployeeZoneController extends AccountBaseController
 
         $validated = $request->validate([
             'zone_ids'   => 'nullable|array',
-            'zone_ids.*' => 'string|uuid',
+            'zone_ids.*' => ['string', 'regex:/^([0-9]+|[0-9a-fA-F-]{36})$/'],
         ]);
 
         $zoneIds = $validated['zone_ids'] ?? [];

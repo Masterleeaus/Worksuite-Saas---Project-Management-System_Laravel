@@ -1813,7 +1813,7 @@ trait BookingTrait
 
         $adjusted = $amount + (($amount * $modifier) / 100);
 
-        return max(0, round($adjusted, 3));
+        return max(0, round($adjusted, 2));
     }
 
     /**
