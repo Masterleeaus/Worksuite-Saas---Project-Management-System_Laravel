@@ -174,6 +174,7 @@ class FsmTargetModulePromotionBootstrapTest extends TestCase
         $this->assertTrue(Route::has('api.fsmproject.projects.summary'));
         $this->assertTrue(Route::has('api.fsmsize.index'));
         $this->assertTrue(Route::has('fsmproject.update'));
+        $this->assertTrue(Route::has('fsmproject.unlink'));
         $this->assertTrue(Route::has('fsmproject.destroy'));
         $this->assertTrue(Route::has('fsmsize.update'));
         $this->assertTrue(Route::has('fsmsize.destroy'));
@@ -254,7 +255,7 @@ class FsmTargetModulePromotionBootstrapTest extends TestCase
         $this->assertArrayHasKey('total_hours', $summaryData);
         $this->assertArrayHasKey('completion_percent', $summaryData);
 
-        $controller->unlink(101);
+        $controller->unlink(Request::create(route('api.fsmproject.orders.unlink', 101), 'POST'), 101);
         $this->assertDatabaseHas('fsm_orders', [
             'id' => 101,
             'project_id' => null,

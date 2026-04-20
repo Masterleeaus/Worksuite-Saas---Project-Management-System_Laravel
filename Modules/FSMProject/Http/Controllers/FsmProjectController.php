@@ -114,12 +114,16 @@ class FsmProjectController extends Controller
     }
 
     /** Unlink an FSM order from a project / task */
-    public function unlink(int $orderId)
+    public function unlink(Request $request, int $orderId)
     {
         $order = FSMOrder::where('company_id', $this->companyId())->findOrFail($orderId);
         $order->project()->dissociate();
         $order->task_id = null;
         $order->save();
+
+        if (! $request->expectsJson()) {
+            return redirect()->back()->with('success', 'Project link removed.');
+        }
 
         return response()->json(['success' => true]);
     }

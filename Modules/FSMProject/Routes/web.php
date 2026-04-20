@@ -9,5 +9,6 @@ Route::middleware(['web', 'auth'])->prefix('account/fsm-project')->name('fsmproj
     Route::post('/', [FsmProjectController::class, 'store'])->name('store');
     Route::get('/{orderId}/edit', [FsmProjectController::class, 'edit'])->name('edit');
     Route::post('/{orderId}', [FsmProjectController::class, 'update'])->name('update');
+    Route::post('/{orderId}/unlink', [FsmProjectController::class, 'unlink'])->name('unlink');
     Route::post('/{orderId}/delete', [FsmProjectController::class, 'destroy'])->name('destroy');
 });

@@ -36,7 +36,7 @@
                             @endif
                         </td>
                         <td class="text-end">
-                            <form action="{{ route('fsmproject.destroy', $order->id) }}" method="POST" class="d-inline">
+                            <form action="{{ route('fsmproject.unlink', $order->id) }}" method="POST" class="d-inline">
                                 @csrf
                                 <button type="submit" class="btn btn-sm btn-outline-danger">Unlink</button>
                             </form>
