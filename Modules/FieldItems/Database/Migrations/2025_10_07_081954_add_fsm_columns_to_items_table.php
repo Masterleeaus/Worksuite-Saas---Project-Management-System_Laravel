@@ -9,6 +9,10 @@ return new class extends Migration
 {
     private function suppliersIdIsBigint(): bool
     {
+        if (!in_array(DB::connection()->getDriverName(), ['mysql', 'mariadb'], true)) {
+            return true;
+        }
+
         // Detect suppliers.id type without requiring doctrine/dbal
         $row = DB::selectOne("
             SELECT DATA_TYPE, COLUMN_TYPE
@@ -30,6 +34,10 @@ return new class extends Migration
 
     private function hasForeignKey(string $table, string $constraint): bool
     {
+        if (!in_array(DB::connection()->getDriverName(), ['mysql', 'mariadb'], true)) {
+            return false;
+        }
+
         $exists = DB::selectOne("
             SELECT CONSTRAINT_NAME
             FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
@@ -83,14 +91,18 @@ return new class extends Migration
 
         // 3) Align existing type if it was created with the wrong width earlier
         //    (No doctrine/dbal, so use raw SQL to MODIFY if needed.)
-        $col = DB::selectOne("
-            SELECT DATA_TYPE, COLUMN_TYPE
-            FROM INFORMATION_SCHEMA.COLUMNS
-            WHERE TABLE_SCHEMA = DATABASE()
-              AND TABLE_NAME = 'items'
-              AND COLUMN_NAME = 'fsm_default_supplier_id'
-            LIMIT 1
-        ");
+        $col = null;
+
+        if (in_array(DB::connection()->getDriverName(), ['mysql', 'mariadb'], true)) {
+            $col = DB::selectOne("
+                SELECT DATA_TYPE, COLUMN_TYPE
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_SCHEMA = DATABASE()
+                  AND TABLE_NAME = 'items'
+                  AND COLUMN_NAME = 'fsm_default_supplier_id'
+                LIMIT 1
+            ");
+        }
 
         if ($col) {
             $isColBig = strtolower($col->DATA_TYPE ?? '') === 'bigint';

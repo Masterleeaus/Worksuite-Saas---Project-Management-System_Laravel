@@ -6,6 +6,7 @@ use App\Models\CurrencyFormatSetting;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration {
 
@@ -23,7 +24,7 @@ return new class extends Migration {
                 $table->string('thousand_separator')->nullable();
                 $table->string('decimal_separator')->nullable();
 
-                if (Schema::hasColumn('currencies', 'currency_position')) {
+                if (Schema::hasColumn('currencies', 'currency_position') && in_array(DB::connection()->getDriverName(), ['mysql', 'mariadb'], true)) {
                     DB::statement("ALTER TABLE currencies CHANGE COLUMN currency_position currency_position ENUM('left', 'right', 'left_with_space', 'right_with_space') NOT NULL DEFAULT 'left'");
                 }
                 else {
@@ -36,6 +37,10 @@ return new class extends Migration {
 
             foreach ($companies as $company) {
                 $currencyFormat = CurrencyFormatSetting::where('company_id', $company->id)->first();
+
+                if (!$currencyFormat) {
+                    continue;
+                }
 
                 Currency::where('company_id', $company->id)
                     ->update([

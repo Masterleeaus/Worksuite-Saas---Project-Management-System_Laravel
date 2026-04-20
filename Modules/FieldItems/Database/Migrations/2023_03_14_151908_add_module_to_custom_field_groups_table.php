@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
 use App\Models\CustomFieldGroup;
 
 return new class extends Migration
@@ -14,14 +15,27 @@ return new class extends Migration
      */
     public function up()
     {
-        
-        $data = [
-            'company_id' => 1,
-            'name' => 'Item',
-            'model' => 'Modules\FieldItems\Entities\Item'
-        ];
+        if (!Schema::hasTable('custom_field_groups') || !Schema::hasTable('companies')) {
+            return;
+        }
 
-        CustomFieldGroup::create($data);
+        $companyIds = DB::table('companies')->pluck('id')->all();
+
+        if (empty($companyIds)) {
+            return;
+        }
+
+        foreach ($companyIds as $companyId) {
+            CustomFieldGroup::firstOrCreate(
+                [
+                    'company_id' => $companyId,
+                    'name' => 'Item',
+                ],
+                [
+                    'model' => 'Modules\FieldItems\Entities\Item',
+                ]
+            );
+        }
     }
 
     /**

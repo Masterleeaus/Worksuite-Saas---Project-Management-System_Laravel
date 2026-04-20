@@ -20,10 +20,17 @@ return new class extends Migration
             return true;
         }
 
-        Schema::table('global_invoices', function (Blueprint $table) {
-            $table->double('sub_total')->nullable()->change();
-            $table->double('total')->nullable()->change();
-        });
+        if (Schema::hasTable('global_invoices')) {
+            Schema::table('global_invoices', function (Blueprint $table) {
+                if (Schema::hasColumn('global_invoices', 'sub_total')) {
+                    $table->double('sub_total')->nullable()->change();
+                }
+
+                if (Schema::hasColumn('global_invoices', 'total')) {
+                    $table->double('total')->nullable()->change();
+                }
+            });
+        }
 
         if (!Schema::hasColumn('front_details', 'homepage_background')) {
             Schema::table('front_details', function (Blueprint $table) {
@@ -34,10 +41,17 @@ return new class extends Migration
         }
 
 
-        Schema::table('packages', function (Blueprint $table) {
-            $table->double('annual_price')->nullable()->change();
-            $table->double('monthly_price')->nullable()->change();
-        });
+        if (Schema::hasTable('packages')) {
+            Schema::table('packages', function (Blueprint $table) {
+                if (Schema::hasColumn('packages', 'annual_price')) {
+                    $table->double('annual_price')->nullable()->change();
+                }
+
+                if (Schema::hasColumn('packages', 'monthly_price')) {
+                    $table->double('monthly_price')->nullable()->change();
+                }
+            });
+        }
 
         // Delete the users that are not in users table
         UserAuth::withoutGlobalScope(ActiveScope::class)

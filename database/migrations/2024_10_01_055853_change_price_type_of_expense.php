@@ -13,7 +13,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement('ALTER TABLE expenses MODIFY price DOUBLE');
+        if (Schema::hasTable('expenses') && Schema::hasColumn('expenses', 'price') && in_array(DB::connection()->getDriverName(), ['mysql', 'mariadb'], true)) {
+            DB::statement('ALTER TABLE expenses MODIFY price DOUBLE');
+        }
     }
 
     /**
