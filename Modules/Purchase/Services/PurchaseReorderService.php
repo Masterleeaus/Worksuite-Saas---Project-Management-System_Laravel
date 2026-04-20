@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Handles the stock-replenishment lifecycle within the Purchase module:
@@ -66,23 +67,32 @@ class PurchaseReorderService
                 $subTotal += ($item['qty'] ?? 1) * ($item['unit_price'] ?? 0);
             }
 
-            $order = Order::create([
+            if ($subTotal <= 0 && isset($data['total'])) {
+                $subTotal = (float) $data['total'];
+            }
+
+            $orderPayload = [
                 'company_id'            => $data['company_id'],
                 'order_type'            => 'purchase',
                 'purchase_status'       => 'draft',
                 'supplier_id'           => $data['supplier_id'],
                 'po_number'             => $data['po_number'] ?? null,
-                'currency_id'           => $data['currency_id'] ?? null,
+                'currency_id'           => $data['currency_id'] ?? DB::table('currencies')->value('id'),
                 'order_date'            => now()->toDateString(),
                 'sub_total'             => $subTotal,
                 'total'                 => $subTotal,
-                'due_amount'            => $subTotal,
                 'payment_terms'         => $data['payment_terms'] ?? null,
                 'expected_delivery_date' => $data['expected_delivery_date'] ?? null,
                 'status'                => 'pending',
                 'gst_applicable'        => $data['gst_applicable'] ?? true,
                 'gst_amount'            => $data['gst_amount'] ?? 0,
-            ]);
+            ];
+
+            if (Schema::hasColumn('orders', 'due_amount')) {
+                $orderPayload['due_amount'] = $subTotal;
+            }
+
+            $order = Order::create($orderPayload);
 
             return $order;
         });
@@ -136,18 +146,32 @@ class PurchaseReorderService
         }
 
         return DB::transaction(function () use ($order, $invoiceReference) {
-            $expense = Expense::create([
+            $expensePayload = [
                 'company_id'   => $order->company_id,
                 'item_name'    => "PO #{$order->po_number} – supplier invoice {$invoiceReference}",
                 'price'        => $order->total,
-                'total'        => $order->total,
-                'date'         => now()->toDateString(),
                 'purchase_from' => $order->supplier_id
                     ? optional($order->supplier)->name
                     : null,
                 'status'       => 'approved',
                 'added_by'     => $order->added_by,
-            ]);
+            ];
+
+            if (Schema::hasColumn('expenses', 'total')) {
+                $expensePayload['total'] = $order->total;
+            }
+
+            if (Schema::hasColumn('expenses', 'currency_id')) {
+                $expensePayload['currency_id'] = $order->currency_id ?? DB::table('currencies')->value('id');
+            }
+
+            if (Schema::hasColumn('expenses', 'date')) {
+                $expensePayload['date'] = now()->toDateString();
+            } elseif (Schema::hasColumn('expenses', 'purchase_date')) {
+                $expensePayload['purchase_date'] = now()->toDateString();
+            }
+
+            $expense = Expense::create($expensePayload);
 
             $order->update([
                 'invoice_reference' => $invoiceReference,

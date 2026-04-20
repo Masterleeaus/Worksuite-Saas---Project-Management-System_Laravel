@@ -35,8 +35,14 @@ class OrderObserver
         }
 
         $order->custom_order_number = $order->order_number;
-        $orderSettings = (company()) ? company()->invoiceSetting : $order->company->invoiceSetting;
-        $order->original_order_number = str($order->order_number)->replace($orderSettings->order_prefix . $orderSettings->order_number_separator, '');
+        $orderSettings = $order->resolveOrderSettings();
+
+        if (!is_null($orderSettings)) {
+            $order->original_order_number = str($order->order_number)->replace($orderSettings->order_prefix . $orderSettings->order_number_separator, '');
+        }
+        else {
+            $order->original_order_number = (string) $order->order_number;
+        }
     }
 
     public function created(Order $order)

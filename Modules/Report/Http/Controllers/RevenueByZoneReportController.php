@@ -2,6 +2,7 @@
 
 namespace Modules\Report\Http\Controllers;
 
+use App\DataTables\FinanceReportDataTable;
 use App\Http\Controllers\FinanceReportController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -28,9 +29,10 @@ class RevenueByZoneReportController extends FinanceReportController
     /**
      * Display the zone revenue index page.
      */
-    public function index(Request $request)
+    public function index(FinanceReportDataTable $dataTable)
     {
         abort_403(user()->permission('view_financial_reports') !== 'all');
+        $request = request();
 
         if (!request()->ajax()) {
             $this->territories = Schema::hasTable('fsm_territories')

@@ -2,6 +2,7 @@
 
 namespace Modules\Report\Http\Controllers;
 
+use App\DataTables\TaskReportDataTable;
 use App\Http\Controllers\TaskReportController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -31,9 +32,10 @@ class BookingReportController extends TaskReportController
     /**
      * Display the FSM booking performance report index.
      */
-    public function index(Request $request)
+    public function index(TaskReportDataTable $dataTable)
     {
         abort_403(user()->permission('view_reports') !== 'all');
+        $request = request();
 
         if (!request()->ajax()) {
             $this->setupViewData($request);

@@ -13,6 +13,7 @@
         </testsuite>
         <testsuite name="Feature">
             <directory suffix="Test.php">./tests/Feature</directory>
+            <directory suffix="Test.php">./tests/Integration</directory>
             <directory suffix="Test.php">./Modules/TitanCore/Tests/Feature</directory>
             <directory suffix="Test.php">./Modules/Accountings/Tests/Feature</directory>
             <directory suffix="Test.php">./Modules/Purchase/Tests/Feature</directory>

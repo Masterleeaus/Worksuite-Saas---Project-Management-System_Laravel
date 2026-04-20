@@ -50,6 +50,7 @@ class PurchaseOrderLifecycleTest extends TestCase
                 $t->timestamps();
             });
         }
+        $this->ensureTestCurrencyExists();
 
         if (!Schema::hasTable('companies')) {
             Schema::create('companies', function ($t) {
@@ -58,6 +59,7 @@ class PurchaseOrderLifecycleTest extends TestCase
                 $t->timestamps();
             });
         }
+        $this->ensureTestCompanyExists();
 
         if (!Schema::hasTable('users')) {
             Schema::create('users', function ($t) {
@@ -146,6 +148,64 @@ class PurchaseOrderLifecycleTest extends TestCase
                 $t->timestamps();
             });
         }
+    }
+
+    private function ensureTestCompanyExists(): void
+    {
+        if (!Schema::hasTable('companies') || \DB::table('companies')->where('id', 1)->exists()) {
+            return;
+        }
+
+        $payload = [
+            'id' => 1,
+            'company_name' => 'Test Company',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+
+        foreach ([
+            'company_email' => 'test-company@example.test',
+            'company_phone' => '0000000000',
+            'address' => 'Test Address',
+            'before_days' => 0,
+            'after_days' => 0,
+            'allow_client_signup' => 0,
+            'admin_client_signup_approval' => 0,
+        ] as $column => $value) {
+            if (Schema::hasColumn('companies', $column)) {
+                $payload[$column] = $value;
+            }
+        }
+
+        \DB::table('companies')->insert($payload);
+    }
+
+    private function ensureTestCurrencyExists(): void
+    {
+        if (!Schema::hasTable('currencies') || \DB::table('currencies')->where('id', 1)->exists()) {
+            return;
+        }
+
+        $payload = [
+            'id' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+
+        foreach ([
+            'currency_name' => 'US Dollar',
+            'currency_code' => 'USD',
+            'currency_symbol' => '$',
+            'is_cryptocurrency' => 'no',
+            'no_of_decimal' => 2,
+            'currency_position' => 'left',
+        ] as $column => $value) {
+            if (Schema::hasColumn('currencies', $column)) {
+                $payload[$column] = $value;
+            }
+        }
+
+        \DB::table('currencies')->insert($payload);
     }
 
     // -----------------------------------------------------------------------

@@ -178,8 +178,20 @@ class Order extends BaseModel
 
     public function formatOrderNumber()
     {
-        $orderSettings = (company()) ? company()->invoiceSetting : $this->company->invoiceSetting;
+        $orderSettings = $this->resolveOrderSettings();
+
+        if (is_null($orderSettings)) {
+            return (string) ($this->order_number ?? (self::lastOrderNumber() + 1));
+        }
+
         return \App\Helper\NumberFormat::order($this->order_number, $orderSettings);
+    }
+
+    public function resolveOrderSettings()
+    {
+        return company()?->invoiceSetting
+            ?? $this->company?->invoiceSetting
+            ?? invoice_setting();
     }
 
     public function project(): BelongsTo
