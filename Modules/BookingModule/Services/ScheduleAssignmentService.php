@@ -11,13 +11,16 @@ use Modules\BookingModule\Services\NotificationGate;
 
 class ScheduleAssignmentService
 {
+    public function __construct(protected NotificationGate $gate) {}
+
     /**
      * Assign / reassign / unassign a schedule to a staff user.
      * This module uses schedules.assigned_to as the canonical assignee field.
      */
     public function assign(Schedule $schedule, ?int $toUserId, ?string $note = null): Schedule
     {
-        $fromUserId = $schedule->effective_assignee_id;
+        $fromUserId = $schedule->effective_assignee_id ?? $schedule->assigned_to;
+        $companyId  = $schedule->company_id ?? null;
 
         $schedule->assigned_to = $toUserId;
         $schedule->assigned_by = Auth::id();
@@ -41,13 +44,13 @@ class ScheduleAssignmentService
         try {
             if ($toUserId && $schedule->assignee) {
                 if ($fromUserId && $fromUserId !== $toUserId) {
-                    if ($gate->canNotify($schedule->assignee->id ?? null, $companyId, 'reassigned')) {
-                    $schedule->assignee->notify(new ScheduleReassignedNotification($schedule));
-                }
+                    if ($this->gate->canNotify($schedule->assignee->id ?? null, $companyId, 'reassigned')) {
+                        $schedule->assignee->notify(new ScheduleReassignedNotification(['schedule_id' => $schedule->id]));
+                    }
                 } else {
-                    if ($gate->canNotify($schedule->assignee->id ?? null, $companyId, 'assigned')) {
-                    $schedule->assignee->notify(new ScheduleAssignedNotification($schedule));
-                }
+                    if ($this->gate->canNotify($schedule->assignee->id ?? null, $companyId, 'assigned')) {
+                        $schedule->assignee->notify(new ScheduleAssignedNotification(['schedule_id' => $schedule->id]));
+                    }
                 }
             }
         } catch (\Throwable $e) {
