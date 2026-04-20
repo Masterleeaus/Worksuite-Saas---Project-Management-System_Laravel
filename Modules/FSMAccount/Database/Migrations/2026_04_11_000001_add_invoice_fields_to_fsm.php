@@ -9,9 +9,11 @@ return new class extends Migration {
     public function up(): void
     {
         // Add invoice linkage to fsm_orders
-        if (Schema::hasTable('fsm_orders') && ! Schema::hasColumn('fsm_orders', 'invoiced')) {
+        if (Schema::hasTable('fsm_orders') && (! Schema::hasColumn('fsm_orders', 'invoiced') || ! Schema::hasColumn('fsm_orders', 'invoice_total'))) {
             Schema::table('fsm_orders', function (Blueprint $table) {
-                $table->boolean('invoiced')->default(false);
+                if (! Schema::hasColumn('fsm_orders', 'invoiced')) {
+                    $table->boolean('invoiced')->default(false);
+                }
                 if (! Schema::hasColumn('fsm_orders', 'invoice_total')) {
                     $table->decimal('invoice_total', 15, 2)->nullable();
                 }
