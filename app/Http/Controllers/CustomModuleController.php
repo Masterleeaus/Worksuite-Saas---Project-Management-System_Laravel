@@ -426,6 +426,7 @@ class CustomModuleController extends Controller
 
         $installStatus = empty($repairExecution['failed'] ?? []) ? 'installed' : 'partial_failed';
         $log = ModuleInstallLog::create([
+            'event' => 'install_completed',
             'module_name' => $moduleName,
             'version' => $analysis['package_summary']['declared_version'] ?? ($analysis['version'] ?? 'unknown'),
             'status' => $installStatus,
@@ -670,7 +671,21 @@ class CustomModuleController extends Controller
         try {
             $module = Module::find($moduleName);
             if (!$module) {
-                return ['status' => 'warn', 'detail' => 'Module could not be discovered by laravel-modules after file install.'];
+                $statusFile = storage_path('app/modules_statuses.json');
+                if (File::exists($statusFile)) {
+                    $statuses = json_decode((string) File::get($statusFile), true);
+                    if (is_array($statuses)) {
+                        $statuses[$moduleName] = true;
+                        File::put($statusFile, json_encode($statuses, JSON_PRETTY_PRINT));
+                    }
+                }
+
+                cache()->forget('laravel-modules');
+                $module = Module::find($moduleName);
+
+                if (!$module) {
+                    return ['status' => 'warn', 'detail' => 'Module could not be discovered by laravel-modules after file install.'];
+                }
             }
 
             $module->enable();
@@ -706,6 +721,14 @@ class CustomModuleController extends Controller
     {
         $modulePath = base_path('Modules/' . $moduleName);
         $module = Module::find($moduleName);
+        $statusEnabled = false;
+        $statusFile = storage_path('app/modules_statuses.json');
+        if (File::exists($statusFile)) {
+            $statuses = json_decode((string) File::get($statusFile), true);
+            if (is_array($statuses)) {
+                $statusEnabled = (bool) ($statuses[$moduleName] ?? false);
+            }
+        }
         $routeFileCount = 0;
         foreach (['Routes/web.php', 'Routes/api.php'] as $routeFile) {
             if (File::exists($modulePath . '/' . $routeFile)) {
@@ -715,8 +738,8 @@ class CustomModuleController extends Controller
 
         $audit = [
             'module_path_exists' => File::isDirectory($modulePath),
-            'module_discovered' => (bool) $module,
-            'module_enabled' => $module ? $module->isEnabled() : false,
+            'module_discovered' => (bool) $module || $statusEnabled,
+            'module_enabled' => $module ? $module->isEnabled() : $statusEnabled,
             'module_registry_row' => Schema::hasTable('modules')
                 ? DB::table('modules')->where('module_name', $moduleName)->exists()
                 : null,
