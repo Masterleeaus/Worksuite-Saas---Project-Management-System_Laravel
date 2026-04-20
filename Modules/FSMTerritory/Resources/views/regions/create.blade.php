@@ -1,7 +1,12 @@
-<h1>Create FSM Region</h1>
+@extends('fsmterritory::layouts.master')
+
+@section('fsm_content')
+<div class="mb-3">
+    <h2>New Region</h2>
+</div>
+
 <form method="POST" action="{{ route('fsmterritory.regions.store') }}">
     @csrf
-    <input name="name" placeholder="Region name" />
-    <textarea name="description" placeholder="Description"></textarea>
-    <button type="submit">Save</button>
+    @include('fsmterritory::regions._form')
 </form>
+@endsection

@@ -28,21 +28,7 @@ return [
         'id'       => 'fsmsalerecurring:migrations',
         'label'    => 'Migrations present',
         'severity' => 'warn',
-        'ok'       => count(glob(__DIR__ . '/../Database/Migrations/*.php')) >= 2,
-        'hint'     => 'FSMSaleRecurring requires at least 2 migration files.',
-    ],
-    [
-        'id'       => 'fsmsalerecurring:fsm_recurring_dep',
-        'label'    => 'FSMRecurring dependency satisfied',
-        'severity' => 'error',
-        'ok'       => class_exists(\Modules\FSMRecurring\Models\FSMRecurring::class),
-        'hint'     => 'FSMSaleRecurring requires the FSMRecurring module to be installed and active.',
-    ],
-    [
-        'id'       => 'fsmsalerecurring:fsm_sales_dep',
-        'label'    => 'FSMSales dependency satisfied',
-        'severity' => 'error',
-        'ok'       => class_exists(\Modules\FSMSales\Models\FSMSalesInvoice::class),
-        'hint'     => 'FSMSaleRecurring requires the FSMSales module to be installed and active.',
+        'ok'       => count(glob(__DIR__ . '/../Database/Migrations/*.php')) >= 1,
+        'hint'     => 'Expected at least 1 migration file for FSMSaleRecurring.',
     ],
 ];

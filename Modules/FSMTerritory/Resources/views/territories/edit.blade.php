@@ -1,7 +1,6 @@
-<h1>Edit FSM Territory</h1>
-<form method="POST" action="{{ route('fsmterritory.territories.update', $territory->id) }}">
-    @csrf
-    <input name="name" value="{{ $territory->name ?? '' }}" />
-    <textarea name="description">{{ $territory->description ?? '' }}</textarea>
-    <button type="submit">Update</button>
-</form>
+@extends('fsmterritory::layouts.master')
+
+@section('fsm_content')
+<h2 class="mb-3">Edit Territory: {{ $territory->name }}</h2>
+@include('fsmterritory::territories._form', ['territory' => $territory])
+@endsection

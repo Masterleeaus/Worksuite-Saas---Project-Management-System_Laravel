@@ -1,7 +1,6 @@
-<h1>Create FSM Territory</h1>
-<form method="POST" action="{{ route('fsmterritory.territories.store') }}">
-    @csrf
-    <input name="name" placeholder="Territory name" />
-    <textarea name="description" placeholder="Description"></textarea>
-    <button type="submit">Save</button>
-</form>
+@extends('fsmterritory::layouts.master')
+
+@section('fsm_content')
+<h2 class="mb-3">New Territory</h2>
+@include('fsmterritory::territories._form', ['territory' => null])
+@endsection

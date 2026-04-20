@@ -47,31 +47,36 @@
             </thead>
             <tbody>
                 @forelse($recurring as $entry)
-                @php $sl = $entry->statusLabel(); @endphp
+                @php
+                    $sl = match($entry->status) {
+                        'inactive' => ['label' => 'Inactive', 'class' => 'bg-secondary'],
+                        default => ['label' => 'Active', 'class' => 'bg-success'],
+                    };
+                @endphp
                 <tr>
                     <td><a href="{{ route('fsmsales.recurring.show', $entry->id) }}">#{{ $entry->id }}</a></td>
                     <td>{{ $entry->client?->name ?? '—' }}</td>
-                    <td>{{ $entry->scheduleLabel() }}</td>
-                    <td class="small">{{ $entry->period_start?->format('d M Y') ?? '—' }} → {{ $entry->period_end?->format('d M Y') ?? '—' }}</td>
-                    <td class="text-end">${{ number_format($entry->amount, 2) }}</td>
-                    <td class="{{ $entry->isOverdue() ? 'text-danger fw-semibold' : '' }}">
+                    <td>{{ ucfirst((string) $entry->rotation) }}</td>
+                    <td class="small">{{ $entry->issue_date?->format('d M Y') ?? '—' }} → {{ $entry->next_invoice_date?->format('d M Y') ?? '—' }}</td>
+                    <td class="text-end">${{ number_format($entry->total, 2) }}</td>
+                    <td class="{{ ($entry->due_date && $entry->due_date->isPast() && $entry->status === 'active') ? 'text-danger fw-semibold' : '' }}">
                         {{ $entry->due_date?->format('d M Y') ?? '—' }}
                     </td>
                     <td><span class="badge {{ $sl['class'] }}">{{ $sl['label'] }}</span></td>
                     <td>
-                        @if($entry->fsm_sales_invoice_id)
-                            <a href="{{ route('fsmsales.invoices.show', $entry->fsm_sales_invoice_id) }}" class="btn btn-xs btn-sm btn-outline-info">View</a>
+                        @if($entry->recurrings->first())
+                            <a href="{{ route('fsmsales.invoices.show', $entry->recurrings->first()->id) }}" class="btn btn-xs btn-sm btn-outline-info">View</a>
                         @else —
                         @endif
                     </td>
                     <td>
-                        @if($entry->status === 'draft')
+                        @if($entry->status === 'active')
                         <form method="POST" action="{{ route('fsmsales.recurring.convert', $entry->id) }}" class="d-inline">
                             @csrf
                             <button class="btn btn-sm btn-outline-primary">Convert</button>
                         </form>
                         @endif
-                        @if(!in_array($entry->status, ['paid']))
+                        @if($entry->status !== 'inactive')
                         <form method="POST" action="{{ route('fsmsales.recurring.mark-paid', $entry->id) }}" class="d-inline">
                             @csrf
                             <button class="btn btn-sm btn-outline-success">Paid</button>

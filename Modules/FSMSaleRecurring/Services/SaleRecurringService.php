@@ -2,25 +2,25 @@
 
 namespace Modules\FSMSaleRecurring\Services;
 
+use App\Models\Invoice;
+use App\Models\InvoiceItems;
 use Modules\FSMRecurring\Models\FSMRecurring;
-use Modules\FSMSales\Models\FSMSalesInvoice;
-use Modules\FSMSales\Models\FSMSalesInvoiceLine;
 
 class SaleRecurringService
 {
     /**
      * Get all recurring schedules linked to invoice lines on this invoice.
      */
-    public function getRecurringsForInvoice(FSMSalesInvoice $invoice): \Illuminate\Support\Collection
+    public function getRecurringsForInvoice(Invoice $invoice): \Illuminate\Support\Collection
     {
-        $lineIds = $invoice->lines()->pluck('id');
+        $lineIds = $invoice->items()->pluck('id');
         return FSMRecurring::whereIn('invoice_line_id', $lineIds)->get();
     }
 
     /**
      * Link a recurring schedule to an invoice line.
      */
-    public function linkToInvoiceLine(FSMRecurring $recurring, FSMSalesInvoiceLine $line): void
+    public function linkToInvoiceLine(FSMRecurring $recurring, InvoiceItems $line): void
     {
         $recurring->update(['invoice_line_id' => $line->id]);
     }

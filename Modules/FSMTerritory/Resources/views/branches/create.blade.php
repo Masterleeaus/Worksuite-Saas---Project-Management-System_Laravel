@@ -1,7 +1,12 @@
-<h1>Create FSM Branch</h1>
+@extends('fsmterritory::layouts.master')
+
+@section('fsm_content')
+<div class="mb-3">
+    <h2>New Branch</h2>
+</div>
+
 <form method="POST" action="{{ route('fsmterritory.branches.store') }}">
     @csrf
-    <input name="name" placeholder="Branch name" />
-    <textarea name="description" placeholder="Description"></textarea>
-    <button type="submit">Save</button>
+    @include('fsmterritory::branches._form')
 </form>
+@endsection

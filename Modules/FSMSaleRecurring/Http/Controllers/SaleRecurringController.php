@@ -2,10 +2,11 @@
 
 namespace Modules\FSMSaleRecurring\Http\Controllers;
 
+use App\Models\Invoice;
+use App\Models\InvoiceItems;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\FSMRecurring\Models\FSMRecurring;
-use Modules\FSMSales\Models\FSMSalesInvoice;
 use Modules\FSMSaleRecurring\Services\SaleRecurringService;
 
 class SaleRecurringController extends Controller
@@ -28,7 +29,7 @@ class SaleRecurringController extends Controller
     public function linkForm(int $id)
     {
         $recurring = FSMRecurring::findOrFail($id);
-        $invoices = FSMSalesInvoice::with('lines')->orderByDesc('invoice_date')->get();
+        $invoices = Invoice::with('items')->orderByDesc('issue_date')->get();
         return view('fsmsalerecurring::recurrings.link', compact('recurring', 'invoices'));
     }
 
@@ -36,8 +37,8 @@ class SaleRecurringController extends Controller
     public function link(Request $request, int $id)
     {
         $recurring = FSMRecurring::findOrFail($id);
-        $data = $request->validate(['invoice_line_id' => 'required|integer|exists:fsm_sales_invoice_lines,id']);
-        $line = \Modules\FSMSales\Models\FSMSalesInvoiceLine::findOrFail($data['invoice_line_id']);
+        $data = $request->validate(['invoice_line_id' => 'required|integer|exists:invoice_items,id']);
+        $line = InvoiceItems::findOrFail($data['invoice_line_id']);
         $this->service->linkToInvoiceLine($recurring, $line);
         return redirect()->route('fsmsalerecurring.index')->with('success', 'Recurring linked to invoice line.');
     }

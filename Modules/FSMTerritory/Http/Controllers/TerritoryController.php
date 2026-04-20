@@ -4,17 +4,16 @@ namespace Modules\FSMTerritory\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Modules\FSMTerritory\Models\FSMBranch;
 use Modules\FSMTerritory\Models\FSMTerritory;
+use Modules\FSMTerritory\Models\FSMBranch;
 
 class TerritoryController extends Controller
 {
     public function index(Request $request)
     {
-        $filter = $request->only(['q']);
-        $territories = FSMTerritory::with(['branch'])
-            ->where('company_id', company()->id)
-            ->when($filter['q'] ?? null, fn ($query, $value) => $query->where('name', 'like', "%{$value}%"))
+        $filter      = $request->only(['q']);
+        $territories = FSMTerritory::with(['branch.district.region'])
+            ->when($filter['q'] ?? null, fn($q, $v) => $q->where('name', 'like', "%$v%"))
             ->orderBy('name')
             ->paginate(20)
             ->withQueryString();
@@ -24,21 +23,21 @@ class TerritoryController extends Controller
 
     public function create()
     {
-        $branches = FSMBranch::where('company_id', company()->id)->orderBy('name')->get();
+        $branches = FSMBranch::orderBy('name')->get();
+        $types    = FSMTerritory::TYPES;
 
-        return view('fsmterritory::territories.create', compact('branches'));
+        return view('fsmterritory::territories.create', compact('branches', 'types'));
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name' => 'required|string|max:256',
+            'name'        => 'required|string|max:256',
             'description' => 'nullable|string|max:512',
-            'branch_id' => 'nullable|integer',
-            'type' => 'nullable|string|max:32',
-            'zip_codes' => 'nullable|string',
+            'branch_id'   => 'nullable|integer',
+            'type'        => 'nullable|string|max:32',
+            'zip_codes'   => 'nullable|string',
         ]);
-        $data['company_id'] = company()->id;
 
         FSMTerritory::create($data);
 
@@ -48,22 +47,23 @@ class TerritoryController extends Controller
 
     public function edit(int $id)
     {
-        $territory = FSMTerritory::where('company_id', company()->id)->findOrFail($id);
-        $branches = FSMBranch::where('company_id', company()->id)->orderBy('name')->get();
+        $territory = FSMTerritory::findOrFail($id);
+        $branches  = FSMBranch::orderBy('name')->get();
+        $types     = FSMTerritory::TYPES;
 
-        return view('fsmterritory::territories.edit', compact('territory', 'branches'));
+        return view('fsmterritory::territories.edit', compact('territory', 'branches', 'types'));
     }
 
     public function update(Request $request, int $id)
     {
-        $territory = FSMTerritory::where('company_id', company()->id)->findOrFail($id);
+        $territory = FSMTerritory::findOrFail($id);
 
         $data = $request->validate([
-            'name' => 'required|string|max:256',
+            'name'        => 'required|string|max:256',
             'description' => 'nullable|string|max:512',
-            'branch_id' => 'nullable|integer',
-            'type' => 'nullable|string|max:32',
-            'zip_codes' => 'nullable|string',
+            'branch_id'   => 'nullable|integer',
+            'type'        => 'nullable|string|max:32',
+            'zip_codes'   => 'nullable|string',
         ]);
 
         $territory->update($data);
@@ -74,7 +74,7 @@ class TerritoryController extends Controller
 
     public function destroy(int $id)
     {
-        FSMTerritory::where('company_id', company()->id)->findOrFail($id)->delete();
+        FSMTerritory::findOrFail($id)->delete();
 
         return redirect()->route('fsmterritory.territories.index')
             ->with('success', 'Territory deleted.');

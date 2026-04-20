@@ -2,9 +2,9 @@
 
 namespace Modules\FSMSales\Http\Controllers;
 
+use App\Models\Invoice;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
-use Modules\FSMSales\Models\FSMSalesInvoice;
 
 class DashboardController extends Controller
 {
@@ -12,19 +12,22 @@ class DashboardController extends Controller
     {
         $thisMonth = now()->startOfMonth();
 
-        $invoiced = FSMSalesInvoice::where('invoice_date', '>=', $thisMonth)
-            ->whereNotIn('status', [FSMSalesInvoice::STATUS_VOID])
+        $invoiced = Invoice::where('issue_date', '>=', $thisMonth)
+            ->whereNotIn('status', ['canceled'])
             ->sum('total');
 
-        $collected = FSMSalesInvoice::where('invoice_date', '>=', $thisMonth)
-            ->where('status', FSMSalesInvoice::STATUS_PAID)
-            ->sum('amount_paid');
+        $collected = Invoice::where('issue_date', '>=', $thisMonth)
+            ->where('status', 'paid')
+            ->sum(DB::raw('total - due_amount'));
 
-        $outstanding = FSMSalesInvoice::whereNotIn('status', [FSMSalesInvoice::STATUS_PAID, FSMSalesInvoice::STATUS_VOID])
+        $outstanding = Invoice::whereNotIn('status', ['paid', 'canceled'])
             ->whereNotNull('due_date')
-            ->sum(DB::raw('total - amount_paid'));
+            ->sum('due_amount');
 
-        $overdueCount = FSMSalesInvoice::where('status', FSMSalesInvoice::STATUS_OVERDUE)->count();
+        $overdueCount = Invoice::whereNotIn('status', ['paid', 'canceled'])
+            ->whereNotNull('due_date')
+            ->whereDate('due_date', '<', now()->toDateString())
+            ->count();
 
         return view('fsmsales::dashboard.widget', compact(
             'invoiced', 'collected', 'outstanding', 'overdueCount'

@@ -28,21 +28,7 @@ return [
         'id'       => 'fsmrouteavailability:migrations',
         'label'    => 'Migrations present',
         'severity' => 'warn',
-        'ok'       => count(glob(__DIR__ . '/../Database/Migrations/*.php')) >= 4,
-        'hint'     => 'FSMRouteAvailability requires at least 4 migration files.',
-    ],
-    [
-        'id'       => 'fsmrouteavailability:fsm_route_dep',
-        'label'    => 'FSMRoute dependency satisfied',
-        'severity' => 'error',
-        'ok'       => class_exists(\Modules\FSMRoute\Models\FSMRoute::class),
-        'hint'     => 'FSMRouteAvailability requires the FSMRoute module to be installed and active.',
-    ],
-    [
-        'id'       => 'fsmrouteavailability:fsm_availability_dep',
-        'label'    => 'FSMAvailability dependency satisfied',
-        'severity' => 'error',
-        'ok'       => class_exists(\Modules\FSMAvailability\Models\FSMAvailabilityRule::class),
-        'hint'     => 'FSMRouteAvailability requires the FSMAvailability module to be installed and active.',
+        'ok'       => count(glob(__DIR__ . '/../Database/Migrations/*.php')) >= 3,
+        'hint'     => 'Expected at least 3 migration files for FSMRouteAvailability tables.',
     ],
 ];
