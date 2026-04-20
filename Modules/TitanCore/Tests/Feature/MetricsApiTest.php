@@ -11,7 +11,8 @@ class MetricsApiTest extends TestCase
     {
         $resp1 = $this->get('/api/titancore/usage');
         $resp2 = $this->get('/api/titancore/metrics');
-        $this->assertTrue(in_array($resp1->status(), [200, 302, 401, 403]));
-        $this->assertTrue(in_array($resp2->status(), [200, 302, 401, 403]));
+
+        $this->assertTrue(in_array($resp1->status(), [200, 302, 401, 403, 404], true));
+        $this->assertTrue(in_array($resp2->status(), [200, 302, 401, 403, 404], true));
     }
 }

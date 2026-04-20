@@ -121,11 +121,13 @@ class TitanTierTwoResourcesTest extends TestCase
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable();
             $table->string('project_name')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
 
         Schema::create('project_notes', function ($table) {
             $table->id();
+            $table->unsignedBigInteger('company_id')->nullable();
             $table->unsignedBigInteger('project_id')->nullable();
             $table->unsignedBigInteger('client_id')->nullable();
             $table->string('title')->nullable();
@@ -203,8 +205,8 @@ class TitanTierTwoResourcesTest extends TestCase
         ]);
 
         DB::table('project_notes')->insert([
-            ['id' => 1001, 'project_id' => 1001, 'title' => 'Tenant A Note', 'details' => 'A', 'created_at' => now(), 'updated_at' => now()],
-            ['id' => 2002, 'project_id' => 2002, 'title' => 'Tenant B Note', 'details' => 'B', 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 1001, 'company_id' => 1, 'project_id' => 1001, 'title' => 'Tenant A Note', 'details' => 'A', 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 2002, 'company_id' => 2, 'project_id' => 2002, 'title' => 'Tenant B Note', 'details' => 'B', 'created_at' => now(), 'updated_at' => now()],
         ]);
 
         DB::table('project_files')->insert([
