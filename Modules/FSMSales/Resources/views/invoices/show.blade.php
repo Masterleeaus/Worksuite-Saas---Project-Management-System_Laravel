@@ -58,13 +58,23 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @php $taxTotal = 0; @endphp
                         @forelse($invoice->lines as $line)
+                        @php
+                            $lineTax = 0;
+                            if (!empty($line->taxes)) {
+                                $taxIds = json_decode($line->taxes, true) ?: [];
+                                $taxRate = \App\Models\Tax::whereIn('id', $taxIds)->sum('rate_percent');
+                                $lineTax = round(((float) $line->amount) * ((float) $taxRate / 100), 2);
+                            }
+                            $taxTotal += $lineTax;
+                        @endphp
                         <tr>
                             <td><span class="badge bg-secondary">{{ $line->item_name ?? 'Item' }}</span></td>
                             <td>{{ $line->item_summary ?? '—' }}</td>
                             <td class="text-end">{{ number_format($line->quantity, 2) }}</td>
                             <td class="text-end">${{ number_format($line->unit_price, 2) }}</td>
-                            <td class="text-end">$0.00</td>
+                            <td class="text-end">${{ number_format($lineTax, 2) }}</td>
                             <td class="text-end">${{ number_format($line->amount, 2) }}</td>
                         </tr>
                         @empty
@@ -78,7 +88,7 @@
                         </tr>
                         <tr>
                             <td colspan="4" class="text-end">Tax</td>
-                            <td colspan="2" class="text-end">$0.00</td>
+                            <td colspan="2" class="text-end">${{ number_format($taxTotal, 2) }}</td>
                         </tr>
                         <tr>
                             <td colspan="4" class="text-end">Total</td>

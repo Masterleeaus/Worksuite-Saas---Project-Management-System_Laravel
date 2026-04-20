@@ -211,7 +211,8 @@ class InvoiceController extends Controller
             'paid' => 'paid',
             'void' => 'canceled',
             'draft' => 'draft',
-            default => 'unpaid',
+            'sent', 'overdue' => 'unpaid',
+            default => throw new \InvalidArgumentException("Unsupported invoice status: {$status}"),
         };
     }
 
