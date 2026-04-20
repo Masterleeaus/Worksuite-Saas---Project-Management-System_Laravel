@@ -74,7 +74,7 @@ class CompanyMenuListener
             'permission' => 'schedule manage'
         ]);
 
-                $menu->add([
+        $menu->add([
             'title' => __('Unassigned Bookings'),
             'icon' => '',
             'name' => 'schedule-unassigned',
@@ -82,7 +82,7 @@ class CompanyMenuListener
             'order' => 25,
             'ignore_if' => [],
             'depend_on' => [],
-            'route' => 'schedules.unassigned',
+            'route' => 'appointment.schedules.unassigned',
             'module' => $module,
             'permission' => 'schedule show'
         ]);
@@ -95,7 +95,7 @@ class CompanyMenuListener
             'order' => 26,
             'ignore_if' => [],
             'depend_on' => [],
-            'route' => 'schedules.mine',
+            'route' => 'appointment.schedules.mine',
             'module' => $module,
             'permission' => 'schedule show'
         ]);

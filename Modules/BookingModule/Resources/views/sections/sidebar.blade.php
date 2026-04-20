@@ -13,6 +13,10 @@
         || user()->permission('add_booking') != 'none'
         || user()->permission('edit_booking') != 'none'
         || user()->permission('delete_booking') != 'none'
+        || user()->permission('appointment manage') != 'none'
+        || user()->permission('appointments manage') != 'none'
+        || user()->permission('schedule manage') != 'none'
+        || user()->permission('appointment dispatch') != 'none'
     );
 @endphp
 
@@ -24,28 +28,57 @@
         </x-slot>
 
         <div class="accordionItemContent pb-2">
-            @if (Route::has('bookings.index'))
+            {{-- Classic booking list --}}
+            @if (Route::has('bookings.index') && ($isAdminRole || user()->permission('view_booking') != 'none'))
                 <x-sub-menu-item :link="route('bookings.index')" :text="__('Bookings')" />
             @endif
+
+            {{-- Appointment/scheduling sub-items (enabled for all roles when module is active) --}}
+            @if ($hasBookingUserModule)
+                @if (Route::has('appointment.dashboard') && ($isAdminRole || user()->permission('appointment dashboard manage') != 'none'))
+                    <x-sub-menu-item :link="route('appointment.dashboard')" :text="__('Booking Dashboard')" />
+                @endif
+                @if (Route::has('appointments.index') && ($isAdminRole || user()->permission('appointments manage') != 'none'))
+                    <x-sub-menu-item :link="route('appointments.index')" :text="__('Appointments')" />
+                @endif
+                @if (Route::has('schedules.index') && ($isAdminRole || user()->permission('schedule manage') != 'none'))
+                    <x-sub-menu-item :link="route('schedules.index')" :text="__('Schedules')" />
+                @endif
+                @if (Route::has('appointment.schedules.unassigned') && ($isAdminRole || user()->permission('schedule show') != 'none'))
+                    <x-sub-menu-item :link="route('appointment.schedules.unassigned')" :text="__('Unassigned Bookings')" />
+                @endif
+                @if (Route::has('appointment.schedules.mine') && ($isAdminRole || user()->permission('schedule show') != 'none'))
+                    <x-sub-menu-item :link="route('appointment.schedules.mine')" :text="__('My Bookings')" />
+                @endif
+            @endif
+
+            {{-- Dispatch board (classic booking) --}}
             @if (Route::has('admin.dispatch.board') && ($isAdminRole || user()->permission('manage_dispatch_board') != 'none' || user()->permission('view_booking') != 'none'))
                 <x-sub-menu-item :link="route('admin.dispatch.board')" :text="__('Dispatch Board')" />
             @endif
+
+            {{-- Appointment dispatch --}}
+            @if ($hasBookingUserModule && Route::has('appointment.dispatch') && ($isAdminRole || user()->permission('appointment dispatch') != 'none'))
+                <x-sub-menu-item :link="route('appointment.dispatch')" :text="__('Appointment Dispatch')" />
+            @endif
+
+            {{-- Booking pages & requests --}}
             @if (Route::has('admin.booking.pages.index') && ($isAdminRole || user()->permission('view_booking_pages') != 'none' || user()->permission('manage_booking_pages') != 'none'))
                 <x-sub-menu-item :link="route('admin.booking.pages.index')" :text="__('Booking Pages')" />
             @endif
             @if (Route::has('admin.booking.page-requests.index') && ($isAdminRole || user()->permission('view_booking_page_requests') != 'none'))
                 <x-sub-menu-item :link="route('admin.booking.page-requests.index')" :text="__('Page Requests')" />
             @endif
+
+            {{-- Settings (staff capacity / availability & notification preferences) --}}
+            @if ($hasBookingUserModule && ($isAdminRole || user()->permission('appointment settings manage') != 'none'))
+                @if (Route::has('appointment.settings.staff_capacity'))
+                    <x-sub-menu-item :link="route('appointment.settings.staff_capacity')" :text="__('Availability')" />
+                @endif
+                @if (Route::has('appointment.settings.notification_preferences'))
+                    <x-sub-menu-item :link="route('appointment.settings.notification_preferences')" :text="__('Reminders')" />
+                @endif
+            @endif
         </div>
     </x-menu-item>
-@endif
-
-
-@if (in_array('bookingmodule', user_modules()))
-    <x-menu-item icon="calendar-check" :text="__('Booking Dashboard')" :link="route('appointment.dashboard')" />
-    <x-menu-item icon="calendar-check" :text="__('Appointments')" :link="route('appointments.index')" />
-    <x-menu-item icon="calendar-check" :text="__('Schedules')" :link="route('schedules.index')" />
-    <x-menu-item icon="calendar-check" :text="__('Dispatch')" :link="route('appointment.dispatch')" />
-    <x-menu-item icon="calendar-check" :text="__('Availability')" :link="route('appointment.settings.staff_capacity')" />
-    <x-menu-item icon="calendar-check" :text="__('Reminders')" :link="route('appointment.settings.notification_preferences')" />
 @endif

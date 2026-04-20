@@ -19,11 +19,9 @@ class PermissionTableSeeder extends Seeder
     {
         Model::unguard();
 
-        // $this->call("OthersTableSeeder");
-
         Artisan::call('cache:clear');
 
-        $permission = [
+        $permissionNames = [
             'appointment manage',
             'appointment dashboard manage',
             'appointment dispatch',
@@ -56,22 +54,21 @@ class PermissionTableSeeder extends Seeder
         ];
 
         $company_role = Role::where('name', 'company')->first();
-        foreach ($permission as $key => $value) {
-            $table = Permission::where('name', $value)->where('module', 'Appointment')->exists();
-            if (!$table) {
-                $permission = Permission::create(
-                    [
-                        'name' => $value,
-                        'guard_name' => 'web',
-                        'module' => 'Appointment',
-                        'created_by' => 0,
-                        'created_at' => date('Y-m-d H:i:s'),
-                        'updated_at' => date('Y-m-d H:i:s')
-                    ]
-                );
 
-                if (!$company_role->hasPermission($value)) {
-                    $company_role->givePermission($permission);
+        foreach ($permissionNames as $value) {
+            $exists = Permission::where('name', $value)->where('module', 'Appointment')->exists();
+            if (!$exists) {
+                $permissionModel = Permission::create([
+                    'name'       => $value,
+                    'guard_name' => 'web',
+                    'module'     => 'Appointment',
+                    'created_by' => 0,
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s'),
+                ]);
+
+                if ($company_role && !$company_role->hasPermission($value)) {
+                    $company_role->givePermission($permissionModel);
                 }
             }
         }
