@@ -30,6 +30,14 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['web'])->group(function () {
 
     Route::get('/titan', function () {
+        if (auth()->guest()) {
+            if (Route::has('login')) {
+                return redirect()->route('login');
+            }
+
+            return redirect('/login');
+        }
+
         if (!class_exists(\Filament\Facades\Filament::class)) {
             abort(503, 'Titan panel is not yet available. Please run: composer require filament/filament && php artisan filament:install --panels');
         }
@@ -38,7 +46,7 @@ Route::middleware(['web'])->group(function () {
             return redirect()->route('filament.titan.pages.command-centre');
         }
 
-        return redirect()->route('login');
+        abort(503, 'Titan panel routes are not available yet.');
     })->name('titan.home');
 
 });

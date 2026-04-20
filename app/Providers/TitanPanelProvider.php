@@ -78,7 +78,8 @@ class TitanPanelProvider extends PanelProvider
             return false;
         }
 
-        $isAdmin = method_exists($user, 'hasRole') && $user->hasRole('admin');
+        $hasInternalRole = method_exists($user, 'hasRole')
+            && ($user->hasRole('admin') || $user->hasRole('employee') || $user->hasRole('superadmin'));
 
         $permission = method_exists($user, 'permission')
             ? $user->permission('titan_access')
@@ -86,7 +87,7 @@ class TitanPanelProvider extends PanelProvider
 
         $hasTitanPermission = !in_array($permission, [false, null, 'none'], true);
 
-        return $isAdmin || $hasTitanPermission;
+        return $hasInternalRole || $hasTitanPermission;
     }
 
     public static function resolveWorksuiteUser(): ?object
