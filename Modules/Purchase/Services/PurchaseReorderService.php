@@ -77,7 +77,7 @@ class PurchaseReorderService
                 'purchase_status'       => 'draft',
                 'supplier_id'           => $data['supplier_id'],
                 'po_number'             => $data['po_number'] ?? null,
-                'currency_id'           => $data['currency_id'] ?? DB::table('currencies')->value('id'),
+                'currency_id'           => $data['currency_id'] ?? $this->resolveCurrencyId((int) $data['company_id']),
                 'order_date'            => now()->toDateString(),
                 'sub_total'             => $subTotal,
                 'total'                 => $subTotal,
@@ -162,7 +162,7 @@ class PurchaseReorderService
             }
 
             if (Schema::hasColumn('expenses', 'currency_id')) {
-                $expensePayload['currency_id'] = $order->currency_id ?? DB::table('currencies')->value('id');
+                $expensePayload['currency_id'] = $order->currency_id ?? $this->resolveCurrencyId((int) $order->company_id);
             }
 
             if (Schema::hasColumn('expenses', 'date')) {
@@ -228,5 +228,30 @@ class PurchaseReorderService
                 "Purchase order would exceed supplier credit limit of {$supplier->credit_limit}."
             );
         }
+    }
+
+    private function resolveCurrencyId(int $companyId): ?int
+    {
+        $companyCurrencyId = DB::table('companies')
+            ->where('id', $companyId)
+            ->value('currency_id');
+
+        if (!is_null($companyCurrencyId)) {
+            return (int) $companyCurrencyId;
+        }
+
+        if (Schema::hasColumn('currencies', 'is_default')) {
+            $defaultCurrencyId = DB::table('currencies')
+                ->where('is_default', 1)
+                ->value('id');
+
+            if (!is_null($defaultCurrencyId)) {
+                return (int) $defaultCurrencyId;
+            }
+        }
+
+        $fallbackCurrencyId = DB::table('currencies')->value('id');
+
+        return is_null($fallbackCurrencyId) ? null : (int) $fallbackCurrencyId;
     }
 }
