@@ -41,7 +41,18 @@ class FsmTargetModulePromotionBootstrapTest extends TestCase
             $table->string('name')->nullable();
             $table->unsignedBigInteger('project_id')->nullable();
             $table->unsignedBigInteger('task_id')->nullable();
+            $table->unsignedBigInteger('stage_id')->nullable();
+            $table->dateTime('date_start')->nullable();
+            $table->dateTime('date_end')->nullable();
             $table->timestamps();
+        });
+
+        Schema::create('projects', function ($table) {
+            $table->id();
+            $table->unsignedBigInteger('company_id')->nullable();
+            $table->string('project_name')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('fsm_sizes', function ($table) {
@@ -139,6 +150,14 @@ class FsmTargetModulePromotionBootstrapTest extends TestCase
             'updated_at' => now(),
         ]);
 
+        DB::table('projects')->insert([
+            'id' => 555,
+            'company_id' => 1,
+            'project_name' => 'FSM Linked Project',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
         $this->withoutMiddleware();
         $this->withoutMiddleware(VerifyCsrfToken::class);
         $this->actingAs(new TitanFakeUser(11, 1, ['admin']));
@@ -151,6 +170,8 @@ class FsmTargetModulePromotionBootstrapTest extends TestCase
         $this->assertTrue(Route::has('fsmsize.index'));
         $this->assertTrue(Route::has('fsmsize.store'));
         $this->assertTrue(Route::has('api.fsmproject.orders.link'));
+        $this->assertTrue(Route::has('api.fsmproject.orders.unlink'));
+        $this->assertTrue(Route::has('api.fsmproject.projects.summary'));
         $this->assertTrue(Route::has('api.fsmsize.index'));
         $this->assertTrue(Route::has('fsmproject.update'));
         $this->assertTrue(Route::has('fsmproject.destroy'));
@@ -201,6 +222,43 @@ class FsmTargetModulePromotionBootstrapTest extends TestCase
             'company_id' => 1,
             'project_id' => 555,
             'task_id' => 777,
+        ]);
+    }
+
+    public function test_fsmproject_api_link_unlink_and_summary_flow(): void
+    {
+        $controller = app(\Modules\FSMProject\Http\Controllers\FsmProjectController::class);
+
+        $controller->link(Request::create(route('api.fsmproject.orders.link', 101), 'POST', [
+            'project_id' => 555,
+            'task_id' => 777,
+        ]), 101);
+
+        DB::table('fsm_orders')->where('id', 101)->update([
+            'date_start' => now()->subHour(),
+            'date_end' => now(),
+        ]);
+
+        $ordersResponse = $controller->byProject(555);
+        $ordersData = $ordersResponse->getData(true);
+        $this->assertCount(1, $ordersData['data']);
+
+        $order = \Modules\FSMCore\Models\FSMOrder::query()->findOrFail(101);
+        $project = \App\Models\Project::query()->findOrFail(555);
+        $this->assertSame(555, $order->project?->id);
+        $this->assertSame(101, $project->fsmOrders()->first()?->id);
+
+        $summaryResponse = $controller->summary(555);
+        $summaryData = $summaryResponse->getData(true)['data'];
+        $this->assertSame(1, $summaryData['count']);
+        $this->assertArrayHasKey('total_hours', $summaryData);
+        $this->assertArrayHasKey('completion_percent', $summaryData);
+
+        $controller->unlink(101);
+        $this->assertDatabaseHas('fsm_orders', [
+            'id' => 101,
+            'project_id' => null,
+            'task_id' => null,
         ]);
     }
 
