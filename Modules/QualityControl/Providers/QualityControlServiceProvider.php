@@ -9,6 +9,9 @@ use Illuminate\Support\ServiceProvider;
 use Modules\QualityControl\Console\Commands\AutoCreateRecurringSchedules;
 use Modules\QualityControl\Console\Commands\ActivateQualityControlModuleCommand;
 use Modules\QualityControl\Listeners\JobCompletedListener;
+use Modules\QualityControl\Services\ExecutionRecordService;
+use Modules\QualityControl\Services\ScheduleService;
+use Modules\QualityControl\Services\TemplateService;
 
 class QualityControlServiceProvider extends ServiceProvider
 {
@@ -18,6 +21,9 @@ class QualityControlServiceProvider extends ServiceProvider
     {
         $this->registerConfig();
         $this->registerCommands();
+        $this->app->singleton(ExecutionRecordService::class);
+        $this->app->singleton(TemplateService::class);
+        $this->app->singleton(ScheduleService::class);
     }
 
     public function boot(): void

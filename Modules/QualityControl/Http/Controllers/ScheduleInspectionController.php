@@ -72,8 +72,7 @@ class ScheduleInspectionController extends AccountBaseController
     public function show($id)
     {
         $this->viewInspectionPermission = ModuleAccess::permissionLevel('view_quality_control');
-        $this->schedule = Schedule::with('worker', 'items', 'reply', 'reply.files', 'reply.user')
-            ->where('id', $id)->first();
+        $this->schedule = $this->findScheduleForTenant((int) $id)->load('worker', 'items', 'reply', 'reply.files', 'reply.user');
         abort_if(!$this->schedule, 404);
         $this->pageTitle = __('Inspection') . '-' . $this->schedule->subject;
 
@@ -86,7 +85,7 @@ class ScheduleInspectionController extends AccountBaseController
     public function update(UpdateSchedule $request, $id)
     {
 
-        $schedule = Schedule::findOrFail($id);
+        $schedule = $this->findScheduleForTenant((int) $id);
         $schedule->status = $request->status;
         $schedule->save();
 
@@ -107,7 +106,7 @@ class ScheduleInspectionController extends AccountBaseController
 
     public function destroy($id)
     {
-        $schedule = Schedule::findOrFail($id);
+        $schedule = $this->findScheduleForTenant((int) $id);
 
         $this->deleteInspectionPermission = ModuleAccess::permissionLevel('delete_quality_control');
         abort_403(!($this->deleteInspectionPermission == 'all'
@@ -120,7 +119,7 @@ class ScheduleInspectionController extends AccountBaseController
 
     public function updateOtherData(Request $request, $id)
     {
-        $schedule = Schedule::findOrFail($id);
+        $schedule = $this->findScheduleForTenant((int) $id);
         $schedule->agent_id = $request->agent_id;
         $schedule->priority = $request->priority;
         $schedule->save();
@@ -150,12 +149,12 @@ class ScheduleInspectionController extends AccountBaseController
         }
 
         if ($items_total == $jumlah) {
-            $schedule = Schedule::findOrFail($id);
+            $schedule = $this->findScheduleForTenant((int) $id);
             $schedule->status = 'resolved';
             $schedule->save();
 
         } else if ($items_total != $jumlah) {
-            $schedule = Schedule::findOrFail($id);
+            $schedule = $this->findScheduleForTenant((int) $id);
             $schedule->status = 'open';
             $schedule->save();
 
@@ -232,7 +231,7 @@ class ScheduleInspectionController extends AccountBaseController
 
     public function changeStatus(Request $request)
     {
-        $schedule = Schedule::find($request->scheduleId);
+        $schedule = $this->findScheduleForTenant((int) $request->scheduleId);
         $this->editInspectionPermission = ModuleAccess::permissionLevel('edit_quality_control');
 
         abort_403(!($this->editInspectionPermission == 'all'));
@@ -240,5 +239,17 @@ class ScheduleInspectionController extends AccountBaseController
         $schedule->update(['status' => $request->status]);
 
         return Reply::successWithData(__('messages.updateSuccess'), ['status' => 'success']);
+    }
+
+    private function findScheduleForTenant(int $scheduleId): Schedule
+    {
+        $schedule = Schedule::findOrFail($scheduleId);
+        $companyId = $this->user->company_id ?? null;
+
+        if ($companyId && !is_null($schedule->company_id) && (int) $schedule->company_id !== (int) $companyId) {
+            abort(404);
+        }
+
+        return $schedule;
     }
 }

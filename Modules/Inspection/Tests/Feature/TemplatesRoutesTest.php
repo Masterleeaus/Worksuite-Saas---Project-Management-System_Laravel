@@ -10,5 +10,6 @@ class TemplatesRoutesTest extends TestCase
     public function test_templates_routes_are_registered(): void
     {
         $this->assertTrue(Route::has('inspection-templates.index'));
+        $this->assertTrue(Route::has('inspection-templates.items.store'));
     }
 }
