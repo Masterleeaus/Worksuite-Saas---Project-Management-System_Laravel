@@ -13,7 +13,7 @@ return new class extends Migration {
             Schema::table('fsm_orders', function (Blueprint $table) {
                 $table->boolean('invoiced')->default(false);
                 if (! Schema::hasColumn('fsm_orders', 'invoice_total')) {
-                    $table->decimal('invoice_total', 15, 2)->nullable()->after('invoiced');
+                    $table->decimal('invoice_total', 15, 2)->nullable();
                 }
             });
         }

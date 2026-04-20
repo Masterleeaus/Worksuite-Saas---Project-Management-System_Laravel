@@ -30,7 +30,6 @@ class ReportServiceProvider extends ServiceProvider
 
     public function register(): void
     {
-        $this->app->register(RouteServiceProvider::class);
         $this->mergeConfigFrom(
             module_path($this->moduleName, 'Config/config.php'), $this->moduleNameLower
         );
