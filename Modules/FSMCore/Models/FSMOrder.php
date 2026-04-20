@@ -121,10 +121,7 @@ class FSMOrder extends Model
 
     public function lead()
     {
-        if (!class_exists(\Modules\FSMCRM\Models\FSMLead::class)) {
-            return null;
-        }
-        return $this->belongsTo(\Modules\FSMCRM\Models\FSMLead::class, 'lead_id');
+        return $this->belongsTo(\App\Models\Lead::class, 'lead_id');
     }
 
     public function photos()

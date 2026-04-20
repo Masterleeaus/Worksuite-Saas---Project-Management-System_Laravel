@@ -1,16 +1,10 @@
 @extends('fsmcrm::layouts.master')
 
 @section('fsmcrm_content')
-@php
-    $stageColors = \Modules\FSMCRM\Models\FSMLead::stageColors();
-    $stageBadge  = $stageColors[$lead->stage] ?? 'secondary';
-    $stageLabel  = \Modules\FSMCRM\Models\FSMLead::stages()[$lead->stage] ?? $lead->stage;
-@endphp
-
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>{{ $lead->name }}</h2>
+    <h2>{{ $lead->company_name ?: $lead->client_name }}</h2>
     <div class="d-flex gap-2 flex-wrap">
-        @if($lead->isWon())
+        @if($stage === 'won')
             <a href="{{ route('fsmcrm.leads.convert', $lead->id) }}" class="btn btn-success">🔧 Create FSM Order</a>
         @endif
         <a href="{{ route('fsmcrm.leads.edit', $lead->id) }}" class="btn btn-primary">Edit</a>
@@ -26,25 +20,22 @@
             <div class="card-body">
                 <dl class="row mb-0">
                     <dt class="col-sm-4">Stage</dt>
-                    <dd class="col-sm-8"><span class="badge bg-{{ $stageBadge }}">{{ $stageLabel }}</span></dd>
+                    <dd class="col-sm-8"><span class="badge bg-{{ $stageColors[$stage] ?? 'secondary' }}">{{ $stageLabel }}</span></dd>
 
-                    <dt class="col-sm-4">Contact</dt>
-                    <dd class="col-sm-8">{{ $lead->contact_name ?? '—' }}</dd>
+                    <dt class="col-sm-4">Client</dt>
+                    <dd class="col-sm-8">{{ $lead->client_name ?? '—' }}</dd>
 
                     <dt class="col-sm-4">Email</dt>
-                    <dd class="col-sm-8">{{ $lead->email ?? '—' }}</dd>
+                    <dd class="col-sm-8">{{ $lead->client_email ?? '—' }}</dd>
 
                     <dt class="col-sm-4">Phone</dt>
-                    <dd class="col-sm-8">{{ $lead->phone ?? '—' }}</dd>
+                    <dd class="col-sm-8">{{ $lead->mobile ?? '—' }}</dd>
 
                     <dt class="col-sm-4">Expected Revenue</dt>
-                    <dd class="col-sm-8">{{ $lead->expected_revenue > 0 ? number_format($lead->expected_revenue, 2) : '—' }}</dd>
-
-                    <dt class="col-sm-4">Close Date</dt>
-                    <dd class="col-sm-8">{{ $lead->close_date?->format('d M Y') ?? '—' }}</dd>
+                    <dd class="col-sm-8">{{ $lead->value > 0 ? number_format($lead->value, 2) : '—' }}</dd>
 
                     <dt class="col-sm-4">Notes</dt>
-                    <dd class="col-sm-8">{!! nl2br(e($lead->notes ?? '—')) !!}</dd>
+                    <dd class="col-sm-8">{!! nl2br(e($lead->note ?? '—')) !!}</dd>
                 </dl>
             </div>
         </div>
@@ -63,7 +54,7 @@
                     </dd>
 
                     <dt class="col-sm-4">Service Type</dt>
-                    <dd class="col-sm-8">{{ $lead->serviceType?->name ?? '—' }}</dd>
+                    <dd class="col-sm-8">{{ $lead->fsmServiceType?->name ?? '—' }}</dd>
 
                     <dt class="col-sm-4">Number of Sites</dt>
                     <dd class="col-sm-8">{{ $lead->site_count }}</dd>
@@ -110,7 +101,7 @@
                     <div class="px-3 py-3 text-muted text-center">No FSM Orders yet.</div>
                 @endforelse
             </div>
-            @if($lead->isWon())
+            @if($stage === 'won')
                 <div class="card-footer">
                     <a href="{{ route('fsmcrm.leads.convert', $lead->id) }}" class="btn btn-success btn-sm w-100">+ Create FSM Order</a>
                 </div>

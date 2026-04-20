@@ -2,10 +2,10 @@
 
 namespace Modules\FSMCRM\Http\Controllers;
 
+use App\Models\Lead;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Schema;
-use Modules\FSMCRM\Models\FSMLead;
 use Modules\FSMCore\Models\FSMLocation;
 use Modules\FSMCore\Models\FSMOrder;
 use Modules\FSMCore\Models\FSMStage;
@@ -18,14 +18,16 @@ class ConvertToOrderController extends Controller
      */
     public function create(int $leadId)
     {
-        $lead = FSMLead::with(['fsmLocation', 'serviceType'])->findOrFail($leadId);
+        $lead = Lead::whereNotNull('fsm_location_id')
+            ->with(['fsmLocation', 'fsmServiceType', 'leadStatus'])
+            ->findOrFail($leadId);
 
-        if (! $lead->isWon()) {
+        if (! $this->isWonLead($lead)) {
             return redirect()->route('fsmcrm.leads.show', $leadId)
                 ->with('error', 'Only Won leads can be converted to FSM Orders.');
         }
 
-        $stages    = FSMStage::orderBy('sequence')->get();
+        $stages = FSMStage::orderBy('sequence')->get();
         $locations = FSMLocation::where('active', true)->orderBy('name')->get();
         $templates = FSMTemplate::where('active', true)->orderBy('name')->get();
 
@@ -43,9 +45,11 @@ class ConvertToOrderController extends Controller
      */
     public function store(Request $request, int $leadId)
     {
-        $lead = FSMLead::findOrFail($leadId);
+        $lead = Lead::whereNotNull('fsm_location_id')
+            ->with('leadStatus')
+            ->findOrFail($leadId);
 
-        if (! $lead->isWon()) {
+        if (! $this->isWonLead($lead)) {
             return redirect()->route('fsmcrm.leads.show', $leadId)
                 ->with('error', 'Only Won leads can be converted to FSM Orders.');
         }
@@ -67,17 +71,17 @@ class ConvertToOrderController extends Controller
         }
 
         // Auto-resolve template from lead's service type if not overridden
-        if (empty($data['template_id']) && $lead->service_type_id) {
-            $data['template_id'] = $lead->service_type_id;
+        if (empty($data['template_id']) && $lead->fsm_service_type_id) {
+            $data['template_id'] = $lead->fsm_service_type_id;
         }
 
         // Default description from lead notes
-        if (empty($data['description']) && $lead->notes) {
-            $data['description'] = $lead->notes;
+        if (empty($data['description']) && $lead->note) {
+            $data['description'] = $lead->note;
         }
 
         // Generate order reference
-        $data['name']    = $this->nextOrderReference();
+        $data['name'] = $this->nextOrderReference();
         $data['lead_id'] = $lead->id;
 
         $order = FSMOrder::create($data);
@@ -91,12 +95,12 @@ class ConvertToOrderController extends Controller
                 'lead_id'     => $lead->id,
                 'location_id' => $order->location_id,
                 'template_id' => $order->template_id,
-                'name'        => $lead->name,
+                'name'        => $lead->company_name ?: $lead->client_name,
             ])->with('info', 'FSM Order created. Now create the recurring service agreement.');
         }
 
         return redirect()->route('fsmcore.orders.show', $order->id)
-            ->with('success', "FSM Order {$order->name} created from lead '{$lead->name}'.");
+            ->with('success', "FSM Order {$order->name} created from lead '" . ($lead->company_name ?: $lead->client_name) . "'.");
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
@@ -112,5 +116,10 @@ class ConvertToOrderController extends Controller
         }
 
         return 'ORD-' . str_pad((string) $next, 5, '0', STR_PAD_LEFT);
+    }
+
+    private function isWonLead(Lead $lead): bool
+    {
+        return strtolower((string) ($lead->leadStatus?->type ?? '')) === 'won';
     }
 }

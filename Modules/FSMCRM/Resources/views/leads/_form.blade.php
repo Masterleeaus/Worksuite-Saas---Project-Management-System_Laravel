@@ -3,10 +3,10 @@
 <div class="row g-3">
     {{-- Core CRM fields --}}
     <div class="col-md-8">
-        <label class="form-label fw-semibold">Lead Title <span class="text-danger">*</span></label>
-        <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
-               value="{{ old('name', $lead?->name) }}" required>
-        @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+        <label class="form-label fw-semibold">Company Name <span class="text-danger">*</span></label>
+        <input type="text" name="company_name" class="form-control @error('company_name') is-invalid @enderror"
+               value="{{ old('company_name', $lead?->company_name) }}" required>
+        @error('company_name') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
 
     <div class="col-md-4">
@@ -20,24 +20,24 @@
     </div>
 
     <div class="col-md-4">
-        <label class="form-label">Contact Name</label>
-        <input type="text" name="contact_name" class="form-control @error('contact_name') is-invalid @enderror"
-               value="{{ old('contact_name', $lead?->contact_name) }}">
-        @error('contact_name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+        <label class="form-label">Client Name <span class="text-danger">*</span></label>
+        <input type="text" name="client_name" class="form-control @error('client_name') is-invalid @enderror"
+               value="{{ old('client_name', $lead?->client_name) }}" required>
+        @error('client_name') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
 
     <div class="col-md-4">
         <label class="form-label">Email</label>
-        <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
-               value="{{ old('email', $lead?->email) }}">
-        @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
+        <input type="email" name="client_email" class="form-control @error('client_email') is-invalid @enderror"
+               value="{{ old('client_email', $lead?->client_email) }}">
+        @error('client_email') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
 
     <div class="col-md-4">
         <label class="form-label">Phone</label>
-        <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror"
-               value="{{ old('phone', $lead?->phone) }}">
-        @error('phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
+        <input type="text" name="mobile" class="form-control @error('mobile') is-invalid @enderror"
+               value="{{ old('mobile', $lead?->mobile) }}">
+        @error('mobile') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
 
     <div class="col-md-4">
@@ -48,17 +48,10 @@
         @error('expected_revenue') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
 
-    <div class="col-md-4">
-        <label class="form-label">Close Date</label>
-        <input type="date" name="close_date" class="form-control @error('close_date') is-invalid @enderror"
-               value="{{ old('close_date', $lead?->close_date?->format('Y-m-d')) }}">
-        @error('close_date') <div class="invalid-feedback">{{ $message }}</div> @enderror
-    </div>
-
     <div class="col-12">
         <label class="form-label">Notes / Requirements</label>
-        <textarea name="notes" rows="4" class="form-control @error('notes') is-invalid @enderror">{{ old('notes', $lead?->notes) }}</textarea>
-        @error('notes') <div class="invalid-feedback">{{ $message }}</div> @enderror
+        <textarea name="note" rows="4" class="form-control @error('note') is-invalid @enderror">{{ old('note', $lead?->note) }}</textarea>
+        @error('note') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
 
     {{-- FSM fields --}}
@@ -77,13 +70,13 @@
 
     <div class="col-md-6">
         <label class="form-label">Service Type (Template)</label>
-        <select name="service_type_id" class="form-select @error('service_type_id') is-invalid @enderror">
+        <select name="fsm_service_type_id" class="form-select @error('fsm_service_type_id') is-invalid @enderror">
             <option value="">— None —</option>
             @foreach($templates as $tmpl)
-                <option value="{{ $tmpl->id }}" @selected(old('service_type_id', $lead?->service_type_id) == $tmpl->id)>{{ $tmpl->name }}</option>
+                <option value="{{ $tmpl->id }}" @selected(old('fsm_service_type_id', $lead?->fsm_service_type_id) == $tmpl->id)>{{ $tmpl->name }}</option>
             @endforeach
         </select>
-        @error('service_type_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+        @error('fsm_service_type_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
 
     <div class="col-md-4">
