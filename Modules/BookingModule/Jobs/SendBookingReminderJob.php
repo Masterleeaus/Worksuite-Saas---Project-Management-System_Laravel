@@ -15,7 +15,9 @@ use Modules\BookingModule\Notifications\ScheduleReminder2hNotification;
  * SendBookingReminderJob
  *
  * Sends a time-sensitive reminder notification to the assignee of a schedule.
- * Called from BookingCompletedListener and from scheduled console commands.
+ * Dispatched by:
+ *   - SendUpcomingBookingNotificationJob (scheduled scan, every minute)
+ *   - ScheduleAssignmentService (on assign / reschedule when automation setting enabled)
  *
  * The lead_minutes parameter controls which notification class is used:
  *   1440 → 24-hour reminder

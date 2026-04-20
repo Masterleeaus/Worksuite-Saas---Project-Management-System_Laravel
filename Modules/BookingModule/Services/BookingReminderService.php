@@ -50,6 +50,32 @@ class BookingReminderService
     }
 
     /**
+     * Lead times resolved for an explicit company_id — safe to call from console context.
+     *
+     * @return int[]
+     */
+    public function reminderLeadTimesForCompany(int $companyId): array
+    {
+        $dbValue = $this->settingsService->getForCompany(
+            'automation.reminders.lead_time_minutes',
+            $companyId
+        );
+
+        if ($dbValue !== null) {
+            $times = is_array($dbValue)
+                ? $dbValue
+                : array_map('intval', explode(',', (string) $dbValue));
+
+            $times = array_filter(array_map('intval', $times), fn ($v) => $v > 0);
+            if (!empty($times)) {
+                return array_values($times);
+            }
+        }
+
+        return (array) config('bookingmodule.automation.reminders.lead_time_minutes', [1440, 120]);
+    }
+
+    /**
      * Whether reminders should trigger after assignment (from DB or config).
      */
     public function remindersOnAssign(): bool
@@ -64,11 +90,45 @@ class BookingReminderService
     }
 
     /**
+     * Whether reminders should trigger after assignment — resolved for explicit company_id.
+     */
+    public function remindersOnAssignForCompany(int $companyId): bool
+    {
+        $dbValue = $this->settingsService->getForCompany(
+            'automation.reminders.after_assignment',
+            $companyId
+        );
+
+        if ($dbValue !== null) {
+            return (bool) $dbValue;
+        }
+
+        return (bool) config('bookingmodule.automation.reminders.triggers.after_assignment', true);
+    }
+
+    /**
      * Whether reminders should trigger after reschedule (from DB or config).
      */
     public function remindersOnReschedule(): bool
     {
         $dbValue = $this->settingsService->get('automation.reminders.after_reschedule');
+
+        if ($dbValue !== null) {
+            return (bool) $dbValue;
+        }
+
+        return (bool) config('bookingmodule.automation.reminders.triggers.after_reschedule', true);
+    }
+
+    /**
+     * Whether reminders should trigger after reschedule — resolved for explicit company_id.
+     */
+    public function remindersOnRescheduleForCompany(int $companyId): bool
+    {
+        $dbValue = $this->settingsService->getForCompany(
+            'automation.reminders.after_reschedule',
+            $companyId
+        );
 
         if ($dbValue !== null) {
             return (bool) $dbValue;
@@ -107,10 +167,14 @@ class BookingReminderService
     /**
      * Return all schedules that are due for a reminder at a given lead time.
      *
-     * @param  int  $leadMinutes
+     * When $companyId is provided the query is scoped to that company explicitly
+     * (safe for console/queue context where Auth is not set).
+     *
+     * @param  int       $leadMinutes
+     * @param  int|null  $companyId  Optional explicit company scope.
      * @return \Illuminate\Database\Eloquent\Collection<Schedule>
      */
-    public function dueSchedules(int $leadMinutes): \Illuminate\Database\Eloquent\Collection
+    public function dueSchedules(int $leadMinutes, ?int $companyId = null): \Illuminate\Database\Eloquent\Collection
     {
         $toleranceMin = (int) config('bookingmodule.automation.reminders.tolerance_minutes', 5);
 
@@ -118,10 +182,16 @@ class BookingReminderService
         $lowerBound = Carbon::now()->addMinutes($leadMinutes)->subMinutes((int) floor($toleranceMin / 2));
         $upperBound = Carbon::now()->addMinutes($leadMinutes)->addMinutes((int) ceil($toleranceMin / 2));
 
-        return Schedule::query()
+        $query = Schedule::withoutGlobalScope('company_id')
             ->where('status', 'Approved')
-            ->whereNotNull('assigned_to')
-            ->where(function ($q) use ($lowerBound, $upperBound) {
+            ->whereNotNull('assigned_to');
+
+        // Scope to company when provided (required for multi-tenant console dispatch).
+        if ($companyId) {
+            $query->where('company_id', $companyId);
+        }
+
+        return $query->where(function ($q) use ($lowerBound, $upperBound) {
                 // Prefer starts_at (full datetime) if populated; fall back to date+start_time concat.
                 $q->where(function ($qq) use ($lowerBound, $upperBound) {
                     // schedules with a populated starts_at column

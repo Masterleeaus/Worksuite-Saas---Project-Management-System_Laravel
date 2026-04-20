@@ -12,12 +12,13 @@ use Modules\BookingModule\Services\BookingReminderService;
 /**
  * SendUpcomingBookingNotificationJob
  *
- * Scans schedules that are due for a reminder at a given lead time and fans
- * out individual SendBookingReminderJob dispatches per schedule.
+ * Scans schedules that are due for a reminder at a given lead time (scoped to a
+ * specific company) and fans out individual SendBookingReminderJob dispatches
+ * per schedule.
  *
- * Intended to be dispatched by a scheduled console command every minute:
- *   $schedule->job(new SendUpcomingBookingNotificationJob(1440))->everyMinute();
- *   $schedule->job(new SendUpcomingBookingNotificationJob(120))->everyMinute();
+ * Dispatched by DispatchBookingRemindersCommand every minute, once per active
+ * company per configured lead time:
+ *   SendUpcomingBookingNotificationJob::dispatch($companyId, $leadMinutes)
  */
 class SendUpcomingBookingNotificationJob implements ShouldQueue
 {
@@ -27,19 +28,28 @@ class SendUpcomingBookingNotificationJob implements ShouldQueue
     public int $timeout = 120;
 
     public function __construct(
+        public readonly int $companyId,
         public readonly int $leadMinutes = 1440,
     ) {}
 
     public function handle(BookingReminderService $reminderService): void
     {
-        $schedules = $reminderService->dueSchedules($this->leadMinutes);
+        $schedules = $reminderService->dueSchedules($this->leadMinutes, $this->companyId);
 
         foreach ($schedules as $schedule) {
             SendBookingReminderJob::dispatch(
                 $schedule->id,
-                $schedule->company_id ?? 0,
+                $this->companyId,
                 $this->leadMinutes,
             )->onQueue('notifications');
         }
+    }
+
+    /**
+     * Unique job ID prevents duplicate queuing for the same company + lead time scan.
+     */
+    public function uniqueId(): string
+    {
+        return 'upcoming-reminders-' . $this->companyId . '-' . $this->leadMinutes;
     }
 }
