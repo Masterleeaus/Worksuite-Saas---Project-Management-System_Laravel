@@ -17,7 +17,7 @@ return new class extends Migration
 
          Schema::create('project_sub_categories', function (Blueprint $table) {
                 $table->bigIncrements('id');
-                $table->unsignedInteger('category_id')->index('client_sub_categories_category_id_foreign');
+                $table->unsignedInteger('category_id')->index();
                 $table->foreign(['category_id'])->references(['id'])->on('project_category')->onUpdate('CASCADE')->onDelete('CASCADE');
                 $table->string('category_name');
                 $table->timestamps();
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('project_subcategory');
+        Schema::dropIfExists('project_sub_categories');
     }
 };

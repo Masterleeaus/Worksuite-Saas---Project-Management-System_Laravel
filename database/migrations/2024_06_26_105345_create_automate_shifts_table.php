@@ -18,7 +18,7 @@ return new class extends Migration
 
         Schema::create('automate_shifts', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedInteger('user_id')->index('employee_shift_schedules_user_id_foreign');
+            $table->unsignedInteger('user_id')->index();
             $table->foreign(['user_id'])->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('CASCADE');
             $table->unsignedInteger('employee_shift_rotation_id')->nullable();
             $table->foreign('employee_shift_rotation_id')->references('id')->on('employee_shift_rotations')->cascadeOnDelete()->cascadeOnUpdate();

@@ -13,6 +13,8 @@ return new class extends Migration {
 
         // Idempotent seed of built-in tools.
         $now = now();
+        $hasCreatedAt = Schema::hasColumn('ai_tools_registry', 'created_at');
+        $hasUpdatedAt = Schema::hasColumn('ai_tools_registry', 'updated_at');
         $rows = [
             [
                 'tool_name' => 'kb_search',
@@ -67,19 +69,36 @@ return new class extends Migration {
         ];
 
         foreach ($rows as $row) {
-            DB::table('ai_tools_registry')->updateOrInsert(
-                ['tool_name' => $row['tool_name']],
-                [
-                    'title' => $row['title'],
-                    'description' => $row['description'],
-                    'risk_level' => $row['risk_level'],
-                    'is_enabled' => $row['is_enabled'],
-                    'input_schema' => $row['input_schema'],
-                    'updated_at' => $row['updated_at'],
-                    // Don't overwrite created_at if already present.
-                    'created_at' => DB::raw('COALESCE(created_at, '.DB::getPdo()->quote($row['created_at']).')'),
-                ]
-            );
+            $exists = DB::table('ai_tools_registry')
+                ->where('tool_name', $row['tool_name'])
+                ->exists();
+
+            $payload = [
+                'title' => $row['title'],
+                'description' => $row['description'],
+                'risk_level' => $row['risk_level'],
+                'is_enabled' => $row['is_enabled'],
+                'input_schema' => $row['input_schema'],
+            ];
+
+            if ($hasUpdatedAt) {
+                $payload['updated_at'] = $row['updated_at'];
+            }
+
+            if ($exists) {
+                DB::table('ai_tools_registry')
+                    ->where('tool_name', $row['tool_name'])
+                    ->update($payload);
+                continue;
+            }
+
+            $payload['tool_name'] = $row['tool_name'];
+
+            if ($hasCreatedAt) {
+                $payload['created_at'] = $row['created_at'];
+            }
+
+            DB::table('ai_tools_registry')->insert($payload);
         }
     }
 

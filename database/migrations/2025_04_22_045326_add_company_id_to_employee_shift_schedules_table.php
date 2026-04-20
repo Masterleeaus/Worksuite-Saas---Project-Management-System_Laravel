@@ -12,6 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('employee_shift_schedules')) {
+            return;
+        }
+
         if (!Schema::hasColumn('employee_shift_schedules', 'company_id')) {
             Schema::table('employee_shift_schedules', function (Blueprint $table) {
                 $table->integer('company_id')->unsigned()->nullable()->after('user_id');
@@ -19,13 +23,35 @@ return new class extends Migration
             });
         }
 
-        // Use direct DB query for faster updates
-        DB::statement('
-            UPDATE employee_shift_schedules ess
-            INNER JOIN users u ON ess.user_id = u.id
-            SET ess.company_id = u.company_id
-            WHERE u.company_id IS NOT NULL
-        ');
+        if (
+            !Schema::hasTable('users')
+            || !Schema::hasColumn('employee_shift_schedules', 'user_id')
+            || !Schema::hasColumn('employee_shift_schedules', 'company_id')
+            || !Schema::hasColumn('users', 'company_id')
+        ) {
+            return;
+        }
+
+        if (Schema::getConnection()->getDriverName() === 'mysql') {
+            DB::statement('
+                UPDATE employee_shift_schedules ess
+                INNER JOIN users u ON ess.user_id = u.id
+                SET ess.company_id = u.company_id
+                WHERE u.company_id IS NOT NULL
+            ');
+        } else {
+            $rows = DB::table('employee_shift_schedules as ess')
+                ->join('users as u', 'ess.user_id', '=', 'u.id')
+                ->whereNotNull('u.company_id')
+                ->select('ess.id', 'u.company_id')
+                ->get();
+
+            foreach ($rows as $row) {
+                DB::table('employee_shift_schedules')
+                    ->where('id', $row->id)
+                    ->update(['company_id' => $row->company_id]);
+            }
+        }
     }
 
     /**
@@ -33,9 +59,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('employee_shift_schedules', function (Blueprint $table) {
-            $table->dropForeign(['company_id']);
-            $table->dropColumn('company_id');
-        });
+        if (Schema::hasTable('employee_shift_schedules') && Schema::hasColumn('employee_shift_schedules', 'company_id')) {
+            Schema::table('employee_shift_schedules', function (Blueprint $table) {
+                $table->dropForeign(['company_id']);
+                $table->dropColumn('company_id');
+            });
+        }
     }
 };

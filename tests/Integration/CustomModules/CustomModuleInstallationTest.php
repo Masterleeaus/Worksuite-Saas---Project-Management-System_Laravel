@@ -105,7 +105,7 @@ class CustomModuleInstallationTest extends TestCase
         // Create module with conflicting route
         $zip = $this->createTestModuleWithRoute(
             'BadRouteModule',
-            '/admin/settings'
+            '/account/settings/custom-modules'
         );
         
         $response = $this->post(route('custom-modules.store'), [
@@ -235,6 +235,21 @@ class CustomModuleInstallationTest extends TestCase
                 $table->string('display_name')->nullable();
                 $table->timestamps();
             });
+        } else {
+            Schema::table('permissions', function (Blueprint $table) {
+                if (!Schema::hasColumn('permissions', 'permission_key')) {
+                    $table->string('permission_key')->nullable();
+                }
+                if (!Schema::hasColumn('permissions', 'name')) {
+                    $table->string('name')->nullable();
+                }
+                if (!Schema::hasColumn('permissions', 'module')) {
+                    $table->string('module')->nullable();
+                }
+                if (!Schema::hasColumn('permissions', 'display_name')) {
+                    $table->string('display_name')->nullable();
+                }
+            });
         }
 
         if (!Schema::hasTable('module_install_logs')) {
@@ -243,9 +258,79 @@ class CustomModuleInstallationTest extends TestCase
                 $table->string('event')->nullable();
                 $table->string('module_name')->nullable();
                 $table->string('status')->nullable();
+                $table->json('blocking_issues')->nullable();
+                $table->json('warnings')->nullable();
+                $table->json('checks')->nullable();
+                $table->json('package_summary')->nullable();
+                $table->json('manifest_data')->nullable();
+                $table->json('validation_results')->nullable();
+                $table->json('readiness_flags')->nullable();
+                $table->json('fix_plan')->nullable();
                 $table->json('pre_install_snapshot')->nullable();
+                $table->json('applied_repairs')->nullable();
+                $table->json('repair_results')->nullable();
                 $table->boolean('can_rollback')->default(false);
+                $table->timestamp('installed_at')->nullable();
+                $table->timestamp('last_verified_at')->nullable();
+                $table->text('installation_notes')->nullable();
                 $table->timestamps();
+            });
+        } else {
+            Schema::table('module_install_logs', function (Blueprint $table) {
+                if (!Schema::hasColumn('module_install_logs', 'event')) {
+                    $table->string('event')->nullable();
+                }
+                if (!Schema::hasColumn('module_install_logs', 'module_name')) {
+                    $table->string('module_name')->nullable();
+                }
+                if (!Schema::hasColumn('module_install_logs', 'status')) {
+                    $table->string('status')->nullable();
+                }
+                if (!Schema::hasColumn('module_install_logs', 'blocking_issues')) {
+                    $table->json('blocking_issues')->nullable();
+                }
+                if (!Schema::hasColumn('module_install_logs', 'warnings')) {
+                    $table->json('warnings')->nullable();
+                }
+                if (!Schema::hasColumn('module_install_logs', 'checks')) {
+                    $table->json('checks')->nullable();
+                }
+                if (!Schema::hasColumn('module_install_logs', 'package_summary')) {
+                    $table->json('package_summary')->nullable();
+                }
+                if (!Schema::hasColumn('module_install_logs', 'manifest_data')) {
+                    $table->json('manifest_data')->nullable();
+                }
+                if (!Schema::hasColumn('module_install_logs', 'validation_results')) {
+                    $table->json('validation_results')->nullable();
+                }
+                if (!Schema::hasColumn('module_install_logs', 'readiness_flags')) {
+                    $table->json('readiness_flags')->nullable();
+                }
+                if (!Schema::hasColumn('module_install_logs', 'fix_plan')) {
+                    $table->json('fix_plan')->nullable();
+                }
+                if (!Schema::hasColumn('module_install_logs', 'pre_install_snapshot')) {
+                    $table->json('pre_install_snapshot')->nullable();
+                }
+                if (!Schema::hasColumn('module_install_logs', 'applied_repairs')) {
+                    $table->json('applied_repairs')->nullable();
+                }
+                if (!Schema::hasColumn('module_install_logs', 'repair_results')) {
+                    $table->json('repair_results')->nullable();
+                }
+                if (!Schema::hasColumn('module_install_logs', 'can_rollback')) {
+                    $table->boolean('can_rollback')->default(false);
+                }
+                if (!Schema::hasColumn('module_install_logs', 'installed_at')) {
+                    $table->timestamp('installed_at')->nullable();
+                }
+                if (!Schema::hasColumn('module_install_logs', 'last_verified_at')) {
+                    $table->timestamp('last_verified_at')->nullable();
+                }
+                if (!Schema::hasColumn('module_install_logs', 'installation_notes')) {
+                    $table->text('installation_notes')->nullable();
+                }
             });
         }
     }

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('deals', 'create_client')) {
+        if (Schema::hasTable('deals') && !Schema::hasColumn('deals', 'create_client')) {
             Schema::table('deals', function (Blueprint $table) {
                 $table->enum('create_client', [0, 1])->default(0);
             });
@@ -23,8 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('deals', function (Blueprint $table) {
-            $table->dropForeign(['create_client']);
-        });
+        if (Schema::hasTable('deals') && Schema::hasColumn('deals', 'create_client')) {
+            Schema::table('deals', function (Blueprint $table) {
+                $table->dropColumn('create_client');
+            });
+        }
     }
 };

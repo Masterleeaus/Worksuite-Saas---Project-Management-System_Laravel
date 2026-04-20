@@ -14,8 +14,32 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Leave::join('leave_types', 'leave_types.id', 'leaves.leave_type_id')
-            ->update(['leaves.paid' => DB::raw('leave_types.paid')]);;
+        if (
+            !Schema::hasTable('leaves')
+            || !Schema::hasTable('leave_types')
+            || !Schema::hasColumn('leaves', 'paid')
+            || !Schema::hasColumn('leaves', 'leave_type_id')
+            || !Schema::hasColumn('leave_types', 'paid')
+        ) {
+            return;
+        }
+
+        if (Schema::getConnection()->getDriverName() === 'mysql') {
+            Leave::join('leave_types', 'leave_types.id', 'leaves.leave_type_id')
+                ->update(['leaves.paid' => DB::raw('leave_types.paid')]);
+            return;
+        }
+
+        $leavePaidStates = DB::table('leaves')
+            ->join('leave_types', 'leave_types.id', '=', 'leaves.leave_type_id')
+            ->select('leaves.id', 'leave_types.paid as leave_type_paid')
+            ->get();
+
+        foreach ($leavePaidStates as $row) {
+            DB::table('leaves')
+                ->where('id', $row->id)
+                ->update(['paid' => $row->leave_type_paid]);
+        }
     }
 
     /**

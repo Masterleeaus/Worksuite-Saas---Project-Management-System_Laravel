@@ -12,6 +12,14 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('deal_notes') || !Schema::hasColumn('deal_notes', 'title')) {
+            return;
+        }
+
+        if (Schema::getConnection()->getDriverName() === 'sqlite' && !Schema::hasTable('deals')) {
+            return;
+        }
+
         Schema::table('deal_notes', function (Blueprint $table) {
             $table->string('title', 191)->nullable()->change();
         });
@@ -22,6 +30,14 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (!Schema::hasTable('deal_notes') || !Schema::hasColumn('deal_notes', 'title')) {
+            return;
+        }
+
+        if (Schema::getConnection()->getDriverName() === 'sqlite' && !Schema::hasTable('deals')) {
+            return;
+        }
+
         Schema::table('deal_notes', function (Blueprint $table) {
             $table->string('title', 191)->nullable(false)->change();
         });

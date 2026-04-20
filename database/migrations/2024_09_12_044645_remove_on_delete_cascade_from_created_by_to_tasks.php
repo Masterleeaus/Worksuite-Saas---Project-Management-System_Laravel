@@ -11,6 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (
+            Schema::getConnection()->getDriverName() === 'sqlite'
+            || !Schema::hasTable('tasks')
+            || !Schema::hasColumn('tasks', 'created_by')
+        ) {
+            return;
+        }
+
         Schema::table('tasks', function (Blueprint $table) {
             $table->dropForeign('tasks_created_by_foreign');
             $table->foreign('created_by')
@@ -24,6 +32,14 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (
+            Schema::getConnection()->getDriverName() === 'sqlite'
+            || !Schema::hasTable('tasks')
+            || !Schema::hasColumn('tasks', 'created_by')
+        ) {
+            return;
+        }
+
         Schema::table('tasks', function (Blueprint $table) {
             $table->dropForeign('tasks_created_by_foreign');
         });
