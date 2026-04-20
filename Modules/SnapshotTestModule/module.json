@@ -1,1 +1,0 @@
-{"name":"SnapshotTestModule","alias":"SnapshotTestModule","version":"1.0.0","providers":["Modules\\SnapshotTestModule\\Providers\\SnapshotTestModuleServiceProvider"],"permissions":[{"key":"manage_snapshottestmodule","label":"Manage SnapshotTestModule"}],"routes":[{"uri":"\/SnapshotTestModule","method":"GET"}]}

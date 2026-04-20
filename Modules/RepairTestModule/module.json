@@ -1,1 +1,0 @@
-{"name":"RepairTestModule","alias":"RepairTestModule","version":"1.0.0","providers":["Modules\\RepairTestModule\\Providers\\RepairTestModuleServiceProvider"],"permissions":[{"key":"manage_repairtestmodule","label":"Manage RepairTestModule"}],"routes":[{"uri":"\/RepairTestModule","method":"GET"}]}

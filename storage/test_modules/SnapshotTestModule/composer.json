@@ -1,8 +1,0 @@
-{
-    "name": "modules/snapshottestmodule",
-    "autoload": {
-        "psr-4": {
-            "Modules\\SnapshotTestModule\\": ""
-        }
-    }
-}

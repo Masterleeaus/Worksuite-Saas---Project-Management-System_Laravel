@@ -1,8 +1,0 @@
-{
-    "name": "modules/repairtestmodule",
-    "autoload": {
-        "psr-4": {
-            "Modules\\RepairTestModule\\": ""
-        }
-    }
-}
