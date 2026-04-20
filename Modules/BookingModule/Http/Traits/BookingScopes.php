@@ -36,14 +36,21 @@ trait BookingScopes
     public function scopeFilterByZoneId($query, $zoneId): mixed
     {
         return $query->when($zoneId, function ($query) use ($zoneId) {
-            $query->where('zone_id', $zoneId);
+            $query->where('zone_id', (string) $zoneId);
         });
     }
 
     public function scopeFilterByZoneIds($query, $zoneIds): mixed
     {
         return $query->when($zoneIds, function ($query) use ($zoneIds) {
-            $query->whereIn('zone_id', $zoneIds);
+            $query->whereIn('zone_id', array_map('strval', (array)$zoneIds));
+        });
+    }
+
+    public function scopeFilterByCanonicalCoverageZone($query, $zoneId): mixed
+    {
+        return $query->when($zoneId, function ($query) use ($zoneId) {
+            $query->where('zone_id', (string)$zoneId);
         });
     }
 

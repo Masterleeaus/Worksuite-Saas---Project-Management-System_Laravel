@@ -11,8 +11,10 @@ class TerritoryController extends Controller
 {
     public function index(Request $request)
     {
+        $companyId = $this->companyId();
         $filter      = $request->only(['q']);
         $territories = FSMTerritory::with(['branch.district.region'])
+            ->where('company_id', $companyId)
             ->when($filter['q'] ?? null, fn($q, $v) => $q->where('name', 'like', "%$v%"))
             ->orderBy('name')
             ->paginate(20)
@@ -23,7 +25,7 @@ class TerritoryController extends Controller
 
     public function create()
     {
-        $branches = FSMBranch::orderBy('name')->get();
+        $branches = FSMBranch::where('company_id', $this->companyId())->orderBy('name')->get();
         $types    = FSMTerritory::TYPES;
 
         return view('fsmterritory::territories.create', compact('branches', 'types'));
@@ -31,6 +33,7 @@ class TerritoryController extends Controller
 
     public function store(Request $request)
     {
+        $companyId = $this->companyId();
         $data = $request->validate([
             'name'        => 'required|string|max:256',
             'description' => 'nullable|string|max:512',
@@ -38,6 +41,7 @@ class TerritoryController extends Controller
             'type'        => 'nullable|string|max:32',
             'zip_codes'   => 'nullable|string',
         ]);
+        $data['company_id'] = $companyId;
 
         FSMTerritory::create($data);
 
@@ -47,8 +51,9 @@ class TerritoryController extends Controller
 
     public function edit(int $id)
     {
-        $territory = FSMTerritory::findOrFail($id);
-        $branches  = FSMBranch::orderBy('name')->get();
+        $companyId = $this->companyId();
+        $territory = FSMTerritory::where('company_id', $companyId)->findOrFail($id);
+        $branches  = FSMBranch::where('company_id', $companyId)->orderBy('name')->get();
         $types     = FSMTerritory::TYPES;
 
         return view('fsmterritory::territories.edit', compact('territory', 'branches', 'types'));
@@ -56,7 +61,7 @@ class TerritoryController extends Controller
 
     public function update(Request $request, int $id)
     {
-        $territory = FSMTerritory::findOrFail($id);
+        $territory = FSMTerritory::where('company_id', $this->companyId())->findOrFail($id);
 
         $data = $request->validate([
             'name'        => 'required|string|max:256',
@@ -74,9 +79,17 @@ class TerritoryController extends Controller
 
     public function destroy(int $id)
     {
-        FSMTerritory::findOrFail($id)->delete();
+        FSMTerritory::where('company_id', $this->companyId())->findOrFail($id)->delete();
 
         return redirect()->route('fsmterritory.territories.index')
             ->with('success', 'Territory deleted.');
+    }
+
+    private function companyId(): int
+    {
+        $user = auth()->user();
+        abort_if(!$user || !$user->company_id, 403);
+
+        return (int)$user->company_id;
     }
 }

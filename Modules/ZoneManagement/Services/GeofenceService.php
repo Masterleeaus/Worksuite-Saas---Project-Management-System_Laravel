@@ -44,6 +44,8 @@ class GeofenceService
      */
     public function isWithinZone(Zone $zone, float $lat, float $lng): array
     {
+        $zone = $this->resolveCanonicalZoneProxy($zone);
+
         if ($zone->zone_type === 'circle' && $zone->center_lat && $zone->center_lng) {
             $distance = $this->haversineDistance(
                 (float) $zone->center_lat,
@@ -103,5 +105,18 @@ class GeofenceService
         usort($cleaners, fn($a, $b) => $a['distance_m'] <=> $b['distance_m']);
 
         return $cleaners;
+    }
+
+    private function resolveCanonicalZoneProxy(Zone $zone): Zone
+    {
+        if (!isset($zone->territory_id) || empty($zone->territory_id)) {
+            return $zone;
+        }
+
+        if (!class_exists(\Modules\FSMTerritory\Models\FSMTerritory::class)) {
+            return $zone;
+        }
+
+        return $zone;
     }
 }

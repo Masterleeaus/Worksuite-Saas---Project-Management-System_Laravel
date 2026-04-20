@@ -8,6 +8,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Modules\FSMCore\Models\FSMOrder;
 use Modules\TitanGo\Models\NexusJobNote;
+use Modules\TitanGo\Models\TitanGoLocationPing;
 use Modules\TitanGo\Models\TitanGoIssue;
 use Modules\TitanGo\Models\TitanGoWorkerStatus;
 use Modules\TitanGo\Models\TitanGoChecklistCompletion;
@@ -63,6 +64,8 @@ class SyncController extends Controller
                     'note'           => $this->replayNote($companyId, $workerId, (int) $visitId, $payload),
                     'status'         => $this->replayStatus($companyId, $workerId, (int) $visitId, $payload),
                     'issue'          => $this->replayIssue($companyId, $workerId, (int) $visitId, $payload),
+                    'location_ping'  => $this->replayLocationPing($companyId, $workerId, (int) $visitId, $payload),
+                    'route_point'    => $this->replayRoutePoint($companyId, $workerId, (int) $visitId, $payload),
                     'checkin'        => $this->replayCheckin((int) $visitId, $workerId),
                     'checkout'       => $this->replayCheckout((int) $visitId, $workerId),
                     'complete'       => $this->replayComplete((int) $visitId, $workerId),
@@ -111,6 +114,56 @@ class SyncController extends Controller
             'type'        => $payload['type'] ?? 'access_blocked',
             'description' => $payload['description'] ?? null,
             'status'      => 'open',
+        ]);
+    }
+
+    private function replayLocationPing(int $companyId, int $workerId, int $visitId, array $payload): void
+    {
+        $lat = $payload['latitude'] ?? $payload['lat'] ?? null;
+        $lng = $payload['longitude'] ?? $payload['lng'] ?? null;
+        if ($lat === null || $lng === null) {
+            return;
+        }
+
+        TitanGoLocationPing::create([
+            'company_id' => $companyId,
+            'worker_id' => $workerId,
+            'visit_id' => $visitId ?: null,
+            'latitude' => $lat,
+            'longitude' => $lng,
+            'accuracy' => $payload['accuracy'] ?? null,
+            'tracking_mode' => $payload['tracking_mode'] ?? 'background',
+            'created_at' => $payload['recorded_at'] ?? now(),
+            'updated_at' => $payload['recorded_at'] ?? now(),
+        ]);
+    }
+
+    private function replayRoutePoint(int $companyId, int $workerId, int $visitId, array $payload): void
+    {
+        if (!\Illuminate\Support\Facades\Schema::hasTable('titan_go_route_trails')) {
+            return;
+        }
+
+        $lat = $payload['latitude'] ?? $payload['lat'] ?? null;
+        $lng = $payload['longitude'] ?? $payload['lng'] ?? null;
+        if ($lat === null || $lng === null) {
+            return;
+        }
+
+        \Illuminate\Support\Facades\DB::table('titan_go_route_trails')->insert([
+            'company_id' => $companyId,
+            'worker_id' => $workerId,
+            'visit_id' => $visitId ?: null,
+            'booking_id' => isset($payload['booking_id']) ? (string)$payload['booking_id'] : null,
+            'latitude' => $lat,
+            'longitude' => $lng,
+            'accuracy' => $payload['accuracy'] ?? null,
+            'speed' => $payload['speed'] ?? null,
+            'heading' => $payload['heading'] ?? null,
+            'sequence' => (int)($payload['sequence'] ?? 0),
+            'recorded_at' => $payload['recorded_at'] ?? now(),
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
     }
 

@@ -9,7 +9,13 @@ class EmployeeZone extends Model
 {
     protected $table = 'employee_zones';
 
-    protected $fillable = ['employee_id', 'zone_id'];
+    protected $fillable = ['company_id', 'employee_id', 'zone_id'];
+
+    protected $casts = [
+        'company_id' => 'integer',
+        'employee_id' => 'integer',
+        'zone_id' => 'string',
+    ];
 
     public function employee()
     {

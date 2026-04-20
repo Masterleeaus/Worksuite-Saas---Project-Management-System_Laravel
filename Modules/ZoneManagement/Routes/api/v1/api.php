@@ -8,6 +8,10 @@ use Modules\ZoneManagement\Http\Controllers\Api\V1\LocationPingController;
 use Modules\ZoneManagement\Http\Controllers\Api\V1\RouteController;
 use Modules\ZoneManagement\Http\Controllers\Api\V1\DispatchMapController;
 
+// NOTE: ZoneManagement is now a compatibility shell.
+// These legacy endpoints are preserved for backward compatibility and
+// delegate canonical worker execution telemetry to TitanGo bridges.
+
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Api\V1\Admin', 'middleware' => ['auth:api']], function () {
     Route::group(['prefix' => 'zone'], function () {
         Route::get('/', [ZoneController::class, 'index']);   // index
@@ -44,4 +48,3 @@ Route::middleware(['auth:api'])->prefix('v1/gps')->as('gps.')->group(function ()
     Route::post('route-points', [RouteController::class, 'store'])->name('route-points.store');
     Route::get('route-points',  [RouteController::class, 'index'])->name('route-points.index');
 });
-

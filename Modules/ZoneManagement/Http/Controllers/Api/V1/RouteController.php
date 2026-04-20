@@ -8,12 +8,15 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Modules\ZoneManagement\Entities\RoutePoint;
+use Modules\ZoneManagement\Services\TitanGoExecutionBridge;
 
 /**
  * Records and retrieves GPS route data for opt-in route tracking.
  */
 class RouteController extends Controller
 {
+    public function __construct(private TitanGoExecutionBridge $titanBridge) {}
+
     /**
      * Append a batch of route points for a booking.
      *
@@ -55,6 +58,12 @@ class RouteController extends Controller
         }, $request->points);
 
         RoutePoint::insert($rows);
+
+        try {
+            $this->titanBridge->mirrorRoutePoints($user, (string)$request->booking_id, $request->points);
+        } catch (\Throwable) {
+            // canonical mirror is best-effort for compatibility phase
+        }
 
         return response()->json(['inserted' => count($rows)], 201);
     }

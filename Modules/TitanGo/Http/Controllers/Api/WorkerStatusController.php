@@ -26,6 +26,14 @@ class WorkerStatusController extends Controller
         'job_complete' => 'Completed',
     ];
 
+    private const LEGACY_STATUS_MAP = [
+        'check_in' => 'arrived',
+        'checked_in' => 'arrived',
+        'check_out' => 'job_complete',
+        'checked_out' => 'job_complete',
+        'complete' => 'job_complete',
+    ];
+
     /**
      * GET /api/nexus/v1/jobs/{id}/status
      */
@@ -51,27 +59,33 @@ class WorkerStatusController extends Controller
         $companyId = $request->user()->company_id;
         $workerId  = $request->user()->id;
 
-        $this->assertWorkerAssigned($companyId, $workerId, $id);
+        $visitId = $id ?: (int)$request->get('visit_id', $request->get('booking_id', 0));
+        $this->assertWorkerAssigned($companyId, $workerId, $visitId);
 
         $request->validate([
-            'status' => 'required|in:' . implode(',', TitanGoWorkerStatus::STATUSES),
+            'status' => 'required|string',
             'notes'  => 'nullable|string|max:1000',
         ]);
+
+        $status = self::LEGACY_STATUS_MAP[$request->status] ?? $request->status;
+        if (!in_array($status, TitanGoWorkerStatus::STATUSES, true)) {
+            abort(422, 'Unsupported worker status.');
+        }
 
         $signal = TitanGoWorkerStatus::create([
             'company_id' => $companyId,
             'worker_id'  => $workerId,
-            'visit_id'   => $id,
-            'status'     => $request->status,
+            'visit_id'   => $visitId,
+            'status'     => $status,
             'notes'      => $request->notes,
         ]);
 
         // Optionally advance FSM stage for key lifecycle signals
-        if (array_key_exists($request->status, self::STAGE_SIGNALS)) {
-            $stageName = self::STAGE_SIGNALS[$request->status];
+        if (array_key_exists($status, self::STAGE_SIGNALS)) {
+            $stageName = self::STAGE_SIGNALS[$status];
             $stage = FSMStage::where('name', $stageName)->first();
             if ($stage) {
-                FSMOrder::where('id', $id)->update(['stage_id' => $stage->id]);
+                FSMOrder::where('id', $visitId)->update(['stage_id' => $stage->id]);
             }
         }
 

@@ -14,6 +14,7 @@ use Modules\ZoneManagement\Entities\RoutePoint;
 use Modules\ZoneManagement\Entities\Zone;
 use Modules\ZoneManagement\Entities\ZoneCheckIn;
 use Modules\ZoneManagement\Services\GeofenceService;
+use Modules\ZoneManagement\Services\TitanGoExecutionBridge;
 
 /**
  * Handles GPS check-in and check-out for field cleaners.
@@ -22,7 +23,10 @@ use Modules\ZoneManagement\Services\GeofenceService;
  */
 class CheckInController extends Controller
 {
-    public function __construct(private GeofenceService $geofence) {}
+    public function __construct(
+        private GeofenceService $geofence,
+        private TitanGoExecutionBridge $titanBridge
+    ) {}
 
     /**
      * Verify whether the given coordinates are within the geofence for the
@@ -115,6 +119,16 @@ class CheckInController extends Controller
             'within_geofence'  => $withinGeofence,
         ]);
 
+        try {
+            $this->titanBridge->mirrorCheckIn($user, [
+                'visit_id' => $request->get('fsm_order_id'),
+                'booking_id' => $request->booking_id,
+                'notes' => $request->get('notes'),
+            ]);
+        } catch (\Throwable) {
+            // compatibility bridge failures must not break legacy API contract
+        }
+
         // Broadcast event for admin dispatch map (if broadcasting is configured)
         if (class_exists(\Illuminate\Support\Facades\Event::class)) {
             try {
@@ -192,6 +206,16 @@ class CheckInController extends Controller
             'check_out_accuracy'=> $request->accuracy,
             'checked_out_at'    => now(),
         ]);
+
+        try {
+            $this->titanBridge->mirrorCheckOut($user, [
+                'visit_id' => $request->get('fsm_order_id'),
+                'booking_id' => $checkIn->booking_id,
+                'notes' => $checkIn->notes,
+            ]);
+        } catch (\Throwable) {
+            // compatibility bridge failures must not break legacy API contract
+        }
 
         // FSMTimesheet integration: close the open timesheet line for this user/order
         if (

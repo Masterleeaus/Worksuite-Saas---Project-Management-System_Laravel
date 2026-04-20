@@ -12,8 +12,10 @@ class BranchController extends Controller
 {
     public function index(Request $request)
     {
+        $companyId = $this->companyId();
         $filter   = $request->only(['q']);
         $branches = FSMBranch::with(['district.region', 'manager'])
+            ->where('company_id', $companyId)
             ->when($filter['q'] ?? null, fn($q, $v) => $q->where('name', 'like', "%$v%"))
             ->orderBy('name')
             ->paginate(20)
@@ -24,20 +26,23 @@ class BranchController extends Controller
 
     public function create()
     {
-        $districts = FSMDistrict::orderBy('name')->get();
-        $users     = User::orderBy('name')->get();
+        $companyId = $this->companyId();
+        $districts = FSMDistrict::where('company_id', $companyId)->orderBy('name')->get();
+        $users     = User::where('company_id', $companyId)->orderBy('name')->get();
 
         return view('fsmterritory::branches.create', compact('districts', 'users'));
     }
 
     public function store(Request $request)
     {
+        $companyId = $this->companyId();
         $data = $request->validate([
             'name'        => 'required|string|max:256',
             'description' => 'nullable|string|max:512',
             'district_id' => 'nullable|integer',
             'manager_id'  => 'nullable|integer',
         ]);
+        $data['company_id'] = $companyId;
 
         FSMBranch::create($data);
 
@@ -47,16 +52,17 @@ class BranchController extends Controller
 
     public function edit(int $id)
     {
-        $branch    = FSMBranch::findOrFail($id);
-        $districts = FSMDistrict::orderBy('name')->get();
-        $users     = User::orderBy('name')->get();
+        $companyId = $this->companyId();
+        $branch    = FSMBranch::where('company_id', $companyId)->findOrFail($id);
+        $districts = FSMDistrict::where('company_id', $companyId)->orderBy('name')->get();
+        $users     = User::where('company_id', $companyId)->orderBy('name')->get();
 
         return view('fsmterritory::branches.edit', compact('branch', 'districts', 'users'));
     }
 
     public function update(Request $request, int $id)
     {
-        $branch = FSMBranch::findOrFail($id);
+        $branch = FSMBranch::where('company_id', $this->companyId())->findOrFail($id);
 
         $data = $request->validate([
             'name'        => 'required|string|max:256',
@@ -73,9 +79,17 @@ class BranchController extends Controller
 
     public function destroy(int $id)
     {
-        FSMBranch::findOrFail($id)->delete();
+        FSMBranch::where('company_id', $this->companyId())->findOrFail($id)->delete();
 
         return redirect()->route('fsmterritory.branches.index')
             ->with('success', 'Branch deleted.');
+    }
+
+    private function companyId(): int
+    {
+        $user = auth()->user();
+        abort_if(!$user || !$user->company_id, 403);
+
+        return (int)$user->company_id;
     }
 }
