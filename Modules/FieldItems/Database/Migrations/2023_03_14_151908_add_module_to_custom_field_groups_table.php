@@ -17,6 +17,10 @@ return new class extends Migration
     {
         $companyId = Company::query()->value('id');
 
+        if (is_null($companyId)) {
+            return;
+        }
+
         $data = [
             'company_id' => $companyId,
             'name' => 'Item',
