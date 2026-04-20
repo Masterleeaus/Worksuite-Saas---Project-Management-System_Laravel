@@ -149,4 +149,22 @@ class FsmModuleHealthChecksTest extends TestCase
         $this->assertStringContainsString("'id'       => 'fsmtimesheet:service_provider'", $content);
         $this->assertStringContainsString("'id'       => 'fsmtimesheet:fsm_core_dep'", $content);
     }
+
+    public function test_fsm_route_availability_health_checks_are_defined(): void
+    {
+        $content = file_get_contents($this->repoRoot . '/Modules/FSMRouteAvailability/health/checks.php');
+
+        $this->assertStringContainsString("'id'       => 'fsmrouteavailability:module_json'", $content);
+        $this->assertStringContainsString("'id'       => 'fsmrouteavailability:service_provider'", $content);
+        $this->assertStringContainsString("'id'       => 'fsmrouteavailability:fsm_route_dep'", $content);
+    }
+
+    public function test_fsm_sale_recurring_health_checks_are_defined(): void
+    {
+        $content = file_get_contents($this->repoRoot . '/Modules/FSMSaleRecurring/health/checks.php');
+
+        $this->assertStringContainsString("'id'       => 'fsmsalerecurring:module_json'", $content);
+        $this->assertStringContainsString("'id'       => 'fsmsalerecurring:service_provider'", $content);
+        $this->assertStringContainsString("'id'       => 'fsmsalerecurring:fsm_sales_dep'", $content);
+    }
 }
