@@ -96,7 +96,7 @@ class ProviderController extends Controller
         $this->business_settings = $business_settings;
         $this->booking_details_amount = $booking_details_amount;
 
-        $this->messaging = app('firebase.messaging');
+        $this->messaging = app()->bound('firebase.messaging') ? app('firebase.messaging') : null;
         $this->advanceSearchService = $advanceSearchService;
     }
 

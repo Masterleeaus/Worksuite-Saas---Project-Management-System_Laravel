@@ -100,6 +100,15 @@ class TitanCoreServiceProvider extends ServiceProvider
             );
         });
 
+        $this->app->bind(\Modules\TitanCore\Contracts\AI\ClientInterface::class, function () {
+            return new \Modules\TitanCore\AI\Adapters\OpenAIAdapter([
+                'api_key' => (string) (config('ai.providers.openai.api_key') ?? env('OPENAI_API_KEY') ?? ''),
+                'base_url' => (string) (config('ai.providers.openai.base_url') ?? 'https://api.openai.com/v1'),
+                'chat_model' => (string) (config('ai.providers.openai.chat_model') ?? 'gpt-4o-mini'),
+                'embed_model' => (string) (config('ai.providers.openai.embed_model') ?? 'text-embedding-3-small'),
+            ]);
+        });
+
         // no bindings; keep lightweight
     }
 

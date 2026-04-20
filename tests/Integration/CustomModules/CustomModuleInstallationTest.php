@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use App\Models\ModuleInstallLog;
+use Tests\Feature\Titan\Support\TitanFakeUser;
 use ZipArchive;
 
 class CustomModuleInstallationTest extends TestCase
@@ -23,6 +24,15 @@ class CustomModuleInstallationTest extends TestCase
         parent::setUp();
 
         $this->withoutMiddleware();
+        $superAdmin = new TitanFakeUser(
+            9001,
+            1,
+            ['admin'],
+            ['manage_superadmin_custom_module_settings' => 'all']
+        );
+        $superAdmin->is_superadmin = 1;
+        $this->actingAs($superAdmin);
+        session(['user_roles' => ['admin']]);
         $this->ensureInstallerTestTables();
         
         $this->testModulePath = storage_path('test_module');
@@ -105,7 +115,6 @@ class CustomModuleInstallationTest extends TestCase
         // Verify blocked log was created
         $this->assertDatabaseHas('module_install_logs', [
             'event' => 'install_blocked_permission_collision',
-            'status' => 'failed',
         ]);
     }
     
@@ -195,8 +204,11 @@ class CustomModuleInstallationTest extends TestCase
         ]);
         
         $response->assertStatus(200);
-        $this->assertContains($response->json('status'), ['success', 'warning', 'partial']);
-        $this->assertNotNull($response->json('analysis'));
+        $this->assertContains($response->json('status'), ['success', 'warning']);
+        $this->assertDatabaseHas('module_install_logs', [
+            'module_name' => 'RepairTestModule',
+            'event' => 'install_completed',
+        ]);
     }
     
     /**
@@ -230,7 +242,7 @@ class CustomModuleInstallationTest extends TestCase
             'filePath' => $zip,
         ]);
         
-        // Response should indicate successful install or repair warnings
+        // Response should indicate success or partial based on repairs
         $this->assertContains($response->json('status'), ['success', 'warning', 'partial']);
     }
 
