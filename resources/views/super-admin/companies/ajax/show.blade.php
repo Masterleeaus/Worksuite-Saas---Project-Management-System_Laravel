@@ -86,16 +86,17 @@
     </div>
     <!--  USER CARDS END -->
 
+    @php($companyAdmin = $company->user ?: \App\Models\Company::firstActiveAdmin($company))
     <!--  USER CARDS START -->
     <div class="col-md-6 col-xl-4 mb-4 mb-xl-0 mb-lg-4 mb-md-0">
-        @if($company->user)
-            <x-cards.user :image="$company->user->image_url">
+        @if($companyAdmin)
+            <x-cards.user :image="$companyAdmin->image_url">
                 <div class="row mb-1">
                     <div class="col-12">
                         <h4 class="card-title f-15 f-w-500 text-darkest-grey mb-0">
-                            {{ ($company->user->salutation ? $company->user->salutation->label() . ' ' : '') . $company->user->name }}
+                            {{ ($companyAdmin->salutation ? $companyAdmin->salutation->label() . ' ' : '') . $companyAdmin->name }}
                             @if(global_setting()->email_verification)
-                                @if(is_null($company->user->userAuth->email_verified_at))
+                                @if(is_null($companyAdmin->userAuth->email_verified_at))
                                     <i class="fa fa-times-circle text-red" data-toggle="tooltip"
                                        data-original-title="@lang('superadmin.notVerifiedEmail')"></i>
                                 @else
@@ -106,17 +107,17 @@
                         </h4>
                     </div>
                 </div>
-                @if ($company->user->country)
+                @if ($companyAdmin->country)
                     <p class="f-12 font-weight-normal text-dark-grey mb-1">
                         <span
-                            class='flag-icon flag-icon-{{ $company->user->country->iso }} flag-icon-squared'></span> {{ $company->user->country->nicename }}
+                            class='flag-icon flag-icon-{{ $companyAdmin->country->iso }} flag-icon-squared'></span> {{ $companyAdmin->country->nicename }}
                     </p>
                 @endif
 
                 <p class="card-text f-12 text-lightest">@lang('app.lastLogin')
 
-                    @if (!is_null($company->user->last_login))
-                        {{ $company->user->last_login->timezone(global_setting()->timezone)->translatedFormat(global_setting()->date_format . ' ' . global_setting()->time_format) }}
+                    @if (!is_null($companyAdmin->last_login))
+                        {{ $companyAdmin->last_login->timezone(global_setting()->timezone)->translatedFormat(global_setting()->date_format . ' ' . global_setting()->time_format) }}
                     @else
                         --
                     @endif
@@ -217,8 +218,13 @@
             <x-cards.data-row :label="__('modules.accountSettings.companyAddress')"
                               :value="isset($company->defaultAddress) ? $company->defaultAddress->address : '--'"
                               html="true"/>
+            @php
+                $companyCurrencyLabel = $company->currency
+                    ? ($company->currency->currency_code . ' (' . $company->currency->currency_symbol . ')')
+                    : '--';
+            @endphp
             <x-cards.data-row :label="__('modules.accountSettings.defaultCurrency')"
-                              :value="$company->currency->currency_code . ' (' . $company->currency->currency_symbol . ')'"/>
+                              :value="$companyCurrencyLabel"/>
             <x-cards.data-row :label="__('modules.accountSettings.defaultTimezone')" :value="$company->timezone"/>
 
             @if (module_enabled('Subdomain'))

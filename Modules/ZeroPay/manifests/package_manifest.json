@@ -1,0 +1,16 @@
+{
+  "feature_defaults": {
+    "basic": {
+      "ai_channels": ["email"],
+      "voice": false
+    },
+    "pro": {
+      "ai_channels": ["email", "sms", "whatsapp", "messenger", "telegram"],
+      "voice": false
+    },
+    "enterprise": {
+      "ai_channels": ["email", "sms", "whatsapp", "messenger", "telegram"],
+      "voice": true
+    }
+  }
+}

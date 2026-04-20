@@ -5,9 +5,11 @@ namespace App\Http\Controllers\SuperAdmin;
 use App\Helper\Reply;
 use App\Http\Requests\SuperAdmin\Register\StoreRequest;
 use App\Models\Company;
+use App\Models\Currency;
 use App\Models\EmployeeDetails;
 use App\Models\GlobalSetting;
 use App\Models\Role;
+use App\Models\SuperAdmin\GlobalCurrency;
 use App\Models\SuperAdmin\SeoDetail;
 use App\Models\SuperAdmin\SignUpSetting;
 use App\Models\SuperAdmin\TrFrontDetail;
@@ -89,6 +91,7 @@ class CompanyRegisterController extends FrontBaseController
             }
 
             $company->save();
+            $this->ensureCompanyCurrency($company);
 
             $user = $this->addUser($company, $request, $global);
 
@@ -143,6 +146,7 @@ class CompanyRegisterController extends FrontBaseController
         $user->name = $request->name;
         $user->email = $request->email;
         $user->status = 'active';
+        $user->is_superadmin = 0;
         $user->user_auth_id = $userAuth->id;
         $user->locale = $company->locale;
         $user->country_id = $countryId;
@@ -157,42 +161,141 @@ class CompanyRegisterController extends FrontBaseController
             $user->notify(new NewUser($user, $request->password, signup: true));
         }
 
-        if (!$user->hasRole('admin')) {
+        $adminRole = $this->ensureCompanyRole($company, 'admin', 'App Administrator', 'Admin is allowed to manage everything of the app.');
+        $employeeRole = $this->ensureCompanyRole($company, 'employee', 'Employee', 'Employee can see tasks and projects assigned to him.');
+        $this->ensureCompanyRole($company, 'client', 'Client', 'Client can see own tasks and projects.');
 
-            // Attach Admin Role
-            $adminRole = Role::withoutGlobalScope(CompanyScope::class)->where('name', 'admin')->where('company_id', $company->id)->first();
+        $hasCompanyAdminRole = $user->roles()
+            ->withoutGlobalScope(CompanyScope::class)
+            ->where('roles.name', 'admin')
+            ->where('roles.company_id', $company->id)
+            ->exists();
 
-            $employeeRole = Role::withoutGlobalScope(CompanyScope::class)->where('name', 'employee')->where('company_id', $company->id)->first();
+        $user->roles()->syncWithoutDetaching([$employeeRole->id]);
+        $this->addEmployeeDetails($user, $company->id);
 
-            $user->roles()->attach($adminRole->id);
-            $this->addEmployeeDetails($user, $employeeRole, $company->id);
-
+        if (!$hasCompanyAdminRole) {
+            $user->roles()->syncWithoutDetaching([$adminRole->id]);
             $user->assignUserRolePermission($adminRole->id);
         }
 
         return $user;
     }
 
-    private function addEmployeeDetails($user, $employeeRole, $companyId)
+    private function addEmployeeDetails($user, $companyId)
     {
-        $employee = new EmployeeDetails();
-        $employee->user_id = $user->id;
+        $employee = EmployeeDetails::firstOrNew(['user_id' => $user->id]);
         $employee->company_id = $companyId;
-        /* @phpstan-ignore-line */
-        $employee->employee_id = 'EMP-1';
-        /* @phpstan-ignore-line */
+        $employee->employee_id = $employee->employee_id ?: ('EMP-' . $user->id);
         $employee->save();
 
-        $search = new UniversalSearch();
-        $search->searchable_id = $user->id;
-        $search->company_id = $companyId;
+        $search = UniversalSearch::firstOrNew([
+            'searchable_id' => $user->id,
+            'company_id' => $companyId,
+            'route_name' => 'employees.show',
+        ]);
         $search->title = $user->name;
-        $search->route_name = 'employees.show';
         $search->save();
+    }
 
-        // Assign Role
-        $user->roles()->attach($employeeRole->id);
-        /* @phpstan-ignore-line */
+    private function ensureCompanyCurrency(Company $company): void
+    {
+        $currentCurrency = null;
+
+        if ($company->currency_id) {
+            $currentCurrency = Currency::withoutGlobalScope(CompanyScope::class)
+                ->where('id', $company->currency_id)
+                ->where('company_id', $company->id)
+                ->first();
+        }
+
+        if ($currentCurrency) {
+            return;
+        }
+
+        $globalCurrencyCode = optional(global_setting()->currency)->currency_code;
+        $currencyQuery = Currency::withoutGlobalScope(CompanyScope::class)->where('company_id', $company->id);
+
+        if ($globalCurrencyCode) {
+            $currencyQuery->where('currency_code', $globalCurrencyCode);
+        }
+
+        $currency = $currencyQuery->first();
+
+        if (!$currency) {
+            $globalCurrency = $globalCurrencyCode ? GlobalCurrency::where('currency_code', $globalCurrencyCode)->first() : null;
+            $globalCurrency = $globalCurrency ?: GlobalCurrency::first();
+
+            if ($globalCurrency) {
+                $currency = Currency::withoutGlobalScope(CompanyScope::class)->firstOrCreate(
+                    [
+                        'company_id' => $company->id,
+                        'currency_code' => $globalCurrency->currency_code,
+                    ],
+                    [
+                        'currency_name' => $globalCurrency->currency_name,
+                        'currency_symbol' => $globalCurrency->currency_symbol,
+                        'exchange_rate' => $globalCurrency->exchange_rate,
+                        'currency_position' => $globalCurrency->currency_position,
+                        'no_of_decimal' => $globalCurrency->no_of_decimal,
+                        'thousand_separator' => $globalCurrency->thousand_separator,
+                        'decimal_separator' => $globalCurrency->decimal_separator,
+                        'is_cryptocurrency' => $globalCurrency->is_cryptocurrency,
+                        'usd_price' => $globalCurrency->usd_price,
+                    ]
+                );
+            }
+            else {
+                $currency = Currency::withoutGlobalScope(CompanyScope::class)->where('company_id', $company->id)->first();
+            }
+        }
+
+        if (!$currency) {
+            $currency = $this->createFallbackUsdCurrency($company);
+        }
+
+        if ($currency) {
+            $company->currency_id = $currency->id;
+            $company->saveQuietly();
+        }
+    }
+
+    private function createFallbackUsdCurrency(Company $company): Currency
+    {
+        $currency = new Currency();
+        $currency->currency_name = 'Dollars';
+        $currency->currency_symbol = '$';
+        $currency->currency_code = 'USD';
+        $currency->exchange_rate = 1;
+        $currency->currency_position = 'left';
+        $currency->no_of_decimal = 2;
+        $currency->thousand_separator = ',';
+        $currency->decimal_separator = '.';
+        $currency->company_id = $company->id;
+        $currency->saveQuietly();
+
+        return $currency;
+    }
+
+    private function ensureCompanyRole(Company $company, string $name, string $displayName, string $description): Role
+    {
+        $role = Role::withoutGlobalScope(CompanyScope::class)
+            ->where('name', $name)
+            ->where('company_id', $company->id)
+            ->first();
+
+        if ($role) {
+            return $role;
+        }
+
+        $role = new Role();
+        $role->name = $name;
+        $role->company_id = $company->id;
+        $role->display_name = $displayName;
+        $role->description = $description;
+        $role->saveQuietly();
+
+        return $role;
     }
 
     public function recaptchaValidate($request)

@@ -24,6 +24,7 @@ class FSMOrder extends Model
         'agreement_id',
         'fsm_recurring_id',
         'lead_id',
+        'estimate_id',
         'priority',
         'color',
         'scheduled_date_start',
@@ -52,6 +53,7 @@ class FSMOrder extends Model
         'template_id' => 'integer',
         'agreement_id' => 'integer',
         'lead_id' => 'integer',
+        'estimate_id' => 'integer',
         'color' => 'integer',
         'scheduled_date_start' => 'datetime',
         'scheduled_date_end' => 'datetime',
@@ -85,6 +87,11 @@ class FSMOrder extends Model
     public function project(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Project::class, 'project_id');
+    }
+
+    public function task(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Task::class, 'task_id');
     }
 
     public function template()
@@ -128,6 +135,11 @@ class FSMOrder extends Model
     public function lead()
     {
         return $this->belongsTo(\App\Models\Lead::class, 'lead_id');
+    }
+
+    public function estimate()
+    {
+        return $this->belongsTo(\App\Models\Estimate::class, 'estimate_id');
     }
 
     public function photos()

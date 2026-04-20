@@ -1,0 +1,11 @@
+{
+  "produces": [
+    "zeropay.session.created",
+    "zeropay.attempt.confirmed",
+    "zeropay.followup.queued"
+  ],
+  "consumes": [
+    "invoice.created",
+    "payment.recorded"
+  ]
+}

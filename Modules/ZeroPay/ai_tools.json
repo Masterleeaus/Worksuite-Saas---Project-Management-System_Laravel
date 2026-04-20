@@ -1,0 +1,19 @@
+{
+  "tools": [
+    {
+      "name": "followup_drafter",
+      "risk": "low",
+      "approval": "none"
+    },
+    {
+      "name": "rail_recommender",
+      "risk": "low",
+      "approval": "none"
+    },
+    {
+      "name": "bank_match_suggester",
+      "risk": "low",
+      "approval": "operator"
+    }
+  ]
+}

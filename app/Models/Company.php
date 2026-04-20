@@ -299,7 +299,8 @@ class Company extends BaseModel
 
     public function currency(): BelongsTo
     {
-        return $this->belongsTo(Currency::class, 'currency_id');
+        return $this->belongsTo(Currency::class, 'currency_id')
+            ->withoutGlobalScope(CompanyScope::class);
     }
 
     public function package(): BelongsTo
@@ -314,28 +315,51 @@ class Company extends BaseModel
 
     public function user()
     {
-        return $this->hasOne(User::class)->withoutGlobalScopes([CompanyScope::class, ActiveScope::class])->setEagerLoads([]);
+        return $this->hasOne(User::class)
+            ->withoutGlobalScopes([CompanyScope::class, ActiveScope::class])
+            ->where('users.is_superadmin', 0)
+            ->whereHas('roles', function ($query) {
+                $query->withoutGlobalScope(CompanyScope::class)
+                    ->where('roles.name', 'admin')
+                    ->whereColumn('roles.company_id', 'users.company_id');
+            })
+            ->orderBy('users.id')
+            ->setEagerLoads([]);
+    }
+
+    public function admins()
+    {
+        return $this->hasMany(User::class)
+            ->withoutGlobalScopes([CompanyScope::class, ActiveScope::class])
+            ->where('users.is_superadmin', 0)
+            ->whereHas('roles', function ($query) {
+                $query->withoutGlobalScope(CompanyScope::class)
+                    ->where('roles.name', 'admin')
+                    ->whereColumn('roles.company_id', 'users.company_id');
+            });
     }
 
     public static function firstActiveAdmin($company)
     {
-        if (is_null($company)) {
+        if (!$company) {
             return null;
         }
 
-        $companyId = $company instanceof self ? $company->id : $company;
-        $adminRole = Role::query()
-            ->where('name', 'admin')
-            ->where('company_id', $companyId)
-            ->first();
+        if (!$company instanceof self) {
+            $company = self::query()->find($company);
+        }
 
-        if (is_null($adminRole)) {
+        if (!$company) {
             return null;
         }
 
-        return $adminRole->users()
-            ->where('status', 'active')
-            ->first();
+        $admin = $company->admins()->where('users.status', 'active')->orderBy('users.id')->first();
+
+        if ($admin) {
+            return $admin;
+        }
+
+        return $company->admins()->orderBy('users.id')->first();
     }
 
     public function employees()

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Validation\ValidationException;
 use Tests\Feature\Titan\Support\TitanFakeUser;
 use Tests\TestCase;
 
@@ -25,10 +26,17 @@ class FsmTargetModulePromotionBootstrapTest extends TestCase
         DB::reconnect('sqlite');
         Schema::dropAllTables();
 
+        Schema::create('companies', function ($table) {
+            $table->id();
+            $table->string('date_format')->nullable();
+            $table->timestamps();
+        });
+
         Schema::create('users', function ($table) {
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable();
             $table->string('name')->nullable();
+            $table->string('image')->nullable();
             $table->string('email')->nullable();
             $table->string('password')->nullable();
             $table->string('status')->default('active');
@@ -53,6 +61,24 @@ class FsmTargetModulePromotionBootstrapTest extends TestCase
             $table->string('project_name')->nullable();
             $table->timestamps();
             $table->softDeletes();
+        });
+
+        Schema::create('tasks', function ($table) {
+            $table->id();
+            $table->unsignedBigInteger('company_id')->nullable();
+            $table->unsignedBigInteger('project_id')->nullable();
+            $table->string('heading')->nullable();
+            $table->string('status')->default('incomplete');
+            $table->dateTime('completed_on')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        Schema::create('task_users', function ($table) {
+            $table->id();
+            $table->unsignedBigInteger('task_id')->nullable();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->timestamps();
         });
 
         Schema::create('fsm_sizes', function ($table) {
@@ -140,6 +166,13 @@ class FsmTargetModulePromotionBootstrapTest extends TestCase
             'updated_at' => now(),
         ]);
 
+        DB::table('companies')->insert([
+            'id' => 1,
+            'date_format' => 'Y-m-d',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
         DB::table('fsm_orders')->insert([
             'id' => 101,
             'company_id' => 1,
@@ -158,6 +191,34 @@ class FsmTargetModulePromotionBootstrapTest extends TestCase
             'updated_at' => now(),
         ]);
 
+        DB::table('projects')->insert([
+            'id' => 556,
+            'company_id' => 1,
+            'project_name' => 'Another Project',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('tasks')->insert([
+            'id' => 777,
+            'company_id' => 1,
+            'project_id' => 555,
+            'heading' => 'FSM Linked Task',
+            'status' => 'incomplete',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('tasks')->insert([
+            'id' => 778,
+            'company_id' => 1,
+            'project_id' => 556,
+            'heading' => 'Different Project Task',
+            'status' => 'incomplete',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
         $this->withoutMiddleware();
         $this->withoutMiddleware(VerifyCsrfToken::class);
         $this->actingAs(new TitanFakeUser(11, 1, ['admin']));
@@ -170,6 +231,7 @@ class FsmTargetModulePromotionBootstrapTest extends TestCase
         $this->assertTrue(Route::has('fsmsize.index'));
         $this->assertTrue(Route::has('fsmsize.store'));
         $this->assertTrue(Route::has('api.fsmproject.orders.link'));
+        $this->assertTrue(Route::has('api.fsmproject.orders.link-task'));
         $this->assertTrue(Route::has('api.fsmproject.orders.unlink'));
         $this->assertTrue(Route::has('api.fsmproject.projects.summary'));
         $this->assertTrue(Route::has('api.fsmsize.index'));
@@ -246,8 +308,11 @@ class FsmTargetModulePromotionBootstrapTest extends TestCase
 
         $order = \Modules\FSMCore\Models\FSMOrder::query()->findOrFail(101);
         $project = \App\Models\Project::query()->findOrFail(555);
+        $task = \App\Models\Task::without(['company', 'project', 'users'])->findOrFail(777);
         $this->assertSame(555, $order->project?->id);
+        $this->assertSame(777, $order->task?->id);
         $this->assertSame(101, $project->fsmOrders()->first()?->id);
+        $this->assertSame(101, $task->fsmOrders()->first()?->id);
 
         $summaryResponse = $controller->summary(555);
         $summaryData = $summaryResponse->getData(true)['data'];
@@ -261,6 +326,22 @@ class FsmTargetModulePromotionBootstrapTest extends TestCase
             'project_id' => null,
             'task_id' => null,
         ]);
+    }
+
+    public function test_fsmproject_task_link_rejects_cross_project_task(): void
+    {
+        $controller = app(\Modules\FSMProject\Http\Controllers\FsmProjectController::class);
+
+        $controller->link(Request::create(route('api.fsmproject.orders.link', 101), 'POST', [
+            'project_id' => 555,
+            'task_id' => 777,
+        ]), 101);
+
+        $this->expectException(ValidationException::class);
+
+        $controller->linkTask(Request::create(route('api.fsmproject.orders.link-task', 101), 'POST', [
+            'task_id' => 778,
+        ]), 101);
     }
 
     public function test_fsmrecurring_frequency_web_render_and_save_flow(): void

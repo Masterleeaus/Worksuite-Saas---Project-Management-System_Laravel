@@ -1,0 +1,22 @@
+{
+  "public": [
+    "GET /zeropay/session/{token}",
+    "POST /zeropay/session/{token}/select-method",
+    "POST /zeropay/session/{token}/email-invoice",
+    "GET /zeropay/download/invoice/{token}",
+    "GET /zeropay/download/receipt/{token}"
+  ],
+  "internal": [
+    "POST /api/zeropay/session",
+    "GET /api/zeropay/session/{id}",
+    "POST /api/zeropay/session/{id}/resend",
+    "POST /api/zeropay/session/{id}/mark-cash",
+    "POST /api/zeropay/session/{id}/bank-confirm",
+    "POST /api/zeropay/session/{id}/voice-followup",
+    "GET /api/zeropay/matches",
+    "POST /api/zeropay/matches/{id}/accept",
+    "POST /api/zeropay/callbacks/stripe",
+    "POST /api/zeropay/callbacks/paypal",
+    "POST /api/zeropay/callbacks/cryptomus"
+  ]
+}

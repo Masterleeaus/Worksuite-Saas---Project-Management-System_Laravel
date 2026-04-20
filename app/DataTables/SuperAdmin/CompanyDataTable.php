@@ -86,7 +86,7 @@ class CompanyDataTable extends BaseDataTable
 
         $datatables->editColumn('email', fn($row) => $row->company_email ?: '--');
         $datatables->editColumn('mobile', fn($row) => $row->company_phone ?: '--');
-        $datatables->editColumn('companyowner', fn($row) => $row?->user?->name ?: '--');
+        $datatables->editColumn('companyowner', fn($row) => Company::firstActiveAdmin($row)?->name ?: '--');
         $datatables->editColumn('timezone', fn($row) => $row->timezone ?: '--');
         $datatables->editColumn('nextpaymentdate', fn($row) => $row->globalInvoices->count() === 1
             ? $row->globalInvoices->first()?->next_pay_date?->format('Y-m-d') ?? '--'
@@ -173,9 +173,11 @@ class CompanyDataTable extends BaseDataTable
 
             $totalEmployees = $row->totalEmployees;
             $maxEmployees = $row->package?->max_employees ?? '--';
+            $totalAdmins = $row->totalAdmins;
             $totalClient = $row->totalClient;
             $totalUsers = $row->users_count;
 
+            $string .= __('app.menu.admin') . ": $totalAdmins ";
             $string .= __('app.menu.employees') . ": $totalEmployees" . "/" . "$maxEmployees ";
             $string .= __('app.menu.clients') . ": $totalClient ";
             $string .= __('superadmin.superadmin.totalUsers') . ": $totalUsers";
@@ -194,6 +196,7 @@ class CompanyDataTable extends BaseDataTable
             $registrationDate = $row->created_at->timezone(global_setting()->timezone)->diffForHumans();
             $time = $row->created_at->timezone(global_setting()->timezone)->translatedFormat(global_setting()->date_format . ' ' . global_setting()->time_format);
             $string .= __('superadmin.superadmin.registerDate') . "<span data-toggle='tooltip' data-original-title='$time'>: $registrationDate</span> ";
+            $string .= '<li>' . __('app.menu.admin') . ': ' . $row->totalAdmins . '</li>';
             $string .= '<li>' . __('app.menu.employees') . ': ' . $row->totalEmployees . '/' . ($row->package?->max_employees ?? '--') . '</li>';
             $string .= '<li>' . __('app.menu.clients') . ': ' . $row->totalClient . '</li>';
             $string .= '<li>' . __('superadmin.superadmin.totalUsers') . ': ' . $row->users_count . '</li>';
@@ -226,6 +229,9 @@ class CompanyDataTable extends BaseDataTable
             }])
             ->withCount([
                 'users',
+                'admins as totalAdmins' => function ($q) {
+                    $q->where('users.status', 'active');
+                },
                 'users as totalEmployees' => function ($q) {
                     $q->whereHas('employeeDetail');
                 },
