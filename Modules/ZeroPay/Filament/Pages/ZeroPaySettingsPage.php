@@ -14,6 +14,8 @@ class ZeroPaySettingsPage extends TitanPage implements HasForms
 {
     use InteractsWithForms;
 
+    private const DEFAULT_DOWNLOAD_EXPIRY_MINUTES = 1440;
+
     protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
     protected static ?string $navigationGroup = 'ZeroPay';
     protected static ?string $navigationLabel = 'ZeroPay Settings';
@@ -32,7 +34,7 @@ class ZeroPaySettingsPage extends TitanPage implements HasForms
             'bank_account_name' => $settings['bank_account_name'] ?? null,
             'bank_bsb' => $settings['bank_bsb'] ?? null,
             'bank_account_number' => $settings['bank_account_number'] ?? null,
-            'download_expiry_minutes' => $settings['download_expiry_minutes'] ?? (int) config('zeropay.download_expiry_minutes', 1440),
+            'download_expiry_minutes' => $settings['download_expiry_minutes'] ?? (int) config('zeropay.download_expiry_minutes', self::DEFAULT_DOWNLOAD_EXPIRY_MINUTES),
             'ai_email_enabled' => (bool) ($settings['ai_email_enabled'] ?? true),
         ]);
     }
@@ -59,9 +61,11 @@ class ZeroPaySettingsPage extends TitanPage implements HasForms
             return;
         }
 
+        $existing = ZeroPaySetting::getCompanySettings($companyId);
+
         ZeroPaySetting::query()->updateOrCreate(
             ['company_id' => $companyId],
-            ['settings' => $this->data]
+            ['settings' => array_merge($existing, $this->data)]
         );
 
         Notification::make()->title('ZeroPay settings saved')->success()->send();

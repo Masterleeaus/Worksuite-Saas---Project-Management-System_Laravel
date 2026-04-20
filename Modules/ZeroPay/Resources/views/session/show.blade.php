@@ -19,7 +19,11 @@
 <body>
 <div class="card">
     <h2>ZeroPay Payment Session</h2>
-    <p class="muted">Invoice #{{ $session->invoice?->invoice_number }} · Session {{ $session->public_token }}</p>
+    <p class="muted">
+        Invoice #{{ $session->invoice?->invoice_number }}
+        <span aria-hidden="true"> · </span><span class="sr-only">, </span>
+        Session {{ $session->public_token }}
+    </p>
 
     @if (session('status'))
         <p class="pill">{{ session('status') }}</p>
