@@ -60,4 +60,20 @@ class FsmInstallFlowHardeningContractsTest extends TestCase
             $this->assertFileExists($absolutePath, "Missing FSMTerritory render target {$relativeViewPath}");
         }
     }
+
+    public function test_company_observer_syncs_package_modules_into_module_settings_and_permissions(): void
+    {
+        $observerPath = $this->repoRoot . '/app/Observers/CompanyObserver.php';
+        $this->assertFileExists($observerPath);
+
+        $contents = (string) file_get_contents($observerPath);
+
+        $this->assertStringContainsString('createModuleSettings', $contents);
+        $this->assertStringContainsString('updateModuleSettings', $contents);
+        $this->assertStringContainsString('syncModuleRolePermissions', $contents);
+        $this->assertStringContainsString('json_decode($package->module_in_package ??', $contents);
+        $this->assertStringContainsString('collect($moduleList)->merge($moduleInPackage->all())->unique()', $contents);
+        $this->assertStringContainsString("ModuleSetting::create([", $contents);
+        $this->assertStringContainsString("PermissionRole::insertModuleRolePermission", $contents);
+    }
 }

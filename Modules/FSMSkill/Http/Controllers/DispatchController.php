@@ -20,13 +20,13 @@ class DispatchController extends Controller
     public function index(Request $request)
     {
         $orderId = $request->integer('order_id');
-        $order   = $orderId ? FSMOrder::find($orderId) : null;
+        $order   = $orderId ? FSMOrder::where('company_id', $this->companyId())->find($orderId) : null;
 
         // All active workers
-        $workers = \App\Models\User::orderBy('name')->get();
+        $workers = \App\Models\User::where('company_id', $this->companyId())->orderBy('name')->get();
 
         // Skill filter (sidebar)
-        $skills = FSMSkill::where('active', true)->with(['skillType', 'levels'])->orderBy('name')->get();
+        $skills = FSMSkill::where('company_id', $this->companyId())->where('active', true)->with(['skillType', 'levels'])->orderBy('name')->get();
 
         $qualifiedWorkers = collect();
         $matchResults     = [];
@@ -44,5 +44,13 @@ class DispatchController extends Controller
         return view('fsmskill::dispatch.index', compact(
             'order', 'workers', 'skills', 'qualifiedWorkers', 'matchResults'
         ));
+    }
+
+    private function companyId(): int
+    {
+        $user = auth()->user();
+        abort_if(!$user || !$user->company_id, 403);
+
+        return (int) $user->company_id;
     }
 }

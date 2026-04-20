@@ -56,6 +56,51 @@ class FsmTargetModulePromotionBootstrapTest extends TestCase
             $table->timestamps();
         });
 
+        Schema::create('fsm_frequencies', function ($table) {
+            $table->id();
+            $table->unsignedBigInteger('company_id')->nullable();
+            $table->string('name');
+            $table->boolean('active')->default(true);
+            $table->unsignedInteger('interval')->default(1);
+            $table->string('interval_type', 20)->default('weekly');
+            $table->boolean('is_exclusive')->default(false);
+            $table->boolean('use_bymonthday')->default(false);
+            $table->unsignedTinyInteger('month_day')->nullable();
+            $table->boolean('use_byweekday')->default(false);
+            $table->boolean('weekday_mo')->default(false);
+            $table->boolean('weekday_tu')->default(false);
+            $table->boolean('weekday_we')->default(false);
+            $table->boolean('weekday_th')->default(false);
+            $table->boolean('weekday_fr')->default(false);
+            $table->boolean('weekday_sa')->default(false);
+            $table->boolean('weekday_su')->default(false);
+            $table->boolean('use_bymonth')->default(false);
+            $table->boolean('month_jan')->default(false);
+            $table->boolean('month_feb')->default(false);
+            $table->boolean('month_mar')->default(false);
+            $table->boolean('month_apr')->default(false);
+            $table->boolean('month_may')->default(false);
+            $table->boolean('month_jun')->default(false);
+            $table->boolean('month_jul')->default(false);
+            $table->boolean('month_aug')->default(false);
+            $table->boolean('month_sep')->default(false);
+            $table->boolean('month_oct')->default(false);
+            $table->boolean('month_nov')->default(false);
+            $table->boolean('month_dec')->default(false);
+            $table->boolean('use_setpos')->default(false);
+            $table->integer('set_pos')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('fsm_skill_types', function ($table) {
+            $table->id();
+            $table->unsignedBigInteger('company_id')->nullable();
+            $table->string('name', 128);
+            $table->text('description')->nullable();
+            $table->boolean('active')->default(true);
+            $table->timestamps();
+        });
+
         Schema::create('sessions', function ($table) {
             $table->string('id')->primary();
             $table->unsignedBigInteger('user_id')->nullable()->index();
@@ -107,6 +152,12 @@ class FsmTargetModulePromotionBootstrapTest extends TestCase
         $this->assertTrue(Route::has('fsmsize.store'));
         $this->assertTrue(Route::has('api.fsmproject.orders.link'));
         $this->assertTrue(Route::has('api.fsmsize.index'));
+        $this->assertTrue(Route::has('fsmproject.update'));
+        $this->assertTrue(Route::has('fsmproject.destroy'));
+        $this->assertTrue(Route::has('fsmsize.update'));
+        $this->assertTrue(Route::has('fsmsize.destroy'));
+        $this->assertTrue(Route::has('fsmrecurring.frequencies.index'));
+        $this->assertTrue(Route::has('fsmskill.skill-types.index'));
     }
 
     public function test_fsmsize_web_render_and_save_flow(): void
@@ -150,6 +201,48 @@ class FsmTargetModulePromotionBootstrapTest extends TestCase
             'company_id' => 1,
             'project_id' => 555,
             'task_id' => 777,
+        ]);
+    }
+
+    public function test_fsmrecurring_frequency_web_render_and_save_flow(): void
+    {
+        $controller = app(\Modules\FSMRecurring\Http\Controllers\FrequencyController::class);
+        $indexResponse = $controller->index();
+        $this->assertInstanceOf(View::class, $indexResponse);
+
+        $storeResponse = $controller->store(Request::create(route('fsmrecurring.frequencies.store'), 'POST', [
+            'name' => 'Weekly',
+            'interval' => 1,
+            'interval_type' => 'weekly',
+            'active' => 1,
+        ]));
+
+        $this->assertInstanceOf(RedirectResponse::class, $storeResponse);
+        $this->assertSame(route('fsmrecurring.frequencies.index'), $storeResponse->getTargetUrl());
+
+        $this->assertDatabaseHas('fsm_frequencies', [
+            'company_id' => 1,
+            'name' => 'Weekly',
+        ]);
+    }
+
+    public function test_fsmskill_type_web_render_and_save_flow(): void
+    {
+        $controller = app(\Modules\FSMSkill\Http\Controllers\SkillTypeController::class);
+        $indexResponse = $controller->index();
+        $this->assertInstanceOf(View::class, $indexResponse);
+
+        $storeResponse = $controller->store(Request::create(route('fsmskill.skill-types.store'), 'POST', [
+            'name' => 'Cleaning',
+            'active' => 1,
+        ]));
+
+        $this->assertInstanceOf(RedirectResponse::class, $storeResponse);
+        $this->assertSame(route('fsmskill.skill-types.index'), $storeResponse->getTargetUrl());
+
+        $this->assertDatabaseHas('fsm_skill_types', [
+            'company_id' => 1,
+            'name' => 'Cleaning',
         ]);
     }
 }
