@@ -102,7 +102,7 @@
                 <table class="table table-sm mb-0">
                     <thead class="table-light"><tr><th>Desc</th><th class="text-end">Total</th><th></th></tr></thead>
                     <tbody>
-                        @forelse($invoice->lines as $line)
+                        @forelse($invoice->items as $line)
                         <tr>
                             <td>
                                 <span class="badge bg-secondary small">{{ $line->item_name ?? 'Item' }}</span>

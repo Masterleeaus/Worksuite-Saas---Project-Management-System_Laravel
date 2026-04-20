@@ -58,13 +58,23 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @php $taxTotal = 0; @endphp
-                        @forelse($invoice->lines as $line)
+                        @php
+                            $taxTotal = 0;
+                            $taxIds = $invoice->items
+                                ->pluck('taxes')
+                                ->filter()
+                                ->flatMap(fn($taxes) => json_decode($taxes, true) ?: [])
+                                ->unique()
+                                ->values()
+                                ->all();
+                            $taxRates = \App\Models\Tax::whereIn('id', $taxIds)->pluck('rate_percent', 'id');
+                        @endphp
+                        @forelse($invoice->items as $line)
                         @php
                             $lineTax = 0;
                             if (!empty($line->taxes)) {
                                 $taxIds = json_decode($line->taxes, true) ?: [];
-                                $taxRate = \App\Models\Tax::whereIn('id', $taxIds)->sum('rate_percent');
+                                $taxRate = collect($taxIds)->sum(fn($taxId) => (float) ($taxRates[$taxId] ?? 0));
                                 $lineTax = round(((float) $line->amount) * ((float) $taxRate / 100), 2);
                             }
                             $taxTotal += $lineTax;

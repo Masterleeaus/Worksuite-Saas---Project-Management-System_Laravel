@@ -13,7 +13,7 @@ class SaleRecurringService
      */
     public function getRecurringsForInvoice(Invoice $invoice): \Illuminate\Support\Collection
     {
-        $lineIds = $invoice->lines()->pluck('id');
+        $lineIds = $invoice->items()->pluck('id');
         return FSMRecurring::whereIn('invoice_line_id', $lineIds)->get();
     }
 

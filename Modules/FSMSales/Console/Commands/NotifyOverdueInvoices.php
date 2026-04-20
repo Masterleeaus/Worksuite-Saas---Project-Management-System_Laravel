@@ -38,8 +38,8 @@ class NotifyOverdueInvoices extends Command
         foreach ($overdue as $invoice) {
             if ($invoice->status === 'draft') {
                 $invoice->update(['status' => 'unpaid']);
+                $count++;
             }
-            $count++;
         }
 
         if ($count > 0) {

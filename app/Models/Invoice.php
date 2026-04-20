@@ -199,11 +199,6 @@ class Invoice extends BaseModel
         return $this->hasMany(InvoiceItems::class, 'invoice_id');
     }
 
-    public function lines(): HasMany
-    {
-        return $this->hasMany(InvoiceItems::class, 'invoice_id');
-    }
-
     public function fsmOrders(): BelongsToMany
     {
         return $this->belongsToMany(
