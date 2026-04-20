@@ -6,7 +6,5 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvi
 
 class EventServiceProvider extends ServiceProvider
 {
-    protected $listen = [
-        \Modules\FSMSales\Events\RecurringInvoiceOverdue::class => [],
-    ];
+    protected $listen = [];
 }

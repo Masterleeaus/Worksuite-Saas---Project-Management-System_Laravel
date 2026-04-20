@@ -1,62 +1,9 @@
 # Readme for worksuite
 
-## Installation and runtime support policy
+## Installation
 
-- **Primary supported install/runtime database:** MySQL 8.x.
-- **SQLite:** supported for lightweight/local test flows only; full production parity is not guaranteed.
-- **PHP runtime:** 8.3+.
-
-## Required PHP extensions
-
-Install these PHP extensions before running setup:
-
-- mbstring
-- pdo
-- pdo_mysql
-- dom
-- curl
-- zip
-- bcmath
-- intl
-- gd
-- exif
-- fileinfo
-
-## Clean install commands (matches install-check workflow)
-
-```bash
-composer install --no-interaction --prefer-dist --optimize-autoloader
-npm ci --prefer-offline
-npm run production
-
-cp .env.example .env
-php artisan key:generate
-
-php artisan package:discover --ansi
-php artisan config:clear
-php artisan route:clear
-php artisan view:clear
-
-php artisan migrate --force --no-interaction
-php artisan route:list > /tmp/route-list.txt
-tail -5 /tmp/route-list.txt
-php artisan about
-```
-
-## Queue, scheduler, and workers
-
-- For background jobs in non-sync mode, run a queue worker (for example `php artisan queue:work`).
-- Configure cron to run Laravel scheduler every minute:
-
-```bash
-* * * * * php /path/to/project/artisan schedule:run >> /dev/null 2>&1
-```
-
-- If realtime features are enabled, run Reverb worker:
-
-```bash
-php artisan reverb:start
-```
+See the full installation and smoke-check guide at:
+- [docs/install.md](docs/install.md)
 
 ### Plugins used in the app
 

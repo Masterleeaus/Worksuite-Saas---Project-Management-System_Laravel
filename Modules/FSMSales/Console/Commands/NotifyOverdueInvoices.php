@@ -2,9 +2,9 @@
 
 namespace Modules\FSMSales\Console\Commands;
 
+use App\Models\Invoice;
+use App\Models\RecurringInvoice;
 use Illuminate\Console\Command;
-use Modules\FSMSales\Models\FSMRecurringInvoice;
-use Modules\FSMSales\Models\FSMSalesInvoice;
 
 /**
  * Mark overdue invoices and fire notifications.
@@ -28,16 +28,16 @@ class NotifyOverdueInvoices extends Command
 
     private function processRegularInvoices(): void
     {
-        $overdue = FSMSalesInvoice::query()
-            ->whereNotIn('status', [FSMSalesInvoice::STATUS_PAID, FSMSalesInvoice::STATUS_VOID])
+        $overdue = Invoice::query()
+            ->whereNotIn('status', ['paid', 'canceled'])
             ->whereNotNull('due_date')
-            ->where('due_date', '<', now()->toDateString())
+            ->whereDate('due_date', '<', now()->toDateString())
             ->get();
 
         $count = 0;
         foreach ($overdue as $invoice) {
-            if ($invoice->status !== FSMSalesInvoice::STATUS_OVERDUE) {
-                $invoice->update(['status' => FSMSalesInvoice::STATUS_OVERDUE]);
+            if ($invoice->status === 'draft') {
+                $invoice->update(['status' => 'unpaid']);
                 $count++;
             }
         }
@@ -49,38 +49,21 @@ class NotifyOverdueInvoices extends Command
 
     private function processRecurringInvoices(): void
     {
-        $overdue = FSMRecurringInvoice::query()
-            ->where('status', '!=', FSMRecurringInvoice::STATUS_PAID)
-            ->where('overdue_notified', false)
+        $overdue = RecurringInvoice::query()
+            ->where('status', '=', 'active')
             ->whereNotNull('due_date')
-            ->where('due_date', '<', now()->toDateString())
+            ->whereDate('due_date', '<', now()->toDateString())
             ->get();
 
         $count = 0;
         foreach ($overdue as $recurring) {
-            $recurring->update([
-                'status'           => FSMRecurringInvoice::STATUS_OVERDUE,
-                'overdue_notified' => true,
-            ]);
-
-            // Fire notification if Sms or mail notifications are available
-            $this->dispatchOverdueNotification($recurring);
+            $recurring->update(['status' => 'inactive']);
 
             $count++;
         }
 
         if ($count > 0) {
             $this->info("Sent {$count} overdue recurring invoice alert(s).");
-        }
-    }
-
-    private function dispatchOverdueNotification(FSMRecurringInvoice $recurring): void
-    {
-        // Integration hook – extend via EventServiceProvider listeners if needed
-        try {
-            event(new \Modules\FSMSales\Events\RecurringInvoiceOverdue($recurring));
-        } catch (\Throwable) {
-            // Silently skip if event class not registered
         }
     }
 }

@@ -11,11 +11,9 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        if (Schema::getConnection()->getDriverName() !== 'mysql' || !Schema::hasTable('invoices')) {
-            return;
+        if (Schema::hasTable('invoices') && Schema::hasColumn('invoices', 'status') && in_array(DB::connection()->getDriverName(), ['mysql', 'mariadb'], true)) {
+            DB::statement("ALTER TABLE invoices CHANGE COLUMN status status ENUM('paid', 'unpaid', 'partial', 'canceled', 'draft', 'pending-confirmation') NOT NULL DEFAULT 'unpaid'");
         }
-
-        DB::statement("ALTER TABLE invoices CHANGE COLUMN status status ENUM('paid', 'unpaid', 'partial', 'canceled', 'draft', 'pending-confirmation') NOT NULL DEFAULT 'unpaid'");
     }
 
     /**

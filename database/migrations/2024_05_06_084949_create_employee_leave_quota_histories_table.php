@@ -20,8 +20,8 @@ return new class extends Migration
 
         Schema::create('employee_leave_quota_histories', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('user_id')->index();
-            $table->unsignedInteger('leave_type_id')->index();
+            $table->unsignedInteger('user_id');
+            $table->unsignedInteger('leave_type_id');
             $table->foreign(['leave_type_id'])->references(['id'])->on('leave_types')->onUpdate('CASCADE')->onDelete('CASCADE');
             $table->foreign(['user_id'])->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('CASCADE');
             $table->double('no_of_leaves');

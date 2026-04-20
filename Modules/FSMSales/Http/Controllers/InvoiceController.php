@@ -2,21 +2,27 @@
 
 namespace Modules\FSMSales\Http\Controllers;
 
+use App\Models\Invoice;
+use App\Models\InvoiceItems;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\FSMCore\Models\FSMOrder;
-use Modules\FSMSales\Models\FSMSalesInvoice;
-use Modules\FSMSales\Models\FSMSalesInvoiceLine;
 use Modules\FSMSales\Services\InvoiceGenerationService;
 
 class InvoiceController extends Controller
 {
     public function index(Request $request)
     {
-        $q = FSMSalesInvoice::with(['client'])->latest();
+        $q = Invoice::with(['client'])->latest('issue_date');
 
         if ($request->filled('status')) {
-            $q->where('status', $request->get('status'));
+            $status = (string) $request->get('status');
+            if ($status === 'overdue') {
+                $q->whereNotIn('status', ['paid', 'canceled'])
+                    ->whereDate('due_date', '<', now()->toDateString());
+            } else {
+                $q->where('status', $this->mapStatusToNative($status));
+            }
         }
 
         if ($request->filled('client_id')) {
@@ -26,8 +32,8 @@ class InvoiceController extends Controller
         if ($request->filled('q')) {
             $term = trim((string) $request->get('q'));
             $q->where(function ($sub) use ($term) {
-                $sub->where('number', 'like', "%{$term}%")
-                    ->orWhere('notes', 'like', "%{$term}%");
+                $sub->where('invoice_number', 'like', "%{$term}%")
+                    ->orWhere('note', 'like', "%{$term}%");
             });
         }
 
@@ -40,7 +46,7 @@ class InvoiceController extends Controller
 
     public function show(int $id)
     {
-        $invoice = FSMSalesInvoice::with(['lines.order', 'orders', 'client'])->findOrFail($id);
+        $invoice = Invoice::with(['items', 'fsmOrders', 'client'])->findOrFail($id);
 
         return view('fsmsales::invoices.show', compact('invoice'));
     }
@@ -69,19 +75,27 @@ class InvoiceController extends Controller
             'order_ids.*'  => 'integer|exists:fsm_orders,id',
         ]);
 
-        $invoice = FSMSalesInvoice::create([
+        $invoice = Invoice::create([
             'company_id'   => auth()->user()->company_id ?? null,
-            'number'       => FSMSalesInvoice::nextNumber(),
+            'invoice_number' => Invoice::lastInvoiceNumber(auth()->user()->company_id ?? null) + 1,
             'client_id'    => $data['client_id'] ?? null,
-            'agreement_id' => $data['agreement_id'] ?? null,
-            'invoice_date' => $data['invoice_date'],
+            'issue_date' => $data['invoice_date'],
             'due_date'     => $data['due_date'] ?? null,
-            'status'       => FSMSalesInvoice::STATUS_DRAFT,
-            'notes'        => $data['notes'] ?? null,
+            'status'       => 'draft',
+            'note'        => $data['notes'] ?? null,
+            'currency_id' => company()?->currency_id ?? null,
+            'default_currency_id' => company()?->currency_id ?? null,
+            'sub_total' => 0,
+            'total' => 0,
+            'due_amount' => 0,
+            'discount' => 0,
+            'discount_type' => 'percent',
+            'recurring' => 'no',
         ]);
 
         if (!empty($data['order_ids'])) {
-            $invoice->orders()->attach($data['order_ids']);
+            $invoice->fsmOrders()->attach($data['order_ids']);
+            $invoice->update(['fsm_order_id' => $data['order_ids'][0] ?? null]);
 
             // Mark orders as invoiced
             FSMOrder::whereIn('id', $data['order_ids'])->update(['is_invoiced' => true]);
@@ -93,7 +107,7 @@ class InvoiceController extends Controller
 
     public function edit(int $id)
     {
-        $invoice = FSMSalesInvoice::with(['lines', 'orders'])->findOrFail($id);
+        $invoice = Invoice::with(['items', 'fsmOrders'])->findOrFail($id);
         $clients = \App\Models\User::orderBy('name')->get();
 
         return view('fsmsales::invoices.edit', compact('invoice', 'clients'));
@@ -101,7 +115,7 @@ class InvoiceController extends Controller
 
     public function update(Request $request, int $id)
     {
-        $invoice = FSMSalesInvoice::findOrFail($id);
+        $invoice = Invoice::findOrFail($id);
 
         $data = $request->validate([
             'client_id'    => 'nullable|integer|exists:users,id',
@@ -112,7 +126,17 @@ class InvoiceController extends Controller
             'amount_paid'  => 'nullable|numeric|min:0',
         ]);
 
-        $invoice->update($data);
+        $nativeStatus = $this->mapStatusToNative((string) $data['status']);
+        $amountPaid = isset($data['amount_paid']) ? (float) $data['amount_paid'] : $invoice->amount_paid;
+
+        $invoice->update([
+            'client_id' => $data['client_id'] ?? null,
+            'issue_date' => $data['invoice_date'],
+            'due_date' => $data['due_date'] ?? null,
+            'status' => $nativeStatus,
+            'note' => $data['notes'] ?? null,
+            'due_amount' => max(0, round((float) $invoice->total - $amountPaid, 2)),
+        ]);
 
         return redirect()->route('fsmsales.invoices.show', $invoice->id)
             ->with('success', 'Invoice updated.');
@@ -120,8 +144,8 @@ class InvoiceController extends Controller
 
     public function destroy(int $id)
     {
-        $invoice = FSMSalesInvoice::findOrFail($id);
-        $number  = $invoice->number;
+        $invoice = Invoice::findOrFail($id);
+        $number  = $invoice->invoice_number;
         $invoice->delete();
 
         return redirect()->route('fsmsales.invoices.index')
@@ -132,7 +156,7 @@ class InvoiceController extends Controller
 
     public function addLine(Request $request, int $id)
     {
-        $invoice = FSMSalesInvoice::findOrFail($id);
+        $invoice = Invoice::findOrFail($id);
 
         $data = $request->validate([
             'line_type'   => 'required|string|in:service,timesheet,stock,equipment,other',
@@ -142,15 +166,19 @@ class InvoiceController extends Controller
             'tax_rate'    => 'nullable|numeric|min:0|max:1',
         ]);
 
-        FSMSalesInvoiceLine::create([
+        InvoiceItems::create([
             'company_id'           => $invoice->company_id,
-            'fsm_sales_invoice_id' => $invoice->id,
-            'line_type'            => $data['line_type'],
-            'description'          => $data['description'] ?? null,
-            'qty'                  => $data['qty'],
+            'invoice_id' => $invoice->id,
+            'type' => 'item',
+            'item_name' => ucfirst($data['line_type']),
+            'item_summary' => $data['description'] ?? null,
+            'quantity' => $data['qty'],
             'unit_price'           => $data['unit_price'],
-            'tax_rate'             => $data['tax_rate'] ?? 0,
+            'amount' => round((float) $data['qty'] * (float) $data['unit_price'], 2),
+            'fsm_order_id' => $invoice->fsm_order_id,
         ]);
+
+        $this->recalculateInvoiceTotals($invoice);
 
         return redirect()->route('fsmsales.invoices.edit', $invoice->id)
             ->with('success', 'Line added.');
@@ -158,8 +186,9 @@ class InvoiceController extends Controller
 
     public function deleteLine(int $invoiceId, int $lineId)
     {
-        $line = FSMSalesInvoiceLine::where('fsm_sales_invoice_id', $invoiceId)->findOrFail($lineId);
+        $line = InvoiceItems::where('invoice_id', $invoiceId)->findOrFail($lineId);
         $line->delete();
+        $this->recalculateInvoiceTotals(Invoice::findOrFail($invoiceId));
 
         return redirect()->route('fsmsales.invoices.edit', $invoiceId)
             ->with('success', 'Line removed.');
@@ -174,5 +203,27 @@ class InvoiceController extends Controller
 
         return redirect()->route('fsmsales.invoices.show', $invoice->id)
             ->with('success', "Draft invoice {$invoice->number} created from order {$order->name}.");
+    }
+
+    private function mapStatusToNative(string $status): string
+    {
+        return match ($status) {
+            'paid' => 'paid',
+            'void' => 'canceled',
+            'draft' => 'draft',
+            'sent', 'overdue' => 'unpaid',
+            default => throw new \InvalidArgumentException("Unsupported invoice status: {$status}"),
+        };
+    }
+
+    private function recalculateInvoiceTotals(Invoice $invoice): void
+    {
+        $subTotal = (float) $invoice->items()->sum('amount');
+        $amountPaid = (float) $invoice->amount_paid;
+        $invoice->update([
+            'sub_total' => $subTotal,
+            'total' => $subTotal,
+            'due_amount' => max(0, round($subTotal - $amountPaid, 2)),
+        ]);
     }
 }

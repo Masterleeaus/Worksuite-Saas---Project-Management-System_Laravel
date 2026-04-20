@@ -30,7 +30,7 @@ return new class extends Migration
         $tables = ['asset_types', 'assets', 'asset_lending_history'];
 
         $count = Company::count();
-        $firstCompanyId = Company::query()->value('id');
+        $singleCompanyId = Company::query()->value('id');
 
         try {
 
@@ -44,8 +44,8 @@ return new class extends Migration
                     });
                 }
 
-                if (Schema::hasColumn($table, 'company_id') && $count === 1 && !is_null($firstCompanyId)) {
-                    DB::table($table)->update(['company_id' => $firstCompanyId]);
+                if (Schema::hasColumn($table, 'company_id') && $count === 1 && $singleCompanyId) {
+                    DB::table($table)->update(['company_id' => $singleCompanyId]);
                 }
             }
 

@@ -19,7 +19,7 @@ return new class extends Migration {
             $table->increments('id');
             $table->unsignedInteger('company_id')->nullable();
             $table->foreign('company_id')->references('id')->on('companies')->cascadeOnDelete()->cascadeOnUpdate();
-            $table->unsignedInteger('user_id')->index();
+            $table->unsignedInteger('user_id');
             $table->foreign(['user_id'])->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('CASCADE');
             $table->unsignedInteger('employee_shift_rotation_id')->nullable();
             $table->foreign('employee_shift_rotation_id')->references('id')->on('employee_shift_rotations')->cascadeOnDelete()->cascadeOnUpdate();

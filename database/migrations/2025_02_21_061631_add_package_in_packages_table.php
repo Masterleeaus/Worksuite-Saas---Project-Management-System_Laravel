@@ -15,15 +15,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $isMysql = Schema::getConnection()->getDriverName() === 'mysql';
 
-        if (!Schema::hasColumn('packages', 'package')) {
+        if (Schema::hasTable('packages') && !Schema::hasColumn('packages', 'package')) {
             Schema::table('packages', function (Blueprint $table) {
                 $table->string('package')->nullable()->after('annual_status');
             });
         }
 
-        if ($isMysql && Schema::hasTable('packages')) {
+        if (Schema::hasTable('packages') && Schema::hasColumn('packages', 'default') && in_array(DB::connection()->getDriverName(), ['mysql', 'mariadb'], true)) {
             DB::statement("ALTER TABLE `packages`
                 MODIFY COLUMN `default`
                 ENUM('yes', 'no', 'trial', 'lifetime') NOT NULL DEFAULT 'no'");

@@ -438,7 +438,7 @@ return new class extends Migration {
             });
 
             Schema::table('users', function (Blueprint $table) {
-                if (Schema::getConnection()->getDriverName() === 'mysql') {
+                if (\DB::connection()->getDriverName() === 'mysql') {
                     \DB::statement("ALTER TABLE `users` CHANGE `gender` `gender` ENUM('male', 'female', 'others') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL;");
                 }
                 $table->string('email')->nullable()->change();

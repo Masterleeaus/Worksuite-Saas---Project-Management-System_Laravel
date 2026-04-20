@@ -18,11 +18,11 @@ return new class extends Migration
         Schema::create('project_template_milestone', function (Blueprint $table) {
                 $table->increments('id');
 
-                $table->unsignedInteger('company_id')->nullable()->index();
+                $table->unsignedInteger('company_id')->nullable();
                 $table->foreign('company_id')->references('id')->on('companies')->onUpdate('CASCADE')->onDelete('CASCADE');
 
-                $table->unsignedInteger('project_template_id')->nullable()->index();
-                $table->unsignedInteger('currency_id')->nullable()->index();
+                $table->unsignedInteger('project_template_id')->nullable();
+                $table->unsignedInteger('currency_id')->nullable();
                 $table->string('milestone_title');
                 $table->mediumText('summary');
                 $table->double('cost', 30, 2);
@@ -30,8 +30,8 @@ return new class extends Migration
                 $table->enum('add_to_budget', ['yes', 'no'])->default('no');
                 $table->boolean('invoice_created');
                 $table->integer('invoice_id')->nullable();
-                $table->unsignedInteger('added_by')->nullable()->index();
-                $table->unsignedInteger('last_updated_by')->nullable()->index();
+                $table->unsignedInteger('added_by')->nullable();
+                $table->unsignedInteger('last_updated_by')->nullable();
                 $table->foreign(['added_by'])->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('SET NULL');
                 $table->foreign(['currency_id'])->references(['id'])->on('currencies')->onUpdate('CASCADE')->onDelete('CASCADE');
                 $table->foreign(['last_updated_by'])->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('SET NULL');

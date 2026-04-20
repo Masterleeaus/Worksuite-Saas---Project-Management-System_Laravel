@@ -13,8 +13,6 @@ return new class extends Migration {
 
         // Idempotent seed of built-in tools.
         $now = now();
-        $hasCreatedAt = Schema::hasColumn('ai_tools_registry', 'created_at');
-        $hasUpdatedAt = Schema::hasColumn('ai_tools_registry', 'updated_at');
         $rows = [
             [
                 'tool_name' => 'kb_search',
@@ -69,11 +67,7 @@ return new class extends Migration {
         ];
 
         foreach ($rows as $row) {
-            $exists = DB::table('ai_tools_registry')
-                ->where('tool_name', $row['tool_name'])
-                ->exists();
-
-            $payload = [
+            $updates = [
                 'title' => $row['title'],
                 'description' => $row['description'],
                 'risk_level' => $row['risk_level'],
@@ -81,24 +75,18 @@ return new class extends Migration {
                 'input_schema' => $row['input_schema'],
             ];
 
-            if ($hasUpdatedAt) {
-                $payload['updated_at'] = $row['updated_at'];
+            if (Schema::hasColumn('ai_tools_registry', 'updated_at')) {
+                $updates['updated_at'] = $row['updated_at'];
             }
 
-            if ($exists) {
-                DB::table('ai_tools_registry')
-                    ->where('tool_name', $row['tool_name'])
-                    ->update($payload);
-                continue;
+            if (Schema::hasColumn('ai_tools_registry', 'created_at')) {
+                $updates['created_at'] = $row['created_at'];
             }
 
-            $payload['tool_name'] = $row['tool_name'];
-
-            if ($hasCreatedAt) {
-                $payload['created_at'] = $row['created_at'];
-            }
-
-            DB::table('ai_tools_registry')->insert($payload);
+            DB::table('ai_tools_registry')->updateOrInsert(
+                ['tool_name' => $row['tool_name']],
+                $updates
+            );
         }
     }
 

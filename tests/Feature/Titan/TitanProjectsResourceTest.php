@@ -78,6 +78,7 @@ class TitanProjectsResourceTest extends TestCase
         Schema::create('tasks', function ($table) {
             $table->id();
             $table->unsignedBigInteger('project_id')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
 

@@ -12,11 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::getConnection()->getDriverName() !== 'mysql' || !Schema::hasTable('purchase_orders')) {
-            return;
+        if (Schema::hasTable('purchase_orders') && Schema::hasColumn('purchase_orders', 'purchase_order_number') && in_array(DB::connection()->getDriverName(), ['mysql', 'mariadb'], true)) {
+            DB::statement('ALTER TABLE `purchase_orders` CHANGE `purchase_order_number` `purchase_order_number` INT NULL DEFAULT NULL');
         }
-
-        DB::statement('ALTER TABLE `purchase_orders` CHANGE `purchase_order_number` `purchase_order_number` INT NULL DEFAULT NULL');
     }
 
     /**

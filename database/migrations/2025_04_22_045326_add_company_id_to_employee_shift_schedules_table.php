@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('employee_shift_schedules')) {
+        if (!Schema::hasTable('employee_shift_schedules') || !Schema::hasTable('users')) {
             return;
         }
 
@@ -23,34 +23,28 @@ return new class extends Migration
             });
         }
 
-        if (
-            !Schema::hasTable('users')
-            || !Schema::hasColumn('employee_shift_schedules', 'user_id')
-            || !Schema::hasColumn('employee_shift_schedules', 'company_id')
-            || !Schema::hasColumn('users', 'company_id')
-        ) {
-            return;
-        }
-
-        if (Schema::getConnection()->getDriverName() === 'mysql') {
+        if (DB::connection()->getDriverName() === 'sqlite') {
+            DB::statement('
+                UPDATE employee_shift_schedules
+                SET company_id = (
+                    SELECT users.company_id
+                    FROM users
+                    WHERE users.id = employee_shift_schedules.user_id
+                )
+                WHERE EXISTS (
+                    SELECT 1
+                    FROM users
+                    WHERE users.id = employee_shift_schedules.user_id
+                    AND users.company_id IS NOT NULL
+                )
+            ');
+        } else {
             DB::statement('
                 UPDATE employee_shift_schedules ess
                 INNER JOIN users u ON ess.user_id = u.id
                 SET ess.company_id = u.company_id
                 WHERE u.company_id IS NOT NULL
             ');
-        } else {
-            $rows = DB::table('employee_shift_schedules as ess')
-                ->join('users as u', 'ess.user_id', '=', 'u.id')
-                ->whereNotNull('u.company_id')
-                ->select('ess.id', 'u.company_id')
-                ->get();
-
-            foreach ($rows as $row) {
-                DB::table('employee_shift_schedules')
-                    ->where('id', $row->id)
-                    ->update(['company_id' => $row->company_id]);
-            }
         }
     }
 
@@ -59,11 +53,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (Schema::hasTable('employee_shift_schedules') && Schema::hasColumn('employee_shift_schedules', 'company_id')) {
-            Schema::table('employee_shift_schedules', function (Blueprint $table) {
-                $table->dropForeign(['company_id']);
-                $table->dropColumn('company_id');
-            });
-        }
+        Schema::table('employee_shift_schedules', function (Blueprint $table) {
+            $table->dropForeign(['company_id']);
+            $table->dropColumn('company_id');
+        });
     }
 };

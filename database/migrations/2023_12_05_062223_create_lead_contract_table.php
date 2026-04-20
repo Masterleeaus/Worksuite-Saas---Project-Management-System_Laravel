@@ -29,10 +29,6 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        if (Schema::getConnection()->getDriverName() === 'sqlite') {
-            return;
-        }
-
         $this->createTables();
         $this->companySpecificChanges();
         $this->createDealsFromLeads();
@@ -86,13 +82,13 @@ return new class extends Migration {
                 $table->unsignedInteger('lead_id')->nullable();
                 $table->foreign('lead_id')->references('id')->on('leads')->onDelete('cascade')->onUpdate('cascade');
                 $table->date('close_date')->nullable();
-                $table->unsignedBigInteger('agent_id')->nullable()->index();
+                $table->unsignedBigInteger('agent_id')->nullable();
                 $table->foreign(['agent_id'])->references(['id'])->on('lead_agents')->onUpdate('CASCADE')->onDelete('CASCADE');
                 $table->enum('next_follow_up', ['yes', 'no'])->default('yes');
                 $table->double('value', 30, 2)->nullable()->default(0);
                 $table->longText('note')->nullable();
                 $table->text('hash')->nullable();
-                $table->unsignedInteger('currency_id')->nullable()->index();
+                $table->unsignedInteger('currency_id')->nullable();
                 $table->foreign(['currency_id'])->references(['id'])->on('currencies')->onUpdate('CASCADE')->onDelete('SET NULL');
                 $table->unsignedInteger('added_by')->nullable();
                 $table->foreign('added_by')->references('id')->on('users')->onDelete('cascade');
@@ -115,7 +111,9 @@ return new class extends Migration {
 
         Schema::whenTableDoesntHaveColumn('user_leadboard_settings', 'pipeline_stage_id', function (Blueprint $table) {
             try {
-                if (Schema::hasColumn('user_leadboard_settings', 'board_column_id')) {
+                $isSqlite = DB::connection()->getDriverName() === 'sqlite';
+
+                if (!$isSqlite && Schema::hasColumn('user_leadboard_settings', 'board_column_id')) {
                     $table->dropForeign(['board_column_id']);
                     $table->dropColumn('board_column_id');
                 }
@@ -158,9 +156,11 @@ return new class extends Migration {
         }
 
         if (Schema::hasTable('lead_files')) {
-            Schema::table('lead_files', function (Blueprint $table) {
-                $table->dropForeign(['lead_id']);
-            });
+            if (DB::connection()->getDriverName() !== 'sqlite') {
+                Schema::table('lead_files', function (Blueprint $table) {
+                    $table->dropForeign(['lead_id']);
+                });
+            }
 
             Schema::rename('lead_files', 'deal_files');
 
@@ -454,6 +454,9 @@ return new class extends Migration {
 
     private function cleanUpLeadTables()
     {
+        if (DB::connection()->getDriverName() === 'sqlite' || !Schema::hasTable('leads')) {
+            return;
+        }
 
         Schema::table('leads', function (Blueprint $table) {
             $table->dropForeign(['agent_id']);

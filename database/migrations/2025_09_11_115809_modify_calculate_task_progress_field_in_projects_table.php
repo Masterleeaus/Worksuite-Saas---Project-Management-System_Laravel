@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::getConnection()->getDriverName() !== 'mysql' || !Schema::hasTable('projects')) {
+        if (!Schema::hasTable('projects') || !Schema::hasColumn('projects', 'calculate_task_progress')) {
             return;
         }
 
@@ -22,6 +22,10 @@ return new class extends Migration
         $projectsfalse = Project::where('calculate_task_progress', 'false')->get();
 
         // Use raw SQL to modify the enum column
+        if (!in_array(DB::connection()->getDriverName(), ['mysql', 'mariadb'], true)) {
+            return;
+        }
+
         DB::statement("ALTER TABLE projects MODIFY COLUMN calculate_task_progress ENUM('manual', 'task_completion', 'project_total_time', 'project_deadline') DEFAULT 'manual'");
 
         foreach ($projectstrue as $project) {
@@ -40,11 +44,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (Schema::getConnection()->getDriverName() !== 'mysql' || !Schema::hasTable('projects')) {
-            return;
-        }
-
         // Revert back to the original enum values
-        DB::statement("ALTER TABLE projects MODIFY COLUMN calculate_task_progress ENUM('true', 'false') DEFAULT 'true'");
+        if (Schema::hasTable('projects') && Schema::hasColumn('projects', 'calculate_task_progress') && in_array(DB::connection()->getDriverName(), ['mysql', 'mariadb'], true)) {
+            DB::statement("ALTER TABLE projects MODIFY COLUMN calculate_task_progress ENUM('true', 'false') DEFAULT 'true'");
+        }
     }
 };

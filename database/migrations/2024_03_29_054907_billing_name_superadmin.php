@@ -13,33 +13,29 @@ return new class extends Migration {
     public function up(): void
     {
         $tableGateway = 'global_invoice_settings';
-        if (!Schema::hasTable($tableGateway)) {
+
+        if (!Schema::hasTable($tableGateway) || Schema::hasColumn($tableGateway, 'billing_name')) {
             return;
         }
 
-        if (!Schema::hasColumn($tableGateway, 'billing_name')) {
-            Schema::table($tableGateway, function (Blueprint $table) {
-                $table->string('billing_name')->nullable()->after('id');
-                $table->string('billing_address')->nullable()->after('billing_name');
-                $table->string('billing_tax_name')->nullable()->after('billing_address');
-                $table->string('billing_tax_id')->nullable()->after('billing_tax_name');
-            });
+        Schema::table($tableGateway, function (Blueprint $table) {
+            $table->string('billing_name')->nullable()->after('id');
+            $table->string('billing_address')->nullable()->after('billing_name');
+            $table->string('billing_tax_name')->nullable()->after('billing_address');
+            $table->string('billing_tax_id')->nullable()->after('billing_tax_name');
+        });
 
+        $setting = global_setting();
 
-            $setting = global_setting();
+        if ($setting) {
+            $invoice = GlobalInvoiceSetting::first();
 
-            if($setting){
-                $invoice = GlobalInvoiceSetting::first();
-                if ($invoice) {
-                    $invoice->billing_name = $setting->global_app_name;
-                    $invoice->billing_address = $setting->address;
-                    $invoice->save();
-                }
+            if ($invoice) {
+                $invoice->billing_name = $setting->global_app_name;
+                $invoice->billing_address = $setting->address;
+                $invoice->save();
             }
-
         }
-
-
     }
 
     /**

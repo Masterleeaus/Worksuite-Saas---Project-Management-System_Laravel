@@ -12,6 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+
         if (Schema::hasTable('expenses') && Schema::hasColumn('expenses', 'user_id')) {
             Schema::table('expenses', function (Blueprint $table) {
                 $table->unsignedInteger('user_id')->nullable()->change();
@@ -19,31 +20,20 @@ return new class extends Migration
         }
 
         if (
-            Schema::hasTable('expenses')
+            DB::connection()->getDriverName() !== 'sqlite'
+            && Schema::hasTable('expenses')
             && Schema::hasTable('currencies')
             && Schema::hasColumn('expenses', 'currency_id')
             && Schema::hasColumn('expenses', 'exchange_rate')
+            && Schema::hasColumn('currencies', 'id')
             && Schema::hasColumn('currencies', 'exchange_rate')
         ) {
-            if (Schema::getConnection()->getDriverName() === 'mysql') {
-                DB::table('expenses')
-                    ->join('currencies', 'expenses.currency_id', '=', 'currencies.id')
-                    ->update(['expenses.exchange_rate' => DB::raw('currencies.exchange_rate')]);
-            } else {
-                $rows = DB::table('expenses')
-                    ->join('currencies', 'expenses.currency_id', '=', 'currencies.id')
-                    ->select('expenses.id', 'currencies.exchange_rate as currency_exchange_rate')
-                    ->get();
-
-                foreach ($rows as $row) {
-                    DB::table('expenses')
-                        ->where('id', $row->id)
-                        ->update(['exchange_rate' => $row->currency_exchange_rate]);
-                }
-            }
+            DB::table('expenses')
+                ->join('currencies', 'expenses.currency_id', '=', 'currencies.id')
+                ->update(['expenses.exchange_rate' => DB::raw('currencies.exchange_rate')]);
         }
 
-        if (!Schema::hasColumn('global_settings', 'dedicated_subdomain')) {
+        if (Schema::hasTable('global_settings') && !Schema::hasColumn('global_settings', 'dedicated_subdomain')) {
             Schema::table('global_settings', function (Blueprint $table) {
                 $table->string('dedicated_subdomain')->nullable()->after('currency_key_version'); // Adjust the 'after' field as needed
             });
@@ -56,20 +46,14 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (Schema::hasTable('expenses') && Schema::hasColumn('expenses', 'user_id')) {
-            Schema::table('expenses', function (Blueprint $table) {
-                $table->unsignedInteger('user_id')->nullable(false)->change();
-            });
-        }
+        Schema::table('expenses', function (Blueprint $table) {
+            $table->unsignedInteger('user_id')->nullable(false)->change();
+        });
 
-        if (Schema::hasTable('expenses') && Schema::hasColumn('expenses', 'exchange_rate')) {
-            DB::table('expenses')->update(['exchange_rate' => null]);
-        }
+        DB::table('expenses')->update(['exchange_rate' => NULL]);
 
-        if (Schema::hasTable('global_settings') && Schema::hasColumn('global_settings', 'dedicated_subdomain')) {
-            Schema::table('global_settings', function (Blueprint $table) {
-                $table->dropColumn('dedicated_subdomain');
-            });
-        }
+        Schema::table('global_settings', function (Blueprint $table) {
+            $table->dropColumn('dedicated_subdomain');
+        });
     }
 };

@@ -34,36 +34,42 @@ abstract class TierOnePolicy
 
     public function viewAny($user): bool
     {
-        return $this->hasAnyAccess($user, $this->viewPermission);
+        return $this->hasAnyAccess($user, $this->viewPermission, 'viewAny');
     }
 
     public function view($user, Model $record): bool
     {
-        return $this->checkRecordAccess($user, $record, $this->viewPermission);
+        return $this->checkRecordAccess($user, $record, $this->viewPermission, 'view');
     }
 
     public function create($user): bool
     {
-        return $this->hasAnyAccess($user, $this->addPermission);
+        return $this->hasAnyAccess($user, $this->addPermission, 'create');
     }
 
     public function update($user, Model $record): bool
     {
-        return $this->checkRecordAccess($user, $record, $this->editPermission);
+        return $this->checkRecordAccess($user, $record, $this->editPermission, 'update');
     }
 
     public function delete($user, Model $record): bool
     {
-        return $this->checkRecordAccess($user, $record, $this->deletePermission);
+        return $this->checkRecordAccess($user, $record, $this->deletePermission, 'delete');
     }
 
     public function deleteAny($user): bool
     {
-        return $this->hasAnyAccess($user, $this->deletePermission);
+        return $this->hasAnyAccess($user, $this->deletePermission, 'deleteAny');
     }
 
-    protected function hasAnyAccess($user, string $permissionName): bool
+    protected function hasAnyAccess($user, string $permissionName, string $ability): bool
     {
+        $before = $this->before($user, $ability);
+
+        if ($before !== null) {
+            return $before;
+        }
+
         if (!method_exists($user, 'permission')) {
             return false;
         }
@@ -71,8 +77,14 @@ abstract class TierOnePolicy
         return !in_array($user->permission($permissionName), [false, null, 'none'], true);
     }
 
-    protected function checkRecordAccess($user, Model $record, string $permissionName): bool
+    protected function checkRecordAccess($user, Model $record, string $permissionName, string $ability): bool
     {
+        $before = $this->before($user, $ability);
+
+        if ($before !== null) {
+            return $before;
+        }
+
         if (!$this->sameTenant($user, $record)) {
             return false;
         }
