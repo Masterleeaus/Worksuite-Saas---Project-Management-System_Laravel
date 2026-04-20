@@ -20,7 +20,6 @@ use Modules\ReviewModule\Entities\Review;
 use Modules\UserManagement\Entities\Serviceman;
 use Modules\UserManagement\Entities\User;
 use Modules\UserManagement\Entities\UserAddress;
-use Modules\ZoneManagement\Entities\Zone;
 use Modules\BookingModule\Traits\CompanyScoped;
 
 class Booking extends Model
@@ -112,7 +111,11 @@ class Booking extends Model
 
     public function zone(): BelongsTo
     {
-        return $this->belongsTo(Zone::class, 'zone_id');
+        $zoneClass = class_exists(\Modules\ZoneManagement\Entities\Zone::class)
+            ? \Modules\ZoneManagement\Entities\Zone::class
+            : self::class;
+
+        return $this->belongsTo($zoneClass, 'zone_id');
     }
 
     public function serviceman(): BelongsTo

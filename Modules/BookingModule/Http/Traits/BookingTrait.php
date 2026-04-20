@@ -5,6 +5,7 @@ namespace Modules\BookingModule\Http\Traits;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Mockery\Exception;
 use Modules\BookingModule\Entities\BookingPartialPayment;
 use Modules\BookingModule\Entities\BookingRepeat;
@@ -93,6 +94,7 @@ trait BookingTrait
                 $zoneId = config('zone_id') == null ? $request['zone_id'] : config('zone_id');
                 $referralDiscount += $this->referralEarningCalculationForFirstBooking($userId, $totalBookingAmount - $cartData->sum('tax_amount'), $zoneId);
                 $totalBookingAmount -= $referralDiscount;
+                $totalBookingAmount = $this->applyZonePricingModifier($totalBookingAmount, $zoneId, $cartData->first()->service_id ?? null);
 
                 $bookingAdditionalChargeStatus = business_config('booking_additional_charge', 'booking_setup')->live_values ?? 0;
                 $extraFee = 0;
@@ -373,6 +375,7 @@ trait BookingTrait
                 $zoneId = config('zone_id') == null ? $request['zone_id'] : config('zone_id');
                 $referralDiscount += $this->referralEarningCalculationForFirstBooking($userId, $totalBookingAmount - $cartData->sum('tax_amount'), $zoneId);
                 $totalBookingAmount -= $referralDiscount;
+                $totalBookingAmount = $this->applyZonePricingModifier($totalBookingAmount, $zoneId, $cartData->first()->service_id ?? null);
 
                 $bookingAdditionalChargeStatus = business_config('booking_additional_charge', 'booking_setup')->live_values ?? 0;
                 $extraFee = 0;
@@ -651,6 +654,7 @@ trait BookingTrait
             $zoneId = $data['zone_id'];
             $referralDiscount += $this->referralEarningCalculationForFirstBooking($customerUserId, $totalBookingAmount, $zoneId);
             $totalBookingAmount -= $referralDiscount;
+            $totalBookingAmount = $this->applyZonePricingModifier($totalBookingAmount, $zoneId, $subCategory ?? null);
 
             $tax = !is_null($data['service_tax']) ? round((($data['price'] * $data['service_tax']) / 100) * 1, 2) : 0; //
 
@@ -1784,6 +1788,33 @@ trait BookingTrait
 
 
     //=============== REFERRAL EARN & LOYALTY POINT ===============
+
+    private function applyZonePricingModifier(float $amount, ?string $zoneId, $serviceId = null): float
+    {
+        if (empty($zoneId) || !Schema::hasTable('zone_pricing')) {
+            return $amount;
+        }
+
+        $query = DB::table('zone_pricing')
+            ->where('zone_id', (string)$zoneId)
+            ->orderByDesc('id');
+
+        if ($serviceId !== null && Schema::hasColumn('zone_pricing', 'service_id')) {
+            $query->where(function ($q) use ($serviceId) {
+                $q->where('service_id', $serviceId)->orWhereNull('service_id');
+            });
+        }
+
+        $modifier = (float)($query->value('price_modifier') ?? 0);
+
+        if ($modifier === 0.0) {
+            return $amount;
+        }
+
+        $adjusted = $amount + (($amount * $modifier) / 100);
+
+        return max(0, round($adjusted, 2));
+    }
 
     /**
      * @param $userId
