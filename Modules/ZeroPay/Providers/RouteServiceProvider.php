@@ -12,11 +12,19 @@ class RouteServiceProvider extends ServiceProvider
     public function boot(): void
     {
         parent::boot();
+
+        $channelsPath = module_path('ZeroPay', '/Routes/channels.php');
+
+        if (file_exists($channelsPath)) {
+            require $channelsPath;
+        }
     }
 
     public function map(): void
     {
         $this->mapWebRoutes();
+        $this->mapAdminRoutes();
+        $this->mapUserRoutes();
         $this->mapApiRoutes();
     }
 
@@ -25,6 +33,20 @@ class RouteServiceProvider extends ServiceProvider
         Route::middleware('web')
             ->namespace($this->moduleNamespace)
             ->group(module_path('ZeroPay', '/Routes/web.php'));
+    }
+
+    protected function mapAdminRoutes(): void
+    {
+        Route::middleware(['web', 'auth'])
+            ->namespace($this->moduleNamespace)
+            ->group(module_path('ZeroPay', '/Routes/admin.php'));
+    }
+
+    protected function mapUserRoutes(): void
+    {
+        Route::middleware(['web', 'auth'])
+            ->namespace($this->moduleNamespace)
+            ->group(module_path('ZeroPay', '/Routes/user.php'));
     }
 
     protected function mapApiRoutes(): void

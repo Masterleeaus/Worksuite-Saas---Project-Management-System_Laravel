@@ -5,11 +5,11 @@ namespace Modules\ZeroPay\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\ZeroPay\Models\ZeroPayAttempt;
-use Modules\ZeroPay\Services\ZeroPaySessionService;
+use Modules\ZeroPay\Services\PaymentSessionService;
 
 class ZeroPayCallbackController extends Controller
 {
-    public function __construct(private readonly ZeroPaySessionService $sessionService)
+    public function __construct(private readonly PaymentSessionService $sessions)
     {
     }
 
@@ -37,27 +37,15 @@ class ZeroPayCallbackController extends Controller
         }
 
         $attempt = ZeroPayAttempt::query()->findOrFail($attemptId);
+        $result = $this->sessions->recordCallback($attempt, $gateway, $request->all());
 
-        $status = (string) ($request->input('status') ?? $request->input('event') ?? 'pending');
-        $normalized = strtolower($status);
-        $isSuccess = str_contains($normalized, 'success') || str_contains($normalized, 'paid') || str_contains($normalized, 'confirm');
-
-        if ($isSuccess) {
-            $payment = $this->sessionService->confirmAttempt($attempt, [
-                'transaction_id' => (string) ($request->input('transaction_id') ?? $request->input('id') ?? null),
-                'remarks' => ucfirst($gateway) . ' callback confirmation',
-            ]);
-
+        if ($result['success']) {
             return response()->json([
                 'status' => 'success',
                 'message' => ucfirst($gateway) . ' callback confirmed and posted.',
-                'payment_id' => $payment->id,
+                'payment_id' => $result['payment_id'],
             ]);
         }
-
-        $attempt->status = 'failed';
-        $attempt->payload = array_merge((array) $attempt->payload, ['callback' => $request->all(), 'gateway' => $gateway]);
-        $attempt->save();
 
         return response()->json(['status' => 'received', 'message' => ucfirst($gateway) . ' callback logged as non-success.']);
     }

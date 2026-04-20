@@ -31,6 +31,8 @@
         <div><strong>Selected Method:</strong> {{ $session->selected_method ?? 'Not selected' }}</div>
     </div>
 
+
+    <div class="mt"><strong>Recommended Rail:</strong> {{ $recommended_rail ?? 'N/A' }}</div>
     <div class="mt">
         <strong>QR / Link</strong>
         <div><a href="{{ $session->payment_link }}" target="_blank" rel="noopener">{{ $session->payment_link }}</a></div>

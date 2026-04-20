@@ -4,15 +4,17 @@ namespace Modules\ZeroPay\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Modules\ZeroPay\Models\ZeroPayBankMatch;
+use Modules\ZeroPay\Services\BankMatchService;
 
 class ZeroPayBankMatchApiController extends Controller
 {
+    public function __construct(private readonly BankMatchService $bankMatches)
+    {
+    }
+
     public function index()
     {
-        $matches = ZeroPayBankMatch::query()
-            ->where('status', 'queued')
-            ->latest()
-            ->paginate(20);
+        $matches = $this->bankMatches->queued()->latest()->paginate(20);
 
         return response()->json(['status' => 'success', 'data' => $matches]);
     }
@@ -20,9 +22,7 @@ class ZeroPayBankMatchApiController extends Controller
     public function accept(int $id)
     {
         $match = ZeroPayBankMatch::query()->findOrFail($id);
-        $match->status = 'accepted';
-        $match->matched_at = now();
-        $match->save();
+        $match = $this->bankMatches->accept($match);
 
         return response()->json(['status' => 'success', 'message' => 'Bank match accepted.', 'data' => $match]);
     }
