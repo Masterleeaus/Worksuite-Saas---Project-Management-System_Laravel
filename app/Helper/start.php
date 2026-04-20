@@ -1489,7 +1489,13 @@ if (!function_exists('checkCompanyPackageIsValid')) {
 
         return cache()->rememberForever('company_' . $companyId . '_valid_package', function () use ($companyId) {
             $company = Company::with('package')->withCount('employees')->find($companyId);
-            return $company->employees_count <= $company->package->max_employees;
+            $maxEmployees = $company?->package?->max_employees;
+
+            if (is_null($maxEmployees)) {
+                return true;
+            }
+
+            return $company->employees_count <= $maxEmployees;
         });
     }
 }
@@ -1505,7 +1511,13 @@ if (!function_exists('checkCompanyCanAddMoreEmployees')) {
 
         return cache()->rememberForever('company_' . $companyId . '_can_add_more_employees', function () use ($companyId) {
             $company = Company::with('package')->withCount('employees')->find($companyId);
-            return $company->employees_count < $company->package->max_employees;
+            $maxEmployees = $company?->package?->max_employees;
+
+            if (is_null($maxEmployees)) {
+                return true;
+            }
+
+            return $company->employees_count < $maxEmployees;
         });
     }
 }

@@ -3,9 +3,7 @@
     "alias": "expenses",
     "description": "Expense Management: claims, categories, approvals, reimbursements. Ported from donor schema.",
     "providers": [
-        "Modules\\Expenses\\Providers\\ModuleServiceProvider",
-        "Modules\\Expenses\\Providers\\RouteServiceProvider",
-        "Modules\\Expenses\\Providers\\AiRoutesServiceProvider"
+        "Modules\\Expenses\\Providers\\ModuleServiceProvider"
     ],
     "autoload": {
         "psr-4": {

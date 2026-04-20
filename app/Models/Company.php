@@ -319,9 +319,23 @@ class Company extends BaseModel
 
     public static function firstActiveAdmin($company)
     {
-        $admins = Role::with('users')->where('name', 'admin')->where('company_id', $company->id)->first();
+        if (is_null($company)) {
+            return null;
+        }
 
-        return $admins->users->first();
+        $companyId = $company instanceof self ? $company->id : $company;
+        $adminRole = Role::query()
+            ->where('name', 'admin')
+            ->where('company_id', $companyId)
+            ->first();
+
+        if (is_null($adminRole)) {
+            return null;
+        }
+
+        return $adminRole->users()
+            ->where('status', 'active')
+            ->first();
     }
 
     public function employees()
