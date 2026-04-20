@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
@@ -33,10 +34,16 @@ return new class extends Migration {
         }
 
 
-        Schema::table('deals', function (Blueprint $table) {
-            $table->dropForeign(['agent_id']);
-            $table->foreign('agent_id')->references('id')->on('lead_agents')->onDelete('SET NULL')->onUpdate('CASCADE');
-        });
+        if (
+            DB::connection()->getDriverName() !== 'sqlite'
+            && Schema::hasTable('deals')
+            && Schema::hasColumn('deals', 'agent_id')
+        ) {
+            Schema::table('deals', function (Blueprint $table) {
+                $table->dropForeign(['agent_id']);
+                $table->foreign('agent_id')->references('id')->on('lead_agents')->onDelete('SET NULL')->onUpdate('CASCADE');
+            });
+        }
     }
 
     /**
