@@ -2,6 +2,7 @@
 
 namespace Modules\FSMSales\Http\Controllers;
 
+use App\Models\Estimate;
 use App\Models\Invoice;
 use App\Models\InvoiceItems;
 use Illuminate\Http\Request;
@@ -94,11 +95,23 @@ class InvoiceController extends Controller
         ]);
 
         if (!empty($data['order_ids'])) {
+            $estimateId = FSMOrder::query()
+                ->whereIn('id', $data['order_ids'])
+                ->whereNotNull('estimate_id')
+                ->value('estimate_id');
+
             $invoice->fsmOrders()->attach($data['order_ids']);
-            $invoice->update(['fsm_order_id' => $data['order_ids'][0] ?? null]);
+            $invoice->update([
+                'fsm_order_id' => $data['order_ids'][0] ?? null,
+                'estimate_id' => $estimateId,
+            ]);
 
             // Mark orders as invoiced
             FSMOrder::whereIn('id', $data['order_ids'])->update(['is_invoiced' => true]);
+
+            if (! empty($estimateId)) {
+                Estimate::query()->whereKey($estimateId)->update(['status' => 'accepted']);
+            }
         }
 
         return redirect()->route('fsmsales.invoices.show', $invoice->id)

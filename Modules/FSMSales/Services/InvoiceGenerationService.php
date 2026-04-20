@@ -2,6 +2,7 @@
 
 namespace Modules\FSMSales\Services;
 
+use App\Models\Estimate;
 use App\Models\Invoice;
 use App\Models\InvoiceItems;
 use App\Models\RecurringInvoice;
@@ -47,6 +48,7 @@ class InvoiceGenerationService
             'discount_type' => 'percent',
             'recurring' => 'no',
             'fsm_order_id' => $order->id,
+            'estimate_id' => $order->estimate_id,
         ]);
 
         // Attach the order
@@ -74,6 +76,7 @@ class InvoiceGenerationService
         // Mark order as invoiced
         $order->is_invoiced = true;
         $order->save();
+        $this->markEstimateAsInvoiced($order);
 
         return $invoice->fresh(['items']);
     }
@@ -114,6 +117,7 @@ class InvoiceGenerationService
             'discount_type' => 'percent',
             'recurring' => 'no',
             'fsm_order_id' => $order->id,
+            'estimate_id' => $order->estimate_id,
         ]);
 
         $invoice->fsmOrders()->syncWithoutDetaching([$order->id]);
@@ -135,6 +139,7 @@ class InvoiceGenerationService
 
         $order->is_invoiced = true;
         $order->save();
+        $this->markEstimateAsInvoiced($order);
 
         return $invoice->fresh(['items']);
     }
@@ -323,6 +328,17 @@ class InvoiceGenerationService
             'annual' => 'annually',
             default => 'monthly',
         };
+    }
+
+    private function markEstimateAsInvoiced(FSMOrder $order): void
+    {
+        if (empty($order->estimate_id)) {
+            return;
+        }
+
+        Estimate::query()
+            ->whereKey($order->estimate_id)
+            ->update(['status' => 'accepted']);
     }
 
     /**
