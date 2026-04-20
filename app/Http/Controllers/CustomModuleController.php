@@ -1064,7 +1064,7 @@ class CustomModuleController extends Controller
         ]);
         $analysis['visibility_report'] = $visibilityReport;
         $analysis['readiness_matrix'] = app(ModuleReadinessMatrixService::class)->build($analysis);
-        $analysis['repair_queue'] = app(AutoRepairQueueService::class)->queue($visibilityReport);
+        $analysis['repair_queue'] = app(AutoRepairQueueService::class)->build($visibilityReport);
         $analysis['doctor_manifest'] = app(ModuleDoctorManifest::class)->build();
         $analysis['doctor_report'] = app(\App\Support\ModuleDoctor\ModuleDoctorReportAssembler::class)->build($analysis);
         $analysis['checks'][] = [
@@ -1559,7 +1559,8 @@ private function detectPackageNameColumn(): ?string
                     continue;
                 }
                 $label = ucwords(str_replace('_', ' ', (string) $key));
-                $html .= '<li><strong>' . e($label) . ':</strong> ' . e((string) $value) . '</li>';
+                $displayValue = is_scalar($value) ? (string) $value : json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                $html .= '<li><strong>' . e($label) . ':</strong> ' . e($displayValue ?: '') . '</li>';
             }
             $html .= '</ul></div>';
         }
@@ -1994,6 +1995,30 @@ private function detectPackageNameColumn(): ?string
         }
 
         return array_values(array_unique($steps));
+    }
+
+    private function inferWorksuiteModuleMetadata(array $config, ?string $currentVersion, string $envatoItemId, string $productName): array
+    {
+        $inferred = [];
+
+        if (blank((string) ($config['parent_envato_id'] ?? '')) && !blank($envatoItemId)) {
+            $inferred['parent_envato_id'] = $envatoItemId;
+        }
+
+        if (blank((string) ($config['parent_product_name'] ?? '')) && !blank($productName)) {
+            $inferred['parent_product_name'] = $productName;
+        }
+
+        if (blank((string) ($config['parent_min_version'] ?? ''))) {
+            $inferred['parent_min_version'] = $currentVersion ?: '0.0.0';
+        }
+
+        return $inferred;
+    }
+
+    private function persistInferredModuleConfig(string $moduleSourcePath, array $analysis): ?array
+    {
+        return null;
     }
 
     private function renderCheckSummary(array $checks)

@@ -160,7 +160,7 @@ class SecurityScanValidator
             }
             
             // Check for attempts to write to parent directories
-            if (preg_match('/\.\.[\/\\]/', $relativePath)) {
+            if (preg_match('/\.\.[\/\\\\]/', $relativePath)) {
                 $issues[] = [
                     'severity' => 'error',
                     'code' => 'PATH_TRAVERSAL',

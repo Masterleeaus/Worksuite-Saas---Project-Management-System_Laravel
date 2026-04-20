@@ -3,6 +3,7 @@
 namespace Tests\Integration\CustomModules;
 
 use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -12,6 +13,8 @@ use ZipArchive;
 
 class CustomModuleInstallationTest extends TestCase
 {
+    use RefreshDatabase;
+
     protected string $testModulePath;
     protected string $testZipPath;
     
@@ -343,6 +346,7 @@ class CustomModuleInstallationTest extends TestCase
     {
         $modulePath = storage_path("test_modules/{$name}");
         File::ensureDirectoryExists($modulePath);
+        File::ensureDirectoryExists($modulePath . '/Config');
         
         // Create module.json
         File::put($modulePath . '/module.json', json_encode([
@@ -353,11 +357,22 @@ class CustomModuleInstallationTest extends TestCase
             ],
             'routes' => [],
         ]));
+
+        File::put($modulePath . '/Config/config.php', <<<'PHP'
+<?php
+
+return [
+    'parent_envato_id' => (string) config('froiden_envato.envato_item_id'),
+    'parent_product_name' => (string) config('froiden_envato.envato_product_name'),
+    'parent_min_version' => '0.0.0',
+];
+PHP
+        );
         
         // Create a simple PHP file
         File::put($modulePath . '/Module.php', "<?php\nnamespace Modules\\{$name};\n\nclass Module\n{\n}");
         
-        return $this->zipDirectory($modulePath, storage_path("test_{$name}.zip"));
+        return $this->zipDirectory($modulePath, storage_path("{$name}.zip"));
     }
     
     protected function createTestModuleWithPermission(string $name, string $permissionKey): string
@@ -373,7 +388,7 @@ class CustomModuleInstallationTest extends TestCase
             ],
         ]));
         
-        return $this->zipDirectory($modulePath, storage_path("test_{$name}.zip"));
+        return $this->zipDirectory($modulePath, storage_path("{$name}.zip"));
     }
     
     protected function createTestModuleWithRoute(string $name, string $routeUri): string
@@ -389,7 +404,7 @@ class CustomModuleInstallationTest extends TestCase
             ],
         ]));
         
-        return $this->zipDirectory($modulePath, storage_path("test_{$name}.zip"));
+        return $this->zipDirectory($modulePath, storage_path("{$name}.zip"));
     }
     
     protected function createTestModuleWithShellCode(string $name): string
@@ -405,7 +420,7 @@ class CustomModuleInstallationTest extends TestCase
         // Create malicious PHP file
         File::put($modulePath . '/Shell.php', "<?php\nshell_exec('whoami');\n");
         
-        return $this->zipDirectory($modulePath, storage_path("test_{$name}.zip"));
+        return $this->zipDirectory($modulePath, storage_path("{$name}.zip"));
     }
     
     protected function zipDirectory(string $source, string $destination): string
@@ -414,11 +429,12 @@ class CustomModuleInstallationTest extends TestCase
         $zip->open($destination, ZipArchive::CREATE | ZipArchive::OVERWRITE);
         
         $files = File::allFiles($source);
+        $root = basename($source);
         
         foreach ($files as $file) {
             $zip->addFile(
                 $file->getRealPath(),
-                str_replace($source . '/', '', $file->getRealPath())
+                $root . '/' . str_replace($source . '/', '', $file->getRealPath())
             );
         }
         
