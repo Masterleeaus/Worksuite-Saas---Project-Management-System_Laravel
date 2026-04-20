@@ -13,6 +13,12 @@ return [
         'view_cleaner_ratings',
         'manage_qc_corrective_actions',
         'verify_qc_followups',
+        // Phase 8 additions
+        'view_qc_corrective_actions',
+        'assign_qc_corrective_actions',
+        'verify_qc_corrective_actions',
+        'view_qc_verification_queue',
+        'manage_qc_escalations',
     ],
     'legacy_aliases' => [
         'view_inspection',

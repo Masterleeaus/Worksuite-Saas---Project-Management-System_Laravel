@@ -3,6 +3,8 @@
 namespace Modules\QualityControl\Domain\Quality\Actions;
 
 use Modules\Complaint\Entities\Complaint;
+use Modules\QualityControl\Events\VerificationScheduledEvent;
+use Modules\QualityControl\Entities\QcFollowupVerification;
 
 final class CreateQcFromComplaintAction
 {
@@ -56,6 +58,23 @@ final class CreateQcFromComplaintAction
 
         $source->follow_up_schedule_id = $follow->id;
         $source->save();
+
+        // Schedule a follow-up verification and emit event.
+        try {
+            $verification = QcFollowupVerification::create([
+                'company_id'   => $follow->company_id,
+                'schedule_id'  => $follow->id,
+                'complaint_id' => $complaint->id,
+                'status'       => 'queued',
+                'due_at'       => now()->addHours(
+                    (int) config('quality_control.qc_verification_reminder_hours', 24)
+                ),
+            ]);
+
+            VerificationScheduledEvent::dispatch($verification, 'create_qc_from_complaint');
+        } catch (\Throwable) {
+            // Non-fatal — verification scheduling failure should not block follow-up creation.
+        }
 
         return (int) $follow->id;
     }

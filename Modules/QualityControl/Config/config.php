@@ -50,6 +50,12 @@ return [
         'default_window_days' => 30,
     ],
 
+    // Automation thresholds and timings (Phase 7)
+    'qc_auto_create_complaint_threshold' => 'high',
+    'qc_reclean_deadline_hours' => 24,
+    'qc_corrective_action_sla_hours' => 48,
+    'qc_verification_reminder_hours' => 24,
+
     // File categories used for proof photos.
     'photo_categories' => ['before', 'after', 'general'],
 ];

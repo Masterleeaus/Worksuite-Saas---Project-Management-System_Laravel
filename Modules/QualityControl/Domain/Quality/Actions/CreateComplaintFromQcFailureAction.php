@@ -21,10 +21,15 @@ final class CreateComplaintFromQcFailureAction
         $complaint->subject = 'QC Failure Follow-up';
         $complaint->status = 'open';
         $complaint->priority = 'high';
-        $complaint->user_id = $record->cleaner_id ?: (user()?->id);
+        $complaint->user_id = $record->cleaner_id ?: (function_exists('user') ? optional(user())->id : null);
         $complaint->quality_control_id = $record->schedule_id;
         $complaint->quality_control_reason = 'Auto-created from failed QC record #' . $record->id;
         $complaint->job_id = $record->booking_id;
+
+        if (\Illuminate\Support\Facades\Schema::hasColumn('complaint', 'qc_record_id')) {
+            $complaint->qc_record_id = $record->id;
+        }
+
         $complaint->save();
 
         $record->complaint_id = $complaint->id;
