@@ -49,7 +49,7 @@ return new class extends Migration
             }
 
             $table->index(['task_id', 'item_id']);
-            $table->index('company_id');
+            $table->index(['company_id']);
         });
     }
 

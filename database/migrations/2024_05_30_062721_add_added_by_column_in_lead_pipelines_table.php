@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('lead_pipelines', 'added_by')) {
+        if (Schema::hasTable('lead_pipelines') && !Schema::hasColumn('lead_pipelines', 'added_by')) {
             Schema::table('lead_pipelines', function (Blueprint $table) {
                 $table->integer('added_by')->nullable()->default(null);
             });
@@ -21,9 +21,11 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('lead_pipelines', function (Blueprint $table) {
-            $table->dropColumn('added_by');
-        });
+        if (Schema::hasTable('lead_pipelines') && Schema::hasColumn('lead_pipelines', 'added_by')) {
+            Schema::table('lead_pipelines', function (Blueprint $table) {
+                $table->dropColumn('added_by');
+            });
+        }
     }
 
 };

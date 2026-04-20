@@ -3,7 +3,7 @@ name: Security
 on:
   push:
     branches: [main, master]
-  pull_request_target:
+  pull_request:
     branches: [main, master, develop]
   schedule:
     # Run every Monday at 08:00 UTC
@@ -24,7 +24,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -66,7 +66,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -94,7 +94,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3

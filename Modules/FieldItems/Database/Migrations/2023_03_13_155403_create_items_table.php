@@ -28,10 +28,10 @@ return new class extends Migration
             $table->boolean('downloadable')->default(false);
             $table->string('downloadable_file')->nullable();
             $table->text('description')->nullable();
-            $table->unsignedBigInteger('category_id')->nullable()->index('items_category_id_foreign');
-            $table->unsignedBigInteger('sub_category_id')->nullable()->index('items_sub_category_id_foreign');
-            $table->unsignedInteger('added_by')->nullable()->index('items_added_by_foreign');
-            $table->unsignedInteger('last_updated_by')->nullable()->index('items_last_updated_by_foreign');
+            $table->unsignedBigInteger('category_id')->nullable()->index();
+            $table->unsignedBigInteger('sub_category_id')->nullable()->index();
+            $table->unsignedInteger('added_by')->nullable()->index();
+            $table->unsignedInteger('last_updated_by')->nullable()->index();
             $table->foreign(['added_by'])->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('SET NULL');
             $table->foreign(['category_id'])->references(['id'])->on('item_category')->onUpdate('CASCADE')->onDelete('SET NULL');
             $table->foreign(['last_updated_by'])->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('SET NULL');

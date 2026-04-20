@@ -12,9 +12,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('deal_histories', function (Blueprint $table) {
-            $table->renameColumn('deal_stage_id', 'deal_stage_from_id');
-        });
+        if (!Schema::hasTable('deal_histories')) {
+            return;
+        }
+
+        if (Schema::getConnection()->getDriverName() === 'sqlite' && !Schema::hasTable('deals')) {
+            return;
+        }
+
+        if (Schema::hasColumn('deal_histories', 'deal_stage_id') && !Schema::hasColumn('deal_histories', 'deal_stage_from_id')) {
+            Schema::table('deal_histories', function (Blueprint $table) {
+                $table->renameColumn('deal_stage_id', 'deal_stage_from_id');
+            });
+        }
 
         if (!Schema::hasColumn('deal_histories', 'deal_stage_to_id')) {
             Schema::table('deal_histories', function (Blueprint $table) {
@@ -29,10 +39,22 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (!Schema::hasTable('deal_histories')) {
+            return;
+        }
+
+        if (Schema::getConnection()->getDriverName() === 'sqlite' && !Schema::hasTable('deals')) {
+            return;
+        }
+
         Schema::table('deal_histories', function (Blueprint $table) {
-            $table->renameColumn('deal_stage_from_id', 'deal_stage_id');
-            $table->dropForeign(['deal_stage_to_id']);
-            $table->dropColumn('deal_stage_to_id');
+            if (Schema::hasColumn('deal_histories', 'deal_stage_from_id') && !Schema::hasColumn('deal_histories', 'deal_stage_id')) {
+                $table->renameColumn('deal_stage_from_id', 'deal_stage_id');
+            }
+            if (Schema::hasColumn('deal_histories', 'deal_stage_to_id')) {
+                $table->dropForeign(['deal_stage_to_id']);
+                $table->dropColumn('deal_stage_to_id');
+            }
         });
     }
 
