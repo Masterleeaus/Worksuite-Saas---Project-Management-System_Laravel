@@ -4,8 +4,12 @@ namespace Modules\FSMProject\Http\Controllers;
 
 use App\Models\Project;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Validation\ValidationException;
 use Modules\FSMCore\Models\FSMOrder;
 
 class FsmProjectController extends Controller
@@ -37,7 +41,9 @@ class FsmProjectController extends Controller
             ->limit(200)
             ->get(['id', 'name', 'project_id', 'task_id']);
 
-        return view('fsmproject::links.create', compact('orders'));
+        $tasksByOrder = $this->tasksByOrder($orders);
+
+        return view('fsmproject::links.create', compact('orders', 'tasksByOrder'));
     }
 
     public function store(Request $request)
@@ -49,8 +55,9 @@ class FsmProjectController extends Controller
         ]);
 
         $order = FSMOrder::where('company_id', $this->companyId())->findOrFail((int) $data['order_id']);
-        $order->project_id = $data['project_id'];
-        $order->task_id = $data['task_id'] ?? null;
+        $project = $this->findCompanyProject((int) $data['project_id']);
+        $order->project()->associate($project);
+        $this->assignTaskToOrder($order, isset($data['task_id']) ? (int) $data['task_id'] : null);
         $order->save();
 
         return redirect()->route('fsmproject.index')
@@ -65,8 +72,9 @@ class FsmProjectController extends Controller
             ->orderByDesc('id')
             ->limit(200)
             ->get(['id', 'name', 'project_id', 'task_id']);
+        $projectTasks = $this->tasksForProject($order->project_id);
 
-        return view('fsmproject::links.edit', compact('order', 'orders'));
+        return view('fsmproject::links.edit', compact('order', 'orders', 'projectTasks'));
     }
 
     public function update(Request $request, int $orderId)
@@ -77,8 +85,9 @@ class FsmProjectController extends Controller
         ]);
 
         $order = FSMOrder::where('company_id', $this->companyId())->findOrFail($orderId);
-        $order->project_id = $data['project_id'];
-        $order->task_id = $data['task_id'] ?? null;
+        $project = $this->findCompanyProject((int) $data['project_id']);
+        $order->project()->associate($project);
+        $this->assignTaskToOrder($order, isset($data['task_id']) ? (int) $data['task_id'] : null);
         $order->save();
 
         return redirect()->route('fsmproject.index')
@@ -99,15 +108,24 @@ class FsmProjectController extends Controller
     /** Link an FSM order to a project / task */
     public function link(Request $request, int $orderId)
     {
+        return $this->linkTask($request, $orderId);
+    }
+
+    public function linkTask(Request $request, int $orderId): JsonResponse
+    {
         $data = $request->validate([
-            'project_id' => 'required|integer',
-            'task_id'    => 'nullable|integer',
+            'project_id' => 'nullable|integer',
+            'task_id' => 'nullable|integer|exists:tasks,id',
         ]);
 
         $order = FSMOrder::where('company_id', $this->companyId())->findOrFail($orderId);
-        $project = $this->findCompanyProject((int) $data['project_id']);
-        $order->project()->associate($project);
-        $order->task_id = $data['task_id'] ?? null;
+
+        if (!empty($data['project_id'])) {
+            $project = $this->findCompanyProject((int) $data['project_id']);
+            $order->project()->associate($project);
+        }
+
+        $this->assignTaskToOrder($order, isset($data['task_id']) ? (int) $data['task_id'] : null);
         $order->save();
 
         return response()->json(['success' => true]);
@@ -223,5 +241,87 @@ class FsmProjectController extends Controller
         }
 
         return $relations;
+    }
+
+    private function assignTaskToOrder(FSMOrder $order, ?int $taskId): void
+    {
+        if ($taskId !== null) {
+            throw_if(
+                empty($order->project_id),
+                ValidationException::withMessages([
+                    'task_id' => 'The selected task must belong to the same project as the order.',
+                ])
+            );
+
+            $exists = DB::table('tasks')
+                ->where('id', $taskId)
+                ->where('project_id', (int) $order->project_id)
+                ->when(Schema::hasColumn('tasks', 'deleted_at'), fn ($query) => $query->whereNull('deleted_at'))
+                ->exists();
+
+            throw_if(
+                !$exists,
+                ValidationException::withMessages([
+                    'task_id' => 'The selected task must belong to the same project as the order.',
+                ])
+            );
+        }
+
+        $order->task_id = $taskId;
+        $this->syncTaskStatusIfConfigured($order);
+    }
+
+    private function syncTaskStatusIfConfigured(FSMOrder $order): void
+    {
+        if (!config('fsmproject.sync_task_status_on_order_completion', false) || empty($order->task_id) || empty($order->date_end) || !Schema::hasTable('tasks')) {
+            return;
+        }
+
+        $updates = [];
+
+        if (Schema::hasColumn('tasks', 'status')) {
+            $updates['status'] = 'completed';
+        }
+        if (Schema::hasColumn('tasks', 'completed_on')) {
+            $updates['completed_on'] = now();
+        }
+
+        if (!empty($updates)) {
+            DB::table('tasks')->where('id', (int) $order->task_id)->update($updates);
+        }
+    }
+
+    private function tasksByOrder(Collection $orders): array
+    {
+        return $orders
+            ->mapWithKeys(function (FSMOrder $order) {
+                return [$order->id => $this->tasksForProject($order->project_id)->values()];
+            })
+            ->all();
+    }
+
+    private function tasksForProject(?int $projectId): Collection
+    {
+        if (empty($projectId) || !Schema::hasTable('tasks') || !Schema::hasColumn('tasks', 'project_id')) {
+            return collect();
+        }
+
+        $query = DB::table('tasks')
+            ->select(['id', 'project_id', 'heading'])
+            ->where('project_id', $projectId)
+            ->orderBy('heading');
+
+        if (Schema::hasColumn('tasks', 'company_id')) {
+            $query->where(function ($builder) {
+                $builder->where('company_id', $this->companyId())
+                    ->orWhereNull('company_id');
+            });
+        }
+
+        if (Schema::hasColumn('tasks', 'deleted_at')) {
+            $query->whereNull('deleted_at');
+        }
+
+        return $query->get();
     }
 }

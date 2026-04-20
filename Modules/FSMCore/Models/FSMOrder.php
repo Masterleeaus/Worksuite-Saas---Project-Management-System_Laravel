@@ -87,6 +87,11 @@ class FSMOrder extends Model
         return $this->belongsTo(\App\Models\Project::class, 'project_id');
     }
 
+    public function task(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Task::class, 'task_id');
+    }
+
     public function template()
     {
         return $this->belongsTo(FSMTemplate::class, 'template_id');

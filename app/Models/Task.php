@@ -171,6 +171,11 @@ class Task extends BaseModel
         return $this->belongsTo(Project::class, 'project_id')->withTrashed();
     }
 
+    public function fsmOrders(): HasMany
+    {
+        return $this->hasMany(\Modules\FSMCore\Models\FSMOrder::class, 'task_id');
+    }
+
     public function recurringTask(): BelongsTo
     {
         return $this->belongsTo(Task::class, 'recurring_task_id');
