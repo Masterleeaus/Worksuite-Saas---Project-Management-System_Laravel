@@ -44,7 +44,6 @@
     "InstantAds": true,
     "ManagedPremises": true,
     "OnboardingPro": true,
-    "ProviderManagement": true,
     "QualityControl": true,
     "ReviewModule": true,
     "ServiceManagement": true,
@@ -58,6 +57,5 @@
     "TitanGo": true,
     "TitanTheme": true,
     "TitanVault": true,
-    "ZoneManagement": true,
     "ZeroPay": true
 }
