@@ -1,0 +1,20 @@
+{
+    "name": "FSMSaleAgreement",
+    "alias": "fsmsaleagreement",
+    "description": "FSM Sale Agreement – Propagates service agreement context from FSM invoices to their linked FSM orders in CleanSmartOS.",
+    "keywords": ["fsm", "sale", "agreement", "invoice", "cleansmartOS"],
+    "active": 1,
+    "order": 1,
+    "providers": [
+        "Modules\\FSMSaleAgreement\\Providers\\FSMSaleAgreementServiceProvider",
+        "Modules\\FSMSaleAgreement\\Providers\\RouteServiceProvider",
+        "Modules\\FSMSaleAgreement\\Providers\\EventServiceProvider",
+        "Modules\\FSMSaleAgreement\\Providers\\ConfigServiceProvider",
+        "Modules\\FSMSaleAgreement\\Providers\\ViewServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": ["FSMCore", "FSMSales", "FSMServiceAgreement"],
+    "version": "1.0.0",
+    "priority": 0
+}

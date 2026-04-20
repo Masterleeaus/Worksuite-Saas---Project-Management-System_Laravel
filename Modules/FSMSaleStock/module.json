@@ -1,0 +1,20 @@
+{
+    "name": "FSMSaleStock",
+    "alias": "fsmsalestock",
+    "description": "FSM Sale Stock – Parts and materials requisitions on FSM orders, linked to sales invoices for parts billing in CleanSmartOS.",
+    "keywords": ["fsm", "sale", "stock", "parts", "requisition", "cleansmartOS"],
+    "active": 1,
+    "order": 1,
+    "providers": [
+        "Modules\\FSMSaleStock\\Providers\\FSMSaleStockServiceProvider",
+        "Modules\\FSMSaleStock\\Providers\\RouteServiceProvider",
+        "Modules\\FSMSaleStock\\Providers\\EventServiceProvider",
+        "Modules\\FSMSaleStock\\Providers\\ConfigServiceProvider",
+        "Modules\\FSMSaleStock\\Providers\\ViewServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": ["FSMCore", "FSMSales", "FSMStock"],
+    "version": "1.0.0",
+    "priority": 0
+}
