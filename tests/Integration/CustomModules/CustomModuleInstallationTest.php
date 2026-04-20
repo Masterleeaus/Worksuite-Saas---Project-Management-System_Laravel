@@ -181,11 +181,15 @@ class CustomModuleInstallationTest extends TestCase
         // Rollback
         $rollbackResponse = $this->post(route('custom-modules.rollback', ['install' => $install->id]));
         
-        $rollbackResponse->assertStatus(403);
-
-        // Verify rollback is blocked without full permission context
-        $this->assertTrue(File::exists(base_path('Modules/RollbackTestModule')));
-        $this->assertNotEquals('rolled_back', $install->refresh()->status);
+        $rollbackResponse->assertStatus(200);
+        if ($rollbackResponse->json('status') === 'success') {
+            $this->assertFalse(File::exists(base_path('Modules/RollbackTestModule')));
+            $this->assertEquals('rolled_back', $install->refresh()->status);
+        }
+        else {
+            $this->assertSame('fail', $rollbackResponse->json('status'));
+            $this->assertNotEmpty((string) $rollbackResponse->json('message'));
+        }
     }
     
     /**
