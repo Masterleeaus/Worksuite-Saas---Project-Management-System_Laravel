@@ -38,7 +38,7 @@ Route::middleware(['web'])->group(function () {
             return redirect()->route('filament.titan.pages.command-centre');
         }
 
-        return redirect('/login');
+        return redirect()->route('login');
     })->name('titan.home');
 
 });
