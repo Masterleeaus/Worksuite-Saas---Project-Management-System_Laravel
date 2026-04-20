@@ -86,7 +86,7 @@ class CompanyDataTable extends BaseDataTable
 
         $datatables->editColumn('email', fn($row) => $row->company_email ?: '--');
         $datatables->editColumn('mobile', fn($row) => $row->company_phone ?: '--');
-        $datatables->editColumn('companyowner', fn($row) => $row?->user?->name ?: '--');
+        $datatables->editColumn('companyowner', fn($row) => Company::firstActiveAdmin($row)?->name ?: '--');
         $datatables->editColumn('timezone', fn($row) => $row->timezone ?: '--');
         $datatables->editColumn('nextpaymentdate', fn($row) => $row->globalInvoices->count() === 1
             ? $row->globalInvoices->first()?->next_pay_date?->format('Y-m-d') ?? '--'

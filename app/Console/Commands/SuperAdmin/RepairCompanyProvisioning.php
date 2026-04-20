@@ -7,6 +7,7 @@ use App\Models\Currency;
 use App\Models\EmployeeDetails;
 use App\Models\Role;
 use App\Models\SuperAdmin\GlobalCurrency;
+use App\Models\UniversalSearch;
 use App\Models\User;
 use App\Scopes\ActiveScope;
 use App\Scopes\CompanyScope;
@@ -280,6 +281,17 @@ class RepairCompanyProvisioning extends Command
         $employeeDetails->company_id = $companyId;
         $employeeDetails->employee_id = $employeeDetails->employee_id ?: ('EMP-' . $user->id);
         $employeeDetails->save();
+
+        UniversalSearch::withoutGlobalScope(CompanyScope::class)->updateOrCreate(
+            [
+                'searchable_id' => $user->id,
+                'company_id' => $companyId,
+                'route_name' => 'employees.show',
+            ],
+            [
+                'title' => $user->name,
+            ]
+        );
     }
 
 }

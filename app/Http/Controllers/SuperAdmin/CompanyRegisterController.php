@@ -163,6 +163,7 @@ class CompanyRegisterController extends FrontBaseController
 
         $adminRole = $this->ensureCompanyRole($company, 'admin', 'App Administrator', 'Admin is allowed to manage everything of the app.');
         $employeeRole = $this->ensureCompanyRole($company, 'employee', 'Employee', 'Employee can see tasks and projects assigned to him.');
+        $this->ensureCompanyRole($company, 'client', 'Client', 'Client can see own tasks and projects.');
 
         $hasCompanyAdminRole = $user->roles()
             ->withoutGlobalScope(CompanyScope::class)
@@ -249,10 +250,31 @@ class CompanyRegisterController extends FrontBaseController
             }
         }
 
+        if (!$currency) {
+            $currency = $this->createFallbackUsdCurrency($company);
+        }
+
         if ($currency) {
             $company->currency_id = $currency->id;
             $company->saveQuietly();
         }
+    }
+
+    private function createFallbackUsdCurrency(Company $company): Currency
+    {
+        $currency = new Currency();
+        $currency->currency_name = 'Dollars';
+        $currency->currency_symbol = '$';
+        $currency->currency_code = 'USD';
+        $currency->exchange_rate = 1;
+        $currency->currency_position = 'left';
+        $currency->no_of_decimal = 2;
+        $currency->thousand_separator = ',';
+        $currency->decimal_separator = '.';
+        $currency->company_id = $company->id;
+        $currency->saveQuietly();
+
+        return $currency;
     }
 
     private function ensureCompanyRole(Company $company, string $name, string $displayName, string $description): Role

@@ -58,7 +58,7 @@ class StoreRequest extends FormRequest
                 }),
             ] : '',
             'status' => 'required',
-            'currency_id' => 'required|exists:global_currencies,id',
+            'currency_id' => 'nullable|exists:global_currencies,id',
             'email' => 'required|email:rfc,strict|check_superadmin',
             'name' => 'required|min:2',
 
