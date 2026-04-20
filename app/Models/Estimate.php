@@ -135,6 +135,11 @@ class Estimate extends BaseModel
         return $this->hasOne(AcceptEstimate::class, 'estimate_id');
     }
 
+    public function fsmOrders(): HasMany
+    {
+        return $this->hasMany(\Modules\FSMCore\Models\FSMOrder::class, 'estimate_id');
+    }
+
     public function getTotalAmountAttribute()
     {
         return (!is_null($this->total) && isset($this->currency) && !is_null($this->currency->currency_symbol)) ? $this->currency->currency_symbol . $this->total : '';
