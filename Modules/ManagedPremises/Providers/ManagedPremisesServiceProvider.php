@@ -15,11 +15,33 @@ class ManagedPremisesServiceProvider extends ServiceProvider
     {
         // Never early-return in register() (global killer prevention)
         $this->mergeConfigFrom(module_path($this->moduleName, 'Config/config.php'), $this->moduleNameLower);
+        $this->mergeManifestConfig();
 
 // Bind integration adapters (safe defaults)
 $this->app->bind(\Modules\ManagedPremises\Integrations\Core\TaskAdapterInterface::class, \Modules\ManagedPremises\Integrations\Core\NullTaskAdapter::class);
 $this->app->bind(\Modules\ManagedPremises\Integrations\Core\HrAdapterInterface::class, \Modules\ManagedPremises\Integrations\Core\NullHrAdapter::class);
 
+    }
+
+    protected function mergeManifestConfig(): void
+    {
+        $manifestFiles = [
+            'permissions',
+            'settings',
+            'menus',
+            'seeders',
+            'lifecycle',
+            'api',
+            'signals',
+            'ai',
+        ];
+
+        foreach ($manifestFiles as $manifest) {
+            $path = module_path($this->moduleName, "manifests/{$manifest}.php");
+            if (file_exists($path)) {
+                $this->mergeConfigFrom($path, "{$this->moduleNameLower}.manifests.{$manifest}");
+            }
+        }
     }
 
     public function boot(): void

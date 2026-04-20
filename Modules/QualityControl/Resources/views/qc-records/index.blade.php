@@ -5,7 +5,7 @@
         <div class="row mb-3">
             <div class="col-12 d-flex justify-content-between align-items-center">
                 <h4 class="mb-0"><i class="fa fa-clipboard-check mr-1"></i>@lang('quality_control::sidebar.qc_records')</h4>
-                <a href="{{ route('qc-records.create') }}" class="btn btn-primary">
+                <a href="{{ route('qc-records.create', array_filter(['property_id' => request('property_id')])) }}" class="btn btn-primary">
                     <i class="fa fa-plus mr-1"></i>@lang('quality_control::app.new_qc_record')
                 </a>
             </div>
@@ -75,7 +75,7 @@
                                     <td colspan="9" class="text-center text-muted py-4">
                                         @lang('app.noRecordFound')
                                         <br>
-                                        <a href="{{ route('qc-records.create') }}" class="btn btn-sm btn-primary mt-2">
+                                        <a href="{{ route('qc-records.create', array_filter(['property_id' => request('property_id')])) }}" class="btn btn-sm btn-primary mt-2">
                                             @lang('quality_control::app.new_qc_record')
                                         </a>
                                     </td>

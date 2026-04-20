@@ -8,6 +8,7 @@ use Modules\ManagedPremises\Entities\Property;
 use Modules\ManagedPremises\Entities\PropertyInspection;
 use Modules\ManagedPremises\Http\Requests\StorePropertyInspectionRequest;
 use Modules\ManagedPremises\Http\Requests\UpdatePropertyInspectionRequest;
+use Modules\QualityControl\Services\ExecutionRecordService;
 
 class PropertyInspectionsController extends Controller
 {
@@ -17,26 +18,27 @@ public function index(Property $property)
     {
         $this->ensureCanViewManagedPremises();
         $this->authorize('view', $property);
-        $inspections = PropertyInspection::company()->where('property_id', $property->id)->latest()->paginate(20);
-        return view('managedpremises::inspections.index', compact('property','inspections'));
+        return redirect()
+            ->route('qc-records.index', ['property_id' => $property->id])
+            ->with('warning', __('Managed Premises inspections are deprecated. You were redirected to Quality Control.'));
     }
 
     public function create(Property $property)
     {
         $this->ensureCanViewManagedPremises();
         $this->authorize('update', $property);
-        return view('managedpremises::inspections.create', compact('property'));
+        return redirect()
+            ->route('qc-records.create', ['property_id' => $property->id])
+            ->with('warning', __('Managed Premises inspections are now created in Quality Control.'));
     }
 
     public function store(StorePropertyInspectionRequest $request, Property $property)
     {
         $this->ensureCanViewManagedPremises();
         $this->authorize('update', $property);
-        $data = $request->validated();
-        $data['company_id'] = company()->id;
-        $data['property_id'] = $property->id;
-        PropertyInspection::create($data);
-        return redirect()->route('managedpremises.properties.show', $property)->with('success', __('managedpremises::app.saved'));
+        return redirect()
+            ->route('qc-records.create', ['property_id' => $property->id])
+            ->with('warning', __('Managed Premises inspections are now created in Quality Control.'));
     }
 
     public function edit(Property $property, PropertyInspection $inspection)
@@ -44,7 +46,18 @@ public function index(Property $property)
         $this->ensureCanViewManagedPremises();
         $this->authorize('update', $property);
         abort_unless($inspection->property_id === $property->id, 404);
-        return view('managedpremises::inspections.edit', compact('property','inspection'));
+
+        $record = $this->resolveLegacyQcRecord($inspection->id);
+
+        if ($record) {
+            return redirect()
+                ->route('qc-records.edit', $record->id)
+                ->with('warning', __('This inspection is managed by Quality Control.'));
+        }
+
+        return redirect()
+            ->route('qc-records.index', ['property_id' => $property->id])
+            ->with('warning', __('This inspection is managed by Quality Control.'));
     }
 
     public function update(UpdatePropertyInspectionRequest $request, Property $property, PropertyInspection $inspection)
@@ -52,8 +65,18 @@ public function index(Property $property)
         $this->ensureCanViewManagedPremises();
         $this->authorize('update', $property);
         abort_unless($inspection->property_id === $property->id, 404);
-        $inspection->update($request->validated());
-        return redirect()->route('managedpremises.properties.show', $property)->with('success', __('managedpremises::app.updated'));
+
+        $record = $this->resolveLegacyQcRecord($inspection->id);
+
+        if ($record) {
+            return redirect()
+                ->route('qc-records.edit', $record->id)
+                ->with('warning', __('This inspection is managed by Quality Control.'));
+        }
+
+        return redirect()
+            ->route('qc-records.index', ['property_id' => $property->id])
+            ->with('warning', __('This inspection is managed by Quality Control.'));
     }
 
     public function destroy(Property $property, PropertyInspection $inspection)
@@ -61,7 +84,32 @@ public function index(Property $property)
         $this->ensureCanViewManagedPremises();
         $this->authorize('update', $property);
         abort_unless($inspection->property_id === $property->id, 404);
-        $inspection->delete();
-        return back()->with('success', __('managedpremises::app.deleted'));
+
+        $record = $this->resolveLegacyQcRecord($inspection->id);
+
+        if ($record) {
+            return redirect()
+                ->route('qc-records.show', $record->id)
+                ->with('warning', __('Delete this inspection from Quality Control.'));
+        }
+
+        return redirect()
+            ->route('qc-records.index', ['property_id' => $property->id])
+            ->with('warning', __('Delete this inspection from Quality Control.'));
+    }
+
+    private function resolveLegacyQcRecord(int $legacyInspectionId): ?object
+    {
+        if (!class_exists(ExecutionRecordService::class)) {
+            return null;
+        }
+
+        try {
+            $companyId = function_exists('company_id') ? company_id() : null;
+
+            return app(ExecutionRecordService::class)->findByLegacyInspectionIdOrId($legacyInspectionId, $companyId);
+        } catch (\Throwable) {
+            return null;
+        }
     }
 }
