@@ -15,11 +15,13 @@ class DispatchMapController extends Controller
      */
     public function index(Request $request)
     {
+        $companyId = $this->companyId();
         $date = $request->date
             ? Carbon::parse($request->date)
             : Carbon::today();
 
         $dayRoutes = FSMDayRoute::with(['person', 'orders.location'])
+            ->where('company_id', $companyId)
             ->whereDate('date', $date)
             ->orderBy('id')
             ->get();
@@ -33,13 +35,15 @@ class DispatchMapController extends Controller
      */
     public function locations(Request $request)
     {
+        $companyId = $this->companyId();
         $date = $request->date ? Carbon::parse($request->date) : Carbon::today();
 
         // Collect person IDs that have day routes today
-        $workerIds = FSMDayRoute::whereDate('date', $date)->pluck('person_id')->filter()->unique();
+        $workerIds = FSMDayRoute::where('company_id', $companyId)->whereDate('date', $date)->pluck('person_id')->filter()->unique();
 
         // Latest ping per worker
         $pings = FSMWorkerLocationPing::with('person:id,name')
+            ->where('company_id', $companyId)
             ->whereIn('person_id', $workerIds)
             ->latestPerWorker()
             ->get();
@@ -55,6 +59,7 @@ class DispatchMapController extends Controller
         // Job locations for today's routes
         $jobs = [];
         foreach ($dayRoutes = FSMDayRoute::with(['orders.location', 'person'])
+            ->where('company_id', $companyId)
             ->whereDate('date', $date)
             ->get() as $dr) {
             foreach ($dr->orders as $order) {
@@ -76,5 +81,13 @@ class DispatchMapController extends Controller
         }
 
         return response()->json(compact('workers', 'jobs'));
+    }
+
+    private function companyId(): int
+    {
+        $user = auth()->user();
+        abort_if(!$user || !$user->company_id, 403);
+
+        return (int)$user->company_id;
     }
 }

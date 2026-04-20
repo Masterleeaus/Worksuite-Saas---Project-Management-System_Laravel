@@ -17,7 +17,6 @@ use Modules\ReviewModule\Entities\Review;
 use Modules\UserManagement\Entities\Serviceman;
 use Modules\UserManagement\Entities\User;
 use App\Traits\HasUuid;
-use Modules\ZoneManagement\Entities\Zone;
 use Modules\ProviderManagement\Traits\CompanyScoped;
 
 class Provider extends Model
@@ -67,7 +66,11 @@ class Provider extends Model
 
     public function zone(): BelongsTo
     {
-        return $this->belongsTo(Zone::class, 'zone_id');
+        $zoneClass = class_exists(\Modules\ZoneManagement\Entities\Zone::class)
+            ? \Modules\ZoneManagement\Entities\Zone::class
+            : self::class;
+
+        return $this->belongsTo($zoneClass, 'zone_id');
     }
 
     public function bank_detail(): HasOne

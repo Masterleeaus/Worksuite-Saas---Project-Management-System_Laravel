@@ -1,8 +1,8 @@
 {
     "name": "ZoneManagement",
     "alias": "zonemanagement",
-    "description": "Manage geographic service zones, coverage maps and zone-based pricing",
-    "keywords": ["zones", "geography", "service-area", "pricing", "cleaning"],
+    "description": "Compatibility shell for legacy zone APIs. Canonical ownership is delegated to FSMTerritory, ProviderManagement, BookingModule, FSMRoute and TitanGo.",
+    "keywords": ["zones", "compatibility", "legacy", "orchestration", "deprecated"],
     "priority": 0,
     "providers": [
         "Modules\\ZoneManagement\\Providers\\ZoneManagementServiceProvider",
@@ -12,7 +12,7 @@
     "files": [
         "start.php"
     ],
-    "requires": [],
+    "requires": ["FSMTerritory", "ProviderManagement", "BookingModule", "FSMRoute", "TitanGo"],
     "active": 1,
     "order": 0,
     "permissions": [
@@ -47,5 +47,7 @@
             "sort_order": 70
         }
     ],
-    "sidebar_menu": true
+    "sidebar_menu": true,
+    "deprecated": true,
+    "compatibility_shell": true
 }

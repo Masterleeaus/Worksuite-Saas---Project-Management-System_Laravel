@@ -6,6 +6,9 @@ use Modules\ZoneManagement\Http\Controllers\Web\Admin\DispatchMapController;
 use Modules\ZoneManagement\Http\Controllers\Web\Admin\GpsSettingsController;
 use Modules\ZoneManagement\Http\Controllers\Web\Admin\RouteReplayController;
 
+// NOTE: ZoneManagement web routes are retained as backward-compatible shell
+// routes while canonical ownership is delegated to FSM*/Provider/Booking/Titan.
+
 Route::middleware(['web','auth'])->prefix('account')->group(function () {
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Web\Admin', 'middleware' => ['admin', 'actch:admin_panel']], function () {
     Route::group(['prefix' => 'zone', 'as' => 'zone.'], function () {

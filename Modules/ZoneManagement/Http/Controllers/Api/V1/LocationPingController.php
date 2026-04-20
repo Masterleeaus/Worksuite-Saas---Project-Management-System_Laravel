@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Modules\ZoneManagement\Entities\CleanerLocation;
 use Modules\ZoneManagement\Entities\GpsSetting;
+use Modules\ZoneManagement\Services\TitanGoExecutionBridge;
 
 /**
  * Receives periodic GPS pings from the PWA field app while a cleaner
@@ -16,6 +17,8 @@ use Modules\ZoneManagement\Entities\GpsSetting;
  */
 class LocationPingController extends Controller
 {
+    public function __construct(private TitanGoExecutionBridge $titanBridge) {}
+
     /**
      * Store a live location ping.
      *
@@ -51,6 +54,19 @@ class LocationPingController extends Controller
             'heading'     => $request->heading,
             'recorded_at' => $request->recorded_at ?? now(),
         ]);
+
+        try {
+            $this->titanBridge->mirrorLocationPing($user, [
+                'lat' => $request->lat,
+                'lng' => $request->lng,
+                'accuracy' => $request->accuracy,
+                'tracking_mode' => 'foreground',
+                'booking_id' => $request->booking_id,
+                'recorded_at' => $request->recorded_at ?? now(),
+            ]);
+        } catch (\Throwable) {
+            // canonical mirror is best-effort for compatibility phase
+        }
 
         // Return the configured ping interval so the PWA can self-adjust
         $settings     = GpsSetting::forCompany($user->company_id ?? null);
