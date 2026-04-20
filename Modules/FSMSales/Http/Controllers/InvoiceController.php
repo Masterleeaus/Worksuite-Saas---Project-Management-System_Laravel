@@ -13,7 +13,10 @@ class InvoiceController extends Controller
 {
     public function index(Request $request)
     {
-        $q = FSMSalesInvoice::with(['client'])->latest();
+        $companyId = $this->companyId();
+        $q = FSMSalesInvoice::with(['client'])
+            ->where('company_id', $companyId)
+            ->latest();
 
         if ($request->filled('status')) {
             $q->where('status', $request->get('status'));
@@ -40,7 +43,9 @@ class InvoiceController extends Controller
 
     public function show(int $id)
     {
-        $invoice = FSMSalesInvoice::with(['lines.order', 'orders', 'client'])->findOrFail($id);
+        $invoice = FSMSalesInvoice::with(['lines.order', 'orders', 'client'])
+            ->where('company_id', $this->companyId())
+            ->findOrFail($id);
 
         return view('fsmsales::invoices.show', compact('invoice'));
     }
@@ -49,10 +54,10 @@ class InvoiceController extends Controller
     {
         // Pre-populate from an order if given
         $order = $request->filled('order_id')
-            ? FSMOrder::findOrFail((int) $request->get('order_id'))
+            ? FSMOrder::where('company_id', $this->companyId())->findOrFail((int) $request->get('order_id'))
             : null;
 
-        $clients = \App\Models\User::orderBy('name')->get();
+        $clients = \App\Models\User::where('company_id', $this->companyId())->orderBy('name')->get();
 
         return view('fsmsales::invoices.create', compact('order', 'clients'));
     }
@@ -70,7 +75,7 @@ class InvoiceController extends Controller
         ]);
 
         $invoice = FSMSalesInvoice::create([
-            'company_id'   => auth()->user()->company_id ?? null,
+            'company_id'   => $this->companyId(),
             'number'       => FSMSalesInvoice::nextNumber(),
             'client_id'    => $data['client_id'] ?? null,
             'agreement_id' => $data['agreement_id'] ?? null,
@@ -81,10 +86,16 @@ class InvoiceController extends Controller
         ]);
 
         if (!empty($data['order_ids'])) {
-            $invoice->orders()->attach($data['order_ids']);
+            $orderIds = FSMOrder::where('company_id', $this->companyId())
+                ->whereIn('id', $data['order_ids'])
+                ->pluck('id')
+                ->all();
+            $invoice->orders()->attach($orderIds);
 
             // Mark orders as invoiced
-            FSMOrder::whereIn('id', $data['order_ids'])->update(['is_invoiced' => true]);
+            FSMOrder::where('company_id', $this->companyId())
+                ->whereIn('id', $orderIds)
+                ->update(['is_invoiced' => true]);
         }
 
         return redirect()->route('fsmsales.invoices.show', $invoice->id)
@@ -93,15 +104,17 @@ class InvoiceController extends Controller
 
     public function edit(int $id)
     {
-        $invoice = FSMSalesInvoice::with(['lines', 'orders'])->findOrFail($id);
-        $clients = \App\Models\User::orderBy('name')->get();
+        $invoice = FSMSalesInvoice::with(['lines', 'orders'])
+            ->where('company_id', $this->companyId())
+            ->findOrFail($id);
+        $clients = \App\Models\User::where('company_id', $this->companyId())->orderBy('name')->get();
 
         return view('fsmsales::invoices.edit', compact('invoice', 'clients'));
     }
 
     public function update(Request $request, int $id)
     {
-        $invoice = FSMSalesInvoice::findOrFail($id);
+        $invoice = FSMSalesInvoice::where('company_id', $this->companyId())->findOrFail($id);
 
         $data = $request->validate([
             'client_id'    => 'nullable|integer|exists:users,id',
@@ -120,7 +133,7 @@ class InvoiceController extends Controller
 
     public function destroy(int $id)
     {
-        $invoice = FSMSalesInvoice::findOrFail($id);
+        $invoice = FSMSalesInvoice::where('company_id', $this->companyId())->findOrFail($id);
         $number  = $invoice->number;
         $invoice->delete();
 
@@ -132,7 +145,7 @@ class InvoiceController extends Controller
 
     public function addLine(Request $request, int $id)
     {
-        $invoice = FSMSalesInvoice::findOrFail($id);
+        $invoice = FSMSalesInvoice::where('company_id', $this->companyId())->findOrFail($id);
 
         $data = $request->validate([
             'line_type'   => 'required|string|in:service,timesheet,stock,equipment,other',
@@ -158,7 +171,10 @@ class InvoiceController extends Controller
 
     public function deleteLine(int $invoiceId, int $lineId)
     {
-        $line = FSMSalesInvoiceLine::where('fsm_sales_invoice_id', $invoiceId)->findOrFail($lineId);
+        $invoice = FSMSalesInvoice::where('company_id', $this->companyId())->findOrFail($invoiceId);
+        $line = FSMSalesInvoiceLine::where('fsm_sales_invoice_id', $invoice->id)
+            ->where('id', $lineId)
+            ->firstOrFail();
         $line->delete();
 
         return redirect()->route('fsmsales.invoices.edit', $invoiceId)
@@ -169,10 +185,15 @@ class InvoiceController extends Controller
 
     public function createFromOrder(int $orderId, InvoiceGenerationService $service)
     {
-        $order   = FSMOrder::findOrFail($orderId);
+        $order   = FSMOrder::where('company_id', $this->companyId())->findOrFail($orderId);
         $invoice = $service->createFromOrderCompletion($order);
 
         return redirect()->route('fsmsales.invoices.show', $invoice->id)
             ->with('success', "Draft invoice {$invoice->number} created from order {$order->name}.");
+    }
+
+    private function companyId(): ?int
+    {
+        return auth()->user()?->company_id;
     }
 }

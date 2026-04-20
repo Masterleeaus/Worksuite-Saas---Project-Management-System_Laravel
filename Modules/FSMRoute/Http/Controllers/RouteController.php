@@ -13,8 +13,10 @@ class RouteController extends Controller
 {
     public function index(Request $request)
     {
+        $companyId = $this->companyId();
         $filter = $request->only(['q']);
         $routes = FSMRoute::with(['person', 'days', 'locations'])
+            ->where('company_id', $companyId)
             ->when($filter['q'] ?? null, fn($q, $v) => $q->where('name', 'like', "%$v%"))
             ->orderBy('name')
             ->paginate(20)
@@ -25,9 +27,10 @@ class RouteController extends Controller
 
     public function create()
     {
+        $companyId = $this->companyId();
         $days      = FSMRouteDay::orderBy('day_index')->get();
-        $locations = FSMLocation::where('active', true)->orderBy('name')->get();
-        $users     = User::orderBy('name')->get();
+        $locations = FSMLocation::where('company_id', $companyId)->where('active', true)->orderBy('name')->get();
+        $users     = User::where('company_id', $companyId)->orderBy('name')->get();
 
         return view('fsmroute::routes.create', compact('days', 'locations', 'users'));
     }
@@ -46,6 +49,7 @@ class RouteController extends Controller
         ]);
 
         $route = FSMRoute::create([
+            'company_id' => $this->companyId(),
             'name'      => $data['name'],
             'person_id' => $data['person_id'] ?? null,
             'max_order' => $data['max_order'] ?? 0,
@@ -61,17 +65,18 @@ class RouteController extends Controller
 
     public function edit(int $id)
     {
-        $route     = FSMRoute::with(['days', 'locations'])->findOrFail($id);
+        $companyId = $this->companyId();
+        $route     = FSMRoute::with(['days', 'locations'])->where('company_id', $companyId)->findOrFail($id);
         $days      = FSMRouteDay::orderBy('day_index')->get();
-        $locations = FSMLocation::where('active', true)->orderBy('name')->get();
-        $users     = User::orderBy('name')->get();
+        $locations = FSMLocation::where('company_id', $companyId)->where('active', true)->orderBy('name')->get();
+        $users     = User::where('company_id', $companyId)->orderBy('name')->get();
 
         return view('fsmroute::routes.edit', compact('route', 'days', 'locations', 'users'));
     }
 
     public function update(Request $request, int $id)
     {
-        $route = FSMRoute::findOrFail($id);
+        $route = FSMRoute::where('company_id', $this->companyId())->findOrFail($id);
 
         $data = $request->validate([
             'name'          => 'required|string|max:256',
@@ -100,9 +105,14 @@ class RouteController extends Controller
 
     public function destroy(int $id)
     {
-        FSMRoute::findOrFail($id)->delete();
+        FSMRoute::where('company_id', $this->companyId())->findOrFail($id)->delete();
 
         return redirect()->route('fsmroute.routes.index')
             ->with('success', 'Route deleted.');
+    }
+
+    private function companyId(): ?int
+    {
+        return auth()->user()?->company_id;
     }
 }

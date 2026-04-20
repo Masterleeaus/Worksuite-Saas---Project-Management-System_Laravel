@@ -967,7 +967,10 @@ class CompanyObserver
     {
         $package = Package::where('id', $company->package_id)->first();
         if (!is_null($package)) {
-            $moduleInPackage = collect(json_decode($package->module_in_package));
+            $moduleInPackage = collect(json_decode($package->module_in_package ?? '', true) ?? [])
+                ->filter(fn ($module) => is_string($module) && trim($module) !== '')
+                ->map(fn (string $module) => strtolower(trim($module)))
+                ->values();
 
             $data = [
                 'admin' => [
@@ -985,6 +988,8 @@ class CompanyObserver
             $existingModuleSettings = ModuleSetting::where('company_id', $company->id)->get();
 
             foreach ($data as $type => $moduleList) {
+                $moduleList = collect($moduleList)->merge($moduleInPackage->all())->unique()->values()->all();
+
                 foreach ($moduleList as $module) {
                     $existingModuleSetting = $existingModuleSettings->where('type', $type)->where('module_name', $module)->first();
 
@@ -1008,6 +1013,7 @@ class CompanyObserver
             }
 
             ModuleSetting::insert($moduleSettings);
+            $this->syncModuleRolePermissions($company, $moduleInPackage);
 
             $this->clearCompanyUserCache($company);
         }
@@ -1019,8 +1025,42 @@ class CompanyObserver
 
         $moduleSettings = ModuleSetting::where('company_id', $company->id)->get();
         $package = Package::where('id', $company->package_id)->first();
-        $moduleInPackage = collect(json_decode($package?->module_in_package ?? '', true) ?? []);
+        $moduleInPackage = collect(json_decode($package?->module_in_package ?? '', true) ?? [])
+            ->filter(fn ($module) => is_string($module) && trim($module) !== '')
+            ->map(fn (string $module) => strtolower(trim($module)))
+            ->values();
         self::widgetUpdate($company, $moduleInPackage->toArray());
+
+        $moduleDefaults = [
+            'admin' => [...ModuleSetting::CLIENT_MODULES, ...ModuleSetting::OTHER_MODULES],
+            'employee' => [...ModuleSetting::CLIENT_MODULES, ...ModuleSetting::OTHER_MODULES],
+            'client' => [...ModuleSetting::CLIENT_MODULES],
+        ];
+
+        foreach ($moduleDefaults as $type => $moduleList) {
+            $moduleList = collect($moduleList)->merge($moduleInPackage->all())->unique()->values();
+
+            foreach ($moduleList as $moduleName) {
+                $exists = $moduleSettings
+                    ->where('type', $type)
+                    ->where('module_name', $moduleName)
+                    ->first();
+
+                if ($exists) {
+                    continue;
+                }
+
+                ModuleSetting::create([
+                    'company_id' => $company->id,
+                    'type' => $type,
+                    'module_name' => $moduleName,
+                    'status' => $moduleInPackage->contains($moduleName) ? 'active' : 'deactive',
+                    'is_allowed' => $moduleInPackage->contains($moduleName) ? 1 : 0,
+                ]);
+            }
+        }
+
+        $moduleSettings = ModuleSetting::where('company_id', $company->id)->get();
 
         $activeModuleSettings = [];
         $inactiveModuleSettings = [];
@@ -1036,8 +1076,35 @@ class CompanyObserver
 
         ModuleSetting::whereIn('id', $activeModuleSettings)->update(['is_allowed' => 1, 'status' => 'active']);
         ModuleSetting::whereIn('id', $inactiveModuleSettings)->update(['is_allowed' => 0, 'status' => 'deactive']);
+        $this->syncModuleRolePermissions($company, $moduleInPackage);
 
         $this->clearCompanyUserCache($company);
+    }
+
+    private function syncModuleRolePermissions(Company $company, $moduleInPackage): void
+    {
+        $moduleNames = collect($moduleInPackage)
+            ->filter(fn ($module) => is_string($module) && trim($module) !== '')
+            ->map(fn (string $module) => strtolower(trim($module)))
+            ->unique()
+            ->values();
+
+        if ($moduleNames->isEmpty()) {
+            return;
+        }
+
+        $existingModuleNames = Module::withoutGlobalScopes()
+            ->whereIn('module_name', $moduleNames->all())
+            ->pluck('module_name');
+
+        foreach ($existingModuleNames as $moduleName) {
+            try {
+                PermissionRole::insertModuleRolePermission($moduleName, $company->id);
+            }
+            catch (\Throwable $e) {
+                // ignore permission sync errors to avoid blocking company save flows
+            }
+        }
     }
 
     public function saasSaving(Company $company): void
