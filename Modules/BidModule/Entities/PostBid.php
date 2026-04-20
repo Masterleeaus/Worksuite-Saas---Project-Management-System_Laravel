@@ -8,4 +8,3 @@ class PostBid extends Model
 {
     protected $guarded = ['id'];
 }
-

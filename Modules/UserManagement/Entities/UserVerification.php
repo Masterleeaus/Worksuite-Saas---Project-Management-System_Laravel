@@ -8,4 +8,3 @@ class UserVerification extends Model
 {
     protected $guarded = ['id'];
 }
-

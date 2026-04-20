@@ -8,4 +8,3 @@ class LoyaltyPointTransaction extends Model
 {
     protected $guarded = ['id'];
 }
-

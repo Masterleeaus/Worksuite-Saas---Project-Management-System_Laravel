@@ -8,4 +8,3 @@ class PaymentRequest extends Model
 {
     protected $guarded = ['id'];
 }
-

@@ -9,4 +9,3 @@ trait MaintenanceModeTrait
         return app()->isDownForMaintenance();
     }
 }
-

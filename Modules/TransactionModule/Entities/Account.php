@@ -8,4 +8,3 @@ class Account extends Model
 {
     protected $guarded = ['id'];
 }
-

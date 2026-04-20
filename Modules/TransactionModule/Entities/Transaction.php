@@ -8,4 +8,3 @@ class Transaction extends Model
 {
     protected $guarded = ['id'];
 }
-

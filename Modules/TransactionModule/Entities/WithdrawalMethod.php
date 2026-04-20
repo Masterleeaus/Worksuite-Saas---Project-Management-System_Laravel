@@ -8,4 +8,3 @@ class WithdrawalMethod extends Model
 {
     protected $guarded = ['id'];
 }
-
