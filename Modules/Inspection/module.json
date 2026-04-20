@@ -1,7 +1,7 @@
 {
     "name": "Inspection",
     "alias": "inspections",
-    "description": "Post-job inspection, quality scoring and re-clean authorisation",
+    "description": "Deprecated compatibility bridge for inspection routes/permissions; canonical ownership is in QualityControl",
     "keywords": ["inspection", "quality", "cleaning", "reclean"],
     "priority": 0,
     "providers": [
@@ -10,7 +10,9 @@
     ],
     "files": [],
     "active": 1,
-    "version": "1.0.2",
+    "version": "1.1.0",
+    "deprecated": true,
+    "deprecation_notice": "Inspection remains enabled as a compatibility wrapper. Use QualityControl for canonical inspection logic.",
     "permissions": [
         "add_inspection",
         "view_inspection",

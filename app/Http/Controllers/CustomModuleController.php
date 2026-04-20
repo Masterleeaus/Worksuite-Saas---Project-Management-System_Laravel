@@ -1764,7 +1764,12 @@ private function detectPackageNameColumn(): ?string
 
     public function rollback(ModuleInstallLog $install, Request $request)
     {
-        abort_403(!auth()->check());
+        if (!auth()->check()) {
+            return Reply::dataOnly([
+                'status' => 'fail',
+                'message' => 'Unauthenticated.',
+            ]);
+        }
         abort_403(GlobalSetting::validateSuperAdmin('manage_superadmin_custom_module_settings'));
 
         if (!$install->can_rollback || empty($install->pre_install_snapshot)) {

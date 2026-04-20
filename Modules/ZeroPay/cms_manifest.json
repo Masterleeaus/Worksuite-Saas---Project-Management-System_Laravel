@@ -1,0 +1,7 @@
+{
+  "surfaces": [
+    "zeropay_public_session",
+    "zeropay_download_invoice",
+    "zeropay_download_receipt"
+  ]
+}

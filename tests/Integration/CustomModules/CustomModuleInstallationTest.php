@@ -106,6 +106,7 @@ class CustomModuleInstallationTest extends TestCase
         
         $response->assertStatus(200);
         $response->assertJsonPath('status', 'fail');
+        $response->assertJsonStructure(['status', 'message', 'analysis' => ['blocking_issues']]);
         $this->assertStringContainsString('edit_invoices', (string) $response->json('analysis.blocking_issues.0'));
         
         // Verify module was NOT installed
@@ -154,7 +155,7 @@ class CustomModuleInstallationTest extends TestCase
         
         $response->assertStatus(200);
         $response->assertJsonPath('status', 'fail');
-        $this->assertStringContainsString('shell_exec', (string) $response->json('analysis.blocking_issues.0'));
+        $this->assertStringContainsString('shell_exec', strtolower((string) $response->json('analysis.blocking_issues.0')));
         
         // Verify module was NOT installed
         $this->assertFalse(File::exists(base_path('Modules/MaliciousModule')));

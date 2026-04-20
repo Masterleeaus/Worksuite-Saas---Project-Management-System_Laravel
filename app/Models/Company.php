@@ -345,6 +345,14 @@ class Company extends BaseModel
             return null;
         }
 
+        if (!$company instanceof self) {
+            $company = self::query()->find($company);
+        }
+
+        if (!$company) {
+            return null;
+        }
+
         $admin = $company->admins()->where('users.status', 'active')->orderBy('users.id')->first();
 
         if ($admin) {
