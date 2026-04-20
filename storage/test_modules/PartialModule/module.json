@@ -1,0 +1,1 @@
+{"name":"PartialModule","alias":"PartialModule","version":"1.0.0","providers":["Modules\\PartialModule\\Providers\\PartialModuleServiceProvider"],"permissions":[{"key":"manage_partialmodule","label":"Manage PartialModule"}],"routes":[{"uri":"\/PartialModule","method":"GET"}]}
