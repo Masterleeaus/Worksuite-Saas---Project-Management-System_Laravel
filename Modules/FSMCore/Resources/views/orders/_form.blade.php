@@ -147,7 +147,7 @@
 </div>
 
 {{-- FSMSales: billing fields (shown only when module is active) --}}
-@if(class_exists(\Modules\FSMSales\Models\FSMSalesInvoice::class) && \Illuminate\Support\Facades\Schema::hasTable('fsm_sales_invoices') && \Illuminate\Support\Facades\Schema::hasColumn('fsm_orders', 'billing_policy'))
+@if(class_exists(\App\Models\Invoice::class) && \Illuminate\Support\Facades\Schema::hasTable('invoices') && \Illuminate\Support\Facades\Schema::hasColumn('fsm_orders', 'billing_policy'))
 <hr>
 <h6 class="text-muted fw-semibold mb-3">💰 Billing</h6>
 <div class="row g-3">

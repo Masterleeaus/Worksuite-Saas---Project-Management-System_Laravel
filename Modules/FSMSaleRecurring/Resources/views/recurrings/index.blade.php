@@ -37,9 +37,9 @@
                 </td>
                 <td>
                     @if($recurring->invoice_line_id)
-                        @php $line = \Modules\FSMSales\Models\FSMSalesInvoiceLine::with('invoice')->find($recurring->invoice_line_id); @endphp
+                        @php $line = \App\Models\InvoiceItems::with('invoice')->find($recurring->invoice_line_id); @endphp
                         @if($line && $line->invoice)
-                            {{ $line->invoice->number ?? ('INV #' . $line->invoice->id) }}
+                            {{ $line->invoice->number }}
                         @else
                             #{{ $recurring->invoice_line_id }}
                         @endif

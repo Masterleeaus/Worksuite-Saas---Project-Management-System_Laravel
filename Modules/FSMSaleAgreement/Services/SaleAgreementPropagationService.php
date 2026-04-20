@@ -2,8 +2,7 @@
 
 namespace Modules\FSMSaleAgreement\Services;
 
-use Modules\FSMSales\Models\FSMSalesInvoice;
-use Modules\FSMCore\Models\FSMOrder;
+use App\Models\Invoice;
 
 class SaleAgreementPropagationService
 {
@@ -11,15 +10,15 @@ class SaleAgreementPropagationService
      * When an invoice has an agreement_id set, push that agreement_id
      * to all FSM orders linked to the invoice (via the pivot table).
      */
-    public function propagate(FSMSalesInvoice $invoice): int
+    public function propagate(Invoice $invoice): int
     {
-        if (!$invoice->agreement_id) {
+        if (!isset($invoice->agreement_id) || !$invoice->agreement_id) {
             return 0;
         }
 
         $count = 0;
 
-        foreach ($invoice->orders as $order) {
+        foreach ($invoice->fsmOrders as $order) {
             if ($order->agreement_id !== $invoice->agreement_id) {
                 $order->update(['agreement_id' => $invoice->agreement_id]);
                 $count++;
@@ -37,9 +36,10 @@ class SaleAgreementPropagationService
     {
         $total = 0;
 
-        FSMSalesInvoice::whereNotNull('agreement_id')
-            ->with('orders')
-            ->each(function (FSMSalesInvoice $invoice) use (&$total) {
+        Invoice::query()
+            ->with('fsmOrders')
+            ->whereNotNull('fsm_order_id')
+            ->each(function (Invoice $invoice) use (&$total) {
                 $total += $this->propagate($invoice);
             });
 

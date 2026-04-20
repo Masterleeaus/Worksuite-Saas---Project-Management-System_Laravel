@@ -2,10 +2,10 @@
 
 namespace Modules\FSMSaleAgreement\Http\Controllers;
 
+use App\Models\Invoice;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\FSMSaleAgreement\Services\SaleAgreementPropagationService;
-use Modules\FSMSales\Models\FSMSalesInvoice;
 
 class SaleAgreementController extends Controller
 {
@@ -13,9 +13,9 @@ class SaleAgreementController extends Controller
 
     public function index(Request $request)
     {
-        $invoices = FSMSalesInvoice::whereNotNull('agreement_id')
-            ->with(['orders', 'lines'])
-            ->orderByDesc('invoice_date')
+        $invoices = Invoice::whereNotNull('fsm_order_id')
+            ->with(['fsmOrders', 'items'])
+            ->orderByDesc('issue_date')
             ->paginate(20)
             ->withQueryString();
 
@@ -24,7 +24,7 @@ class SaleAgreementController extends Controller
 
     public function propagate(int $id)
     {
-        $invoice = FSMSalesInvoice::findOrFail($id);
+        $invoice = Invoice::findOrFail($id);
         $count = $this->service->propagate($invoice);
         return back()->with('success', "Propagated agreement to {$count} order(s).");
     }

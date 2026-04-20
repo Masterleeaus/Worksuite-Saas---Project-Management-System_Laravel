@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('company_id')->nullable();
             $table->unsignedBigInteger('fsm_order_id')->nullable();
-            $table->unsignedBigInteger('invoice_id')->nullable();
+            $table->unsignedInteger('invoice_id')->nullable();
             $table->unsignedBigInteger('requested_by')->nullable();
             $table->string('status', 32)->default('draft');
             $table->text('notes')->nullable();
@@ -20,7 +20,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('fsm_order_id')->references('id')->on('fsm_orders')->onDelete('set null');
-            $table->foreign('invoice_id')->references('id')->on('fsm_sales_invoices')->onDelete('set null');
+            $table->foreign('invoice_id')->references('id')->on('invoices')->onDelete('set null');
             $table->foreign('requested_by')->references('id')->on('users')->onDelete('set null');
         });
     }

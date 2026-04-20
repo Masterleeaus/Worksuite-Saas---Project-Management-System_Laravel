@@ -16,7 +16,7 @@ return new class extends Migration
 
                 $table->foreign('invoice_line_id')
                     ->references('id')
-                    ->on('fsm_sales_invoice_lines')
+                    ->on('invoice_items')
                     ->onDelete('set null');
             }
         });

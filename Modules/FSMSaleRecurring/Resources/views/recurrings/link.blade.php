@@ -44,7 +44,7 @@
                     <option value="">— Select an invoice —</option>
                     @foreach($invoices as $invoice)
                         <option value="{{ $invoice->id }}">
-                            {{ $invoice->number ?? ('INV #' . $invoice->id) }}
+                            {{ $invoice->number }}
                             ({{ $invoice->invoice_date?->format('Y-m-d') ?? '—' }})
                         </option>
                     @endforeach
@@ -56,13 +56,13 @@
                 <select id="invoice_line_id" name="invoice_line_id" class="form-select @error('invoice_line_id') is-invalid @enderror" required>
                     <option value="">— Select a line —</option>
                     @foreach($invoices as $invoice)
-                        @foreach($invoice->lines as $line)
+                        @foreach($invoice->items as $line)
                             <option value="{{ $line->id }}"
                                 data-invoice="{{ $invoice->id }}"
                                 style="display:none">
-                                [{{ $invoice->number ?? ('INV #' . $invoice->id) }}]
-                                {{ $line->description ?? $line->product_name ?? ('Line #' . $line->id) }}
-                                — {{ number_format($line->line_subtotal ?? 0, 2) }}
+                                [{{ $invoice->number }}]
+                                {{ $line->item_summary ?? $line->item_name ?? ('Line #' . $line->id) }}
+                                — {{ number_format($line->amount ?? 0, 2) }}
                             </option>
                         @endforeach
                     @endforeach
