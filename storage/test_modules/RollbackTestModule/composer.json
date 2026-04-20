@@ -1,8 +1,0 @@
-{
-    "name": "modules/rollbacktestmodule",
-    "autoload": {
-        "psr-4": {
-            "Modules\\RollbackTestModule\\": ""
-        }
-    }
-}
