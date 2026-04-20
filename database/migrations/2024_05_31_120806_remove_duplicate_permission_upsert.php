@@ -13,12 +13,14 @@ return new class extends Migration {
     public function up(): void
     {
         DB::statement('
-            DELETE p1 FROM user_permissions p1
-            INNER JOIN user_permissions p2
-            WHERE
-                p1.id > p2.id AND
-                p1.permission_id = p2.permission_id AND
-                p1.user_id = p2.user_id;
+            DELETE FROM user_permissions
+            WHERE id IN (
+                SELECT p1.id FROM user_permissions p1
+                INNER JOIN user_permissions p2
+                    ON p1.id > p2.id
+                    AND p1.permission_id = p2.permission_id
+                    AND p1.user_id = p2.user_id
+            );
         ');
 
         // Step 2: Add unique constraint

@@ -7,6 +7,7 @@ use App\Models\FileStorage;
 use App\Models\StorageSetting;
 use Exception;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Froiden\RestAPI\Exceptions\ApiException;
 use Intervention\Image\ImageManagerStatic as Image;
@@ -446,9 +447,20 @@ class Files
      */
     public static function fixLocalUploadFiles($model, array $columns)
     {
+        $modelInstance = new $model();
+        $tableName = $modelInstance->getTable();
+
+        if (!Schema::hasTable($tableName)) {
+            return;
+        }
+
         foreach ($columns as $column) {
             $name = $column['name'];
             $path = $column['path'];
+
+            if (!Schema::hasColumn($tableName, $name)) {
+                continue;
+            }
 
             $filesData = $model::withoutGlobalScopes()->whereNotNull($name)->get();
 

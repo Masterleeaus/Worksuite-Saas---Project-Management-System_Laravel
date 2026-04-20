@@ -98,7 +98,7 @@ class TitanPanelProvider extends PanelProvider
             return null;
         }
 
-        if (isset($authUser->company_id)) {
+        if (isset($authUser->company_id) || isset($authUser->is_superadmin)) {
             return $authUser;
         }
 
