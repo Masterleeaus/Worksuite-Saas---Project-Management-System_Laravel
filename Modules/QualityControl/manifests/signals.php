@@ -47,5 +47,10 @@ return [
     'consumes' => [
         'job.completed',
         'cleaning.job.completed',
+        // Planning-phase signals emitted by Inspection module
+        'inspection.schedule_created',
+        'inspection.schedule_assigned',
+        'inspection.schedule_recurring_triggered',
+        'inspection.template_applied',
     ],
 ];

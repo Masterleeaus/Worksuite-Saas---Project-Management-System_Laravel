@@ -2,28 +2,14 @@
 
 namespace Modules\Inspection\Entities;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-
-class InspectionTemplate extends Model
+/**
+ * @deprecated Compatibility bridge. Canonical template ownership lives in QualityControl.
+ *
+ * Templates are registered and managed via the QualityControl template registry.
+ * This alias ensures legacy type-checks (`instanceof InspectionTemplate`) continue
+ * to pass while the underlying entity is provided by the QC scheduling engine.
+ */
+class InspectionTemplate extends \Modules\QualityControl\Entities\InspectionTemplate
 {
-    use HasFactory;
-
-    protected $table = 'inspection_templates';
-
-    protected $fillable = [
-        'name',
-        'trade',
-        'description',
-        'is_active',
-    ];
-
-    protected $casts = [
-        'is_active' => 'boolean',
-    ];
-
-    public function items()
-    {
-        return $this->hasMany(InspectionTemplateItem::class, 'template_id')->orderBy('sort_order');
-    }
+    //
 }
