@@ -3,6 +3,7 @@
 namespace Modules\BookingModule\Providers;
 
 use Modules\BookingModule\Console\ActivateModuleCommand;
+use Modules\BookingModule\Console\DispatchBookingRemindersCommand;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
 use Modules\BookingModule\Services\BookingFSMService;
@@ -30,6 +31,7 @@ class BookingModuleServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 ActivateModuleCommand::class,
+                DispatchBookingRemindersCommand::class,
             ]);
         }
 
@@ -38,6 +40,7 @@ class BookingModuleServiceProvider extends ServiceProvider
         $this->registerViews();
         if (class_exists(\Modules\BookingModule\Entities\Appointment::class) && class_exists(\Modules\BookingModule\Observers\AppointmentObserver::class)) { \Modules\BookingModule\Entities\Appointment::observe(\Modules\BookingModule\Observers\AppointmentObserver::class); }
         if (class_exists(\Modules\BookingModule\Entities\Schedule::class) && class_exists(\Modules\BookingModule\Observers\ScheduleObserver::class)) { \Modules\BookingModule\Entities\Schedule::observe(\Modules\BookingModule\Observers\ScheduleObserver::class); }
+        if (class_exists(\Modules\BookingModule\Entities\Schedule::class) && class_exists(\Modules\BookingModule\Observers\ScheduleBookingObserver::class)) { \Modules\BookingModule\Entities\Schedule::observe(\Modules\BookingModule\Observers\ScheduleBookingObserver::class); }
         if (isset($this->app['router']) && class_exists(\Modules\BookingModule\Http\Middleware\PublicBookingHoneypot::class)) { $this->app['router']->aliasMiddleware('appointment.public.honeypot', \Modules\BookingModule\Http\Middleware\PublicBookingHoneypot::class); }
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
     }
@@ -65,7 +68,7 @@ class BookingModuleServiceProvider extends ServiceProvider
      */
     protected function registerConfig()
     {
-        foreach (['config','auto_assign','dispatch','legacy_import','notifications','permissions'] as $cfg) {
+        foreach (['config','auto_assign','automation','dispatch','legacy_import','notifications','permissions'] as $cfg) {
             $cfgPath = module_path($this->moduleName, 'Config/' . $cfg . '.php');
             if (file_exists($cfgPath)) {
                 $this->publishes([$cfgPath => config_path($this->moduleNameLower . '_' . $cfg . '.php')], 'config');

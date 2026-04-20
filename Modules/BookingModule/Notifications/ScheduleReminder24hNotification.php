@@ -19,8 +19,32 @@ class ScheduleReminder24hNotification extends Notification implements ShouldQueu
 
     public function toMail($notifiable): MailMessage
     {
-        return (new MailMessage)
-            ->subject($this->data['subject'] ?? 'Appointment update')
-            ->line($this->data['message'] ?? 'There is an update to your appointment booking.');
+        $subject = $this->data['subject']
+            ?? __('bookingmodule::notifications.reminder_24h_subject', [], 'en')
+            ?: 'Appointment Reminder — Tomorrow';
+
+        $lines = [];
+
+        if (!empty($this->data['date'])) {
+            $lines[] = __('Date') . ': ' . $this->data['date'];
+        }
+
+        if (!empty($this->data['start_time'])) {
+            $lines[] = __('Time') . ': ' . $this->data['start_time'];
+        }
+
+        if (!empty($this->data['location'])) {
+            $lines[] = __('Location') . ': ' . $this->data['location'];
+        }
+
+        $intro = $this->data['message'] ?? 'You have an appointment scheduled for tomorrow. Please see the details below.';
+
+        $mail = (new MailMessage)->subject($subject)->line($intro);
+
+        foreach ($lines as $line) {
+            $mail->line($line);
+        }
+
+        return $mail;
     }
 }

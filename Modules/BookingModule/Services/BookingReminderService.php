@@ -12,18 +12,69 @@ use Modules\BookingModule\Entities\Schedule;
  * schedule based on configurable lead times.  This is the single source of
  * truth for reminder eligibility; the actual dispatching is done by
  * SendBookingReminderJob so that the check and the send are always decoupled.
+ *
+ * Lead times are resolved in priority order:
+ *   1. Per-company DB setting (appointment_settings key: automation.reminders.lead_time_minutes)
+ *   2. Config file value (bookingmodule.automation.reminders.lead_time_minutes)
+ *   3. Hard-coded default: [1440, 120]
  */
 class BookingReminderService
 {
+    public function __construct(
+        protected AppointmentSettingsService $settingsService,
+    ) {}
+
     /**
      * Lead times (in minutes) before schedule start_time at which reminders fire.
-     * Pulled from config — defaults to 24 h and 2 h.
+     * Reads per-company DB override first, then config, then hard-coded default.
      *
      * @return int[]
      */
     public function reminderLeadTimes(): array
     {
+        // Check DB setting first (company-level override)
+        $dbValue = $this->settingsService->get('automation.reminders.lead_time_minutes');
+
+        if ($dbValue !== null) {
+            $times = is_array($dbValue)
+                ? $dbValue
+                : array_map('intval', explode(',', (string) $dbValue));
+
+            $times = array_filter(array_map('intval', $times), fn ($v) => $v > 0);
+            if (!empty($times)) {
+                return array_values($times);
+            }
+        }
+
         return (array) config('bookingmodule.automation.reminders.lead_time_minutes', [1440, 120]);
+    }
+
+    /**
+     * Whether reminders should trigger after assignment (from DB or config).
+     */
+    public function remindersOnAssign(): bool
+    {
+        $dbValue = $this->settingsService->get('automation.reminders.after_assignment');
+
+        if ($dbValue !== null) {
+            return (bool) $dbValue;
+        }
+
+        return (bool) config('bookingmodule.automation.reminders.triggers.after_assignment', true);
+    }
+
+    /**
+     * Whether reminders should trigger after reschedule (from DB or config).
+     */
+    public function remindersOnReschedule(): bool
+    {
+        $dbValue = $this->settingsService->get('automation.reminders.after_reschedule');
+
+        if ($dbValue !== null) {
+            return (bool) $dbValue;
+        }
+
+        return (bool) config('bookingmodule.automation.reminders.triggers.after_reschedule', true);
     }
 
     /**
