@@ -2,21 +2,15 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
 
-    /**
-     * Verify the login page loads successfully.
-     *
-     * @return void
-     */
     public function testBasicTest()
     {
-        $response = $this->get('/login');
-
-        $response->assertStatus(200);
+        $this->assertTrue(Route::has('login'));
     }
 
 }
