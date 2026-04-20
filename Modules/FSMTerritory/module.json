@@ -1,0 +1,20 @@
+{
+    "name": "FSMTerritory",
+    "alias": "fsmterritory",
+    "description": "FSM Territory – Geographic hierarchy (Region, District, Branch, Territory) for field service dispatch and worker assignment in CleanSmartOS.",
+    "keywords": ["fsm", "territory", "region", "district", "branch", "cleansmartOS"],
+    "active": 1,
+    "order": 1,
+    "providers": [
+        "Modules\\FSMTerritory\\Providers\\FSMTerritoryServiceProvider",
+        "Modules\\FSMTerritory\\Providers\\RouteServiceProvider",
+        "Modules\\FSMTerritory\\Providers\\EventServiceProvider",
+        "Modules\\FSMTerritory\\Providers\\ConfigServiceProvider",
+        "Modules\\FSMTerritory\\Providers\\ViewServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": ["FSMCore"],
+    "version": "1.0.0",
+    "priority": 0
+}
