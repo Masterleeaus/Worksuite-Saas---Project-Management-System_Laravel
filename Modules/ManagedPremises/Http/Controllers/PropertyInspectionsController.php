@@ -1,6 +1,12 @@
 <?php
 namespace Modules\ManagedPremises\Http\Controllers;
 
+/**
+ * @deprecated Inspection CRUD ownership has moved to QualityControl.
+ *             This controller is a compatibility bridge only. All mutating actions
+ *             redirect to QualityControl routes. Do not add new write logic here.
+ *             Canonical controller: Modules\QualityControl\Http\Controllers\QcRecordController
+ */
 
 use Modules\ManagedPremises\Http\Controllers\Concerns\EnsuresManagedPremisesPermissions;
 use Illuminate\Routing\Controller;

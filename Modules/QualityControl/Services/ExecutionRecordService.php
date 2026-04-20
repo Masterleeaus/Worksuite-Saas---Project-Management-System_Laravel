@@ -43,6 +43,10 @@ class ExecutionRecordService
                 if ($this->hasColumn('qc_records', 'legacy_inspection_id')) {
                     $q->orWhere('legacy_inspection_id', $id);
                 }
+
+                if ($this->hasColumn('qc_records', 'legacy_pm_property_inspection_id')) {
+                    $q->orWhere('legacy_pm_property_inspection_id', $id);
+                }
             })
             ->first();
     }

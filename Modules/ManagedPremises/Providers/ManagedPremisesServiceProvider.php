@@ -59,6 +59,7 @@ $this->app->bind(\Modules\ManagedPremises\Integrations\Core\HrAdapterInterface::
             $this->commands([
                 \Modules\ManagedPremises\Console\Commands\PmDoctorCommand::class,
                 \Modules\ManagedPremises\Console\Commands\GenerateVisitsCommand::class,
+                \Modules\ManagedPremises\Console\Commands\RetireLegacyInspectionsCommand::class,
             ]);
         }
 

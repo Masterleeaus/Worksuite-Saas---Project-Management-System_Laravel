@@ -42,6 +42,16 @@ class ManagedPremisesStatusSeeder extends Seeder
                     'settings_json' => json_encode($merged),
                     'updated_at' => now(),
                 ]);
+            } else {
+                $userId = DB::table('users')->where('company_id', $company->id)->value('id')
+                    ?: DB::table('users')->value('id');
+                DB::table('pm_settings')->insert([
+                    'company_id' => $company->id,
+                    'user_id' => $userId,
+                    'settings_json' => json_encode($merged),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
             }
         }
     }
