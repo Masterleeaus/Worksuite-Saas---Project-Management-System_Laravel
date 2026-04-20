@@ -32,7 +32,6 @@ class RevenueByZoneReportController extends FinanceReportController
     public function index(FinanceReportDataTable $dataTable)
     {
         abort_403(user()->permission('view_financial_reports') !== 'all');
-        $request = request();
 
         if (!request()->ajax()) {
             $this->territories = Schema::hasTable('fsm_territories')

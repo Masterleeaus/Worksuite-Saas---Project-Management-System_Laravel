@@ -35,10 +35,10 @@ class BookingReportController extends TaskReportController
     public function index(TaskReportDataTable $dataTable)
     {
         abort_403(user()->permission('view_reports') !== 'all');
-        $request = request();
+        $currentRequest = request();
 
         if (!request()->ajax()) {
-            $this->setupViewData($request);
+            $this->setupViewData($currentRequest);
         }
 
         return view('report::booking-performance.index', $this->data);
