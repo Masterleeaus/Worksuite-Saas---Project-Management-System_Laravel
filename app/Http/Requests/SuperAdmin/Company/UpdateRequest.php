@@ -37,7 +37,7 @@ class UpdateRequest extends FormRequest
             ] : '',
             'address' => 'required',
             'status' => 'required',
-            'currency_id' => 'required|exists:currencies,id'
+            'currency_id' => 'nullable|exists:currencies,id'
         ];
 
 

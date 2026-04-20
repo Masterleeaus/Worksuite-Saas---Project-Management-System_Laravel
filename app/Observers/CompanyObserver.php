@@ -929,7 +929,7 @@ class CompanyObserver
 
     private function globalCurrencyCopy($company): void
     {
-        $currencies = GlobalCurrency::all();
+        $currencies = GlobalCurrency::withoutGlobalScopes()->get();
 
         if ($currencies->isEmpty()) {
             $currency = new Currency();
@@ -960,6 +960,8 @@ class CompanyObserver
                 'no_of_decimal' => $currency->no_of_decimal,
                 'thousand_separator' => $currency->thousand_separator,
                 'decimal_separator' => $currency->decimal_separator,
+                'is_cryptocurrency' => $currency->is_cryptocurrency,
+                'usd_price' => $currency->usd_price,
                 'company_id' => $company->id,
             ];
         })->toArray();
@@ -981,7 +983,17 @@ class CompanyObserver
         }
 
         if (!$defaultCurrency) {
-            return;
+            $defaultCurrency = new Currency();
+            $defaultCurrency->currency_name = 'Dollars';
+            $defaultCurrency->currency_symbol = '$';
+            $defaultCurrency->currency_code = 'USD';
+            $defaultCurrency->exchange_rate = 1;
+            $defaultCurrency->currency_position = 'left';
+            $defaultCurrency->no_of_decimal = 2;
+            $defaultCurrency->thousand_separator = ',';
+            $defaultCurrency->decimal_separator = '.';
+            $defaultCurrency->company_id = $company->id;
+            $defaultCurrency->saveQuietly();
         }
 
         $company->currency_id = $defaultCurrency->id;

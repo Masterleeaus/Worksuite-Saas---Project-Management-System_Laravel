@@ -504,6 +504,7 @@ class CompanyController extends AccountBaseController
 
         $adminRole = $this->ensureCompanyRole($company, 'admin', 'App Administrator', 'Admin is allowed to manage everything of the app.');
         $employeeRole = $this->ensureCompanyRole($company, 'employee', 'Employee', 'Employee can see tasks and projects assigned to him.');
+        $this->ensureCompanyRole($company, 'client', 'Client', 'Client can see own tasks and projects.');
 
         $hasCompanyAdminRole = $user->roles()
             ->withoutGlobalScope(CompanyScope::class)
@@ -539,21 +540,10 @@ class CompanyController extends AccountBaseController
         }
 
         if ($globalCurrency) {
-            $currency = Currency::withoutGlobalScope(CompanyScope::class)
-                ->where('currency_code', $globalCurrency->currency_code)
-                ->where('company_id', $company->id)
-                ->first();
-
-            if (is_null($currency)) {
-                return $this->newCurrency($globalCurrency, $company);
-            }
-
-            return $currency;
+            return $this->findOrCreateCompanyCurrencyByGlobal($company, $globalCurrency);
         }
 
-        return Currency::withoutGlobalScope(CompanyScope::class)
-            ->where('company_id', $company->id)
-            ->firstOrFail();
+        return $this->fallbackCompanyCurrency($company);
     }
 
     private function resolveUpdateCurrency(Company $company, ?int $currencyId): Currency
@@ -571,9 +561,13 @@ class CompanyController extends AccountBaseController
             return $currency;
         }
 
-        return Currency::withoutGlobalScope(CompanyScope::class)
-            ->where('company_id', $company->id)
-            ->firstOrFail();
+        $globalCurrency = $this->defaultGlobalCurrency();
+
+        if ($globalCurrency) {
+            return $this->findOrCreateCompanyCurrencyByGlobal($company, $globalCurrency);
+        }
+
+        return $this->fallbackCompanyCurrency($company);
     }
 
     private function defaultGlobalCurrency(): ?GlobalCurrency
@@ -589,6 +583,50 @@ class CompanyController extends AccountBaseController
         }
 
         return GlobalCurrency::first();
+    }
+
+    private function findOrCreateCompanyCurrencyByGlobal(Company $company, GlobalCurrency $globalCurrency): Currency
+    {
+        $currency = Currency::withoutGlobalScope(CompanyScope::class)
+            ->where('currency_code', $globalCurrency->currency_code)
+            ->where('company_id', $company->id)
+            ->first();
+
+        if ($currency) {
+            return $currency;
+        }
+
+        return $this->newCurrency($globalCurrency, $company);
+    }
+
+    private function fallbackCompanyCurrency(Company $company): Currency
+    {
+        $currency = Currency::withoutGlobalScope(CompanyScope::class)
+            ->where('company_id', $company->id)
+            ->first();
+
+        if ($currency) {
+            return $currency;
+        }
+
+        return $this->createFallbackUsdCurrency($company);
+    }
+
+    private function createFallbackUsdCurrency(Company $company): Currency
+    {
+        $currency = new Currency();
+        $currency->currency_name = 'Dollars';
+        $currency->currency_symbol = '$';
+        $currency->currency_code = 'USD';
+        $currency->exchange_rate = 1;
+        $currency->currency_position = 'left';
+        $currency->no_of_decimal = 2;
+        $currency->thousand_separator = ',';
+        $currency->decimal_separator = '.';
+        $currency->company_id = $company->id;
+        $currency->saveQuietly();
+
+        return $currency;
     }
 
     private function ensureCompanyRole(Company $company, string $name, string $displayName, string $description): Role
