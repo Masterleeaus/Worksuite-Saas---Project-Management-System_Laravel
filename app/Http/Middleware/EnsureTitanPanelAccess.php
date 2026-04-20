@@ -25,7 +25,9 @@ class EnsureTitanPanelAccess
             abort(403);
         }
 
-        if ((int) ($user->is_superadmin ?? 0) !== 1 && empty($user->company_id)) {
+        $isSuperAdmin = (bool) ($user->is_superadmin ?? false);
+
+        if (!$isSuperAdmin && empty($user->company_id)) {
             abort(403);
         }
 
