@@ -90,8 +90,11 @@ class AvailabilityRuleController extends Controller
             ->with('success', 'Rule deleted.');
     }
 
-    private function companyId(): ?int
+    private function companyId(): int
     {
-        return auth()->user()?->company_id;
+        $user = auth()->user();
+        abort_if(!$user || !$user->company_id, 403);
+
+        return (int) $user->company_id;
     }
 }

@@ -87,8 +87,11 @@ class FsmSizeController extends Controller
         return FsmSize::query()->where('company_id', $this->companyId());
     }
 
-    private function companyId(): ?int
+    private function companyId(): int
     {
-        return auth()->user()?->company_id;
+        $user = auth()->user();
+        abort_if(!$user || !$user->company_id, 403);
+
+        return (int) $user->company_id;
     }
 }
