@@ -7,9 +7,9 @@
 </div>
 
 <div class="alert alert-info">
-    Converting: <strong>{{ $lead->name }}</strong>
-    @if($lead->contact_name)
-        &mdash; {{ $lead->contact_name }}
+    Converting: <strong>{{ $lead->company_name ?: $lead->client_name }}</strong>
+    @if($lead->client_name)
+        &mdash; {{ $lead->client_name }}
     @endif
 </div>
 
@@ -51,7 +51,7 @@
                         <option value="">— None —</option>
                         @foreach($templates as $tmpl)
                             <option value="{{ $tmpl->id }}"
-                                @selected(old('template_id', $lead->service_type_id) == $tmpl->id)>
+                                @selected(old('template_id', $lead->fsm_service_type_id) == $tmpl->id)>
                                 {{ $tmpl->name }}
                             </option>
                         @endforeach
@@ -72,7 +72,7 @@
                     <label class="form-label">Scheduled Start</label>
                     <input type="datetime-local" name="scheduled_date_start"
                            class="form-control @error('scheduled_date_start') is-invalid @enderror"
-                           value="{{ old('scheduled_date_start', $lead->close_date?->format('Y-m-d') ? $lead->close_date->format('Y-m-d') . 'T08:00' : '') }}">
+                           value="{{ old('scheduled_date_start') }}">
                     @error('scheduled_date_start') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
 
@@ -87,7 +87,7 @@
                 <div class="col-12">
                     <label class="form-label">Description</label>
                     <textarea name="description" rows="4"
-                              class="form-control @error('description') is-invalid @enderror">{{ old('description', $lead->notes) }}</textarea>
+                              class="form-control @error('description') is-invalid @enderror">{{ old('description', $lead->note) }}</textarea>
                     @error('description') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
 
