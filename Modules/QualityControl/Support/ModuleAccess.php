@@ -6,7 +6,7 @@ use App\Models\User;
 
 final class ModuleAccess
 {
-    public const MODULE_ALIASES = ['quality_control', 'inspections'];
+    public const MODULE_ALIASES = ['quality_control', 'inspections', 'inspection'];
 
     public static function userHasModule(?User $user = null): bool
     {
@@ -47,13 +47,23 @@ final class ModuleAccess
             return $level;
         }
 
-        $legacy = InspectionPermissions::legacyFor($permission);
+        foreach (InspectionPermissions::aliasesFor($permission) as $legacy) {
+            try {
+                $legacyLevel = $user->permission($legacy);
+            } catch (\Throwable) {
+                $legacyLevel = 'none';
+            }
 
-        if (! $legacy) {
-            return $level;
+            if ($legacyLevel !== 'none') {
+                return $legacyLevel;
+            }
+
+            if (method_exists($user, 'hasPermissionTo') && $user->hasPermissionTo($legacy)) {
+                return 'all';
+            }
         }
 
-        return $user->hasPermissionTo($legacy) ? 'all' : 'none';
+        return $level;
     }
 
     public static function can(string $permission, array $allowed = ['all'], ?User $user = null): bool

@@ -46,11 +46,15 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
      |--------------------------------------------------------------------------
      */
     Route::resource('qc-records', QcRecordController::class)
-        ->only(['index', 'create', 'store', 'show', 'destroy'])
+        ->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy'])
         ->names('qc-records');
 
     Route::post('qc-records/{id}/trigger-reclean', [QcRecordController::class, 'triggerReclean'])
         ->name('qc-records.trigger_reclean');
+    Route::post('qc-records/{id}/approve', [QcRecordController::class, 'approve'])
+        ->name('qc-records.approve');
+    Route::post('qc-records/{id}/request-reclean', [QcRecordController::class, 'requestReclean'])
+        ->name('qc-records.request_reclean');
 
     /*
      |--------------------------------------------------------------------------

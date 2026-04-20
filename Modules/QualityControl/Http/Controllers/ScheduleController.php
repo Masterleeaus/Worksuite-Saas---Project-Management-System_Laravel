@@ -19,11 +19,11 @@ use Modules\QualityControl\Entities\ScheduleItems;
 use Modules\QualityControl\Http\Requests\StoreSchedule;
 use Modules\QualityControl\Http\Requests\UpdateSchedule;
 use Modules\QualityControl\DataTables\SchedulesDataTable;
+use Modules\QualityControl\Services\ScheduleService;
 
 class ScheduleController extends AccountBaseController
 {
-
-    public function __construct()
+    public function __construct(private readonly ScheduleService $schedules)
     {
         parent::__construct();
         $this->pageTitle = 'Schedules';
@@ -33,6 +33,7 @@ class ScheduleController extends AccountBaseController
             return $next($request);
         });
     }
+
 
     public function index(SchedulesDataTable $dataTable)
     {
@@ -423,7 +424,7 @@ class ScheduleController extends AccountBaseController
      */
     public function createQualityIssue($scheduleId)
     {
-        $schedule = Schedule::findOrFail($scheduleId);
+        $schedule = $this->schedules->findForTenant((int) $scheduleId, $this->user);
 
         // If already linked, just redirect to the issue.
         if (!empty($schedule->complaint_id) && \Illuminate\Support\Facades\Route::has('complaint.show')) {
@@ -463,9 +464,8 @@ class ScheduleController extends AccountBaseController
             'qc_outcome' => 'required|string|in:pending,pass,fail,needs_reclean,escalated',
         ]);
 
-        $schedule->qc_outcome = $request->qc_outcome;
-        $schedule->qc_outcome_set_at = now();
-        $schedule->save();
+        $schedule = $this->schedules->findForTenant((int) $schedule->id, $this->user);
+        $this->schedules->setOutcome($schedule, $request->qc_outcome);
 
         // If an outcome indicates escalation, we ensure an Issue exists (Complaint module) when possible.
         if (in_array($schedule->qc_outcome, ['fail', 'needs_reclean', 'escalated'])) {

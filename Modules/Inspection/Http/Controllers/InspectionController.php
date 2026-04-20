@@ -3,24 +3,23 @@
 namespace Modules\Inspection\Http\Controllers;
 
 use App\Helper\Reply;
-use App\Models\User;
-use Illuminate\Http\Request;
 use App\Http\Controllers\AccountBaseController;
-use Modules\Inspection\Entities\Inspection;
-use Modules\Inspection\Entities\InspectionItem;
-use Modules\Inspection\Entities\InspectionTemplate;
-use Modules\Inspection\Http\Requests\StoreInspectionRequest;
-use Modules\Inspection\Http\Requests\UpdateInspectionRequest;
-use Modules\Inspection\Support\Enums\InspectionStatus;
+use Illuminate\Http\Request;
+use Modules\QualityControl\Services\ExecutionRecordService;
+use Modules\QualityControl\Support\InspectionPermissions;
+use Modules\QualityControl\Support\ModuleAccess;
 
+/**
+ * @deprecated Compatibility bridge. Canonical inspection-run ownership lives in QualityControl.
+ */
 class InspectionController extends AccountBaseController
 {
-    public function __construct()
+    public function __construct(private readonly ExecutionRecordService $records)
     {
         parent::__construct();
         $this->pageTitle = 'Inspections';
         $this->middleware(function ($request, $next) {
-            abort_403(!in_array('inspections', $this->user->modules));
+            abort_403(!ModuleAccess::userHasModule($this->user));
 
             return $next($request);
         });
@@ -28,162 +27,150 @@ class InspectionController extends AccountBaseController
 
     public function index()
     {
-        abort_403(user()->permission('view_inspections') != 'all'
-            && user()->permission('view_inspection') != 'all');
+        abort_403(!ModuleAccess::can(InspectionPermissions::VIEW, ['all'], $this->user));
 
-        $this->inspections = Inspection::with('inspector')
-            ->orderByDesc('id')
-            ->paginate(20);
-
-        $this->statuses  = InspectionStatus::all();
-        $this->inspectors = User::allEmployees();
-
-        return view('inspection::inspections.index', $this->data);
+        return redirect()->route('qc-records.index');
     }
 
     public function create()
     {
-        abort_403(user()->permission('create_inspection') != 'all'
-            && user()->permission('add_inspection') != 'all');
+        abort_403(!ModuleAccess::can(InspectionPermissions::CREATE, ['all'], $this->user));
 
-        $this->inspectors = User::allEmployees();
-        $this->templates  = InspectionTemplate::where('is_active', true)->orderBy('name')->get();
-        $this->statuses   = InspectionStatus::all();
-
-        return view('inspection::inspections.create', $this->data);
+        return redirect()->route('qc-records.create');
     }
 
-    public function store(StoreInspectionRequest $request)
+    public function store(Request $request)
     {
-        abort_403(user()->permission('create_inspection') != 'all'
-            && user()->permission('add_inspection') != 'all');
+        abort_403(!ModuleAccess::can(InspectionPermissions::CREATE, ['all'], $this->user));
 
-        $inspection = Inspection::create(array_merge(
-            $request->safe()->except(['items']),
-            ['company_id' => $this->company->id ?? null]
-        ));
+        $validated = $request->validate([
+            'booking_id' => 'nullable',
+            'inspector_id' => 'nullable|integer|min:1',
+            'template_id' => 'nullable|integer|min:1',
+            'notes' => 'nullable|string',
+            'inspected_at' => 'nullable|date',
+            'items' => 'nullable|array',
+            'items.*.area' => 'required|string|max:191',
+            'items.*.passed' => 'required|boolean',
+            'items.*.notes' => 'nullable|string',
+        ]);
 
-        if ($request->filled('items') && is_array($request->items)) {
-            foreach ($request->items as $item) {
-                $inspection->items()->create([
-                    'area'   => $item['area'],
-                    'passed' => (bool) ($item['passed'] ?? false),
-                    'notes'  => $item['notes'] ?? null,
-                ]);
-            }
-        }
+        $payload = [
+            'booking_id' => isset($validated['booking_id']) ? (string) $validated['booking_id'] : null,
+            'cleaner_id' => $validated['inspector_id'] ?? null,
+            'template_id' => $validated['template_id'] ?? null,
+            'notes' => $validated['notes'] ?? null,
+            'inspected_at' => $validated['inspected_at'] ?? null,
+            'items' => array_map(function ($item) {
+                return [
+                    'item_label' => $item['area'],
+                    'score' => !empty($item['passed']) ? 100 : 0,
+                    'weight' => 0,
+                    'notes' => $item['notes'] ?? null,
+                ];
+            }, $validated['items'] ?? []),
+        ];
+
+        $record = $this->records->create($payload, $this->user);
 
         return redirect()
-            ->route('inspections.show', $inspection->id)
+            ->route('inspections.show', $record->id)
             ->with('success', __('inspection::messages.inspection_created'));
     }
 
     public function show($id)
     {
-        abort_403(user()->permission('view_inspections') != 'all'
-            && user()->permission('view_inspection') != 'all');
+        abort_403(!ModuleAccess::can(InspectionPermissions::VIEW, ['all'], $this->user));
 
-        $this->inspection = Inspection::with(['inspector', 'items', 'template', 'approvedBy'])
-            ->findOrFail($id);
+        $record = $this->records->findByLegacyInspectionIdOrId((int) $id, $this->user->company_id ?? null);
+        abort_if(!$record, 404);
 
-        $this->pageTitle = 'Inspection #' . $id;
-
-        return view('inspection::inspections.show', $this->data);
+        return redirect()->route('qc-records.show', $record->id);
     }
 
     public function edit($id)
     {
-        abort_403(user()->permission('edit_inspection') != 'all');
+        abort_403(!ModuleAccess::can(InspectionPermissions::UPDATE, ['all'], $this->user));
 
-        $this->inspection = Inspection::with('items')->findOrFail($id);
-        $this->inspectors = User::allEmployees();
-        $this->templates  = InspectionTemplate::where('is_active', true)->orderBy('name')->get();
-        $this->statuses   = InspectionStatus::all();
+        $record = $this->records->findByLegacyInspectionIdOrId((int) $id, $this->user->company_id ?? null);
+        abort_if(!$record, 404);
 
-        return view('inspection::inspections.edit', $this->data);
+        return redirect()->route('qc-records.edit', $record->id);
     }
 
-    public function update(UpdateInspectionRequest $request, $id)
+    public function update(Request $request, $id)
     {
-        abort_403(user()->permission('edit_inspection') != 'all');
+        abort_403(!ModuleAccess::can(InspectionPermissions::UPDATE, ['all'], $this->user));
 
-        $inspection = Inspection::findOrFail($id);
-        $inspection->update($request->safe()->except(['items']));
+        $record = $this->records->findByLegacyInspectionIdOrId((int) $id, $this->user->company_id ?? null);
+        abort_if(!$record, 404);
 
-        if ($request->filled('items') && is_array($request->items)) {
-            $keepIds = [];
+        $validated = $request->validate([
+            'booking_id' => 'nullable',
+            'inspector_id' => 'nullable|integer|min:1',
+            'template_id' => 'nullable|integer|min:1',
+            'notes' => 'nullable|string',
+            'inspected_at' => 'nullable|date',
+            'items' => 'nullable|array',
+            'items.*.area' => 'required|string|max:191',
+            'items.*.passed' => 'required|boolean',
+            'items.*.notes' => 'nullable|string',
+        ]);
 
-            foreach ($request->items as $item) {
-                if (!empty($item['id'])) {
-                    $inspItem = InspectionItem::find($item['id']);
-                    if ($inspItem && $inspItem->inspection_id == $inspection->id) {
-                        $inspItem->update([
-                            'area'   => $item['area'],
-                            'passed' => (bool) ($item['passed'] ?? false),
-                            'notes'  => $item['notes'] ?? null,
-                        ]);
-                        $keepIds[] = $inspItem->id;
-                        continue;
-                    }
-                }
+        $payload = [
+            'booking_id' => isset($validated['booking_id']) ? (string) $validated['booking_id'] : null,
+            'cleaner_id' => $validated['inspector_id'] ?? null,
+            'template_id' => $validated['template_id'] ?? null,
+            'notes' => $validated['notes'] ?? null,
+            'inspected_at' => $validated['inspected_at'] ?? null,
+            'items' => array_map(function ($item) {
+                return [
+                    'item_label' => $item['area'],
+                    'score' => !empty($item['passed']) ? 100 : 0,
+                    'weight' => 0,
+                    'notes' => $item['notes'] ?? null,
+                ];
+            }, $validated['items'] ?? []),
+        ];
 
-                $newItem = $inspection->items()->create([
-                    'area'   => $item['area'],
-                    'passed' => (bool) ($item['passed'] ?? false),
-                    'notes'  => $item['notes'] ?? null,
-                ]);
-                $keepIds[] = $newItem->id;
-            }
-
-            $inspection->items()->whereNotIn('id', $keepIds)->delete();
-        }
+        $updated = $this->records->update((int) $record->id, $payload, $this->user->company_id ?? null);
 
         return redirect()
-            ->route('inspections.show', $inspection->id)
+            ->route('inspections.show', $updated->id)
             ->with('success', __('inspection::messages.inspection_updated'));
     }
 
     public function destroy($id)
     {
-        abort_403(user()->permission('delete_inspection') != 'all');
+        abort_403(!ModuleAccess::can(InspectionPermissions::DELETE, ['all'], $this->user));
 
-        Inspection::findOrFail($id)->delete();
+        $record = $this->records->findByLegacyInspectionIdOrId((int) $id, $this->user->company_id ?? null);
+        abort_if(!$record, 404);
+        $this->records->delete((int) $record->id, $this->user->company_id ?? null);
 
         return Reply::success(__('inspection::messages.inspection_deleted'));
     }
 
-    /**
-     * Approve an inspection and mark it as passed.
-     */
     public function approve(Request $request, $id)
     {
-        abort_403(user()->permission('approve_inspection') != 'all');
+        abort_403(!ModuleAccess::can(InspectionPermissions::UPDATE, ['all'], $this->user));
 
-        $inspection = Inspection::findOrFail($id);
-
-        $inspection->update([
-            'status'      => InspectionStatus::PASSED,
-            'approved_at' => now(),
-            'approved_by' => user()->id,
-        ]);
+        $record = $this->records->findByLegacyInspectionIdOrId((int) $id, $this->user->company_id ?? null);
+        abort_if(!$record, 404);
+        $this->records->markApproved((int) $record->id, $this->user->company_id ?? null);
 
         return Reply::success(__('inspection::messages.inspection_approved'));
     }
 
-    /**
-     * Trigger a re-clean request from a failed inspection.
-     */
     public function requestReclean(Request $request, $id)
     {
-        abort_403(user()->permission('request_reclean') != 'all');
+        abort_403(!ModuleAccess::can(InspectionPermissions::TRIGGER_RECLEAN, ['all'], $this->user));
 
-        $inspection = Inspection::findOrFail($id);
-        abort_403($inspection->status !== InspectionStatus::FAILED);
-
-        $inspection->update([
-            'status' => InspectionStatus::RECLEAN_BOOKED,
-        ]);
+        $record = $this->records->findByLegacyInspectionIdOrId((int) $id, $this->user->company_id ?? null);
+        abort_if(!$record, 404);
+        $this->records->markNeedsReclean((int) $record->id, $this->user->company_id ?? null);
 
         return Reply::success(__('inspection::messages.reclean_requested'));
     }
 }
+
