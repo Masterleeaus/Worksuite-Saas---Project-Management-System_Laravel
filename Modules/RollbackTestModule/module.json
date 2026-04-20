@@ -1,0 +1,1 @@
+{"name":"RollbackTestModule","alias":"RollbackTestModule","version":"1.0.0","providers":["Modules\\RollbackTestModule\\Providers\\RollbackTestModuleServiceProvider"],"permissions":[{"key":"manage_rollbacktestmodule","label":"Manage RollbackTestModule"}],"routes":[{"uri":"\/RollbackTestModule","method":"GET"}]}

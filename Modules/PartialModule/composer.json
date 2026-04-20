@@ -1,0 +1,8 @@
+{
+    "name": "modules/partialmodule",
+    "autoload": {
+        "psr-4": {
+            "Modules\\PartialModule\\": ""
+        }
+    }
+}
