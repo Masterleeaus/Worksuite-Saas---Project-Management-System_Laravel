@@ -648,26 +648,9 @@ class CompanyObserver
 
     public function roles($company): void
     {
-        $adminRole = new Role();
-        $adminRole->name = 'admin';
-        $adminRole->company_id = $company->id;
-        $adminRole->display_name = 'App Administrator'; // optional
-        $adminRole->description = 'Admin is allowed to manage everything of the app.'; // optional
-        $adminRole->saveQuietly();
-
-        $employeeRole = new Role();
-        $employeeRole->name = 'employee';
-        $employeeRole->company_id = $company->id;
-        $employeeRole->display_name = 'Employee'; // optional
-        $employeeRole->description = 'Employee can see tasks and projects assigned to him.'; // optional
-        $employeeRole->saveQuietly();
-
-        $clientRole = new Role();
-        $clientRole->name = 'client';
-        $clientRole->company_id = $company->id;
-        $clientRole->display_name = 'Client'; // optional
-        $clientRole->description = 'Client can see own tasks and projects.'; // optional
-        $clientRole->saveQuietly();
+        $adminRole = $this->ensureRole($company->id, 'admin', 'App Administrator', 'Admin is allowed to manage everything of the app.');
+        $employeeRole = $this->ensureRole($company->id, 'employee', 'Employee', 'Employee can see tasks and projects assigned to him.');
+        $clientRole = $this->ensureRole($company->id, 'client', 'Client', 'Client can see own tasks and projects.');
 
         $allPermissions = Permission::whereHas('module', function ($query) {
             $query->withoutGlobalScopes()->where('is_superadmin', '0');
@@ -680,6 +663,27 @@ class CompanyObserver
         $rolePermissionController->permissionRole($allPermissions, 'employee', $company->id);
         $rolePermissionController->rolePermissionInsert($allPermissions, $adminRole->id, 'all');
         $rolePermissionController->permissionRole($allPermissions, 'client', $company->id);
+    }
+
+    private function ensureRole(int $companyId, string $name, string $displayName, string $description): Role
+    {
+        $role = Role::withoutGlobalScope(CompanyScope::class)
+            ->where('company_id', $companyId)
+            ->where('name', $name)
+            ->first();
+
+        if ($role) {
+            return $role;
+        }
+
+        $role = new Role();
+        $role->name = $name;
+        $role->company_id = $companyId;
+        $role->display_name = $displayName;
+        $role->description = $description;
+        $role->saveQuietly();
+
+        return $role;
     }
 
     public function taskBoard($company): void
@@ -927,6 +931,25 @@ class CompanyObserver
     {
         $currencies = GlobalCurrency::all();
 
+        if ($currencies->isEmpty()) {
+            $currency = new Currency();
+            $currency->currency_name = 'Dollars';
+            $currency->currency_symbol = '$';
+            $currency->currency_code = 'USD';
+            $currency->exchange_rate = 1;
+            $currency->currency_position = 'left';
+            $currency->no_of_decimal = 2;
+            $currency->thousand_separator = ',';
+            $currency->decimal_separator = '.';
+            $currency->company_id = $company->id;
+            $currency->saveQuietly();
+
+            $company->currency_id = $currency->id;
+            $company->saveQuietly();
+
+            return;
+        }
+
         $data = $currencies->map(function ($currency) use ($company) {
             return [
                 'currency_name' => $currency->currency_name,
@@ -941,15 +964,25 @@ class CompanyObserver
             ];
         })->toArray();
 
-        Currency::insert($data);
+        Currency::withoutGlobalScope(CompanyScope::class)->insert($data);
 
-        $defaultCurrencyQuery = Currency::where('company_id', $company->id);
+        $defaultCurrencyQuery = Currency::withoutGlobalScope(CompanyScope::class)->where('company_id', $company->id);
 
         if (global_setting()->currency) {
             $defaultCurrencyQuery->where('currency_code', global_setting()->currency->currency_code);
         }
 
-        $defaultCurrency = $defaultCurrencyQuery->firstOrFail();
+        $defaultCurrency = $defaultCurrencyQuery->first();
+
+        if (!$defaultCurrency) {
+            $defaultCurrency = Currency::withoutGlobalScope(CompanyScope::class)
+                ->where('company_id', $company->id)
+                ->first();
+        }
+
+        if (!$defaultCurrency) {
+            return;
+        }
 
         $company->currency_id = $defaultCurrency->id;
         $company->saveQuietly();
