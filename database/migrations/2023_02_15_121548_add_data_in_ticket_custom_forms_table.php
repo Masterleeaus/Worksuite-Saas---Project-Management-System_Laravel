@@ -19,7 +19,7 @@ return new class extends Migration {
 
         if (!Schema::hasColumn('tickets', 'group_id')) {
             Schema::table('tickets', function (Blueprint $table) {
-                $table->unsignedInteger('group_id')->after('type_id')->nullable();
+                $table->unsignedInteger('group_id')->nullable();
                 $table->foreign(['group_id'])->references(['id'])->on('ticket_groups')->onUpdate('CASCADE')->onDelete('CASCADE');
             });
         }

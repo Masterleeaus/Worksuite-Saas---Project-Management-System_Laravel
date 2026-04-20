@@ -55,7 +55,6 @@ class EInvoiceServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->register(RouteServiceProvider::class);
 
         // Bind AI client — resolves to OpenAIClient (or swap adapter as needed)
         $this->app->bind(ClientInterface::class, function ($app) {
