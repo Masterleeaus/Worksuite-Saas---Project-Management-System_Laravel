@@ -201,6 +201,11 @@ class Project extends BaseModel
         return $this->hasMany(Task::class, 'project_id')->orderByDesc('id');
     }
 
+    public function fsmOrders(): HasMany
+    {
+        return $this->hasMany(\Modules\FSMCore\Models\FSMOrder::class, 'project_id');
+    }
+
     public function files(): HasMany
     {
         return $this->hasMany(ProjectFile::class, 'project_id')->orderByDesc('id');

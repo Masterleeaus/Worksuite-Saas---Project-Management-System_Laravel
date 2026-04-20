@@ -4,6 +4,7 @@ namespace Modules\FSMCore\Models;
 
 use App\Traits\HasCompany;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class FSMOrder extends Model
 {
@@ -79,6 +80,11 @@ class FSMOrder extends Model
     public function stage()
     {
         return $this->belongsTo(FSMStage::class, 'stage_id');
+    }
+
+    public function project(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Project::class, 'project_id');
     }
 
     public function template()

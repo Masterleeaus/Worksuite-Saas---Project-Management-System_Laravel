@@ -2,6 +2,7 @@
 
 namespace Modules\FSMProject\Http\Controllers;
 
+use App\Models\Project;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
@@ -98,19 +99,31 @@ class FsmProjectController extends Controller
     /** Link an FSM order to a project / task */
     public function link(Request $request, int $orderId)
     {
-        $request->validate([
+        $data = $request->validate([
             'project_id' => 'required|integer',
             'task_id'    => 'nullable|integer',
         ]);
 
         $order = FSMOrder::where('company_id', $this->companyId())->findOrFail($orderId);
-        $data = ['project_id' => $request->project_id];
-        if ($request->filled('task_id')) {
-            $data['task_id'] = $request->task_id;
-        }
-        $order->project_id = $data['project_id'];
+        $project = $this->findCompanyProject((int) $data['project_id']);
+        $order->project()->associate($project);
         $order->task_id = $data['task_id'] ?? null;
         $order->save();
+
+        return response()->json(['success' => true]);
+    }
+
+    /** Unlink an FSM order from a project / task */
+    public function unlink(Request $request, int $orderId)
+    {
+        $order = FSMOrder::where('company_id', $this->companyId())->findOrFail($orderId);
+        $order->project()->dissociate();
+        $order->task_id = null;
+        $order->save();
+
+        if (! $request->expectsJson()) {
+            return redirect()->back()->with('success', 'Project link removed.');
+        }
 
         return response()->json(['success' => true]);
     }
@@ -118,16 +131,64 @@ class FsmProjectController extends Controller
     /** Orders belonging to a project */
     public function byProject(int $projectId)
     {
-        if (! Schema::hasTable('fsm_orders') || ! Schema::hasColumn('fsm_orders', 'project_id')) {
+        if (! Schema::hasTable('fsm_orders') || ! Schema::hasTable('projects') || ! Schema::hasColumn('fsm_orders', 'project_id')) {
             return response()->json(['data' => []]);
         }
 
-        $orders = FSMOrder::where('company_id', $this->companyId())
-            ->where('project_id', $projectId)
-            ->with(['stage', 'location'])
+        $companyId = $this->companyId();
+        $project = $this->findCompanyProject($projectId);
+
+        $orders = $project->fsmOrders()
+            ->where('company_id', $companyId)
+            ->with($this->availableOrderRelations())
             ->get();
 
         return response()->json(['data' => $orders]);
+    }
+
+    /** Summary of FSM orders linked to a project */
+    public function summary(int $projectId)
+    {
+        if (! Schema::hasTable('fsm_orders') || ! Schema::hasTable('projects') || ! Schema::hasColumn('fsm_orders', 'project_id')) {
+            return response()->json([
+                'data' => [
+                    'count' => 0,
+                    'total_hours' => 0.0,
+                    'completed' => 0,
+                    'pending' => 0,
+                    'completion_percent' => 0,
+                ],
+            ]);
+        }
+
+        $companyId = $this->companyId();
+        $project = $this->findCompanyProject($projectId);
+        $orders = $project->fsmOrders()
+            ->where('company_id', $companyId)
+            ->with($this->availableOrderRelations())
+            ->get();
+
+        $completed = Schema::hasTable('fsm_stages')
+            ? $orders->filter(fn ($order) => (bool) optional($order->stage)->is_completion_stage)->count()
+            : $orders->filter(fn ($order) => !empty($order->date_end))->count();
+        $count = $orders->count();
+        $totalHours = round($orders->sum(function ($order) {
+            if (empty($order->date_start) || empty($order->date_end)) {
+                return 0;
+            }
+
+            return $order->date_start->diffInMinutes($order->date_end) / 60;
+        }), 2);
+
+        return response()->json([
+            'data' => [
+                'count' => $count,
+                'total_hours' => $totalHours,
+                'completed' => $completed,
+                'pending' => max($count - $completed, 0),
+                'completion_percent' => $count > 0 ? (int) round(($completed / $count) * 100) : 0,
+            ],
+        ]);
     }
 
     private function companyId(): int
@@ -136,5 +197,31 @@ class FsmProjectController extends Controller
         abort_if(!$user || !$user->company_id, 403);
 
         return (int) $user->company_id;
+    }
+
+    private function findCompanyProject(int $projectId): Project
+    {
+        abort_if(!Schema::hasTable('projects'), 404);
+
+        return Project::query()
+            ->where('company_id', $this->companyId())
+            ->findOrFail($projectId);
+    }
+
+    private function availableOrderRelations(): array
+    {
+        $relations = [];
+
+        if (Schema::hasTable('fsm_stages')) {
+            $relations[] = 'stage';
+        }
+        if (Schema::hasTable('fsm_locations')) {
+            $relations[] = 'location';
+        }
+        if (Schema::hasTable('users')) {
+            $relations[] = 'person';
+        }
+
+        return $relations;
     }
 }
