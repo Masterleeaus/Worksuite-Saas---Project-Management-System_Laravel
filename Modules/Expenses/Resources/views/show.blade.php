@@ -3,12 +3,12 @@
   <p>Date: {{ $e->date }} | Amount: {{ number_format($e->amount,2) }} | Status: {{ $e->status ?? 'draft' }}</p>
   <p>Description: {{ $e->description }}</p>
 
-  <form method="POST" action="{{ route('expenses.submit', $e->id) }}" style="display:inline">@csrf<button>Submit</button></form>
-  <form method="POST" action="{{ route('expenses.approve', $e->id) }}" style="display:inline">@csrf<button>Approve</button></form>
-  <form method="POST" action="{{ route('expenses.reimburse', $e->id) }}" style="display:inline">@csrf<button>Reimburse</button></form>
+  <form method="POST" action="{{ route('module-expenses.submit', $e->id) }}" style="display:inline">@csrf<button>Submit</button></form>
+  <form method="POST" action="{{ route('module-expenses.approve', $e->id) }}" style="display:inline">@csrf<button>Approve</button></form>
+  <form method="POST" action="{{ route('module-expenses.reimburse', $e->id) }}" style="display:inline">@csrf<button>Reimburse</button></form>
 
   <h2>Receipts</h2>
-  <form method="POST" action="{{ route('expenses.receipts.upload', $e->id) }}" enctype="multipart/form-data">
+  <form method="POST" action="{{ route('module-expenses.receipts.upload', $e->id) }}" enctype="multipart/form-data">
     @csrf
     <input type="file" name="file" required>
     <button type="submit">Upload</button>

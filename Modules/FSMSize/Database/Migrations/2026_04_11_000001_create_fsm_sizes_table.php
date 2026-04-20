@@ -52,7 +52,7 @@ return new class extends Migration {
         if (Schema::hasTable('fsm_orders')) {
             Schema::table('fsm_orders', function (Blueprint $table) {
                 if (! Schema::hasColumn('fsm_orders', 'size_id')) {
-                    $table->unsignedBigInteger('size_id')->nullable()->after('type_id');
+                    $table->unsignedBigInteger('size_id')->nullable();
                 }
                 if (! Schema::hasColumn('fsm_orders', 'size_value')) {
                     $table->decimal('size_value', 10, 2)->nullable()->after('size_id');

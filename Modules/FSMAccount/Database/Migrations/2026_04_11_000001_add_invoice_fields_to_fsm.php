@@ -11,7 +11,7 @@ return new class extends Migration {
         // Add invoice linkage to fsm_orders
         if (Schema::hasTable('fsm_orders') && ! Schema::hasColumn('fsm_orders', 'invoiced')) {
             Schema::table('fsm_orders', function (Blueprint $table) {
-                $table->boolean('invoiced')->default(false)->after('duration');
+                $table->boolean('invoiced')->default(false);
                 if (! Schema::hasColumn('fsm_orders', 'invoice_total')) {
                     $table->decimal('invoice_total', 15, 2)->nullable()->after('invoiced');
                 }
@@ -21,7 +21,7 @@ return new class extends Migration {
         // Add is_invoiceable to fsm_stages
         if (Schema::hasTable('fsm_stages') && ! Schema::hasColumn('fsm_stages', 'is_invoiceable')) {
             Schema::table('fsm_stages', function (Blueprint $table) {
-                $table->boolean('is_invoiceable')->default(false)->after('is_closed');
+                $table->boolean('is_invoiceable')->default(false);
             });
         }
 

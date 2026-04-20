@@ -7,10 +7,10 @@ return new class extends Migration {
   public function up(): void {
     if (Schema::hasTable('expense')) {
       Schema::table('expense', function (Blueprint $t) {
-        if (!Schema::hasColumn('expense','status')) $t->string('status')->default('draft')->after('description');
-        if (!Schema::hasColumn('expense','approved_by')) $t->unsignedBigInteger('approved_by')->nullable()->after('status');
-        if (!Schema::hasColumn('expense','approved_at')) $t->timestamp('approved_at')->nullable()->after('approved_by');
-        if (!Schema::hasColumn('expense','reimbursed_at')) $t->timestamp('reimbursed_at')->nullable()->after('approved_at');
+        if (!Schema::hasColumn('expense','status')) $t->string('status')->default('draft');
+        if (!Schema::hasColumn('expense','approved_by')) $t->unsignedBigInteger('approved_by')->nullable();
+        if (!Schema::hasColumn('expense','approved_at')) $t->timestamp('approved_at')->nullable();
+        if (!Schema::hasColumn('expense','reimbursed_at')) $t->timestamp('reimbursed_at')->nullable();
       });
     }
   }

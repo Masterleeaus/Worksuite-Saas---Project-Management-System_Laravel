@@ -81,7 +81,7 @@ class AttemptToAuthenticate
         }
 
 
-        if($authUser->company){
+        if ($authUser->company && $authUser->company->attendanceSetting) {
             $attendanceSetting = $authUser->company->attendanceSetting;
             $checkAutoClockinConditions = $this->checkAutoClockinConditions($authUser);
 

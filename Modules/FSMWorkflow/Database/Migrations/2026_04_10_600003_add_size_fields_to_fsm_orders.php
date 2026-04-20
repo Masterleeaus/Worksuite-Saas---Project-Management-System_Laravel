@@ -17,7 +17,7 @@ return new class extends Migration {
     {
         if (!Schema::hasColumn('fsm_orders', 'size_id')) {
             Schema::table('fsm_orders', function (Blueprint $table) {
-                $table->unsignedBigInteger('size_id')->nullable()->after('stage_id')->index();
+                $table->unsignedBigInteger('size_id')->nullable()->index();
                 $table->unsignedInteger('estimated_sqm')->nullable()->after('size_id');
                 $table->unsignedInteger('room_count')->nullable()->after('estimated_sqm');
 
