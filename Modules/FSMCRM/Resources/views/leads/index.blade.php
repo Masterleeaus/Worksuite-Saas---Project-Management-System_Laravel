@@ -42,17 +42,17 @@
         <tbody>
         @forelse($leads as $lead)
             <tr>
-                <td><a href="{{ route('fsmcrm.leads.show', $lead->id) }}">{{ $lead->name }}</a></td>
-                <td>{{ $lead->contact_name ?? '—' }}</td>
+                <td><a href="{{ route('fsmcrm.leads.show', $lead->id) }}">{{ $lead->company_name ?: $lead->client_name }}</a></td>
+                <td>{{ $lead->client_name ?? '—' }}</td>
                 <td>
                     @php
-                        $stageColors = \Modules\FSMCRM\Models\FSMLead::stageColors();
-                        $stageColor = $stageColors[$lead->stage] ?? 'secondary';
+                        $leadStage = strtolower((string) ($lead->leadStatus?->type ?? ''));
+                        $stageColor = $stageColors[$leadStage] ?? 'secondary';
                     @endphp
-                    <span class="badge bg-{{ $stageColor }}">{{ $stages[$lead->stage] ?? $lead->stage }}</span>
+                    <span class="badge bg-{{ $stageColor }}">{{ $stages[$leadStage] ?? ($lead->leadStatus?->type ?? '—') }}</span>
                 </td>
-                <td>{{ $lead->expected_revenue > 0 ? number_format($lead->expected_revenue, 2) : '—' }}</td>
-                <td>{{ $lead->close_date?->format('d M Y') ?? '—' }}</td>
+                <td>{{ $lead->value > 0 ? number_format($lead->value, 2) : '—' }}</td>
+                <td>—</td>
                 <td>{{ $lead->fsmLocation?->name ?? '—' }}</td>
                 <td>
                     @if($lead->orders_count > 0)
@@ -64,7 +64,7 @@
                 <td>
                     <a href="{{ route('fsmcrm.leads.show', $lead->id) }}" class="btn btn-sm btn-outline-secondary">View</a>
                     <a href="{{ route('fsmcrm.leads.edit', $lead->id) }}" class="btn btn-sm btn-outline-primary">Edit</a>
-                    @if($lead->stage === 'won')
+                    @if(strtolower((string) ($lead->leadStatus?->type ?? '')) === 'won')
                         <a href="{{ route('fsmcrm.leads.convert', $lead->id) }}" class="btn btn-sm btn-success">🔧 Create FSM Order</a>
                     @endif
                 </td>

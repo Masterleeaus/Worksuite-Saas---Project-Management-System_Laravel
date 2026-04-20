@@ -208,6 +208,76 @@ if (!function_exists('global_setting')) {
     }
 }
 
+
+if (!function_exists('setting')) {
+
+    /**
+     * Backward-compatible key/value settings helper used by legacy modules.
+     */
+    function setting($key = null, $default = null)
+    {
+        static $writer;
+
+        if (is_null($writer)) {
+            $writer = new class {
+                public function save()
+                {
+                    return true;
+                }
+            };
+        }
+
+        if (is_array($key)) {
+            $moduleSettings = cache()->get('module_runtime_settings', []);
+
+            foreach ($key as $settingKey => $settingValue) {
+                if (is_string($settingKey) && $settingKey !== '') {
+                    $moduleSettings[$settingKey] = $settingValue;
+                }
+            }
+
+            cache()->forever('module_runtime_settings', $moduleSettings);
+
+            if (\Illuminate\Support\Facades\Schema::hasTable('global_settings')) {
+                $globalSetting = \App\Models\GlobalSetting::first();
+
+                if ($globalSetting) {
+                    foreach ($key as $settingKey => $settingValue) {
+                        if (is_string($settingKey) && \Illuminate\Support\Facades\Schema::hasColumn('global_settings', $settingKey)) {
+                            $globalSetting->{$settingKey} = $settingValue;
+                        }
+                    }
+
+                    $globalSetting->save();
+                    cache()->forget('global_setting');
+                }
+            }
+
+            return $writer;
+        }
+
+        if (!is_string($key) || $key === '') {
+            return $default;
+        }
+
+        $moduleSettings = cache()->get('module_runtime_settings', []);
+
+        if (array_key_exists($key, $moduleSettings)) {
+            return $moduleSettings[$key];
+        }
+
+        if (\Illuminate\Support\Facades\Schema::hasTable('global_settings') && \Illuminate\Support\Facades\Schema::hasColumn('global_settings', $key)) {
+            $globalSetting = global_setting();
+
+            if ($globalSetting && isset($globalSetting->{$key})) {
+                return $globalSetting->{$key};
+            }
+        }
+
+        return $default;
+    }
+}
+
 if (!function_exists('push_setting')) {
 
     // @codingStandardsIgnoreLine

@@ -42,6 +42,7 @@ use App\Console\Commands\ModuleHealthCheck;
 use App\Console\Commands\ModuleMigrateOrdered;
 use App\Console\Commands\SuperAdmin\FreeLicenceRenew;
 use App\Console\Commands\SuperAdmin\TrialExpire;
+use App\Console\Commands\SuperAdmin\RepairCompanyProvisioning;
 use App\Console\Commands\TitanFilamentCheckCommand;
 
 class Kernel extends ConsoleKernel
@@ -90,6 +91,7 @@ class Kernel extends ConsoleKernel
         // SAAS
         FreeLicenceRenew::class,
         TrialExpire::class,
+        RepairCompanyProvisioning::class,
         DeleteSpamCompanies::class,
         AssignShiftRotation::class,
         AssignEmployeeShiftRotation::class,

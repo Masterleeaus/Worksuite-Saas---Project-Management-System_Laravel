@@ -1,6 +1,6 @@
 <x-layout>
 <h1>Expenses</h1>
-<a href="{{ route('expenses.create') }}">New Expense</a>
+<a href="{{ route('module-expenses.create') }}">New Expense</a>
 <table><thead><tr><th>Date</th><th>Amount</th><th>Category</th><th>Description</th></tr></thead>
 <tbody>
 @foreach($rows as $e)

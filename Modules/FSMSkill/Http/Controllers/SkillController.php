@@ -11,13 +11,17 @@ class SkillController extends Controller
 {
     public function index()
     {
-        $skills = FSMSkill::with('skillType')->withCount('levels')->orderBy('name')->paginate(50);
+        $skills = FSMSkill::where('company_id', $this->companyId())
+            ->with('skillType')
+            ->withCount('levels')
+            ->orderBy('name')
+            ->paginate(50);
         return view('fsmskill::skills.index', compact('skills'));
     }
 
     public function create()
     {
-        $types = FSMSkillType::where('active', true)->orderBy('name')->get();
+        $types = FSMSkillType::where('company_id', $this->companyId())->where('active', true)->orderBy('name')->get();
         return view('fsmskill::skills.create', compact('types'));
     }
 
@@ -30,6 +34,7 @@ class SkillController extends Controller
             'active'        => 'nullable|boolean',
         ]);
         $data['active'] = $request->boolean('active', true);
+        $data['company_id'] = $this->companyId();
 
         FSMSkill::create($data);
 
@@ -39,14 +44,14 @@ class SkillController extends Controller
 
     public function edit(int $id)
     {
-        $skill = FSMSkill::findOrFail($id);
-        $types = FSMSkillType::where('active', true)->orderBy('name')->get();
+        $skill = FSMSkill::where('company_id', $this->companyId())->findOrFail($id);
+        $types = FSMSkillType::where('company_id', $this->companyId())->where('active', true)->orderBy('name')->get();
         return view('fsmskill::skills.edit', compact('skill', 'types'));
     }
 
     public function update(Request $request, int $id)
     {
-        $skill = FSMSkill::findOrFail($id);
+        $skill = FSMSkill::where('company_id', $this->companyId())->findOrFail($id);
         $data  = $request->validate([
             'skill_type_id' => 'nullable|integer|exists:fsm_skill_types,id',
             'name'          => 'required|string|max:128',
@@ -63,8 +68,16 @@ class SkillController extends Controller
 
     public function destroy(int $id)
     {
-        FSMSkill::findOrFail($id)->delete();
+        FSMSkill::where('company_id', $this->companyId())->findOrFail($id)->delete();
         return redirect()->route('fsmskill.skills.index')
             ->with('success', 'Skill deleted.');
+    }
+
+    private function companyId(): int
+    {
+        $user = auth()->user();
+        abort_if(!$user || !$user->company_id, 403);
+
+        return (int) $user->company_id;
     }
 }

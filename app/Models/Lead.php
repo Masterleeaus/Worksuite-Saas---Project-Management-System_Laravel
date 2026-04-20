@@ -152,6 +152,11 @@ class Lead extends BaseModel
         return $this->belongsTo(LeadSource::class, 'source_id');
     }
 
+    public function leadStatus(): BelongsTo
+    {
+        return $this->belongsTo(LeadStatus::class, 'status_id');
+    }
+
     public function category(): BelongsTo
     {
         return $this->belongsTo(LeadCategory::class, 'category_id');
@@ -187,6 +192,21 @@ class Lead extends BaseModel
         return static::$estimateUsesLeadId
             ? $this->hasMany(Estimate::class, 'lead_id', 'id')
             : $this->hasMany(Estimate::class, 'client_id', 'client_id');
+    }
+
+    public function fsmOrders(): HasMany
+    {
+        return $this->hasMany(\Modules\FSMCore\Models\FSMOrder::class, 'lead_id');
+    }
+
+    public function fsmLocation(): BelongsTo
+    {
+        return $this->belongsTo(\Modules\FSMCore\Models\FSMLocation::class, 'fsm_location_id');
+    }
+
+    public function fsmServiceType(): BelongsTo
+    {
+        return $this->belongsTo(\Modules\FSMCore\Models\FSMTemplate::class, 'fsm_service_type_id');
     }
 
     public static function allLeads($contactId = null)

@@ -31,7 +31,6 @@ class AitoolsServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->register(RouteServiceProvider::class);
 
         // Runtime spine (DB-backed providers/models)
         $this->app->singleton(AiClientFactory::class, fn () => new AiClientFactory());

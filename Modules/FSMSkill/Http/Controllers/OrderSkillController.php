@@ -16,18 +16,18 @@ class OrderSkillController extends Controller
 
     public function index(int $orderId)
     {
-        $order        = FSMOrder::findOrFail($orderId);
+        $order        = FSMOrder::where('company_id', $this->companyId())->findOrFail($orderId);
         $requirements = FSMOrderSkillRequirement::with(['skill.skillType', 'skillLevel'])
-            ->where('fsm_order_id', $orderId)
+            ->where('fsm_order_id', $order->id)
             ->get();
-        $skills = FSMSkill::where('active', true)->with(['skillType', 'levels'])->orderBy('name')->get();
+        $skills = FSMSkill::where('company_id', $this->companyId())->where('active', true)->with(['skillType', 'levels'])->orderBy('name')->get();
 
         return view('fsmskill::order_skills.index', compact('order', 'requirements', 'skills'));
     }
 
     public function store(Request $request, int $orderId)
     {
-        FSMOrder::findOrFail($orderId);
+        $order = FSMOrder::where('company_id', $this->companyId())->findOrFail($orderId);
 
         $data = $request->validate([
             'skill_id'       => 'required|integer|exists:fsm_skills,id',
@@ -35,7 +35,7 @@ class OrderSkillController extends Controller
         ]);
 
         FSMOrderSkillRequirement::updateOrCreate(
-            ['fsm_order_id' => $orderId, 'skill_id' => $data['skill_id']],
+            ['fsm_order_id' => $order->id, 'skill_id' => $data['skill_id']],
             ['skill_level_id' => $data['skill_level_id'] ?? null]
         );
 
@@ -45,7 +45,8 @@ class OrderSkillController extends Controller
 
     public function destroy(int $orderId, int $id)
     {
-        $req = FSMOrderSkillRequirement::where('fsm_order_id', $orderId)->findOrFail($id);
+        $order = FSMOrder::where('company_id', $this->companyId())->findOrFail($orderId);
+        $req = FSMOrderSkillRequirement::where('fsm_order_id', $order->id)->findOrFail($id);
         $req->delete();
 
         return redirect()->route('fsmskill.order-skills.index', $orderId)
@@ -59,11 +60,20 @@ class OrderSkillController extends Controller
      */
     public function validateWorker(Request $request, int $orderId)
     {
-        FSMOrder::findOrFail($orderId);
+        $order = FSMOrder::where('company_id', $this->companyId())->findOrFail($orderId);
 
         $data   = $request->validate(['user_id' => 'required|integer']);
-        $result = $this->matcher->checkOrderMatch($data['user_id'], $orderId);
+        \App\Models\User::where('company_id', $this->companyId())->findOrFail($data['user_id']);
+        $result = $this->matcher->checkOrderMatch($data['user_id'], $order->id);
 
         return response()->json($result);
+    }
+
+    private function companyId(): int
+    {
+        $user = auth()->user();
+        abort_if(!$user || !$user->company_id, 403);
+
+        return (int) $user->company_id;
     }
 }

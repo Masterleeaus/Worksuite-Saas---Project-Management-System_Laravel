@@ -26,10 +26,10 @@ return [
     ],
     [
         'id'       => 'fsmcrm:model_lead',
-        'label'    => 'FSMLead model present',
+        'label'    => 'Native Lead model available',
         'severity' => 'error',
-        'ok'       => file_exists(__DIR__ . '/../Models/FSMLead.php'),
-        'hint'     => 'Models/FSMLead.php is required.',
+        'ok'       => class_exists(\App\Models\Lead::class),
+        'hint'     => 'App\\Models\\Lead is required.',
     ],
     [
         'id'       => 'fsmcrm:migrations',

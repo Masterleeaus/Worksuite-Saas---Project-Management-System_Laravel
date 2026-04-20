@@ -10,7 +10,7 @@ class FrequencyController extends Controller
 {
     public function index()
     {
-        $frequencies = FSMFrequency::orderBy('name')->paginate(50);
+        $frequencies = FSMFrequency::where('company_id', $this->companyId())->orderBy('name')->paginate(50);
         return view('fsmrecurring::frequencies.index', compact('frequencies'));
     }
 
@@ -25,6 +25,7 @@ class FrequencyController extends Controller
     public function store(Request $request)
     {
         $data = $this->validated($request);
+        $data['company_id'] = $this->companyId();
         FSMFrequency::create($data);
         return redirect()->route('fsmrecurring.frequencies.index')
             ->with('success', 'Frequency rule created.');
@@ -32,7 +33,7 @@ class FrequencyController extends Controller
 
     public function edit(int $id)
     {
-        $frequency = FSMFrequency::findOrFail($id);
+        $frequency = FSMFrequency::where('company_id', $this->companyId())->findOrFail($id);
         return view('fsmrecurring::frequencies.edit', [
             'frequency'     => $frequency,
             'intervalTypes' => FSMFrequency::$intervalTypes,
@@ -41,7 +42,7 @@ class FrequencyController extends Controller
 
     public function update(Request $request, int $id)
     {
-        $frequency = FSMFrequency::findOrFail($id);
+        $frequency = FSMFrequency::where('company_id', $this->companyId())->findOrFail($id);
         $data = $this->validated($request);
         $frequency->update($data);
         return redirect()->route('fsmrecurring.frequencies.index')
@@ -50,7 +51,7 @@ class FrequencyController extends Controller
 
     public function destroy(int $id)
     {
-        FSMFrequency::findOrFail($id)->delete();
+        FSMFrequency::where('company_id', $this->companyId())->findOrFail($id)->delete();
         return redirect()->route('fsmrecurring.frequencies.index')
             ->with('success', 'Frequency rule deleted.');
     }
@@ -93,5 +94,13 @@ class FrequencyController extends Controller
             'use_setpos' => 'nullable|boolean',
             'set_pos'    => 'nullable|integer|min:-366|max:366',
         ]);
+    }
+
+    private function companyId(): int
+    {
+        $user = auth()->user();
+        abort_if(!$user || !$user->company_id, 403);
+
+        return (int) $user->company_id;
     }
 }

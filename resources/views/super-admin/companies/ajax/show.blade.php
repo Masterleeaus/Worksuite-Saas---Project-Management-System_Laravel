@@ -217,8 +217,13 @@
             <x-cards.data-row :label="__('modules.accountSettings.companyAddress')"
                               :value="isset($company->defaultAddress) ? $company->defaultAddress->address : '--'"
                               html="true"/>
+            @php
+                $companyCurrencyLabel = $company->currency
+                    ? ($company->currency->currency_code . ' (' . $company->currency->currency_symbol . ')')
+                    : '--';
+            @endphp
             <x-cards.data-row :label="__('modules.accountSettings.defaultCurrency')"
-                              :value="$company->currency->currency_code . ' (' . $company->currency->currency_symbol . ')'"/>
+                              :value="$companyCurrencyLabel"/>
             <x-cards.data-row :label="__('modules.accountSettings.defaultTimezone')" :value="$company->timezone"/>
 
             @if (module_enabled('Subdomain'))

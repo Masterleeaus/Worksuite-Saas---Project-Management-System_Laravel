@@ -21,7 +21,7 @@ return new class extends Migration
             $table->id();
             $table->integer('company_id')->unsigned()->nullable();
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade')->onUpdate('cascade');
-            $table->unsignedBigInteger('category_id')->index('item_sub_category_category_id_foreign');
+            $table->unsignedBigInteger('category_id')->index();
             $table->foreign(['category_id'])->references(['id'])->on('item_category')->onUpdate('CASCADE')->onDelete('CASCADE');
             $table->string('category_name');
             $table->timestamps();

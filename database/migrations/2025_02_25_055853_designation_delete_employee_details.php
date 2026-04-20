@@ -13,6 +13,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::getConnection()->getDriverName() !== 'mysql' || !Schema::hasTable('employee_details')) {
+            return;
+        }
+
         try {
             DB::statement('ALTER TABLE `employee_details` DROP FOREIGN KEY `employee_details_designation_id_foreign`;');
         } catch (\Exception $e) {

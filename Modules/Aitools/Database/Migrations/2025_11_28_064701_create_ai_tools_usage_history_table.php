@@ -37,9 +37,9 @@ return new class extends Migration
                 ->onUpdate('cascade');
             $table->timestamps();
             
-            $table->index('company_id');
-            $table->index('user_id');
-            $table->index('created_at');
+            $table->index(['company_id']);
+            $table->index(['user_id']);
+            $table->index(['created_at']);
         });
     }
 

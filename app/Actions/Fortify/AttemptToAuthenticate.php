@@ -76,12 +76,11 @@ class AttemptToAuthenticate
         $authUser = $authUser->first();
 
         // Check if the user exists and belongs to the correct company
-        if ($company && $company->id !== $authUser->company_id) {
+        if ($company && (! $authUser || $company->id !== $authUser->company_id)) {
             $this->checkCompany();
         }
 
-
-        if($authUser->company){
+        if ($authUser && $authUser->company && $authUser->company->attendanceSetting) {
             $attendanceSetting = $authUser->company->attendanceSetting;
             $checkAutoClockinConditions = $this->checkAutoClockinConditions($authUser);
 

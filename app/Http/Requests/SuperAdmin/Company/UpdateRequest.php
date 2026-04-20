@@ -34,9 +34,10 @@ class UpdateRequest extends FormRequest
                 Rule::unique('companies')->where(function ($query) {
                     return $query->where('sub_domain', $this->sub_domain)->orWhere('sub_domain', $this->sub_domain . $this->domain);
                 })->ignore($this->route('company')),
-                ] : '',
+            ] : '',
             'address' => 'required',
-            'status' => 'required'
+            'status' => 'required',
+            'currency_id' => 'required|exists:currencies,id'
         ];
 
 

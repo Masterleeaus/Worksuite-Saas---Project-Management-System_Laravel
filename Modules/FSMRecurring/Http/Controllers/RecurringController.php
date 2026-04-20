@@ -16,7 +16,9 @@ class RecurringController extends Controller
 {
     public function index(Request $request)
     {
-        $q = FSMRecurring::query()->with(['location', 'team', 'frequencySet']);
+        $q = FSMRecurring::query()
+            ->where('company_id', $this->companyId())
+            ->with(['location', 'team', 'frequencySet']);
 
         if ($request->filled('state')) {
             $q->where('state', $request->get('state'));
@@ -52,6 +54,7 @@ class RecurringController extends Controller
         $last   = FSMRecurring::max('id') ?? 0;
         $prefix = config('fsmrecurring.recurring_reference_prefix', 'REC');
         $data['name'] = $prefix . '-' . str_pad((int) $last + 1, 5, '0', STR_PAD_LEFT);
+        $data['company_id'] = $this->companyId();
 
         $recurring = FSMRecurring::create($data);
         $recurring->equipment()->sync($equipmentIds);
@@ -62,7 +65,7 @@ class RecurringController extends Controller
 
     public function show(int $id)
     {
-        $recurring = FSMRecurring::with([
+        $recurring = FSMRecurring::where('company_id', $this->companyId())->with([
             'location', 'team', 'person', 'frequencySet', 'fsmTemplate', 'equipment',
             'recurringTemplate',
             'orders.stage', 'orders.location',
@@ -75,7 +78,7 @@ class RecurringController extends Controller
 
     public function edit(int $id)
     {
-        $recurring = FSMRecurring::with('equipment')->findOrFail($id);
+        $recurring = FSMRecurring::where('company_id', $this->companyId())->with('equipment')->findOrFail($id);
         return view('fsmrecurring::recurring.edit', array_merge(
             $this->formData(),
             ['recurring' => $recurring]
@@ -84,7 +87,7 @@ class RecurringController extends Controller
 
     public function update(Request $request, int $id)
     {
-        $recurring = FSMRecurring::findOrFail($id);
+        $recurring = FSMRecurring::where('company_id', $this->companyId())->findOrFail($id);
         $data = $this->validated($request);
         $equipmentIds = $data['equipment_ids'] ?? [];
         unset($data['equipment_ids']);
@@ -98,7 +101,7 @@ class RecurringController extends Controller
 
     public function destroy(int $id)
     {
-        FSMRecurring::findOrFail($id)->delete();
+        FSMRecurring::where('company_id', $this->companyId())->findOrFail($id)->delete();
         return redirect()->route('fsmrecurring.recurring.index')
             ->with('success', 'Recurring schedule deleted.');
     }
@@ -107,7 +110,7 @@ class RecurringController extends Controller
 
     public function start(int $id)
     {
-        $recurring = FSMRecurring::findOrFail($id);
+        $recurring = FSMRecurring::where('company_id', $this->companyId())->findOrFail($id);
         $recurring->actionStart();
         return redirect()->route('fsmrecurring.recurring.show', $id)
             ->with('success', 'Recurring schedule started. Orders generated.');
@@ -115,7 +118,7 @@ class RecurringController extends Controller
 
     public function suspend(int $id)
     {
-        $recurring = FSMRecurring::findOrFail($id);
+        $recurring = FSMRecurring::where('company_id', $this->companyId())->findOrFail($id);
         $recurring->actionSuspend();
         return redirect()->route('fsmrecurring.recurring.show', $id)
             ->with('success', 'Recurring schedule suspended.');
@@ -123,7 +126,7 @@ class RecurringController extends Controller
 
     public function resume(int $id)
     {
-        $recurring = FSMRecurring::findOrFail($id);
+        $recurring = FSMRecurring::where('company_id', $this->companyId())->findOrFail($id);
         $recurring->actionResume();
         return redirect()->route('fsmrecurring.recurring.show', $id)
             ->with('success', 'Recurring schedule resumed.');
@@ -131,7 +134,7 @@ class RecurringController extends Controller
 
     public function close(int $id)
     {
-        $recurring = FSMRecurring::findOrFail($id);
+        $recurring = FSMRecurring::where('company_id', $this->companyId())->findOrFail($id);
         $recurring->actionClose();
         return redirect()->route('fsmrecurring.recurring.show', $id)
             ->with('success', 'Recurring schedule closed.');
@@ -139,7 +142,7 @@ class RecurringController extends Controller
 
     public function generate(int $id)
     {
-        $recurring = FSMRecurring::findOrFail($id);
+        $recurring = FSMRecurring::where('company_id', $this->companyId())->findOrFail($id);
         $created = $recurring->generateOrders();
         return redirect()->route('fsmrecurring.recurring.show', $id)
             ->with('success', count($created) . ' order(s) generated.');
@@ -151,13 +154,13 @@ class RecurringController extends Controller
     {
         return array_merge([
             'recurring'          => null,
-            'locations'          => FSMLocation::where('active', true)->orderBy('name')->get(),
-            'teams'              => FSMTeam::where('active', true)->orderBy('name')->get(),
-            'templates'          => FSMTemplate::where('active', true)->orderBy('name')->get(),
-            'frequencySets'      => FSMFrequencySet::where('active', true)->orderBy('name')->get(),
-            'recurringTemplates' => FSMRecurringTemplate::where('active', true)->orderBy('name')->get(),
-            'equipment'          => FSMEquipment::where('active', true)->orderBy('name')->get(),
-            'workers'            => \App\Models\User::orderBy('name')->get(),
+            'locations'          => FSMLocation::where('company_id', $this->companyId())->where('active', true)->orderBy('name')->get(),
+            'teams'              => FSMTeam::where('company_id', $this->companyId())->where('active', true)->orderBy('name')->get(),
+            'templates'          => FSMTemplate::where('company_id', $this->companyId())->where('active', true)->orderBy('name')->get(),
+            'frequencySets'      => FSMFrequencySet::where('company_id', $this->companyId())->where('active', true)->orderBy('name')->get(),
+            'recurringTemplates' => FSMRecurringTemplate::where('company_id', $this->companyId())->where('active', true)->orderBy('name')->get(),
+            'equipment'          => FSMEquipment::where('company_id', $this->companyId())->where('active', true)->orderBy('name')->get(),
+            'workers'            => \App\Models\User::where('company_id', $this->companyId())->orderBy('name')->get(),
         ], $extra);
     }
 
@@ -178,5 +181,13 @@ class RecurringController extends Controller
             'equipment_ids'         => 'nullable|array',
             'equipment_ids.*'       => 'integer|exists:fsm_equipment,id',
         ]);
+    }
+
+    private function companyId(): int
+    {
+        $user = auth()->user();
+        abort_if(!$user || !$user->company_id, 403);
+
+        return (int) $user->company_id;
     }
 }

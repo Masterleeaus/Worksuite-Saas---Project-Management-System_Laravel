@@ -13,8 +13,9 @@ class EmployeeSkillController extends Controller
 {
     public function index(int $userId)
     {
-        $user   = \App\Models\User::findOrFail($userId);
+        $user   = \App\Models\User::where('company_id', $this->companyId())->findOrFail($userId);
         $skills = FSMEmployeeSkill::with(['skill.skillType', 'skillLevel'])
+            ->where('company_id', $this->companyId())
             ->where('user_id', $userId)
             ->orderBy('skill_id')
             ->get();
@@ -24,14 +25,14 @@ class EmployeeSkillController extends Controller
 
     public function create(int $userId)
     {
-        $user   = \App\Models\User::findOrFail($userId);
-        $skills = FSMSkill::where('active', true)->with('levels')->orderBy('name')->get();
+        $user   = \App\Models\User::where('company_id', $this->companyId())->findOrFail($userId);
+        $skills = FSMSkill::where('company_id', $this->companyId())->where('active', true)->with('levels')->orderBy('name')->get();
         return view('fsmskill::employee_skills.create', compact('user', 'skills'));
     }
 
     public function store(Request $request, int $userId)
     {
-        \App\Models\User::findOrFail($userId);
+        \App\Models\User::where('company_id', $this->companyId())->findOrFail($userId);
 
         $data = $request->validate([
             'skill_id'       => 'required|integer|exists:fsm_skills,id',
@@ -48,7 +49,7 @@ class EmployeeSkillController extends Controller
         }
 
         FSMEmployeeSkill::updateOrCreate(
-            ['user_id' => $userId, 'skill_id' => $data['skill_id']],
+            ['company_id' => $this->companyId(), 'user_id' => $userId, 'skill_id' => $data['skill_id']],
             [
                 'skill_level_id'   => $data['skill_level_id'] ?? null,
                 'expiry_date'      => $data['expiry_date'] ?? null,
@@ -63,16 +64,16 @@ class EmployeeSkillController extends Controller
 
     public function edit(int $userId, int $id)
     {
-        $user       = \App\Models\User::findOrFail($userId);
-        $empSkill   = FSMEmployeeSkill::where('user_id', $userId)->findOrFail($id);
-        $skills     = FSMSkill::where('active', true)->with('levels')->orderBy('name')->get();
-        $levels     = FSMSkillLevel::where('skill_id', $empSkill->skill_id)->orderBy('progress')->get();
+        $user       = \App\Models\User::where('company_id', $this->companyId())->findOrFail($userId);
+        $empSkill   = FSMEmployeeSkill::where('company_id', $this->companyId())->where('user_id', $userId)->findOrFail($id);
+        $skills     = FSMSkill::where('company_id', $this->companyId())->where('active', true)->with('levels')->orderBy('name')->get();
+        $levels     = FSMSkillLevel::where('company_id', $this->companyId())->where('skill_id', $empSkill->skill_id)->orderBy('progress')->get();
         return view('fsmskill::employee_skills.edit', compact('user', 'empSkill', 'skills', 'levels'));
     }
 
     public function update(Request $request, int $userId, int $id)
     {
-        $empSkill = FSMEmployeeSkill::where('user_id', $userId)->findOrFail($id);
+        $empSkill = FSMEmployeeSkill::where('company_id', $this->companyId())->where('user_id', $userId)->findOrFail($id);
 
         $data = $request->validate([
             'skill_level_id' => 'nullable|integer|exists:fsm_skill_levels,id',
@@ -98,7 +99,7 @@ class EmployeeSkillController extends Controller
 
     public function destroy(int $userId, int $id)
     {
-        $empSkill = FSMEmployeeSkill::where('user_id', $userId)->findOrFail($id);
+        $empSkill = FSMEmployeeSkill::where('company_id', $this->companyId())->where('user_id', $userId)->findOrFail($id);
 
         if ($empSkill->certificate_path) {
             Storage::disk('public')->delete($empSkill->certificate_path);
@@ -113,9 +114,17 @@ class EmployeeSkillController extends Controller
     /** AJAX: return skill levels for a given skill (used in dynamic form). */
     public function levels(int $skillId)
     {
-        $levels = FSMSkillLevel::where('skill_id', $skillId)
+        $levels = FSMSkillLevel::where('company_id', $this->companyId())->where('skill_id', $skillId)
             ->orderBy('progress')
             ->get(['id', 'name', 'progress']);
         return response()->json($levels);
+    }
+
+    private function companyId(): int
+    {
+        $user = auth()->user();
+        abort_if(!$user || !$user->company_id, 403);
+
+        return (int) $user->company_id;
     }
 }

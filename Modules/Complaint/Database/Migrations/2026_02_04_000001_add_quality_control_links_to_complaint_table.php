@@ -11,7 +11,7 @@ return new class extends Migration
         if (Schema::hasTable('complaint')) {
             Schema::table('complaint', function (Blueprint $table) {
                 if (!Schema::hasColumn('complaint', 'quality_control_id')) {
-                    $table->unsignedInteger('quality_control_id')->nullable()->after('type_id');
+                    $table->unsignedInteger('quality_control_id')->nullable();
                 }
                 if (!Schema::hasColumn('complaint', 'quality_control_reason')) {
                     $table->string('quality_control_reason')->nullable()->after('quality_control_id');

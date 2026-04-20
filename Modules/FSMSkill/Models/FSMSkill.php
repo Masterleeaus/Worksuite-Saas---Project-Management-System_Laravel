@@ -2,10 +2,13 @@
 
 namespace Modules\FSMSkill\Models;
 
+use App\Traits\HasCompany;
 use Illuminate\Database\Eloquent\Model;
 
 class FSMSkill extends Model
 {
+    use HasCompany;
+
     protected $table = 'fsm_skills';
 
     protected $fillable = [

@@ -9,7 +9,7 @@
         "dispatch",
         "cleansmartOS"
     ],
-    "active": 1,
+    "active": 0,
     "order": 1,
     "providers": [
         "Modules\\FSMCalendar\\Providers\\FSMCalendarServiceProvider",

@@ -9,6 +9,7 @@ use App\Models\SuperAdmin\TrFrontDetail;
 use App\Models\SuperAdmin\OfflinePlanChange;
 use Illuminate\Database\Migrations\Migration;
 use App\Models\SuperAdmin\GlobalInvoiceSetting;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -107,6 +108,10 @@ return new class extends Migration
         foreach ($files as $file) {
             $model = $file['model'];
             $columns = $file['columns'];
+
+            if (!Schema::hasTable((new $model())->getTable())) {
+                continue;
+            }
 
             Files::fixLocalUploadFiles($model, $columns);
         }

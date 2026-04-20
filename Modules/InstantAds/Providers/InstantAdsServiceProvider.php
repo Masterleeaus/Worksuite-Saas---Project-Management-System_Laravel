@@ -19,7 +19,6 @@ class InstantAdsServiceProvider extends ServiceProvider
 
     public function register(): void
     {
-        $this->app->register(RouteServiceProvider::class);
     }
 
     protected function registerConfig(): void
