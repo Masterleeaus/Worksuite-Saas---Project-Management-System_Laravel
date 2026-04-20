@@ -1,0 +1,1 @@
+{"name":"TestModule","alias":"TestModule","version":"1.0.0","providers":["Modules\\TestModule\\Providers\\TestModuleServiceProvider"],"permissions":[{"key":"manage_testmodule","label":"Manage TestModule"}],"routes":[{"uri":"\/TestModule","method":"GET"}]}
