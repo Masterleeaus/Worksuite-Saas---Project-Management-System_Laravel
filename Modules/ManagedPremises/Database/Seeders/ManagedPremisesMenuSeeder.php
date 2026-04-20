@@ -65,8 +65,8 @@ class ManagedPremisesMenuSeeder extends Seeder
             ];
 
             if ($hasKey) {
-                $slug = Str::slug((string) ($menu['label'] ?? ('menu-' . ($index + 1))));
-                $itemPayload['key'] = 'managedpremises.menu.' . $slug;
+                $slug = Str::slug((string) ($menu['label'] ?? ''));
+                $itemPayload['key'] = 'managedpremises.menu.' . ($slug ?: 'item-' . md5($itemPayload['route'] . $index));
             }
 
             $exists = DB::table('menus')
