@@ -29,7 +29,10 @@ class ManagedPremisesStatusSeeder extends Seeder
             $row = DB::table('pm_settings')->where('company_id', $company->id)->first();
             $current = [];
             if ($row?->settings_json) {
-                $current = json_decode((string) $row->settings_json, true) ?: [];
+                $decoded = json_decode((string) $row->settings_json, true);
+                if (is_array($decoded)) {
+                    $current = $decoded;
+                }
             }
 
             $merged = array_replace_recursive($defaults, $current);

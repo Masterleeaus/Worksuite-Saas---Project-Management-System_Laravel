@@ -32,4 +32,3 @@ class UpdateQcRecordRequest extends CoreRequest
         ];
     }
 }
-

@@ -5,6 +5,7 @@ namespace Modules\ManagedPremises\Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class ManagedPremisesMenuSeeder extends Seeder
 {
@@ -64,7 +65,8 @@ class ManagedPremisesMenuSeeder extends Seeder
             ];
 
             if ($hasKey) {
-                $itemPayload['key'] = 'managedpremises.seeded.' . ($index + 1);
+                $slug = Str::slug((string) ($menu['label'] ?? ('menu-' . ($index + 1))));
+                $itemPayload['key'] = 'managedpremises.menu.' . $slug;
             }
 
             $exists = DB::table('menus')

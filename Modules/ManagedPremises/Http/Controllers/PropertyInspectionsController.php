@@ -8,6 +8,7 @@ use Modules\ManagedPremises\Entities\Property;
 use Modules\ManagedPremises\Entities\PropertyInspection;
 use Modules\ManagedPremises\Http\Requests\StorePropertyInspectionRequest;
 use Modules\ManagedPremises\Http\Requests\UpdatePropertyInspectionRequest;
+use Modules\QualityControl\Entities\QcRecord;
 use Modules\QualityControl\Services\ExecutionRecordService;
 
 class PropertyInspectionsController extends Controller
@@ -98,7 +99,7 @@ public function index(Property $property)
             ->with('warning', __('Delete this inspection from Quality Control.'));
     }
 
-    private function resolveLegacyQcRecord(int $legacyInspectionId): ?object
+    private function resolveLegacyQcRecord(int $legacyInspectionId): ?QcRecord
     {
         if (!class_exists(ExecutionRecordService::class)) {
             return null;

@@ -16,18 +16,18 @@ use Modules\ManagedPremises\Domain\Premises\Actions\ArchivePremiseAction;
 
 class PropertiesController extends AccountBaseController
 {
+    use EnsuresManagedPremisesPermissions;
+
     public function __construct(
         private readonly CreatePremiseAction $createPremiseAction,
         private readonly UpdatePremiseAction $updatePremiseAction,
         private readonly ArchivePremiseAction $archivePremiseAction
     )
     {
-        $this->ensureCanViewManagedPremises();
         parent::__construct();
         $this->pageTitle = 'managedpremises::app.menu.properties';
         $this->pageIcon = 'ti-home';
     }
-    use EnsuresManagedPremisesPermissions;
 
     public function index()
     {

@@ -55,7 +55,7 @@
                                 <td>{{ $record->booking_id ?? '—' }}</td>
                             </tr>
                             <tr>
-                                <th class="text-muted">Premise</th>
+                                <th class="text-muted">@lang('managedpremises::app.property')</th>
                                 <td>{{ $record->property_id ? ('#' . $record->property_id) : '—' }}</td>
                             </tr>
                             <tr>

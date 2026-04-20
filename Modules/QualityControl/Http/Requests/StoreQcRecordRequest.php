@@ -32,4 +32,3 @@ class StoreQcRecordRequest extends CoreRequest
         ];
     }
 }
-
