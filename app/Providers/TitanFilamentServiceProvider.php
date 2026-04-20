@@ -42,7 +42,7 @@ class TitanFilamentServiceProvider extends ServiceProvider
     {
         // Bind the panel provider so it can be resolved from the container
         // for programmatic introspection (e.g. titan:filament-check command).
-        $this->app->singleton(TitanPanelProvider::class);
+        $this->app->singleton(TitanPanelProvider::class, fn ($app) => new TitanPanelProvider($app));
     }
 
     /**

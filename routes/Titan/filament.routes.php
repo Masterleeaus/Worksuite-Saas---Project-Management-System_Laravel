@@ -34,7 +34,11 @@ Route::middleware(['web'])->group(function () {
             abort(503, 'Titan panel is not yet available. Please run: composer require filament/filament && php artisan filament:install --panels');
         }
 
-        return redirect()->route('filament.titan.pages.command-centre');
+        if (Route::has('filament.titan.pages.command-centre')) {
+            return redirect()->route('filament.titan.pages.command-centre');
+        }
+
+        return redirect('/login');
     })->name('titan.home');
 
 });
