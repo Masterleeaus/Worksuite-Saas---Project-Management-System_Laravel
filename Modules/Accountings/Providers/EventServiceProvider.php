@@ -32,7 +32,7 @@ class EventServiceProvider extends ServiceProvider
         ProfitabilitySnapshot::class => AccountingEnginePolicy::class,
     ];
 
-/**
+    /**
      * The event listener mappings for the application.
      *
      * @var array
