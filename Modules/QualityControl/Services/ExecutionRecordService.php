@@ -10,10 +10,14 @@ use Modules\QualityControl\Entities\QcRecordItem;
 
 class ExecutionRecordService
 {
-    public function listForCompany(?int $companyId)
+    public function listForCompany(?int $companyId, array $filters = [])
     {
         return QcRecord::query()
             ->when($companyId, fn ($q) => $q->where('company_id', $companyId))
+            ->when(!empty($filters['property_id']), fn ($q) => $q->where('property_id', (int) $filters['property_id']))
+            ->when(!empty($filters['unit_id']), fn ($q) => $q->where('unit_id', (int) $filters['unit_id']))
+            ->when(!empty($filters['room_id']), fn ($q) => $q->where('room_id', (int) $filters['room_id']))
+            ->when(!empty($filters['visit_id']), fn ($q) => $q->where('visit_id', (int) $filters['visit_id']))
             ->with(['cleaner', 'template'])
             ->latest();
     }
@@ -39,6 +43,10 @@ class ExecutionRecordService
                 if ($this->hasColumn('qc_records', 'legacy_inspection_id')) {
                     $q->orWhere('legacy_inspection_id', $id);
                 }
+
+                if ($this->hasColumn('qc_records', 'legacy_pm_property_inspection_id')) {
+                    $q->orWhere('legacy_pm_property_inspection_id', $id);
+                }
             })
             ->first();
     }
@@ -52,6 +60,10 @@ class ExecutionRecordService
                 'cleaner_id' => $validated['cleaner_id'] ?? null,
                 'template_id' => $validated['template_id'] ?? null,
                 'schedule_id' => $validated['schedule_id'] ?? null,
+                'property_id' => $validated['property_id'] ?? null,
+                'unit_id' => $validated['unit_id'] ?? null,
+                'room_id' => $validated['room_id'] ?? null,
+                'visit_id' => $validated['visit_id'] ?? null,
                 'status' => 'pending',
                 'overall_score' => 0,
                 'notes' => $validated['notes'] ?? null,
@@ -86,6 +98,10 @@ class ExecutionRecordService
                 'cleaner_id' => $validated['cleaner_id'] ?? $record->cleaner_id,
                 'template_id' => $validated['template_id'] ?? $record->template_id,
                 'schedule_id' => $validated['schedule_id'] ?? $record->schedule_id,
+                'property_id' => $validated['property_id'] ?? $record->property_id,
+                'unit_id' => $validated['unit_id'] ?? $record->unit_id,
+                'room_id' => $validated['room_id'] ?? $record->room_id,
+                'visit_id' => $validated['visit_id'] ?? $record->visit_id,
                 'notes' => $validated['notes'] ?? $record->notes,
                 'inspected_at' => $validated['inspected_at'] ?? $record->inspected_at,
             ]);
@@ -147,4 +163,3 @@ class ExecutionRecordService
         }
     }
 }
-

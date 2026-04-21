@@ -68,10 +68,10 @@
                         <tbody>
                         @forelse($inspections as $i)
                             <tr>
-                                <td>{{ optional($i->scheduled_for)->format('d M Y H:i') }}</td>
+                                <td>{{ optional($i->inspected_at)->format('d M Y H:i') ?? optional($i->created_at)->format('d M Y H:i') }}</td>
                                 <td>
                                     <a href="{{ route('managedpremises.properties.show', $i->property_id) }}">
-                                        {{ $i->property?->name ?? ('#'.$i->property_id) }}
+                                        {{ '#'.$i->property_id }}
                                     </a>
                                 </td>
                                 <td><span class="badge bg-secondary">{{ $i->status }}</span></td>

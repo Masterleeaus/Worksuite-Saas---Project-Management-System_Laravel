@@ -22,6 +22,7 @@ use Modules\ManagedPremises\Http\Controllers\PropertyInspectionsController;
 use Modules\ManagedPremises\Http\Controllers\PropertyDocumentsController;
 use Modules\ManagedPremises\Http\Controllers\PropertyApprovalsController;
 use Modules\ManagedPremises\Http\Controllers\PropertyCalendarController;
+use Modules\ManagedPremises\Http\Controllers\PropertyMeterReadingsController;
 
 use Modules\ManagedPremises\Http\Controllers\PropertySettingsController;
 
@@ -273,6 +274,17 @@ Route::group([
     Route::post('properties/{property}/approvals/{approval}/decision', [PropertyApprovalsController::class, 'decision'])
         ->middleware('permission:managedpremises.approvals.update')
         ->name('properties.approvals.decision');
+
+    // Meter Readings
+    Route::get('properties/{property}/meters', [PropertyMeterReadingsController::class, 'index'])
+        ->middleware('permission:managedpremises.meters.view')
+        ->name('properties.meters.index');
+    Route::post('properties/{property}/meters', [PropertyMeterReadingsController::class, 'store'])
+        ->middleware('permission:managedpremises.meters.manage')
+        ->name('properties.meters.store');
+    Route::delete('properties/{property}/meters/{reading}', [PropertyMeterReadingsController::class, 'destroy'])
+        ->middleware('permission:managedpremises.meters.manage')
+        ->name('properties.meters.destroy');
 
     // Calendar
     Route::get('calendar', [PropertyCalendarController::class, 'index'])

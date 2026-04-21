@@ -4,7 +4,7 @@ namespace Modules\ManagedPremises\Http\Controllers\Api;
 use Illuminate\Routing\Controller;
 use Modules\ManagedPremises\Http\Requests\CalendarFeedRequest;
 use Modules\ManagedPremises\Entities\PropertyVisit;
-use Modules\ManagedPremises\Entities\PropertyInspection;
+use Modules\QualityControl\Entities\QcRecord;
 use Modules\ManagedPremises\Http\Resources\CalendarItemResource;
 use Modules\ManagedPremises\Http\Controllers\Concerns\EnsuresManagedPremisesPermissions;
 
@@ -36,19 +36,21 @@ class CalendarFeedController extends Controller
                 'status' => $v->status,
             ]);
 
-        $inspections = PropertyInspection::query()
-            ->where('company_id', $companyId)
-            ->whereBetween('scheduled_for', [$from, $to])
-            ->with('property')
-            ->get()
-            ->map(fn($i) => [
-                'type' => 'inspection',
-                'id' => $i->id,
-                'property_id' => $i->property_id,
-                'title' => ($i->inspection_type ?: 'Inspection') . ' — ' . ($i->property?->name ?? ('#'.$i->property_id)),
-                'start' => optional($i->scheduled_for)->toIso8601String(),
-                'status' => $i->status,
-            ]);
+        $inspections = class_exists(QcRecord::class)
+            ? QcRecord::query()
+                ->where('company_id', $companyId)
+                ->whereBetween('inspected_at', [$from, $to])
+                ->whereNotNull('property_id')
+                ->get()
+                ->map(fn($i) => [
+                    'type' => 'inspection',
+                    'id' => $i->id,
+                    'property_id' => $i->property_id,
+                    'title' => 'QC Inspection — #' . $i->property_id,
+                    'start' => optional($i->inspected_at)->toIso8601String(),
+                    'status' => $i->status,
+                ])
+            : collect();
 
         return CalendarItemResource::collection($visits->merge($inspections)->values());
     }

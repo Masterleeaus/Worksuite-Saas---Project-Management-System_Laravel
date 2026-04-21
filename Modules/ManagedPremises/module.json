@@ -24,6 +24,17 @@
     "order": 0,
     "aliases": {},
     "requires": [],
+    "inspection_owner": "quality_control",
+    "manifests": {
+        "permissions": "manifests/permissions.php",
+        "settings": "manifests/settings.php",
+        "menus": "manifests/menus.php",
+        "seeders": "manifests/seeders.php",
+        "api": "manifests/api.php",
+        "lifecycle": "manifests/lifecycle.php",
+        "signals": "manifests/signals.php",
+        "ai": "manifests/ai.php"
+    },
     "permissions": [
         "view_premises",
         "add_premise",

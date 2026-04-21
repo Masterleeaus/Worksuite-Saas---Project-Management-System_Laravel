@@ -7,7 +7,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Modules\ManagedPremises\Entities\PropertyVisit;
-use Modules\ManagedPremises\Entities\PropertyInspection;
+use Modules\QualityControl\Entities\QcRecord;
 
 class PropertyCalendarController extends Controller
 {
@@ -42,12 +42,14 @@ public function __construct()
             ->with('property')
             ->get();
 
-        $inspections = PropertyInspection::query()
-            ->where('company_id', $companyId)
-            ->whereBetween('scheduled_for', [$start, $end])
-            ->orderBy('scheduled_for')
-            ->with('property')
-            ->get();
+        $inspections = class_exists(QcRecord::class)
+            ? QcRecord::query()
+                ->where('company_id', $companyId)
+                ->whereBetween('inspected_at', [$start, $end])
+                ->whereNotNull('property_id')
+                ->orderBy('inspected_at')
+                ->get()
+            : collect();
 
         return view('managedpremises::calendar.index', compact('month','start','end','visits','inspections'));
     }
