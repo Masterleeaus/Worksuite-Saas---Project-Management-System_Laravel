@@ -21,9 +21,11 @@ use Tests\TestCase;
  */
 class JobRetryConfigTest extends TestCase
 {
-    // ------------------------------------------------------------------
-    // All jobs implement ShouldQueue
-    // ------------------------------------------------------------------
+    /** @test */
+    public function record_payment_ledger_job_is_unique(): void
+    {
+        $this->assertInstanceOf(ShouldBeUnique::class, new \Modules\Accountings\Jobs\RecordPaymentLedgerJob(1, 1));
+    }
 
     /** @test */
     public function all_accounting_jobs_are_queueable(): void

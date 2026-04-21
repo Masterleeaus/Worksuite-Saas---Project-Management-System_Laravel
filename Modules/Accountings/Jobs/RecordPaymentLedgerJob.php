@@ -5,6 +5,7 @@ namespace Modules\Accountings\Jobs;
 use App\Models\Payment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
@@ -15,7 +16,7 @@ use Modules\Accountings\Actions\RecordPaymentAction;
  *
  * Dispatched by PaymentAccountingObserver on payment.created / status→complete.
  */
-class RecordPaymentLedgerJob implements ShouldQueue
+class RecordPaymentLedgerJob implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
