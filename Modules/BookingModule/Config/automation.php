@@ -75,6 +75,10 @@ return [
             'after_assignment' => (bool) env('BOOKING_REMINDER_ON_ASSIGN', true),
             'after_reschedule' => (bool) env('BOOKING_REMINDER_ON_RESCHEDULE', true),
         ],
+
+        // How long (in days) to retain rows in booking_reminder_logs before pruning.
+        // Set via BOOKING_REMINDER_RETENTION_DAYS env var or override in config.
+        'retention_days' => (int) env('BOOKING_REMINDER_RETENTION_DAYS', 90),
     ],
 ];
 

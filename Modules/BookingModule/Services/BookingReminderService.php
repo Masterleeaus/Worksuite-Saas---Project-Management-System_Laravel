@@ -170,6 +170,15 @@ class BookingReminderService
      * When $companyId is provided the query is scoped to that company explicitly
      * (safe for console/queue context where Auth is not set).
      *
+     * Query strategy (index-friendly):
+     *   1. When starts_at is populated we do a straight BETWEEN on the indexed datetime column.
+     *      Recommended index: schedules(company_id, status, assigned_to, starts_at)
+     *   2. Only rows where starts_at IS NULL fall through to the CAST(CONCAT(date, ' ', start_time))
+     *      fallback.  This branch cannot use a B-tree index, but is bounded to rows that have no
+     *      starts_at value.  A data-backfill migration that sets starts_at = CONCAT(date,' ',start_time)
+     *      on existing rows will eliminate this branch entirely and is recommended for high-volume
+     *      installs.  See: Modules/BookingModule/Database/Migrations/ for future backfill migration.
+     *
      * @param  int       $leadMinutes
      * @param  int|null  $companyId  Optional explicit company scope.
      * @return \Illuminate\Database\Eloquent\Collection<Schedule>
@@ -191,21 +200,25 @@ class BookingReminderService
             $query->where('company_id', $companyId);
         }
 
-        return $query->where(function ($q) use ($lowerBound, $upperBound) {
-                // Prefer starts_at (full datetime) if populated; fall back to date+start_time concat.
-                $q->where(function ($qq) use ($lowerBound, $upperBound) {
-                    // schedules with a populated starts_at column
+        $lower = $lowerBound->toDateTimeString();
+        $upper = $upperBound->toDateTimeString();
+
+        return $query->where(function ($q) use ($lower, $upper) {
+                // Branch 1 (index-friendly): rows with a populated starts_at datetime column.
+                $q->where(function ($qq) use ($lower, $upper) {
                     $qq->whereNotNull('starts_at')
-                       ->whereBetween('starts_at', [
-                           $lowerBound->toDateTimeString(),
-                           $upperBound->toDateTimeString(),
-                       ]);
-                })->orWhere(function ($qq) use ($lowerBound, $upperBound) {
-                    // schedules without starts_at — compare concatenated date+start_time
+                       ->whereBetween('starts_at', [$lower, $upper]);
+                });
+
+                // Branch 2 (fallback): rows without starts_at — compare concatenated date+start_time.
+                // This branch is intentionally second so the optimizer checks starts_at first.
+                $q->orWhere(function ($qq) use ($lower, $upper) {
                     $qq->whereNull('starts_at')
+                       ->whereNotNull('date')
+                       ->whereNotNull('start_time')
                        ->whereRaw(
                            "CAST(CONCAT(date, ' ', start_time) AS DATETIME) BETWEEN ? AND ?",
-                           [$lowerBound->toDateTimeString(), $upperBound->toDateTimeString()]
+                           [$lower, $upper]
                        );
                 });
             })

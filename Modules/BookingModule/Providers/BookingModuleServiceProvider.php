@@ -4,6 +4,7 @@ namespace Modules\BookingModule\Providers;
 
 use Modules\BookingModule\Console\ActivateModuleCommand;
 use Modules\BookingModule\Console\DispatchBookingRemindersCommand;
+use Modules\BookingModule\Console\PruneBookingReminderLogsCommand;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
 use Modules\BookingModule\Services\BookingFSMService;
@@ -32,6 +33,7 @@ class BookingModuleServiceProvider extends ServiceProvider
             $this->commands([
                 ActivateModuleCommand::class,
                 DispatchBookingRemindersCommand::class,
+                PruneBookingReminderLogsCommand::class,
             ]);
         }
 
