@@ -15,9 +15,6 @@ class InspectionDatabaseSeeder extends Seeder
     public function run()
     {
         Model::unguard();
-
-        $this->call(InspectionPermissionsSeeder::class);
-        $this->call(InspectionTemplateSeeder::class);
-        $this->call(InspectionModuleSeeder::class);
+        $this->call(QualityControlDatabaseSeeder::class);
     }
 }

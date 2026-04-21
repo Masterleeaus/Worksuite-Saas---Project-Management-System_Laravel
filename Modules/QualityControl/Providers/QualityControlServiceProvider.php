@@ -76,6 +76,14 @@ class QualityControlServiceProvider extends ServiceProvider
         ], 'config');
 
         $this->mergeConfigFrom(__DIR__ . '/../Config/titanzero.php', 'quality_control_titanzero');
+
+        $this->mergeConfigFrom(__DIR__ . '/../manifests/permissions.php', 'quality_control_manifest_permissions');
+        $this->mergeConfigFrom(__DIR__ . '/../manifests/settings.php', 'quality_control_manifest_settings');
+        $this->mergeConfigFrom(__DIR__ . '/../manifests/api.php', 'quality_control_manifest_api');
+        $this->mergeConfigFrom(__DIR__ . '/../manifests/lifecycle.php', 'quality_control_manifest_lifecycle');
+        $this->mergeConfigFrom(__DIR__ . '/../manifests/signals.php', 'quality_control_manifest_signals');
+        $this->mergeConfigFrom(__DIR__ . '/../manifests/seeders.php', 'quality_control_manifest_seeders');
+        $this->mergeConfigFrom(__DIR__ . '/../manifests/ai.php', 'quality_control_manifest_ai');
     }
 
     protected function registerTranslations(): void

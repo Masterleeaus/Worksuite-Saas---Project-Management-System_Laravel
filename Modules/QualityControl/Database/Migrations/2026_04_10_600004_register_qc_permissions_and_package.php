@@ -12,6 +12,14 @@ return new class extends Migration {
         ['name' => 'manage_qc_templates',  'display_name' => 'Manage QC Templates'],
         ['name' => 'trigger_reclean',      'display_name' => 'Trigger Re-clean'],
         ['name' => 'view_cleaner_ratings', 'display_name' => 'View Cleaner Ratings'],
+        ['name' => 'manage_qc_corrective_actions',  'display_name' => 'Manage QC Corrective Actions'],
+        ['name' => 'verify_qc_followups',           'display_name' => 'Verify QC Follow-ups'],
+        // Phase 8 additions
+        ['name' => 'view_qc_corrective_actions',    'display_name' => 'View QC Corrective Actions'],
+        ['name' => 'assign_qc_corrective_actions',  'display_name' => 'Assign QC Corrective Actions'],
+        ['name' => 'verify_qc_corrective_actions',  'display_name' => 'Verify QC Corrective Actions'],
+        ['name' => 'view_qc_verification_queue',    'display_name' => 'View QC Verification Queue'],
+        ['name' => 'manage_qc_escalations',         'display_name' => 'Manage QC Escalations'],
     ];
 
     public function up(): void

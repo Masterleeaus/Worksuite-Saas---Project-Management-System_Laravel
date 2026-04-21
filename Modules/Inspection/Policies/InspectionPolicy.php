@@ -2,19 +2,17 @@
 
 namespace Modules\Inspection\Policies;
 
-use App\Models\User;
-use Modules\QualityControl\Support\InspectionPermissions;
-use Modules\QualityControl\Support\ModuleAccess;
-
-class InspectionPolicy
+/**
+ * @deprecated Compatibility bridge policy.
+ *
+ * All Inspection permission checks are owned by QualityControl.
+ * This class extends the canonical QC InspectionPolicy so that
+ * Inspection-namespaced policy lookups resolve with identical rules
+ * without duplicating authorization logic.
+ *
+ * @see \Modules\QualityControl\Policies\InspectionPolicy
+ */
+class InspectionPolicy extends \Modules\QualityControl\Policies\InspectionPolicy
 {
-    public function viewAny(User $user): bool
-    {
-        return ModuleAccess::can(InspectionPermissions::VIEW, ['all'], $user);
-    }
-
-    public function create(User $user): bool
-    {
-        return ModuleAccess::can(InspectionPermissions::CREATE, ['all'], $user);
-    }
+    // No overrides. Inherits all authorization logic from QC canonical policy.
 }

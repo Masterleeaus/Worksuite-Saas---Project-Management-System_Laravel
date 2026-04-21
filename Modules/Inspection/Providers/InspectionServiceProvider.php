@@ -24,6 +24,7 @@ class InspectionServiceProvider extends ServiceProvider
             $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
         }
         $this->scheduleCommands();
+        $this->registerTemplatesViaQcRegistry();
 
         // Titan Zero + Titan Go integration (capabilities registry)
         if (class_exists(\Modules\TitanZero\Services\CapabilityRegistry::class)) {
@@ -86,5 +87,40 @@ class InspectionServiceProvider extends ServiceProvider
         $schedule->command('recurring-schedule-create')
             ->daily()
             ->timezone($timezone);
+    }
+
+    /**
+     * Register Inspection template packs into the QualityControl template registry.
+     *
+     * Inspection is the planning module; its default template packs (cleaner, builder,
+     * electrician, plumber) are made available in the QC template registry so that
+     * the verification engine can reference them without circular coupling.
+     */
+    protected function registerTemplatesViaQcRegistry(): void
+    {
+        if (! class_exists(\Modules\QualityControl\Support\TemplatePacks::class)) {
+            return;
+        }
+
+        // The QC TemplatePacks::defaultPacks() is the canonical source already containing
+        // the same pack definitions. Registering via the QC class here acts as a bridge
+        // hook, giving future QC registry implementations a chance to enrich packs with
+        // Inspection-sourced metadata (e.g. recommended frequency, site type).
+        //
+        // If a QC template registry service exists, delegate to it; otherwise no-op.
+        if (! class_exists(\Modules\QualityControl\Services\TemplateRegistryService::class)) {
+            return;
+        }
+
+        try {
+            $registry = $this->app->make(\Modules\QualityControl\Services\TemplateRegistryService::class);
+            $packs    = \Modules\Inspection\Support\TemplatePacks::defaultPacks();
+
+            foreach ($packs as $trade => $items) {
+                $registry->registerPack($trade, $items, 'inspection');
+            }
+        } catch (\Throwable) {
+            // Non-fatal: template registry is optional infrastructure.
+        }
     }
 }

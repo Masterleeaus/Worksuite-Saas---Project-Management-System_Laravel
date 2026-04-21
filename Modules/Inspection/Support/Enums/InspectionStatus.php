@@ -2,14 +2,25 @@
 
 namespace Modules\Inspection\Support\Enums;
 
+/**
+ * @deprecated Use Modules\QualityControl\Support\Enums\InspectionStatus (canonical source).
+ *
+ * This class is a compatibility bridge. All methods and constant values are identical to
+ * the QC enum; static methods delegate to the canonical class to avoid dual maintenance.
+ */
 final class InspectionStatus
 {
-    public const PENDING    = 'pending';
-    public const IN_PROGRESS = 'in_progress';
-    public const PASSED     = 'passed';
-    public const FAILED     = 'failed';
-    public const RECLEAN_BOOKED = 'reclean_booked';
+    /**
+     * Shared status constants – must stay in sync with QC canonical values.
+     * @see \Modules\QualityControl\Support\Enums\InspectionStatus
+     */
+    public const PENDING        = \Modules\QualityControl\Support\Enums\InspectionStatus::PENDING;
+    public const IN_PROGRESS    = \Modules\QualityControl\Support\Enums\InspectionStatus::IN_PROGRESS;
+    public const PASSED         = \Modules\QualityControl\Support\Enums\InspectionStatus::PASSED;
+    public const FAILED         = \Modules\QualityControl\Support\Enums\InspectionStatus::FAILED;
+    public const RECLEAN_BOOKED = \Modules\QualityControl\Support\Enums\InspectionStatus::RECLEAN_BOOKED;
 
+    /** Returns only the 5 statuses originally owned by the Inspection module. */
     public static function all(): array
     {
         return [
@@ -21,27 +32,15 @@ final class InspectionStatus
         ];
     }
 
+    /** @deprecated Delegates to QC canonical implementation. */
     public static function label(string $status): string
     {
-        return match ($status) {
-            self::PENDING        => 'Pending',
-            self::IN_PROGRESS    => 'In Progress',
-            self::PASSED         => 'Passed',
-            self::FAILED         => 'Failed',
-            self::RECLEAN_BOOKED => 'Re-clean Booked',
-            default              => ucfirst($status),
-        };
+        return \Modules\QualityControl\Support\Enums\InspectionStatus::label($status);
     }
 
+    /** @deprecated Delegates to QC canonical implementation. */
     public static function badgeClass(string $status): string
     {
-        return match ($status) {
-            self::PENDING        => 'badge-secondary',
-            self::IN_PROGRESS    => 'badge-info',
-            self::PASSED         => 'badge-success',
-            self::FAILED         => 'badge-danger',
-            self::RECLEAN_BOOKED => 'badge-warning',
-            default              => 'badge-light',
-        };
+        return \Modules\QualityControl\Support\Enums\InspectionStatus::badgeClass($status);
     }
 }

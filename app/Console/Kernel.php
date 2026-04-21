@@ -44,6 +44,7 @@ use App\Console\Commands\SuperAdmin\FreeLicenceRenew;
 use App\Console\Commands\SuperAdmin\TrialExpire;
 use App\Console\Commands\SuperAdmin\RepairCompanyProvisioning;
 use App\Console\Commands\TitanFilamentCheckCommand;
+use Modules\QualityControl\Console\Commands\EnforceCorrectiveActionSlaCommand;
 
 class Kernel extends ConsoleKernel
 {
@@ -100,6 +101,9 @@ class Kernel extends ConsoleKernel
 
         // Titan Filament
         TitanFilamentCheckCommand::class,
+
+        // QC Automation
+        EnforceCorrectiveActionSlaCommand::class,
     ];
 
     /**
@@ -174,6 +178,9 @@ class Kernel extends ConsoleKernel
         $schedule->command('app:recalculate-leaves-quotas')->monthly();
 
         $schedule->command('queue:flush')->weekly();
+
+        // QC SLA enforcement — hourly sweep for overdue corrective actions
+        $schedule->command('qc:enforce-corrective-action-sla')->hourly();
 
         // SAAS added one after the other in hours to reduce server load
         $schedule->command('free-licence-renew')->dailyAt('01:00');

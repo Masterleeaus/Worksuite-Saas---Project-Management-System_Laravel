@@ -8,13 +8,24 @@ use Modules\QualityControl\Entities\InspectionTemplate;
 use Modules\QualityControl\Support\ModuleAccess;
 use Illuminate\Support\Facades\Event;
 use Modules\QualityControl\Entities\QcRecord;
-use Modules\QualityControl\Services\ExecutionRecordService;
+use Modules\QualityControl\Domain\Quality\Actions\CreateComplaintFromQcFailureAction;
+use Modules\QualityControl\Domain\Quality\Actions\CreateQcRecordAction;
+use Modules\QualityControl\Domain\Quality\Actions\MarkNeedsRecleanAction;
+use Modules\QualityControl\Domain\Quality\Actions\PassQcRecordAction;
+use Modules\QualityControl\Domain\Quality\DTOs\QcRecordData;
 use Modules\QualityControl\Http\Requests\StoreQcRecordRequest;
 use Modules\QualityControl\Http\Requests\UpdateQcRecordRequest;
+use Modules\QualityControl\Services\ExecutionRecordService;
 
 class QcRecordController extends AccountBaseController
 {
-    public function __construct(private readonly ExecutionRecordService $records)
+    public function __construct(
+        private readonly ExecutionRecordService $records,
+        private readonly CreateQcRecordAction $createQcRecord,
+        private readonly PassQcRecordAction $passQcRecord,
+        private readonly MarkNeedsRecleanAction $markNeedsReclean,
+        private readonly CreateComplaintFromQcFailureAction $createComplaintFromQcFailure,
+    )
     {
         parent::__construct();
         $this->pageTitle = __('quality_control::sidebar.qc_records');
@@ -60,9 +71,10 @@ class QcRecordController extends AccountBaseController
     {
         abort_403(!in_array(ModuleAccess::permissionLevel('add_quality_control'), ['all']));
 
-        $validated = $request->validated();
-
-        $record = $this->records->create($validated, $this->user);
+        $record = $this->createQcRecord->handle(
+            QcRecordData::fromArray($request->validated()),
+            $this->user
+        );
 
         $this->maybeAutoTriggerReclean($record);
 
@@ -111,9 +123,7 @@ class QcRecordController extends AccountBaseController
     {
         abort_403(!in_array(ModuleAccess::permissionLevel('edit_quality_control'), ['all']));
 
-        $validated = $request->validated();
-
-        $record = $this->records->update((int) $id, $validated, $this->user->company_id ?? null);
+        $record = $this->records->update((int) $id, $request->validated(), $this->user->company_id ?? null);
         $this->maybeAutoTriggerReclean($record);
 
         return redirect()
@@ -134,10 +144,7 @@ class QcRecordController extends AccountBaseController
             return back()->with('warning', __('quality_control::messages.reclean_already_triggered'));
         }
 
-        $record->reclean_triggered    = true;
-        $record->reclean_triggered_at = now();
-        $record->status               = 'reclean_required';
-        $record->save();
+        $record = $this->markNeedsReclean->handle($record, (string) $request->input('reason', 'manual_trigger'));
 
         // Dispatch a loose-coupled event that other modules can listen to.
         Event::dispatch('quality_control.reclean_triggered', [$record]);
@@ -152,7 +159,8 @@ class QcRecordController extends AccountBaseController
     public function approve(Request $request, $id)
     {
         abort_403(!in_array(ModuleAccess::permissionLevel('edit_quality_control'), ['all']));
-        $record = $this->records->markApproved((int) $id, $this->user->company_id ?? null);
+        $record = $this->records->findForTenant((int) $id, $this->user->company_id ?? null);
+        $this->passQcRecord->handle($record);
 
         return back()->with('success', __('messages.updateSuccess'));
     }
@@ -160,7 +168,8 @@ class QcRecordController extends AccountBaseController
     public function requestReclean(Request $request, $id)
     {
         abort_403(!in_array(ModuleAccess::permissionLevel('trigger_reclean'), ['all']));
-        $record = $this->records->markNeedsReclean((int) $id, $this->user->company_id ?? null);
+        $record = $this->records->findForTenant((int) $id, $this->user->company_id ?? null);
+        $record = $this->markNeedsReclean->handle($record, (string) $request->input('reason', 'manual_request'));
         Event::dispatch('quality_control.reclean_triggered', [$record]);
 
         return back()->with('success', __('quality_control::messages.reclean_triggered'));
@@ -176,10 +185,14 @@ class QcRecordController extends AccountBaseController
             return;
         }
 
-        $record->status = 'reclean_required';
-        $record->save();
+        $record = $this->markNeedsReclean->handle($record, 'below_threshold');
 
         Event::dispatch('quality_control.reclean_triggered', [$record]);
+        Event::dispatch('quality_control.record_failed', [$record]);
+
+        if (config('quality_control.auto_create_complaint_on_failed_qc', true)) {
+            $this->createComplaintFromQcFailure->handle($record);
+        }
 
         if (config('quality_control.create_issue_on_needs_reclean', true)) {
             Event::dispatch('inspection.needs_reclean', [$record->booking_id, $record->cleaner_id, $record->id]);

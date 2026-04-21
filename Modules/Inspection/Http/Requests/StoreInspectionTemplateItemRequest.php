@@ -2,30 +2,16 @@
 
 namespace Modules\Inspection\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-
-class StoreInspectionTemplateItemRequest extends FormRequest
+/**
+ * @deprecated Compatibility bridge request.
+ *
+ * Validation rules for inspection template items are owned by QualityControl.
+ * This class extends the canonical QC request so that Inspection routes continue
+ * to work without duplicating rule definitions.
+ *
+ * @see \Modules\QualityControl\Http\Requests\StoreInspectionTemplateItemRequest
+ */
+class StoreInspectionTemplateItemRequest extends \Modules\QualityControl\Http\Requests\StoreInspectionTemplateItemRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
-    public function rules(): array
-    {
-        return [
-            'item_name' => ['required', 'string', 'max:191'],
-            'standard' => ['nullable', 'string', 'max:191'],
-            'sort_order' => ['nullable', 'integer', 'min:0'],
-            'is_required' => ['nullable', 'boolean'],
-        ];
-    }
-
-    protected function prepareForValidation(): void
-    {
-        $this->merge([
-            'sort_order' => (int) $this->input('sort_order', 0),
-            'is_required' => (bool) $this->input('is_required', false),
-        ]);
-    }
+    // No overrides. Inherits all validation rules from QC canonical request.
 }

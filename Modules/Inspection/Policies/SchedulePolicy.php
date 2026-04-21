@@ -2,14 +2,17 @@
 
 namespace Modules\Inspection\Policies;
 
-use App\Models\User;
-use Modules\QualityControl\Support\InspectionPermissions;
-use Modules\QualityControl\Support\ModuleAccess;
-
-class SchedulePolicy
+/**
+ * @deprecated Compatibility bridge policy.
+ *
+ * All schedule permission checks are owned by QualityControl.
+ * This class extends the canonical QC SchedulePolicy so that
+ * Inspection-namespaced policy lookups resolve with identical rules
+ * without duplicating authorization logic.
+ *
+ * @see \Modules\QualityControl\Policies\SchedulePolicy
+ */
+class SchedulePolicy extends \Modules\QualityControl\Policies\SchedulePolicy
 {
-    public function viewAny(User $user): bool
-    {
-        return ModuleAccess::can(InspectionPermissions::VIEW, ['all'], $user);
-    }
+    // No overrides. Inherits all authorization logic from QC canonical policy.
 }

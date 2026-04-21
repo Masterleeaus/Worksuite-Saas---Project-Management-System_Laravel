@@ -2,29 +2,16 @@
 
 namespace Modules\Inspection\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-
-class UpdateInspectionTemplateRequest extends FormRequest
+/**
+ * @deprecated Compatibility bridge request.
+ *
+ * Validation rules for updating inspection templates are owned by QualityControl.
+ * This class extends the canonical QC request so that Inspection routes continue
+ * to work without duplicating rule definitions.
+ *
+ * @see \Modules\QualityControl\Http\Requests\UpdateInspectionTemplateRequest
+ */
+class UpdateInspectionTemplateRequest extends \Modules\QualityControl\Http\Requests\UpdateInspectionTemplateRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
-    public function rules(): array
-    {
-        return [
-            'name' => ['required', 'string', 'max:191'],
-            'trade' => ['nullable', 'string', 'max:191'],
-            'description' => ['nullable', 'string', 'max:2000'],
-            'is_active' => ['nullable', 'boolean'],
-        ];
-    }
-
-    protected function prepareForValidation(): void
-    {
-        $this->merge([
-            'is_active' => (bool) $this->input('is_active', false),
-        ]);
-    }
+    // No overrides. Inherits all validation rules from QC canonical request.
 }
