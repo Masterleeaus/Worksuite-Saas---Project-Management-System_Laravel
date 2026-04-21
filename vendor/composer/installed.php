@@ -3,7 +3,7 @@
         'name' => 'laravel/laravel',
         'pretty_version' => 'dev-copilot/upgrade-accountings-module',
         'version' => 'dev-copilot/upgrade-accountings-module',
-        'reference' => '7d08e8123b540707ee1f98d8bc9b8970764af8e0',
+        'reference' => '33668b14eb870da2f7c1aac6e41124f7816ff45c',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -1269,7 +1269,7 @@
         'laravel/laravel' => array(
             'pretty_version' => 'dev-copilot/upgrade-accountings-module',
             'version' => 'dev-copilot/upgrade-accountings-module',
-            'reference' => '7d08e8123b540707ee1f98d8bc9b8970764af8e0',
+            'reference' => '33668b14eb870da2f7c1aac6e41124f7816ff45c',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
