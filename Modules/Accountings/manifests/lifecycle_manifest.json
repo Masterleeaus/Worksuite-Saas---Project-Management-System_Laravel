@@ -1,0 +1,15 @@
+{
+  "stages": [
+    "visit_cost_calculated",
+    "job_cost_finalized",
+    "invoice_posted",
+    "payment_recorded",
+    "period_closed"
+  ],
+  "hooks": [
+    "visit_completed",
+    "invoice_issued",
+    "payment_received",
+    "contract_cycle_closed"
+  ]
+}

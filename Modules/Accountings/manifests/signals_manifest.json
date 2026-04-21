@@ -1,0 +1,16 @@
+{
+  "produces": [
+    "account.transaction.posted",
+    "account.invoice.adjusted",
+    "account.payment.received",
+    "account.period.closed",
+    "account.margin.warning",
+    "account.contract.unprofitable"
+  ],
+  "consumes": [
+    "visit.completed",
+    "invoice.issued",
+    "payment.received",
+    "contract.cycle.closed"
+  ]
+}

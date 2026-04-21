@@ -1,0 +1,5 @@
+{
+  "package": "accountings",
+  "provides": ["cleaning-accounting-engine", "signal-emission", "profitability-analytics"],
+  "depends_on": []
+}

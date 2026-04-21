@@ -1,0 +1,14 @@
+{
+  "public": [],
+  "internal": [
+    "POST /api/v1/accountings/visits/{visitRef}/cost",
+    "POST /api/v1/accountings/invoices/{invoiceId}/ledger",
+    "POST /api/v1/accountings/invoices/{invoiceId}/adjust",
+    "POST /api/v1/accountings/invoices/{invoiceId}/writeoff",
+    "POST /api/v1/accountings/payments/{paymentId}/record",
+    "POST /api/v1/accountings/periods/close",
+    "GET /api/v1/accountings/profitability/site/{siteRef}",
+    "GET /api/v1/accountings/profitability/contract/{contractRef}",
+    "GET /api/v1/accountings/transactions"
+  ]
+}

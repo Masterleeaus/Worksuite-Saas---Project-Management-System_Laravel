@@ -1,0 +1,4 @@
+{
+  "channels": ["internal_dashboard"],
+  "capabilities": ["financial_alerts", "profitability_warnings"]
+}

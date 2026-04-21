@@ -1,0 +1,9 @@
+{
+  "surfaces": [
+    "accountings.dashboard",
+    "accountings.visit-cost-explorer",
+    "accountings.site-profitability",
+    "accountings.contract-profitability",
+    "accountings.period-close"
+  ]
+}

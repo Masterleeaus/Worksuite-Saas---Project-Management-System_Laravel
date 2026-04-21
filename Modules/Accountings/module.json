@@ -1,15 +1,61 @@
 {
     "name": "Accountings",
     "alias": "accountings",
-    "description": "Accounting, GST, Chart of Accounts, Xero/MYOB integration, bank reconciliation",
-    "keywords": ["accounting", "gst", "xero", "myob", "invoices", "expenses"],
+    "description": "Cleaning-business accounting engine with costing, profitability, ledger workflows, and Filament operator surfaces",
+    "keywords": ["accounting", "job costing", "profitability", "ledger", "signals", "cleaning"],
     "priority": 0,
     "active": 1,
     "providers": [
         "Modules\\Accountings\\Providers\\AccountingsServiceProvider",
-        "Modules\\Accountings\\Providers\\EventServiceProvider"
+        "Modules\\Accountings\\Providers\\EventServiceProvider",
+        "Modules\\Accountings\\Providers\\AccountingsFilamentServiceProvider"
     ],
     "aliases": {},
     "files": [],
-    "version": "1.0.2"
+    "version": "1.1.0",
+    "api_routes": [
+        "api/v1/accountings/visits/{visitRef}/cost",
+        "api/v1/accountings/invoices/{invoiceId}/ledger",
+        "api/v1/accountings/invoices/{invoiceId}/adjust",
+        "api/v1/accountings/invoices/{invoiceId}/writeoff",
+        "api/v1/accountings/payments/{paymentId}/record",
+        "api/v1/accountings/periods/close",
+        "api/v1/accountings/profitability/site/{siteRef}",
+        "api/v1/accountings/profitability/contract/{contractRef}",
+        "api/v1/accountings/transactions"
+    ],
+    "ai_tools": "manifests/ai_tools.json",
+    "signals_manifest": "manifests/signals_manifest.json",
+    "lifecycle_manifest": "manifests/lifecycle_manifest.json",
+    "api_manifest": "manifests/api_manifest.json",
+    "cms_surfaces": "manifests/cms_manifest.json",
+    "omni_manifest": "manifests/omni_manifest.json",
+    "package_manifest": "manifests/package_manifest.json",
+    "permissions": [
+        "view_accounts",
+        "post_transactions",
+        "adjust_invoices",
+        "approve_writeoffs",
+        "close_periods",
+        "view_profitability_reports",
+        "export_financial_reports"
+    ],
+    "roles_permissions": {
+        "admin": [
+            "view_accounts",
+            "post_transactions",
+            "adjust_invoices",
+            "approve_writeoffs",
+            "close_periods",
+            "view_profitability_reports",
+            "export_financial_reports"
+        ],
+        "manager": [
+            "view_accounts",
+            "post_transactions",
+            "adjust_invoices",
+            "view_profitability_reports",
+            "export_financial_reports"
+        ]
+    }
 }

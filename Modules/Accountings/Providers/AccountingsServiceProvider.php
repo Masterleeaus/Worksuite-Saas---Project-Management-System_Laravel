@@ -57,10 +57,22 @@ class AccountingsServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->register(RouteServiceProvider::class);
+        $this->app->register(AccountingsFilamentServiceProvider::class);
         $this->app->singleton(
             \Modules\Accountings\Services\FinancialYearService::class,
             \Modules\Accountings\Services\FinancialYearService::class
         );
+        $this->app->singleton(\Modules\Accountings\Services\AccountingSignalService::class);
+        $this->app->singleton(\Modules\Accountings\Services\LedgerPostingService::class);
+        $this->app->singleton(\Modules\Accountings\Services\VisitCostService::class);
+        $this->app->singleton(\Modules\Accountings\Services\SiteProfitabilityService::class);
+        $this->app->singleton(\Modules\Accountings\Services\ContractProfitabilityService::class);
+        $this->app->singleton(\Modules\Accountings\Services\TransactionAggregationService::class);
+        $this->app->singleton(\Modules\Accountings\Services\InvoiceAdjustmentService::class);
+        $this->app->singleton(\Modules\Accountings\Services\WriteoffService::class);
+        $this->app->singleton(\Modules\Accountings\Services\RevenueRecognitionService::class);
+        $this->app->singleton(\Modules\Accountings\Services\DeferredRevenueService::class);
+        $this->app->singleton(\Modules\Accountings\Services\CleaningMarginAnalyticsService::class);
     }
 
     /**

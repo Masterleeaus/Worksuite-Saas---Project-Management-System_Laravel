@@ -1,0 +1,7 @@
+{
+  "tools": [
+    {"name": "accountings.post_visit_cost", "risk": "medium", "approval": "operator"},
+    {"name": "accountings.adjust_invoice", "risk": "medium", "approval": "operator"},
+    {"name": "accountings.close_period", "risk": "high", "approval": "operator"}
+  ]
+}
