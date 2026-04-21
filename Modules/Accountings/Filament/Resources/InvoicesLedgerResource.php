@@ -31,8 +31,8 @@ class InvoicesLedgerResource extends BaseTenantResource
         return $table->columns([
             Tables\Columns\TextColumn::make('invoice_number')->searchable(),
             Tables\Columns\TextColumn::make('issue_date')->date(),
-            Tables\Columns\TextColumn::make('total')->money('USD', divideBy: 1),
-            Tables\Columns\TextColumn::make('due_amount')->money('USD', divideBy: 1),
+            Tables\Columns\TextColumn::make('total')->formatStateUsing(fn ($state): string => number_format((float) $state, 2)),
+            Tables\Columns\TextColumn::make('due_amount')->formatStateUsing(fn ($state): string => number_format((float) $state, 2)),
             Tables\Columns\TextColumn::make('status')->badge(),
             Tables\Columns\IconColumn::make('exported_to_xero')->boolean(),
         ]);

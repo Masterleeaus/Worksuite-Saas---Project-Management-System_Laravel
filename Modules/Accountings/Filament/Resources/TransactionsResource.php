@@ -31,7 +31,7 @@ class TransactionsResource extends BaseTenantResource
         return $table->columns([
             Tables\Columns\TextColumn::make('transaction_type')->label('Type')->badge(),
             Tables\Columns\TextColumn::make('reference')->searchable(),
-            Tables\Columns\TextColumn::make('amount')->money('USD', divideBy: 1),
+            Tables\Columns\TextColumn::make('amount')->formatStateUsing(fn ($state): string => number_format((float) $state, 2)),
             Tables\Columns\TextColumn::make('site_ref')->label('Site'),
             Tables\Columns\TextColumn::make('contract_ref')->label('Contract'),
             Tables\Columns\TextColumn::make('occurred_at')->dateTime(),
