@@ -6,14 +6,17 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Modules\BookingModule\Entities\Schedule;
 use Modules\BookingModule\Entities\ScheduleAssignment;
+use Modules\BookingModule\Jobs\SendBookingReminderJob;
+use Modules\BookingModule\Services\ScheduleAssignmentService;
 use Modules\BookingModule\Services\ScheduleCapacityService;
 use Modules\BookingModule\Services\ScheduleConflictService;
 
 class DispatchScheduleUpdateService
 {
     public function __construct(
-        protected ScheduleCapacityService $capacity,
-        protected ScheduleConflictService $conflicts,
+        protected ScheduleCapacityService   $capacity,
+        protected ScheduleConflictService   $conflicts,
+        protected ScheduleAssignmentService $assignmentService,
     ) {}
 
     /**
@@ -27,7 +30,9 @@ class DispatchScheduleUpdateService
             return ['ok' => false, 'message' => 'Schedule not found'];
         }
 
-        $toUserId = isset($payload['user_id']) && $payload['user_id'] ? (int)$payload['user_id'] : null;
+        $fromUserId = $schedule->assigned_to;
+        $toUserId   = isset($payload['user_id']) && $payload['user_id'] ? (int)$payload['user_id'] : null;
+        $isReassign = $fromUserId && $toUserId && $fromUserId !== $toUserId;
 
         $schedule->date = $payload['date'];
         $schedule->start_time = $payload['start_time'];
@@ -75,6 +80,14 @@ class DispatchScheduleUpdateService
         $history->action = 'dispatch_update';
         $history->notes = 'Dispatch quick edit update';
         $history->save();
+
+        // Dispatch assignment-trigger reminders when user changes.
+        if ($toUserId) {
+            $trigger = $isReassign
+                ? SendBookingReminderJob::TRIGGER_RESCHEDULE
+                : SendBookingReminderJob::TRIGGER_ASSIGN;
+            $this->assignmentService->dispatchRemindersForSchedule($schedule, $trigger);
+        }
 
         return ['ok' => true, 'message' => 'Updated', 'schedule_id' => $schedule->id];
     }

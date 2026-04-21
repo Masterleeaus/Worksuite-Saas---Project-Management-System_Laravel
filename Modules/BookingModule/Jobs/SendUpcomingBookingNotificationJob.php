@@ -41,6 +41,7 @@ class SendUpcomingBookingNotificationJob implements ShouldQueue
                 $schedule->id,
                 $this->companyId,
                 $this->leadMinutes,
+                SendBookingReminderJob::TRIGGER_SCHEDULED,
             )->onQueue('notifications');
         }
     }

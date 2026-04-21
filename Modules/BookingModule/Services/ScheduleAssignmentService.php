@@ -62,25 +62,39 @@ class ScheduleAssignmentService
 
         // Dispatch reminder jobs when enabled by automation settings.
         if ($toUserId && $companyId) {
-            if ($isReassign) {
-                $this->maybeDispatchReminders($schedule, $companyId, 'reschedule');
-            } else {
-                $this->maybeDispatchReminders($schedule, $companyId, 'assign');
-            }
+            $trigger = $isReassign
+                ? SendBookingReminderJob::TRIGGER_RESCHEDULE
+                : SendBookingReminderJob::TRIGGER_ASSIGN;
+            $this->maybeDispatchReminders($schedule, $companyId, $trigger);
         }
 
         return $schedule;
     }
 
     /**
-     * Dispatch SendBookingReminderJob for each configured lead time if
-     * the corresponding automation setting is enabled for this company.
+     * Public entry point for other services (e.g. dispatch services) that
+     * perform their own assignment logic but want consistent reminder dispatch.
      *
      * @param  'assign'|'reschedule'  $trigger
      */
+    public function dispatchRemindersForSchedule(Schedule $schedule, string $trigger): void
+    {
+        $companyId = (int) ($schedule->company_id ?? 0);
+        if (!$companyId) {
+            return;
+        }
+        $this->maybeDispatchReminders($schedule, $companyId, $trigger);
+    }
+
+    /**
+     * Dispatch SendBookingReminderJob for each configured lead time if
+     * the corresponding automation setting is enabled for this company.
+     *
+     * @param  string  $trigger  One of the SendBookingReminderJob::TRIGGER_* constants.
+     */
     private function maybeDispatchReminders(Schedule $schedule, int $companyId, string $trigger): void
     {
-        $enabled = $trigger === 'reschedule'
+        $enabled = $trigger === SendBookingReminderJob::TRIGGER_RESCHEDULE
             ? $this->reminderService->remindersOnRescheduleForCompany($companyId)
             : $this->reminderService->remindersOnAssignForCompany($companyId);
 
@@ -96,7 +110,7 @@ class ScheduleAssignmentService
                 continue;
             }
 
-            SendBookingReminderJob::dispatch($schedule->id, $companyId, $leadMinutes)
+            SendBookingReminderJob::dispatch($schedule->id, $companyId, $leadMinutes, $trigger)
                 ->onQueue('notifications');
         }
     }

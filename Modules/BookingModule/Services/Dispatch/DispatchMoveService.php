@@ -6,14 +6,17 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Modules\BookingModule\Entities\Schedule;
 use Modules\BookingModule\Entities\ScheduleAssignment;
+use Modules\BookingModule\Jobs\SendBookingReminderJob;
+use Modules\BookingModule\Services\ScheduleAssignmentService;
 use Modules\BookingModule\Services\ScheduleCapacityService;
 use Modules\BookingModule\Services\ScheduleConflictService;
 
 class DispatchMoveService
 {
     public function __construct(
-        protected ScheduleCapacityService $capacity,
-        protected ScheduleConflictService $conflicts,
+        protected ScheduleCapacityService  $capacity,
+        protected ScheduleConflictService  $conflicts,
+        protected ScheduleAssignmentService $assignmentService,
     ) {}
 
     public function move(int $scheduleId, ?int $toUserId, string $date, string $startTime, string $endTime, string $note = ''): array
@@ -24,6 +27,7 @@ class DispatchMoveService
         }
 
         $fromUserId = $schedule->assigned_to ?? $schedule->user_id;
+        $isReassign = $fromUserId && $toUserId && $fromUserId !== $toUserId;
 
         // Update timing
         $schedule->date = Carbon::parse($date)->toDateString();
@@ -70,6 +74,14 @@ class DispatchMoveService
             'created_by' => $schedule->created_by,
             'workspace' => $schedule->workspace,
         ]);
+
+        // Dispatch assignment-trigger reminders — drag/drop is always a reschedule event.
+        if ($toUserId) {
+            $trigger = $isReassign
+                ? SendBookingReminderJob::TRIGGER_RESCHEDULE
+                : SendBookingReminderJob::TRIGGER_ASSIGN;
+            $this->assignmentService->dispatchRemindersForSchedule($schedule, $trigger);
+        }
 
         return [
             'ok' => true,
