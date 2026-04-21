@@ -2,34 +2,17 @@
 
 namespace Modules\Inspection\Policies;
 
-use App\Models\User;
-use Modules\QualityControl\Support\InspectionPermissions;
-use Modules\QualityControl\Support\ModuleAccess;
-
-class TemplatePolicy
+/**
+ * @deprecated Compatibility bridge policy.
+ *
+ * All template permission checks are owned by QualityControl.
+ * This class extends the canonical QC TemplatePolicy so that
+ * Inspection-namespaced policy lookups resolve with identical rules
+ * without duplicating authorization logic.
+ *
+ * @see \Modules\QualityControl\Policies\TemplatePolicy
+ */
+class TemplatePolicy extends \Modules\QualityControl\Policies\TemplatePolicy
 {
-    public function viewAny(User $user): bool
-    {
-        return ModuleAccess::can(InspectionPermissions::VIEW, ['all'], $user);
-    }
-
-    public function view(User $user): bool
-    {
-        return $this->viewAny($user);
-    }
-
-    public function create(User $user): bool
-    {
-        return ModuleAccess::can(InspectionPermissions::MANAGE_TEMPLATES, ['all'], $user);
-    }
-
-    public function update(User $user): bool
-    {
-        return ModuleAccess::can(InspectionPermissions::MANAGE_TEMPLATES, ['all'], $user);
-    }
-
-    public function delete(User $user): bool
-    {
-        return ModuleAccess::can(InspectionPermissions::MANAGE_TEMPLATES, ['all'], $user);
-    }
+    // No overrides. Inherits all authorization logic from QC canonical policy.
 }
