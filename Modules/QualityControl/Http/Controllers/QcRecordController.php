@@ -43,7 +43,12 @@ class QcRecordController extends AccountBaseController
 
         $companyId = $this->user->company_id ?? null;
 
-        $records = $this->records->listForCompany($companyId)
+        $records = $this->records->listForCompany($companyId, [
+            'property_id' => $request->integer('property_id'),
+            'unit_id' => $request->integer('unit_id'),
+            'room_id' => $request->integer('room_id'),
+            'visit_id' => $request->integer('visit_id'),
+        ])
             ->latest()
             ->paginate(20);
 

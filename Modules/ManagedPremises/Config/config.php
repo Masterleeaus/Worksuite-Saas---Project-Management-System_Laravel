@@ -13,5 +13,18 @@ return [
         'jobs' => true,
         'documents' => true,
         'titan_zero' => false,
+        'quality_control_owner' => true,
+    ],
+
+    'ownership' => [
+        'premises_master' => 'managedpremises',
+        'inspection_engine' => 'quality_control',
+    ],
+
+    'defaults' => [
+        'approval_mode' => 'manual',
+        'hazard_severity' => 'medium',
+        'service_window' => 'business_hours',
+        'service_plan_state' => 'active',
     ],
 ];
