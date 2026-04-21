@@ -140,6 +140,8 @@ class Kernel extends ConsoleKernel
         // $schedule->command('fetch-ticket-emails')->everyMinute(); // phpcs:ignore
         $schedule->command('send-auto-followup-reminder')->everyMinute();
         $schedule->command('send-time-tracker')->everyMinute();
+        $schedule->command('bookingmodule:send-reminders')->everyMinute()->withoutOverlapping();
+        $schedule->command('bookingmodule:prune-reminder-logs')->dailyAt('03:00');
 
 
         // Daily added different time to reduce server load

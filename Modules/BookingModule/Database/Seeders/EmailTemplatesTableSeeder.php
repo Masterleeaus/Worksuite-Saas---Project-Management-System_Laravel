@@ -257,28 +257,43 @@ class EmailTemplatesTableSeeder extends Seeder
 ];
 
         foreach ($emailTemplate as $eTemp) {
-            $table = EmailTemplate::where('name', $eTemp)->where('module_name', 'Appointment')->exists();
-            if (!$table) {
-                $emailtemplate = EmailTemplate::create(
-                    [
-                        'name' => $eTemp,
-                        'from' => 'Appointment',
-                        'module_name' => 'Appointment',
-                        'created_by' => 1,
-                        'workspace_id' => 0
-                    ]
-                );
-
-                foreach ($defaultTemplate[$eTemp]['lang'] as $lang => $content) {
-                    EmailTemplateLang::create(
+            // Handle simple string entries (have entries in $defaultTemplate)
+            if (is_string($eTemp)) {
+                $table = EmailTemplate::where('name', $eTemp)->where('module_name', 'Appointment')->exists();
+                if (!$table) {
+                    $emailtemplate = EmailTemplate::create(
                         [
-                            'parent_id' => $emailtemplate->id,
-                            'lang' => $lang,
-                            'subject' => $defaultTemplate[$eTemp]['subject'],
-                            'variables' => $defaultTemplate[$eTemp]['variables'],
-                            'content' => $content,
+                            'name' => $eTemp,
+                            'from' => 'Appointment',
+                            'module_name' => 'Appointment',
+                            'created_by' => 1,
+                            'workspace_id' => 0
                         ]
                     );
+
+                    foreach ($defaultTemplate[$eTemp]['lang'] as $lang => $content) {
+                        EmailTemplateLang::create(
+                            [
+                                'parent_id' => $emailtemplate->id,
+                                'lang' => $lang,
+                                'subject' => $defaultTemplate[$eTemp]['subject'],
+                                'variables' => $defaultTemplate[$eTemp]['variables'],
+                                'content' => $content,
+                            ]
+                        );
+                    }
+                }
+            } elseif (is_array($eTemp) && isset($eTemp['name'])) {
+                // Handle array entries (Appointment Assigned, Appointment Reassigned, etc.)
+                $table = EmailTemplate::where('name', $eTemp['name'])->where('module_name', 'Appointment')->exists();
+                if (!$table) {
+                    EmailTemplate::create([
+                        'name'         => $eTemp['name'],
+                        'from'         => 'Appointment',
+                        'module_name'  => 'Appointment',
+                        'created_by'   => 1,
+                        'workspace_id' => 0,
+                    ]);
                 }
             }
         }

@@ -13,6 +13,9 @@ class BookingModuleDatabaseSeeder extends Seeder
 
         $this->call([
             BookingModulePermissionSeeder::class,
+            PermissionTableSeeder::class,
+            EmailTemplatesTableSeeder::class,
+            NotificationsTableSeeder::class,
         ]);
     }
 }
