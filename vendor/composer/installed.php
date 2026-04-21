@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'laravel/laravel',
-        'pretty_version' => 'dev-copilot/refactor-existing-modules',
-        'version' => 'dev-copilot/refactor-existing-modules',
-        'reference' => '97638c86e056cdb2e41269b45c6c80e3d1a96b66',
+        'pretty_version' => 'dev-copilot/upgrade-accountings-module',
+        'version' => 'dev-copilot/upgrade-accountings-module',
+        'reference' => '7d08e8123b540707ee1f98d8bc9b8970764af8e0',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -1267,9 +1267,9 @@
             'dev_requirement' => false,
         ),
         'laravel/laravel' => array(
-            'pretty_version' => 'dev-copilot/refactor-existing-modules',
-            'version' => 'dev-copilot/refactor-existing-modules',
-            'reference' => '97638c86e056cdb2e41269b45c6c80e3d1a96b66',
+            'pretty_version' => 'dev-copilot/upgrade-accountings-module',
+            'version' => 'dev-copilot/upgrade-accountings-module',
+            'reference' => '7d08e8123b540707ee1f98d8bc9b8970764af8e0',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
