@@ -3,6 +3,7 @@
 namespace Modules\Accountings\Observers;
 
 use Illuminate\Support\Facades\Log;
+use Modules\Accountings\Jobs\SyncInvoiceLedgerEntriesJob;
 use Modules\Accountings\Jobs\XeroSyncJob;
 use Modules\Accountings\Services\FinancialYearService;
 
@@ -40,11 +41,13 @@ class InvoiceAccountingObserver
     /**
      * Handle the Invoice "saved" event.
      * Dispatches XeroSyncJob when Xero columns are present and the invoice
-     * has not already been exported.
+     * has not already been exported. Also queues a ledger-sync job for
+     * newly-created invoices so the accounting engine records them.
      */
     public function saved(mixed $invoice): void
     {
         $this->dispatchXeroSync($invoice);
+        $this->dispatchLedgerSync($invoice);
     }
 
     private function setFinancialYear(mixed $invoice): void
@@ -59,6 +62,28 @@ class InvoiceAccountingObserver
         } catch (\Throwable $e) {
             Log::warning('[InvoiceAccountingObserver] Could not set financial_year', [
                 'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    private function dispatchLedgerSync(mixed $invoice): void
+    {
+        try {
+            // Only dispatch for newly-created invoices to avoid duplicate postings.
+            if (!($invoice->wasRecentlyCreated ?? false)) {
+                return;
+            }
+
+            $companyId = $invoice->company_id ?? null;
+            if (!$companyId || !$invoice->id) {
+                return;
+            }
+
+            SyncInvoiceLedgerEntriesJob::dispatch((int) $invoice->id, (int) $companyId);
+        } catch (\Throwable $e) {
+            Log::warning('[InvoiceAccountingObserver] Could not dispatch SyncInvoiceLedgerEntriesJob', [
+                'invoice_id' => $invoice->id ?? null,
+                'error'      => $e->getMessage(),
             ]);
         }
     }

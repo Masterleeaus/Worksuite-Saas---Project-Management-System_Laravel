@@ -47,6 +47,12 @@ class AccountingsServiceProvider extends ServiceProvider
                 \Modules\Accountings\Observers\InvoiceAccountingObserver::class
             );
         }
+
+        if (class_exists(\App\Models\Payment::class)) {
+            \App\Models\Payment::observe(
+                \Modules\Accountings\Observers\PaymentAccountingObserver::class
+            );
+        }
     }
 
     /**
@@ -73,6 +79,7 @@ class AccountingsServiceProvider extends ServiceProvider
         $this->app->singleton(\Modules\Accountings\Services\RevenueRecognitionService::class);
         $this->app->singleton(\Modules\Accountings\Services\DeferredRevenueService::class);
         $this->app->singleton(\Modules\Accountings\Services\CleaningMarginAnalyticsService::class);
+        $this->app->singleton(\Modules\Accountings\Services\ReferenceResolverService::class);
     }
 
     /**

@@ -23,12 +23,20 @@ class XeroSyncTest extends TestCase
     {
         parent::setUp();
 
-        // Create a minimal invoices table for testing
+        // SQLite enforces FK constraints when enabled; disable for this test
+        // so we can insert minimal invoice rows without parent company/user records.
+        \Illuminate\Support\Facades\DB::statement('PRAGMA foreign_keys = OFF');
+
+        // Create a minimal invoices table for testing.
+        // issue_date, due_date, sub_total must be included (NOT NULL in the production schema).
         if (!Schema::hasTable('invoices')) {
             Schema::create('invoices', function ($table) {
                 $table->id();
                 $table->unsignedBigInteger('company_id')->default(1);
                 $table->string('invoice_number')->default('INV-001');
+                $table->date('issue_date');
+                $table->date('due_date');
+                $table->double('sub_total')->default(0);
                 $table->decimal('total', 16, 2)->default(0);
                 $table->boolean('exported_to_xero')->default(false);
                 $table->string('xero_invoice_id')->nullable();
@@ -63,6 +71,9 @@ class XeroSyncTest extends TestCase
         $invoiceId = \Illuminate\Support\Facades\DB::table('invoices')->insertGetId([
             'company_id'       => 1,
             'invoice_number'   => 'INV-TEST-001',
+            'issue_date'       => now()->toDateString(),
+            'due_date'         => now()->addDays(30)->toDateString(),
+            'sub_total'        => 100.00,
             'total'            => 110.00,
             'exported_to_xero' => false,
             'xero_invoice_id'  => null,
@@ -97,6 +108,9 @@ class XeroSyncTest extends TestCase
         $invoiceId = \Illuminate\Support\Facades\DB::table('invoices')->insertGetId([
             'company_id'       => 1,
             'invoice_number'   => 'INV-ALREADY-EXPORTED',
+            'issue_date'       => now()->toDateString(),
+            'due_date'         => now()->addDays(30)->toDateString(),
+            'sub_total'        => 100.00,
             'total'            => 110.00,
             'exported_to_xero' => true,
             'xero_invoice_id'  => 'XERO-UUID-EXISTING',
