@@ -9,6 +9,8 @@ use Modules\QualityControl\Support\ModuleAccess;
 use Illuminate\Support\Facades\Event;
 use Modules\QualityControl\Entities\QcRecord;
 use Modules\QualityControl\Services\ExecutionRecordService;
+use Modules\QualityControl\Http\Requests\StoreQcRecordRequest;
+use Modules\QualityControl\Http\Requests\UpdateQcRecordRequest;
 
 class QcRecordController extends AccountBaseController
 {
@@ -30,7 +32,12 @@ class QcRecordController extends AccountBaseController
 
         $companyId = $this->user->company_id ?? null;
 
-        $records = $this->records->listForCompany($companyId)
+        $records = $this->records->listForCompany($companyId, [
+            'property_id' => $request->integer('property_id'),
+            'unit_id' => $request->integer('unit_id'),
+            'room_id' => $request->integer('room_id'),
+            'visit_id' => $request->integer('visit_id'),
+        ])
             ->latest()
             ->paginate(20);
 
@@ -49,23 +56,11 @@ class QcRecordController extends AccountBaseController
         return view('quality_control::qc-records.create', $this->data);
     }
 
-    public function store(Request $request)
+    public function store(StoreQcRecordRequest $request)
     {
         abort_403(!in_array(ModuleAccess::permissionLevel('add_quality_control'), ['all']));
 
-        $validated = $request->validate([
-            'booking_id'   => 'nullable|string|max:36',
-            'cleaner_id'   => 'nullable|integer|min:1',
-            'template_id'  => 'nullable|integer|min:1',
-            'schedule_id'  => 'nullable|integer|min:1',
-            'notes'        => 'nullable|string',
-            'inspected_at' => 'nullable|date',
-            'items'        => 'nullable|array',
-            'items.*.item_label' => 'required|string|max:191',
-            'items.*.score'      => 'required|integer|min:0|max:100',
-            'items.*.weight'     => 'nullable|integer|min:0|max:100',
-            'items.*.notes'      => 'nullable|string',
-        ]);
+        $validated = $request->validated();
 
         $record = $this->records->create($validated, $this->user);
 
@@ -112,23 +107,11 @@ class QcRecordController extends AccountBaseController
         return view('quality_control::qc-records.create', $this->data);
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateQcRecordRequest $request, $id)
     {
         abort_403(!in_array(ModuleAccess::permissionLevel('edit_quality_control'), ['all']));
 
-        $validated = $request->validate([
-            'booking_id'   => 'nullable|string|max:36',
-            'cleaner_id'   => 'nullable|integer|min:1',
-            'template_id'  => 'nullable|integer|min:1',
-            'schedule_id'  => 'nullable|integer|min:1',
-            'notes'        => 'nullable|string',
-            'inspected_at' => 'nullable|date',
-            'items'        => 'nullable|array',
-            'items.*.item_label' => 'required|string|max:191',
-            'items.*.score'      => 'required|integer|min:0|max:100',
-            'items.*.weight'     => 'nullable|integer|min:0|max:100',
-            'items.*.notes'      => 'nullable|string',
-        ]);
+        $validated = $request->validated();
 
         $record = $this->records->update((int) $id, $validated, $this->user->company_id ?? null);
         $this->maybeAutoTriggerReclean($record);

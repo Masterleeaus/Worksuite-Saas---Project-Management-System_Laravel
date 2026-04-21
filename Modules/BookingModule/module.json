@@ -17,9 +17,7 @@
         "start.php"
     ],
     "requires": [
-        "ProviderManagement",
-        "ServiceManagement",
-        "ZoneManagement"
+        "ServiceManagement"
     ],
     "active": 1,
     "order": 0,

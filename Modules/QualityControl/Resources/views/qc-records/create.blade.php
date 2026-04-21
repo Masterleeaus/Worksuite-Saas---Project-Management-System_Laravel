@@ -5,7 +5,7 @@
         <div class="row mb-3">
             <div class="col-12 d-flex justify-content-between align-items-center">
                 <h4 class="mb-0"><i class="fa fa-plus-circle mr-1"></i>@lang('quality_control::app.new_qc_record')</h4>
-                <a href="{{ route('qc-records.index') }}" class="btn btn-outline-secondary">
+                <a href="{{ route('qc-records.index', array_filter(['property_id' => request('property_id', old('property_id'))])) }}" class="btn btn-outline-secondary">
                     <i class="fa fa-arrow-left mr-1"></i>@lang('app.back')
                 </a>
             </div>
@@ -15,6 +15,10 @@
             <div class="card-body">
                 <form method="POST" action="{{ route('qc-records.store') }}" id="qcRecordForm">
                     @csrf
+                    <input type="hidden" name="property_id" value="{{ old('property_id', request('property_id')) }}">
+                    <input type="hidden" name="unit_id" value="{{ old('unit_id', request('unit_id')) }}">
+                    <input type="hidden" name="room_id" value="{{ old('room_id', request('room_id')) }}">
+                    <input type="hidden" name="visit_id" value="{{ old('visit_id', request('visit_id')) }}">
 
                     @if($errors->any())
                         <div class="alert alert-danger">
@@ -89,7 +93,7 @@
 
                     <hr>
                     <div class="d-flex justify-content-end">
-                        <a href="{{ route('qc-records.index') }}" class="btn btn-outline-secondary mr-2">@lang('app.cancel')</a>
+                        <a href="{{ route('qc-records.index', array_filter(['property_id' => request('property_id', old('property_id'))])) }}" class="btn btn-outline-secondary mr-2">@lang('app.cancel')</a>
                         <button type="submit" class="btn btn-primary">@lang('app.save')</button>
                     </div>
                 </form>

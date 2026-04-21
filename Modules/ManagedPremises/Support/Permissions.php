@@ -58,11 +58,11 @@ class Permissions
 'managedpremises.visits.update',
 'managedpremises.visits.delete',
 
-// Inspections
-'managedpremises.inspections.view',
-'managedpremises.inspections.create',
-'managedpremises.inspections.update',
-'managedpremises.inspections.delete',
+ // Inspections (deprecated compatibility aliases; execution ownership is in QualityControl)
+ 'managedpremises.inspections.view',
+ 'managedpremises.inspections.create',
+ 'managedpremises.inspections.update',
+ 'managedpremises.inspections.delete',
 
             // Settings
             'managedpremises.settings',
@@ -74,6 +74,7 @@ class Permissions
             'managedpremises.service_plans.manage',
             'managedpremises.visits.view',
             'managedpremises.visits.manage',
+            // Deprecated compatibility aliases (ownership moved to QualityControl)
             'managedpremises.inspections.view',
             'managedpremises.inspections.manage',
             'managedpremises.documents.view',

@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'laravel/laravel',
-        'pretty_version' => 'dev-copilot/remove-thin-duplicate-fsm-modules',
-        'version' => 'dev-copilot/remove-thin-duplicate-fsm-modules',
-        'reference' => '9e8ae1458c3772bda28da2eeb80f5ab028ec755a',
+        'pretty_version' => 'dev-copilot/refactor-existing-modules',
+        'version' => 'dev-copilot/refactor-existing-modules',
+        'reference' => '97638c86e056cdb2e41269b45c6c80e3d1a96b66',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -1267,9 +1267,9 @@
             'dev_requirement' => false,
         ),
         'laravel/laravel' => array(
-            'pretty_version' => 'dev-copilot/remove-thin-duplicate-fsm-modules',
-            'version' => 'dev-copilot/remove-thin-duplicate-fsm-modules',
-            'reference' => '9e8ae1458c3772bda28da2eeb80f5ab028ec755a',
+            'pretty_version' => 'dev-copilot/refactor-existing-modules',
+            'version' => 'dev-copilot/refactor-existing-modules',
+            'reference' => '97638c86e056cdb2e41269b45c6c80e3d1a96b66',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

@@ -6,7 +6,7 @@
             <div class="col-12 d-flex justify-content-between align-items-center">
                 <h4 class="mb-0"><i class="fa fa-clipboard-check mr-1"></i>@lang('quality_control::app.qc_record') #{{ $record->id }}</h4>
                 <div>
-                    <a href="{{ route('qc-records.index') }}" class="btn btn-outline-secondary mr-2">
+                    <a href="{{ route('qc-records.index', array_filter(['property_id' => request('property_id', $record->property_id)])) }}" class="btn btn-outline-secondary mr-2">
                         <i class="fa fa-arrow-left mr-1"></i>@lang('app.back')
                     </a>
                     @if($canTriggerReclean)
@@ -53,6 +53,10 @@
                             <tr>
                                 <th class="text-muted">@lang('quality_control::app.booking')</th>
                                 <td>{{ $record->booking_id ?? '—' }}</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">@lang('managedpremises::app.property')</th>
+                                <td>{{ $record->property_id ? ('#' . $record->property_id) : '—' }}</td>
                             </tr>
                             <tr>
                                 <th class="text-muted">@lang('quality_control::app.cleaner')</th>
